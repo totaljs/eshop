@@ -97,7 +97,7 @@ COMPONENT('gallery', function() {
 		self.refresh();
 		self.element.on('click', '.gallery', function() {
 			var item = $(this);
-			index = parseInt(item.attr('data-index'));
+			self.index = parseInt(item.attr('data-index'));
 			self.show();
 		});
 	};
