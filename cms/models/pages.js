@@ -281,6 +281,11 @@ Page.addOperation('render', function(error, model, options, callback) {
 					custom.settings = response.settings[index++];
 					custom.page = response;
 
+					if (!widgets[key]) {
+						F.error(new Error('Widget # ' + key + ' not found'), 'Page: ' + response.name, response.url);
+						return next();
+					}
+
 					// Executes transform
 					Widget.transform(widgets[key].name, widgets[key], custom, function(err, content) {
 
