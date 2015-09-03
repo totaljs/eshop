@@ -377,7 +377,18 @@
 		}
 
 		$.components.GET(managerurl + '/api/pages/', pages.filter, function(response) {
+
+			// Sorts pages by navigation priority
+			if (pages.filter.navigation) {
+				response.items.sort(function(a, b) {
+					if (a.priority > b.priority)
+						return -1;
+					return a.priority === b.priority ? 0 : 1;
+				});
+			}
+
 			SET((reset ? '' : '+') + 'pages.grid', response.items);
+
 			if (pages.tab !== 'pages')
 				SET('pages.tab', 'pages');
 
@@ -980,7 +991,7 @@
 
 						if (target.prop('tagName') === 'IMG') {
 							FIND('#pages.editor.crop').resize(parseInt(target.attr('data-width')), parseInt(target.attr('data-height')));
-							pages.editor.crop.url = target.attr('src');
+							pages.editor.crop.url = target.attr('data-original') || target.attr('src');
 							pages.editor.crop.alt = target.attr('alt');
 							pages.editor.crop.href = '';
 

@@ -58,3 +58,21 @@ footer { text-align: center; font-size: 12px; padding: 50px 0; color: gray; bord
 .bloglisting a { font-size: 22px; font-weight: 700; font-family: $font; }
 
 .message-success { background-color: #8CC152; color: white; padding: 18px 20px; text-align: center; font-size: 16px; }
+
+#gallery-layer { background-color: rgba(0,0,0,0.5); z-index: 5; left: 0; top: 0; position: fixed; bottom: 0; right: 0; overflow: hidden; display: none; width: 100%; height: 100%; }
+.gallery-close { position: absolute; right: 0; top: 0; font-size: 20px; color: white; cursor: pointer; background-color: black; width: 40px; padding: 5px 0; text-align: center; }
+.gallery-container { display: table; width: 100%; height: 100%; }
+.gallery-container img { width: 100%; border-radius: 4px; }
+.gallery-container > div { display: table-cell; height: 100%; vertical-align: middle; max-width: 100%; }
+.gallery-container .fa { background-color: black; padding: 40px 20px; cursor: pointer; font-size: 20px; user-select: none; color: white; }
+.gallery-next { display: table-cell; width: 15%; text-align: right; }
+.gallery-prev { display: table-cell; width: 15%; }
+.gallery-image { display: table-cell; text-align: center; }
+.gallery-image img { box-shadow: 0 0 20px rgba(0,0,0,0.2); margin: 0 auto; }
+.gallery-alt { color: #E0E0E0; margin-top: 15px; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background-color: #505050; border-radius: 3px; padding: 5px 10px; }
+
+.gallery { cursor: pointer; margin-bottom: 20px; }
+.gallery img { border-radius: 4px; }
+.gallery-info { font-size: 11px; margin-top: 10px; text-align: center; }
+.gallery-info > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
+.gallery-info .fa { margin-right: 3px; }
