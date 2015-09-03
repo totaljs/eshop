@@ -544,7 +544,12 @@
 
 				if (response) {
 					setTimeout(function() {
-						target.attr('src', response);
+						var size = target.attr('data-size');
+						if (size) {
+							target.attr('data-original', response);
+							target.attr('src', response + '?s=' + size.replace('%', ''));
+						} else
+							target.attr('src', response);
 					}, 1000);
 				}
 
@@ -633,6 +638,7 @@
 			}
 
 			editor.element.contents().find('#CMS').html(pages.editor.source);
+			editor.resize();
 			editor.change(true);
 			hide();
 		};

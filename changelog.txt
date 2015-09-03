@@ -1,3 +1,8 @@
+======================== (BETA) v1.0.3
+
+- CMS editor: image cropper supports new attributes (`data-size="50%"` for resizing cropped image, helpful for image galleries)
+- updated file handler in `/controllers/default.js` supports percentual resizing of pictures
+
 ======================== v1.0.2
 
 - added data stats manager/orders-products-pages
