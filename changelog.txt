@@ -1,0 +1,13 @@
+======================== v1.0.2
+
+- added data stats manager/orders-products-pages
+- updated footer text
+- updated styles
+
+======================== v1.0.1
+
+- added replace category in manager/products
+- better manager interface for `Pages`
+- updated image cropper (added image dimension)
+- fixed problem with HTML tidy
+- fixed case sensitive URL address for manager

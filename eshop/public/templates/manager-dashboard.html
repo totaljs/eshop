@@ -1,0 +1,276 @@
+<div class="filter" style="padding-bottom:9px">
+	<div class="container">
+		<div class="caption"><span class="fa fa-dashboard mr5"></span> @(Dashboard)</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<h2 class="ui-center">@(Today statistics)</h2>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4 m">
+			<div data-component="template" data-component-path="dashboard.data">
+				<script type="text/html">
+					<br />
+					<table class="table">
+						<tr>
+							<td class="b">@(Today orders)</td>
+							<td class="col-xs-3 ui-right">{{ if webcounter.today.orders }}{{ webcounter.today.orders | format(0) }}{{ else }}0{{ fi }}x</td>
+						</tr>
+						<tr>
+							<td>@(Hits)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.hits | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td>@(Visitors)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.visitors | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td>@(Unique visitors)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.unique | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td>@(Visited pages per user)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.pages | format(0) }}x</td>
+						</tr>
+					</table>
+				</script>
+			</div>
+			<div data-component="template" data-component-path="dashboard.online">
+				<script type="text/html">
+					<div class="fs11 silver ui-center">@(Memory usage) <b>{{ memoryused | format(2) }}</b> @(from) <b>{{ memorytotal | format(2) }} MB</b></div>
+				</script>
+			</div>
+		</div>
+		<div class="col-md-4 m">
+			<hr />
+			<div class="fs11 silver ui-center">@(Online visitors)</div>
+			<div class="dashboard-online-counter">
+				<div data-component="template" data-component-path="dashboard.online">
+					<script type="text/html">
+						<span>{{ visitors }}</span>
+						<div class="ui-center">@(Last visitor:) <b>{{ if last }}{{ last | format('@(yyyy-MM-dd HH:mm)') }}{{ else }}............{{ fi }}</b></div>
+					</script>
+				</div>
+				<br />
+				<canvas id="dashboard-online"></canvas>
+			</div>
+		</div>
+		<div class="col-md-4 m">
+			<div data-component="template" data-component-path="dashboard.online">
+				<script type="text/html">
+					<br />
+					<table class="table">
+						<tr>
+							<td style="border-left:5px solid #61E727">@(Organic search)</td>
+							<td class="col-xs-3 ui-right">{{ today.search | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #479AD0">@(Social networks)</td>
+							<td class="col-xs-3 ui-right">{{ today.social | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #E22926">@(Direct visitors)</td>
+							<td class="col-xs-3 ui-right">{{ today.direct | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #FFEE32">@(Visitors from adverts)</td>
+							<td class="col-xs-3 ui-right">{{ today.advert | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #585858">@(Unknown visitors)</td>
+							<td class="col-xs-3 ui-right">{{ today.unknown | format(0) }}x</td>
+						</tr>
+					</table>
+				</script>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br />
+<div class="bg-smoke">
+	<br />
+	<div class="container" data-component="template" data-component-path="dashboard.data.Order">
+		<script type="text/html">
+			<div class="row">
+				<div class="col-md-3 m red">
+					<div class="b">@(Pending orders)</div>
+					<div>{{ pending }}x</div>
+					<hr class="nmb" />
+				</div>
+				<div class="col-md-3 m">
+					<div class="b">@(Completed orders)</div>
+					<div>{{ completed }}x</div>
+					<hr class="nmb" />
+				</div>
+				<div class="col-md-3 m red">
+					<div class="b">@(Pending money)</div>
+					<div>{{ pending_price | price(2) }}</div>
+					<hr class="nmb" />
+				</div>
+				<div class="col-md-3 m">
+					<div class="b">@(Earned money)</div>
+					<div>{{ completed_price | price(2) }}</div>
+					<hr class="nmb" />
+				</div>
+			</div>
+		</script>
+	</div>
+</div>
+<br />
+
+<div class="container">
+	<br />
+	<div class="ui-center b">@(Desktop devices vs. Mobile devices)</div>
+	<br />
+	<div class="dashboard-devices">
+		<div class="dashboard-devices-desktop"><span class="fa fa-desktop"></span>@(Desktop)</div>
+		<div class="dashboard-devices-mobile">@(Mobile)<span class="fa fa-tablet"></span></div>
+		<div class="dashboard-devices-stats"></div>
+	</div>
+</div>
+
+<br />
+<div class="container">
+	<br />
+	<div class="row">
+		<div class="col-md-6 m">
+			<div class="ui-center b">@(Yearly stats of orders)</div>
+			<canvas id="dashboard-monthly-orders" height="200"></canvas>
+		</div>
+		<div class="col-md-1"></div>
+		<div class="col-md-5 m">
+			<div class="ui-center b">@(Yearly stats of views)</div>
+			<canvas id="dashboard-monthly-hits" height="200"></canvas>
+		</div>
+	</div>
+	<br />
+</div>
+<br />
+
+<div class="bg-smoke">
+	<div class="container">
+		<br />
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="ui-center">@(Yearly stats <b>Visitors vs. Unique Visitors</b>)</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 m">
+				<div class="legend">
+					<label><span class="fa fa-square" style="color:#FFCE54"></span><span>@(Visitors)</span></label>
+					<label><span class="fa fa-square" style="color:#FC6E51"></span><span>@(Unique Visitors)</span></label>
+				</div>
+				<canvas id="dashboard-monthly-visitors" height="350"></canvas>
+			</div>
+		</div>
+		<br />
+	</div>
+</div>
+
+<script>
+
+	var dashboard = {};
+
+	dashboard.data = {};
+	dashboard.online = {};
+	dashboard.cache = {};
+
+	function dashboard_refresh() {
+		$.components.GET(managerurl + '/api/dashboard/', null, function(response) {
+
+			SET('dashboard.data', response);
+
+			if (dashboard.cache.processed)
+				return;
+
+			dashboard.cache.processed = true;
+
+			var data = [];
+			data.push(dashboard_charts_pie_item(response.webcounter.today.search, 'Organic search', '#61E727'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.social, 'Social networks', '#479AD0'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.direct, 'Direct', '#E22926'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.advert, 'Advert', '#FFEE32'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.unknown, 'Other', '#585858'));
+			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'));
+			dashboard.cache.online.Doughnut(data, { responsive: true });
+
+			var year = (new Date()).getFullYear();
+
+			data = {};
+			data.labels = months;
+			data.datasets = [{ fillColor: '#FFCE54', data: dashboard_charts_bar_items(response.webcounter.stats, 'count', year) }, { fillColor: '#FC6E51', data: dashboard_charts_bar_items(response.webcounter.stats, 'unique', year) }];
+			dashboard.cache.visitors = new Chart($('#dashboard-monthly-visitors').get(0).getContext('2d'));
+			dashboard.cache.visitors.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false });
+
+			data = {};
+			data.labels = months;
+			data.datasets = [{ fillColor: '#48CFAD', data: dashboard_charts_bar_items(response.webcounter.stats, 'orders', year) }];
+			dashboard.cache.orders = new Chart($('#dashboard-monthly-orders').get(0).getContext('2d'));
+			dashboard.cache.orders.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
+
+			data = {};
+			data.labels = months;
+			data.datasets = [{ fillColor: '#AC92EC', data: dashboard_charts_bar_items(response.webcounter.stats, 'hits', year) }];
+			dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'));
+			dashboard.cache.hits.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
+
+			var stats_mobile = 0;
+			var stats_desktop = 0;
+
+			Object.keys(response.webcounter.stats).forEach(function(key) {
+				var stats = response.webcounter.stats[key];
+				stats_mobile += stats.mobile;
+				stats_desktop += stats.desktop;
+			});
+
+			setTimeout(function() {
+				$('.dashboard-devices-stats').animate({ width: (stats_desktop / ((stats_desktop + stats_mobile) / 100) >> 0) + '%' }, 1000);
+			}, 1500);
+		});
+	}
+
+	// Helper method for generating pie chart
+	function dashboard_charts_pie_item(value, label, color) {
+		return { value: value, label: label, color: color };
+	}
+
+	// Helper method for generating bar chart
+	function dashboard_charts_bar_items(obj, name, year) {
+		var stats = [];
+
+		for (var i = 0; i < 12; i++) {
+			var value = obj[(i + 1) + '-' + year];
+
+			if (!value || !value[name])
+				stats[i] = 0;
+			else
+				stats[i] = value[name];
+		}
+		return stats;
+	}
+
+	// Refresh online users
+	setInterval(function() {
+		// Refresh only when is the dashboard shown
+		if (jRouting.url === managerurl + '/')
+			dashboard_refresh_online();
+	}, 5000);
+
+	function dashboard_refresh_online() {
+		$.components.GET(managerurl + '/api/dashboard/online/', null, function(response) {
+			if (NOTMODIFIED('dashboard.online', response))
+				return;
+			SET('dashboard.online', response);
+		});
+	}
+
+	dashboard_refresh_online();
+	dashboard_refresh();
+
+</script>

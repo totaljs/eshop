@@ -1,0 +1,233 @@
+<div class="filter" style="padding-bottom:9px;margin-bottom:0">
+	<div class="container">
+		<div class="caption"><span class="fa fa-cogs mr5"></span> @(Internal settings)</div>
+	</div>
+</div>
+<br />
+<div class="container">
+	<div class="row">
+		<div class="col-md-4 col-sm-4 m">
+			<div data-component="textbox" data-component-path="settings.form.url" data-required="true">@(URL address)</div>
+			<div class="help">@(It's used in payments and email messages.)</div>
+		</div>
+		<div class="col-md-4 col-sm-4 m">
+			<div data-component="textbox" data-component-path="settings.form.emailcontactform" data-required="true" data-component-type="email">@(Email for contact form)</div>
+		</div>
+		<div class="col-md-4 col-sm-4 m">
+			<div data-component="textbox" data-component-path="settings.form.emailorderform" data-required="true" data-component-type="email">@(Email for order form)</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4 col-sm-4 m">
+			<div data-component="textbox" data-component-path="settings.form.emailreply" data-required="true" data-component-type="email">@(Email for answers)</div>
+		</div>
+		<div class="col-md-4 col-sm-4 m">
+			<div data-component="textbox" data-component-path="settings.form.emailsender" data-required="true" data-component-type="email">@(Email for sending)</div>
+		</div>
+	</div>
+</div>
+
+<hr />
+<br />
+<div class="container">
+	<div class="row">
+		<div class="col-md-6 col-sm-6 m">
+			<div data-component="textbox" data-component-path="settings.form.defaultorderstatus" data-required="true">@(Default order status)</div>
+			<br />
+			<div class="row">
+				<div class="col-md-4">
+					<div data-component="textbox" data-component-path="settings.form.currency" data-required="true" data-align="center" data-maxlenght="10">@(Currency)</div>
+					<div class="help">@(The currency affects PayPal.)</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6 col-sm-6 m">
+			<div data-component="textboxtags" data-component-path="settings.form.deliverytypes" data-height="92px">@(Delivery types)</div>
+		</div>
+	</div>
+</div>
+<br />
+<div class="hidden" data-component="visible" data-component-path="user" data-if="su.sa === true">
+	<hr style="margin-top:0" />
+	<div class="container">
+		<h2>@(Developer's CMS settings)</h2>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textboxtags" data-component-path="settings.form.templates">@(Registered templates)</div>
+				<div class="help">@(Templates must be created manually in <code>/views/cms/</code> directory.)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-component="textboxtags" data-component-path="settings.form.navigations">@(Registered navigations)</div>
+				<div class="help">@(Navigations must be rendered manually in the layout or view. For render use: <code>F.global.navigation.NAME</code>)</div>
+			</div>
+		</div>
+		<br />
+	</div>
+</div>
+
+<div class="bg-smoke">
+	<br />
+	<div class="container">
+		<div class="b"><span class="fa fa-paypal mr5"></span><b class="blue">PayPal</b> Express Checkout</div>
+		<br />
+		<div class="row">
+			<div class="col-md-4 col-sm-4 m">
+				<div data-component="textbox" data-component-path="settings.form.paypaluser">@(User name)</div>
+			</div>
+			<div class="col-md-4 col-sm-4 m">
+				<div data-component="textbox" data-component-path="settings.form.paypalpassword">@(Password)</div>
+			</div>
+			<div class="col-md-4 col-sm-4 m">
+				<div data-component="textbox" data-component-path="settings.form.paypalsignature">@(Signature)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 m">
+				<div data-component="checkbox" data-component-path="settings.form.paypaldebug">@(Enable <b>test mode for PayPal</b>)</div>
+			</div>
+		</div>
+	</div>
+</div>
+<br />
+
+<div class="container">
+	<div class="help" style="margin-top:10px">@(For creating another access into the administration click on to below button:)</div>
+	<div class="mt5"><a href="javascript:void(0)" data-component="click" data-component-path="settings_users_add"><span class="fa fa-user mr5"></span>@(Add new administrator)</a></div>
+	<br />
+	<div data-component="grid" data-component-path="settings.form.users" data-max="1000000" data-options-page="" data-component-id="settings.users">
+		<script type="text/html">
+		<tr>
+			<td><span class="fa fa-user"></span> {{ login }}</td>
+			<td style="width:400px" class="ui-center active hidden-xs">{{ roles | roles(', ') }}</td>
+			<td style="width:80px" class="ui-right">
+				<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
+				<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+			</td>
+		</tr>
+		</script>
+	</div>
+	<br />
+	<div class="row">
+		<div class="col-md-4 m">
+			<div data-component="validation" data-component-path="settings.form">
+				<button class="button b" data-component="click" data-component-path="settings_save">@(SAVE SETTINGS)</button>
+			</div>
+		</div>
+	</div>
+	<br />
+</div>
+
+<div data-component="form" data-title="@(User evidence)" data-component-path="common.form" data-if="value === 'settings'" data-width="900px" data-component-id="settings.formuser">
+	<div class="padding" style="padding-bottom:0">
+		<div class="row">
+			<div class="col-md-12 m">
+				<div data-component="textbox" data-component-path="settings.formuser.login" data-required="true">@(Login name)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 m">
+				<div data-component="textbox" data-component-path="settings.formuser.password" data-required="true">@(Login password)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 m">
+				<div data-component="dropdowncheckbox" data-component-path="settings.formuser.roles" data-options="@(dashboard)|dashboard;@(orders)|orders;@(products)|products;@(pages)|pages;@(newsletter)|newsletter;@(settings)|settings;@(system)|system">@(Roles)</div>
+				<div class="help">@(If the user roles will be empty then the user will be access to all functionality.)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="settings.formuser">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<script>
+var settings = {};
+settings.form = {};
+settings.cache = {};
+
+function settings_refresh() {
+	$.components.GET(managerurl + '/api/settings/', null, function(response) {
+		SET('settings.form', response);
+
+		// If the user changes a currency then we must reload the website.
+		settings.cache.currency = response.currency;
+	});
+}
+
+function settings_save() {
+	loading(true);
+	$.components.PUT(managerurl + '/api/settings/', settings.form, function() {
+
+		success(true);
+		RESET('settings.form.*');
+
+		if (window.pages_refresh_dependencies)
+			window.pages_refresh_dependencies();
+
+		if (settings.cache.currency === settings.form.currency)
+			return;
+
+		// Refresh settings
+		setTimeout(function() {
+			window.location.reload();
+		}, 3000);
+	});
+}
+
+function settings_users_add() {
+	SET('settings.formuser', {}, true);
+	SET('common.form', 'settings');
+}
+
+Tangular.register('roles', function(value, separator) {
+	if (!(value instanceof Array) || value.length === 0)
+		return '<em>@(super admin)</em>';
+	return value.join(separator);
+});
+
+// Users grid
+ON('#settings.users', function(component) {
+	component.click = function(index, row, button) {
+		switch($(button).attr('name')) {
+
+			case 'edit':
+				var form = $.extend({}, row);
+				form.$index = index;
+				SET('settings.formuser', form, true);
+				SET('common.form', 'settings');
+				break;
+
+			case 'remove':
+				settings.form.users.splice(index, 1);
+				UPDATE('settings.form.users');
+				CHANGE('settings.form.*', true);
+				break;
+		}
+	};
+});
+
+// Users form
+ON('#settings.formuser', function(component) {
+	component.submit = function(hide) {
+		var users = settings.form.users;
+		var is = false;
+
+		if (settings.formuser.$index !== undefined) {
+			users[settings.formuser.$index].login = settings.formuser.login.trim();
+			users[settings.formuser.$index].password = settings.formuser.password.trim();
+			users[settings.formuser.$index].roles = settings.formuser.roles;
+		} else
+			users.push({ login: settings.formuser.login.trim(), password: settings.formuser.password.trim(), roles: settings.formuser.roles });
+
+		UPDATE('settings.form.users');
+		CHANGE('settings.form.*', true);
+		hide();
+	};
+});
+
+settings_refresh();
+</script>

@@ -1,0 +1,216 @@
+@{sitemap('#checkout')}
+
+<div id="loading"></div>
+<div class="padding">
+	<h1>@{title}</h1>
+	<div data-component="visible" data-component-path="datasource" data-if="!value || !value.length" class="hidden">
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8 ui-center">
+				<hr />
+				<br />
+				<div>@(Your shopping cart is empty, <b>try to visit this page later</b>.)</div>
+				<br />
+				<hr />
+				<br />
+				<br />
+				<a href="/shop/" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
+				<br />
+				<br />
+			</div>
+		</div>
+	</div>
+
+	<div data-component="visible" data-component-path="datasource" data-if="value && value.length > 0" class="hidden">
+		<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-10">
+				<table class="table table-bordered checkoutlist" border="0">
+					<thead>
+						<tr>
+							<th class="ui-center">@(Item name)</th>
+							<th class="ui-center hidden-xs">@(Price)</th>
+							<th class="ui-center">@(Count)</th>
+							<th class="ui-center">@(Total)</th>
+						</tr>
+					</thead>
+					<tbody data-component="repeater" data-component-path="datasource">
+						<script type="text/html">
+							<tr>
+								<td><a href="/shop/{{ linker_category }}/{{ linker }}/">{{ name }}</a></td>
+								<td class="ui-right col-xs-2 hidden-xs">{{ price | format(2) }} @{!config.custom.currency_entity}</td>
+								<td class="ui-right col-xs-2 col-sm-1 active"><input type="text" value="{{ count }}" data-id="{{ id }}" maxlength="2" /></td>
+								<td class="ui-right col-xs-3 col-sm-2 b warning">{{ price | sum(2) }} @{!config.custom.currency_entity}<span class="fa fa-times-circle hidden-xs" data-id="{{ id }}"></span></td>
+							</tr>
+						</script>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<br />
+		<hr />
+		<br />
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<div><strong>@(Order informations)</strong>:</div>
+				<br />
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="form.firstname" data-required="true" data-maxlength="30">@(First name)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="form.lastname" data-required="true" data-maxlength="30">@(Last name)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="form.email" data-required="true" data-maxlength="200" data-component-type="email">@(Email address)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="form.phone" data-maxlength="30">@(Phone number)</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<br />
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-md-12 m">
+						<div data-component="dropdown" data-component-path="form.delivery" data-source="common.deliverytypes" data-empty="true" data-required="true">@(Delivery type)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12 m">
+						<div data-component="textarea" data-component-path="form.address" data-required="true" data-height="100px" data-maxlength="1000" data-placeholder="@(Street, ZIP, City, Country, State)">@(Delivery address)</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+		<hr />
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<br />
+				<div data-component="textarea" data-component-path="form.message" data-height="50px" data-maxlength="1000">@(Note)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<br />
+				<div data-component="checkbox" data-component-path="form.isnewsletter">@(I want to receive a newsletter)</div>
+				<div data-component="checkbox" data-component-path="form.isterms" class="b" style="color:red">@(I agree with terms and conditions)</div>
+				<div data-component="error" data-component-path="common.success" style="margin-top:20px"></div>
+				<div data-component="validation" data-component-path="form" data-if="form.isterms === true">
+					<button class="button" disabled="disabled" data-component="click" data-component-path="#submit">@(SUBMIT ORDER)</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<br />
+</div>
+@{section script}
+<script>
+
+	var common = {};
+	var form = {};
+	var datasource;
+
+	common.deliverytypes = '@{config.custom.deliverytypes.join(",")}'.split(',');
+
+	form.email = '@';
+	form.address = '';
+	form.isnewsletter = true;
+
+	$.components.ready(function() {
+
+		var cart = CACHE('cart');
+		if (!cart)
+			return;
+
+		var id = [];
+
+		for (var i = 0, length = cart.length; i < length; i++)
+			id.push(cart[i].id);
+
+		$.components.GET('/api/products/', { id: id.join(',') }, function(response) {
+
+			datasource = [];
+			for (var i = 0, length = response.items.length; i < length; i++) {
+				var item = response.items[i];
+				datasource.push({ id: item.id, name: item.name, price: item.price, linker: item.linker, linker_category: item.linker_category, pictures: item.pictures, reference: item.reference });
+			}
+
+			refresh();
+		});
+
+		$('.checkoutlist').on('change', 'input', function(e) {
+			var count = parseInt(this.value);
+			if (isNaN(count))
+				return;
+			var id = this.getAttribute('data-id');
+			FIND('checkout').update(id, count);
+			refresh();
+		});
+
+		$('.checkoutlist').on('click', '.fa-times-circle', function(e) {
+			FIND('checkout').update($(this).attr('data-id'), 0);
+			refresh();
+		});
+	});
+
+	Array.prototype.find = function(id) {
+		for (var i = 0, length = this.length; i < length; i++) {
+			if (this[i].id === id)
+				return this[i];
+		}
+		return null;
+	};
+
+	Tangular.register('sum', function(value, format) {
+		return (value * this.count).format(format);
+	});
+
+	function refresh() {
+		var cart = CACHE('cart');
+		var index = 0;
+		while (true) {
+
+			var product = datasource[index++];
+			if (product === undefined)
+				break;
+
+			var item = cart.find(product.id);
+
+			if (!item) {
+				index--;
+				datasource.splice(index, 1);
+				continue;
+			}
+
+			product.count = item.count;
+		}
+
+		UPDATE('datasource');
+	}
+
+	OPERATION('submit', function() {
+		form.products = datasource;
+		$.components.POST('/api/checkout/create/', form, function(response) {
+			if (response.success) {
+				FIND('checkout').clear();
+				window.location.href += response.value + '/?success=1';
+				return;
+			}
+			SET('common.success', response);
+		});
+	});
+
+</script>
+@{end}

@@ -1,0 +1,2 @@
+{"datecreated":"2015-08-27T20:12:45.000Z","istemplate":true,"icon":"table","body":"<table class=\"table\">\n    <thead class=\"CMS_remove\">\n        <tr>\n            <th class=\"CMS_edit\">Header content</th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr class=\"CMS_repeat\">\n            <td class=\"CMS_edit\">Row content</td>\n        </tr>\n    </tbody>\n</table>","name":"Single column table","id":"623bb0621e"}
+{"datecreated":"2015-08-27T20:26:04.000Z","istemplate":false,"body":"Looks into /definitions/widgets.js","name":"Top products","id":"e319342961"}

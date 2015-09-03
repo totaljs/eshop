@@ -1,0 +1,11 @@
+@{foreach m in model}
+<div class="row bloglisting">
+	<div class="col-md-12">
+		<a href="@{m.url}">@{m.title}</a>
+		<p>@{m.perex.max(220)}</p>
+		<div><b>@{new Date(m.datecreated).format('yyyy-MM-dd HH:mm')}</b></div>
+	</div>
+</div>
+@{end}
+<br />
+<br />

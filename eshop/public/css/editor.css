@@ -1,0 +1,15 @@
+/*auto*/
+
+#CMS_panel { position: absolute; background-color: black; padding: 3px 2px; border-radius: 4px; box-shadow: 0 0 4px rgba(100,100,100,0.1); z-index: 10; display: none; }
+#CMS_panel * { user-select: none; }
+#CMS_panel span { position: relative; display: inline-block; background-color: #303030; font-size: 14px; cursor: pointer; padding: 5px 0; margin: 1px 2px; width: 28px; text-align: center; border-radius: 4px; color: gray; }
+#CMS_panel span:last-child { background-color: #DF452D; color: white; }
+.CMS_panel_disabled { color: #303030 !important; cursor: not-allowed; background-color: #151515 !important; }
+.CMS_selected { background-color: rgba(0,0,0,0.1) !important; }
+.CMS_repeat { padding-top: 2px; cursor: crosshair; }
+.CMS_remove { padding-top: 2px; cursor: no-drop; }
+.CMS_edit { cursor: text; }
+.CMS_widget { background-color: #F0F0F0; text-align: center; padding: 20px 0; font-weight: bold; color: black; margin: 1px; }
+.CMS_widget pre { padding: 10px; margin: 10px 10px 0; display: block; background-color: white; font-weight: normal; text-align: left; }
+#CMS { margin: 20px 0; }
+.CMS_hidden { display: block !important; }

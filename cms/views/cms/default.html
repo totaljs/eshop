@@ -1,0 +1,10 @@
+@{notranslate}
+
+<div id="CMS">
+	@{if repository.page && repository.page.body}
+		<!-- RENDER UPDATED CONTENT -->
+		@{!repository.page.body}
+	@{else}
+		<div class="CMS_widgets"></div>
+	@{fi}
+</div>

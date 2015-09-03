@@ -1,0 +1,205 @@
+<div class="filter" style="padding-bottom:9px;margin-bottom:0">
+	<div class="container">
+		<div class="caption"><span class="fa fa-cogs mr5"></span> @(System)</div>
+	</div>
+</div>
+<br />
+<div class="container hidden-xs">
+	<div class="row">
+		<div class="col-md-4 col-sm-4 m">
+			<div class="b"><span class="fa fa-dashboard mr5"></span> MonitorGuru</div>
+			<p class="silver">Simple and powerful website monitoring. Monitor your website availability 24/7.</p>
+			<span class="fa fa-link mr5"></span><a href="https://monitorguru.com" target="_blank">@(Visit website)</a>
+		</div>
+		<div class="col-md-4 col-sm-4 m">
+			<div class="b"><span class="fa fa-check-circle mr5"></span> Todomator</div>
+			<p class="silver">Task manager system with time tracking. All your tasks under control.</p>
+			<span class="fa fa-link mr5"></span><a href="https://www.todomator.com" target="_blank">@(Visit website)</a>
+		</div>
+		<div class="col-md-4 col-sm-4 m">
+			<div class="b"><span class="fa fa-map mr5"></span> GPS Localization</div>
+			<p class="silver">Real-time GPS Localization on the map. Track your family, friends or colleagues.</p>
+			<span class="fa fa-link mr5"></span><a href="http://www.gpslocalization.com" target="_blank">@(Visit website)</a>
+		</div>
+	</div>
+	<hr />
+	<br />
+</div>
+<div class="container">
+	<div class="b">@(Backuping)</div>
+	<br />
+	<table class="table table-bordered">
+		<tr>
+			<td><span class="fa fa-cloud-download mr5"></span> @(Backup databases + settings)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_backup_database">@(Backup now)</a></td>
+		</tr>
+		<tr>
+			<td><span class="fa fa-cloud-download mr5"></span> @(Backup full website)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_backup_website">@(Backup now)</a></td>
+		</tr>
+	</table>
+	<br />
+	<div class="b">@(Restoring)</div>
+	<br />
+	<table class="table table-bordered">
+		<tr>
+			<td><span class="fa fa-refresh mr5"></span> @(Restore databases + settings)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_restore_database">@(Restore now)</a></td>
+		</tr>
+	</table>
+	<br />
+	<div class="b">@(Clearing)</div>
+	<br />
+	<table class="table table-bordered">
+		<tr>
+			<td><span class="fa w18 fa-navicon"></span> @(Clear all products)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_products">@(Clear now)</a></td>
+		</tr>
+		<tr>
+			<td><span class="fa w18 fa-shopping-cart"></span> @(Clear all orders)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_orders">@(Clear now)</a></td>
+		</tr>
+		<tr>
+			<td><span class="fa w18 fa-file-text"></span> @(Clear all pages)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_pages">@(Clear now)</a></td>
+		</tr>
+		<tr>
+			<td><span class="fa w18 fa-file-text"></span> @(Clear all widgets)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_widgets">@(Clear now)</a></td>
+		</tr>
+		<tr>
+			<td><span class="fa w18 fa-image"></span> @(Clear all files)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_files">@(Clear now)</a></td>
+		</tr>
+		<tr>
+			<td><span class="fa w18 fa-envelope"></span> @(Clear newsletter list)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_newsletter">@(Clear now)</a></td>
+		</tr>
+		<tr>
+			<td><span class="fa w18 fa-bar-chart"></span> @(Clear visitor stats)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_webcounter">@(Clear now)</a></td>
+		</tr>
+	</table>
+	<br />
+	<br />
+</div>
+
+<!-- HELPERS -->
+<input type="file" id="system_restore_backup" class="hidden" />
+
+<script>
+// Backup databases
+function system_backup_database() {
+	loading(true);
+	window.location.href = managerurl + '/api/backup/database/';
+	setTimeout(function() {
+		loading(false);
+	}, 5000);
+}
+
+// Restore databases
+function system_restore_database() {
+	$('#system_restore_backup').click();
+}
+
+// Backup website
+function system_backup_website() {
+	loading(true);
+	window.location.href = managerurl + '/api/backup/website/';
+	setTimeout(function() {
+		loading(false);
+	}, 5000);
+}
+
+function system_clear_products() {
+	if (!confirm('@(Please, confirm clearing of the database.)'))
+		return;
+	loading(true);
+	$.components.GET(managerurl + '/api/products/clear/', null, function() {
+		success();
+		if (window.products_refresh)
+			window.products_refresh(true);
+	});
+}
+
+function system_clear_orders() {
+	if (!confirm('@(Please, confirm clearing of the database.)'))
+		return;
+	loading(true);
+	$.components.GET(managerurl + '/api/orders/clear/', null, function() {
+		success();
+		if (window.orders_refresh)
+			window.orders_refresh(true);
+	});
+}
+
+function system_clear_pages() {
+	if (!confirm('@(Please, confirm clearing of the database.)'))
+		return;
+	loading(true);
+	$.components.GET(managerurl + '/api/pages/clear/', null, function() {
+		success();
+		if (window.pages_refresh)
+			window.pages_refresh();
+	});
+}
+
+function system_clear_widgets() {
+	if (!confirm('@(Please, confirm clearing of the database.)'))
+		return;
+	loading(true);
+	$.components.GET(managerurl + '/api/widgets/clear/', null, function() {
+		success();
+		if (window.widgets_refresh)
+			window.widgets_refresh();
+	});
+}
+
+function system_clear_files() {
+	if (!confirm('@(Please, confirm clearing of the database.)'))
+		return;
+	loading(true);
+	$.components.GET(managerurl + '/api/files/clear/', null, function() {
+		success();
+	});
+}
+
+function system_clear_newsletter() {
+	if (!confirm('@(Please, confirm clearing of the database.)'))
+		return;
+	loading(true);
+	$.components.GET(managerurl + '/api/newsletter/clear/', null, function() {
+		success();
+		if (window.newsletter_refresh)
+			window.newsletter_refresh(true);
+	});
+}
+
+function system_clear_webcounter() {
+	if (!confirm('@(Please, confirm clearing of the database.)'))
+		return;
+	loading(true);
+	$.components.GET(managerurl + '/api/dashboard/clear/', null, function() {
+		success();
+		setTimeout(function() {
+			window.location.reload(true);
+		}, 1500);
+	});
+}
+
+$('#system_restore_backup').on('change', function(e) {
+	e.preventDefault();
+	e.stopPropagation();
+	loading(true);
+	var el = this;
+	var data = new FormData();
+	data.append('file', this.files[0]);
+	$.components.UPLOAD(managerurl + '/api/restore/database/', data, function(response, err) {
+		el.value = '';
+		success(true);
+		setTimeout(function() {
+			window.location.reload(true);
+		}, 1500);
+	});
+});
+</script>

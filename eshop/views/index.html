@@ -1,0 +1,44 @@
+@{title('Clothes, Fashion Clothing')}
+@{sitemap('#homepage')}
+
+<!-- CMS -->
+@{if repository.page}
+	@{!repository.page.body}
+@{fi}
+
+<div class="cl"></div>
+<div class="padding">
+	<br />
+	<h1>Clothes, <b>Fashion</b> Clothing</h1>
+	<hr />
+
+	<div class="center">
+		<a href="https://www.facebook.com/totaljs.web.framework" class="mr15">Facebook</a>
+		<a href="https://twitter.com/totalframework" class="mr15">Twitter</a>
+		<a href="https://plus.google.com/u/0/+partialjs/posts" class="mr15">Google+</a>
+		<a href="/contact/" class="b">@(Contact)</a>
+	</div>
+	<br />
+	<div class="row">
+		<div class="col-md-2"></div>
+		<div class="col-md-8">
+			<div class="newsletter" data-component="newsletter" data-success="@(Thanks, you have been added.)">
+				<div class="newsletter-button"><button><span class="fa fa-envelope"></span>@(SUBMIT)</button></div>
+				<div class="newsletter-input"><input type="text" placeholder="@(Join to our mailing list)" /></div>
+			</div>
+		</div>
+	</div>
+	<hr />
+
+	<br />
+	@{view('~eshop/partial-products', model)}
+	<br />
+	<br />
+	<div class="row">
+		<div class="col-md-3"></div>
+		<div class="col-md-6">
+			<a href="/shop/" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
+		</div>
+	</div>
+	<br />
+</div>

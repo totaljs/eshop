@@ -1,0 +1,335 @@
+<div class="filter">
+	<div class="container">
+		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> @(Orders)</div>
+		<div class="row">
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="orders.filter.search" data-placeholder="@(Search orders ...)" data-control-icon="fa-search"></div>
+				<div class="help" data-component="template" data-component-path="orders.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(All orders)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div data-component="grid" data-component-path="orders.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more orders)" data-component-id="orders.grid">
+		<script type="text/html">
+		<tr{{ if iscompleted }} class="order-completed"{{ fi }}>
+			<td style="width:150px" class="silver hidden-xs"><span class="fa fa-truck"></span> {{ delivery }}</td>
+			<td style="width:180px">{{ if iscompleted }}<span class="fa fa-check-circle green"></span>{{ fi }}{{ firstname }} {{ lastname }}</td>
+			<td class="hidden-xs"><span class="fa fa-tag"></span> {{ status | raw }}</td>
+			<td style="width:60px" class="ui-right hidden-xs">{{ count }}x</td>
+			<td style="width:100px" class="{{ if ispaid }}green{{ else }}silver{{ fi }} ui-right active">{{ price | price(2) }} <span class="fa fa-paypal"></span></td>
+			<td style="width:80px" class="ui-right">
+				<button name="edit" title="@(Edit)"><span class="fa fa-search"></span></button>
+				<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+			</td>
+		</tr>
+		</script>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Order evidence)" data-component-path="common.form" data-if="value === 'orders'" data-width="900px" data-component-id="orders.form">
+	<br />
+	<div data-component="template" data-component-path="orders.form" class="padding">
+		<script type="text/html">
+		<table class="table table-bordered" border="0">
+			<tbody>
+				<tr>
+					<td class="col-xs-5 active">@(# id)</td>
+					<td><a href="/checkout/{{ id }}/">{{ id }}</a></td>
+				</tr>
+				<tr>
+					<td class="col-xs-5 active">@(Created)</td>
+					<td>{{ datecreated | format('yyyy-MM-dd') }}</td>
+				</tr>
+				{{ if ispaid && datepaid }}
+				<tr>
+					<td class="col-xs-5 active">@(Paid)</td>
+					<td>{{ datepaid | format('@(yyyy-MM-dd)') }}</td>
+				</tr>
+				{{ fi }}
+				<tr>
+					<td class="col-x5-3 active">@(IP address)</td>
+					<td>{{ ip }}</td>
+				</tr>
+				<tr>
+					<td class="col-xs-5 active">@(Total price)</td>
+					<td>{{ price | price(2) }}</td>
+				</tr>
+				<tr>
+					<td class="col-xs-5 active">@(Ordered items)</td>
+					<td>{{ count }}x</td>
+				</tr>
+			</tbody>
+		</table>
+		</script>
+	</div>
+
+	<div class="padding bg-smoke">
+		<div class="row">
+			<div class="col-md-12">
+				<div data-component="textbox" data-component-path="orders.form.status" class="b" data-required="true">@(Order status)</div>
+				<br />
+				<div data-component="checkbox" data-component-path="orders.form.iscompleted" class="b red">@(Order is processed and closed)</div>
+				<div data-component="checkbox" data-component-path="orders.form.isemail">@(Send email to user about the order status)</div>
+				<div data-component="checkbox" data-component-path="orders.form.ispaid">@(Order is paid)</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding" style="padding-bottom:10px">
+		<div class="row">
+			<div class="col-md-12">
+				<div data-component="textbox" data-component-path="orders.form.delivery" data-required="true" data-icon="fa fa-truck">@(Delivery type)</div>
+			</div>
+		</div>
+	</div>
+	<hr />
+	<div class="padding" style="padding-bottom:0">
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="orders.form.firstname" data-required="true">@(First name)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="orders.form.lastname" data-required="true">@(Last name)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 m">
+				<div data-component="textarea" data-component-path="orders.form.address" data-required="true" data-height="100px">@(Delivery address)</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="orders.form.email" data-required="true" data-icon="fa-envelope">@(Email address)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="orders.form.phone">@(Phone number)</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12 m">
+				<div data-component="textarea" data-component-path="orders.form.message">@(Message)</div>
+			</div>
+			<div class="col-md-12 m">
+				<div data-component="textbox" data-component-path="orders.form.note" data-placeholder="@(Internal note only for you)">@(Internal note)</div>
+			</div>
+		</div>
+	</div>
+	<hr />
+	<div class="padding">
+		<div class="silver"><span class="fa fa-shopping-cart"></span> <strong>@(Ordered items)</strong>:</div>
+		<br />
+		<table class="table table-bordered checkoutlist" border="0">
+			<tbody data-component="repeater" data-component-path="orders.form.products">
+				<script type="text/html">
+					<tr>
+						<td class="col-xs-2 hidden-xs"><input style="width:100%" type="text" class="ui-center" value="{{ reference }}" data-name="reference" data-id="{{ id }}" placeholder="@(Item code)" /></td>
+						<td><input style="width:100%" type="text" value="{{ name }}" data-name="name" data-id="{{ id }}" placeholder="@(Item name)" /></td>
+						<td class="ui-right col-xs-2"><input style="width:100%" type="text" class="ui-right" value="{{ price | price(2) }}" data-name="price" data-id="{{ id }}" placeholder="@(Price)" /></td>
+						<td class="ui-right col-xs-2 col-sm-1 active"><input style="width:100%" type="text" class="ui-right" value="{{ count }}x" data-name="count" data-id="{{ id }}" maxlength="3" placeholder="@(Qt.)" /></td>
+						<td class="ui-right col-xs-3 col-sm-2 b warning">{{ price | sum(2) }}<span class="fa fa-times-circle red" data-id="{{ id }}" style="cursor:pointer;margin-left:10px"></span></td>
+					</tr>
+				</script>
+			</tbody>
+		</table>
+		<div><a href="javascript:void(0)" data-component="click" data-component-path="orders_form_add"><span class="fa fa-plus-circle mr5"></span>@(Add new item)</a></div>
+	</div>
+	<div data-component="error" data-component-path="orders.response"></div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="orders.form" data-if="orders.form.products.length > 0">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<script>
+	var orders = {};
+
+	orders.filter = {};
+	orders.filter.page = 1;
+	orders.filter.type = 0;
+
+	orders.grid = [];
+	orders.form = {};
+	orders.info = {};
+	orders.response;
+
+	ON('#orders.grid', function(component) {
+
+		// Max items per page
+		orders.filter.max = component.max;
+		orders_refresh(true);
+
+		component.click = function(index, row, button) {
+			switch ($(button).attr('name')) {
+				case 'edit':
+					$.components.GET(managerurl + '/api/orders/' + row.id, null, function(response, err) {
+
+						// Error prevention
+						if (response instanceof Array)
+							response = {};
+
+						SET('orders.form', $.extend({}, response), true);
+						SET('orders.response', null);
+						SET('common.form', 'orders');
+					});
+					break;
+
+				case 'remove':
+					if (!confirm('@(Do you want to remove selected order?)'))
+						return;
+					$.components.DELETE(managerurl + '/api/orders', { id: row.id }, function() {
+						orders_refresh(true);
+
+						// Refresh dashboard informations
+						if (window.dashboard_refresh)
+							window.dashboard_refresh();
+
+					});
+					break;
+			}
+		};
+
+		component.next = function(page) {
+			SET('orders.filter.page', page);
+		};
+	});
+
+	ON('#orders.form', function(component) {
+		// Submits order form
+		component.submit = function(hide) {
+
+			var price = 0;
+			var count = 0;
+
+			for (var i = 0, length = orders.form.products.length; i < length; i++) {
+				var product = orders.form.products[i];
+				if (product.count > 0)
+					price += (product.price * product.count);
+				count += product.count;
+			}
+
+			orders.form.count = count;
+			orders.form.price = price;
+
+			$.components.PUT(managerurl + '/api/orders/', orders.form, function(response) {
+
+				// Error handling
+				SET('orders.response', response);
+				if (response instanceof Array)
+					return;
+
+				hide();
+				orders_refresh(true);
+				success();
+
+				// Refreshes dashboard informations
+				if (window.dashboard_refresh)
+					window.dashboard_refresh();
+			});
+		};
+
+		// Handles all inputs in ordered items
+		$('.checkoutlist').on('change', 'input', function() {
+			var el = $(this);
+			var id = el.attr('data-id');
+			var name = el.attr('data-name');
+			switch (name) {
+				case 'name':
+				case 'reference':
+					orders_form_update(id, function(item) {
+						item[name] = el.val();
+					});
+					break;
+				case 'price':
+				case 'count':
+					var number = el.val().match(/[0-9\,\.]+/);
+					if (!number)
+						return;
+					number = parseFloat(number);
+					if (isNaN(number))
+						return;
+					orders_form_update(id, function(item) {
+						item[name] = number;
+					});
+					orders_form_refresh();
+					break;
+			}
+		});
+
+		// Removes selected oredered item
+		$('.checkoutlist').on('click', '.fa-times-circle', function(e) {
+			orders_form_update($(this).attr('data-id'), function(item, index) {
+				orders.form.products.splice(index, 1);
+				orders_form_refresh();
+			});
+		});
+	});
+
+	// Method refreshes grid
+	function orders_refresh(reset) {
+
+		if (reset) {
+			orders.filter.page = 1;
+			orders.grid = [];
+		}
+
+		$.components.GET(managerurl + '/api/orders/', orders.filter, function(response) {
+			SET((reset ? '' : '+') + 'orders.grid', response.items);
+			if (!reset)
+				return;
+			orders.info.count = response.count;
+			orders.info.pages = response.pages;
+			UPDATE('orders.info');
+		});
+	}
+
+	// Method appends a new item into the ordered items
+	function orders_form_add() {
+		PUSH('orders.form.products', { id: Date.now() + '', reference: '', name: '', price: 1, count: 1 });
+	}
+
+	// Watchs changes in order filter
+	WATCH('orders.filter.*', function(path, value) {
+		if (NOTMODIFIED('orders.filter', orders.filter))
+			return;
+		orders_refresh(path !== 'orders.filter.page');
+	});
+
+	// Method finds ordered item by its id
+	function orders_form_update(id, callback) {
+		for (var i = 0, length = orders.form.products.length; i < length; i++) {
+			var p = orders.form.products[i];
+			if (p.id === id) {
+				callback(p, i);
+				break;
+			}
+		}
+	}
+
+	// Method calculates prices and count in ordered items
+	function orders_form_refresh() {
+		var count = 0;
+		var price = 0;
+
+		for (var i = 0, length = orders.form.products.length; i < length; i++) {
+			var p = orders.form.products[i];
+			count += p.count;
+			price += p.count * p.price;
+		}
+
+		orders.form.price = price;
+		orders.form.count = count;
+		UPDATE('orders.form');
+	}
+
+	Tangular.register('sum', function(value, format) {
+		return (value * this.count).format(format) + ' ' + currency;
+	});
+
+</script>
