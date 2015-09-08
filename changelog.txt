@@ -1,4 +1,4 @@
-======================== (BETA) v1.0.3
+======================== v1.0.3
 
 - added support for galleries and one gallery widget for example (CMS)
 - CMS editor: image cropper supports new attributes (`data-size="50%"` for resizing cropped image, helpful for image galleries)
