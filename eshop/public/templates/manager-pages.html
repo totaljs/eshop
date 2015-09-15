@@ -849,9 +849,10 @@
 
 			body.on('paste', function(e) {
 				e.preventDefault();
+				e.stopPropagation();
 				var iframe = self.element.get(0).contentWindow;
 				var text = e.originalEvent.clipboardData.getData('text/plain');
-				iframe.document.execCommand('insertHTML', false, text);
+				iframe.document.execCommand('insertText', false, text);
 			});
 
 			body.unbind('keydown').on('keydown', function(e) {
