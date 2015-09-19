@@ -174,74 +174,74 @@ COMPONENT('dropdown', function() {
 
 COMPONENT('textbox', function() {
 
-    var self = this;
-    var isRequired = self.attr('data-required') === 'true';
+	var self = this;
+	var isRequired = self.attr('data-required') === 'true';
 
-    self.validate = function(value) {
+	self.validate = function(value) {
 
-        var is = false;
-        var t = typeof(value);
+		var is = false;
+		var t = typeof(value);
 
-        if (self.find('input').prop('disabled'))
-            return true;
+		if (self.find('input').prop('disabled'))
+			return true;
 
-        if (t === 'undefined' || t === 'object')
-            value = '';
-        else
-            value = value.toString();
+		if (t === 'undefined' || t === 'object')
+			value = '';
+		else
+			value = value.toString();
 
-        is = isRequired ? self.type === 'email' ? value.match(/^[a-zA-Z_\.]+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/) !== null : self.type === 'currency' ? value > 0 : value.length > 0 : true;
-        return is;
-    };
+		is = isRequired ? self.type === 'email' ? value.match(/^[a-zA-Z_\.]+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/) !== null : self.type === 'currency' ? value > 0 : value.length > 0 : true;
+		return is;
+	};
 
-    self.make = function() {
+	self.make = function() {
 
-        var attrs = [];
+		var attrs = [];
 
-        function attr(name) {
-            var a = self.element.attr(name);
-            if (!a)
-                return;
-            attrs.push(name.substring(name.indexOf('-') + 1) + '="' + a + '"');
-        }
+		function attr(name) {
+			var a = self.element.attr(name);
+			if (!a)
+				return;
+			attrs.push(name.substring(name.indexOf('-') + 1) + '="' + a + '"');
+		}
 
-        attr('data-placeholder');
-        attr('data-maxlength');
+		attr('data-placeholder');
+		attr('data-maxlength');
 
-        var content = self.html();
-        var icon = self.attr('data-icon');
-        var align = self.attr('data-align');
-        var cicon = self.attr('data-control-icon');
-        var delay = self.attr('data-component-keypress-delay');
-        var keypress = self.attr('data-component-keypress');
-        var increment = self.attr('data-increment') === 'true';
-        var html = '<input' + (keypress ? ' data-component-keypress="' + keypress + '"' : '') + (delay ? ' data-component-keypress-delay="' + delay + '"' : '') + ' type="' + (self.type === 'password' ? 'password' : 'text') + '" data-component-bind=""' + (attrs.length ? ' ' + attrs.join('') : '') + (align ? ' class="ui-' + align + '"' : '')  + (self.attr('data-autofocus') === 'true' ? ' autofocus="autofocus"' : '') + ' />' + (cicon ? '<div><span class="fa ' + cicon + '"></span></div>' : increment ? '<div><span class="fa fa-caret-up"></span><span class="fa fa-caret-down"></span></div>' : '');
+		var content = self.html();
+		var icon = self.attr('data-icon');
+		var align = self.attr('data-align');
+		var cicon = self.attr('data-control-icon');
+		var delay = self.attr('data-component-keypress-delay');
+		var keypress = self.attr('data-component-keypress');
+		var increment = self.attr('data-increment') === 'true';
+		var html = '<input' + (keypress ? ' data-component-keypress="' + keypress + '"' : '') + (delay ? ' data-component-keypress-delay="' + delay + '"' : '') + ' type="' + (self.type === 'password' ? 'password' : 'text') + '" data-component-bind=""' + (attrs.length ? ' ' + attrs.join('') : '') + (align ? ' class="ui-' + align + '"' : '')  + (self.attr('data-autofocus') === 'true' ? ' autofocus="autofocus"' : '') + ' />' + (cicon ? '<div><span class="fa ' + cicon + '"></span></div>' : increment ? '<div><span class="fa fa-caret-up"></span><span class="fa fa-caret-down"></span></div>' : '');
 
-        if (increment) {
-            self.element.on('click', '.fa-caret-up,.fa-caret-down', function(e) {
-                var el = $(this);
-                var inc = -1;
-                if (el.hasClass('fa-caret-up'))
-                    inc = 1;
-                self.change(true);
-                self.inc(inc);
-            });
-        }
+		if (increment) {
+			self.element.on('click', '.fa-caret-up,.fa-caret-down', function(e) {
+				var el = $(this);
+				var inc = -1;
+				if (el.hasClass('fa-caret-up'))
+					inc = 1;
+				self.change(true);
+				self.inc(inc);
+			});
+		}
 
-        if (content.length === 0) {
-            self.element.addClass('ui-textbox ui-textbox-container');
-            self.element.append(html);
-            return;
-        }
+		if (content.length === 0) {
+			self.element.addClass('ui-textbox ui-textbox-container');
+			self.element.append(html);
+			return;
+		}
 
-        self.element.empty();
-        self.element.addClass('ui-textbox-container');
-        self.element.append('<div class="ui-textbox-label' + (isRequired ? ' ui-textbox-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div><div class="ui-textbox">' + html + '</div>');
-    };
+		self.element.empty();
+		self.element.addClass('ui-textbox-container');
+		self.element.append('<div class="ui-textbox-label' + (isRequired ? ' ui-textbox-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div><div class="ui-textbox">' + html + '</div>');
+	};
 
-    self.state = function(type) {
-        self.find('.ui-textbox').toggleClass('ui-textbox-invalid', self.isInvalid());
-    };
+	self.state = function(type) {
+		self.find('.ui-textbox').toggleClass('ui-textbox-invalid', self.isInvalid());
+	};
 });
 
 COMPONENT('textarea', function() {
@@ -572,6 +572,7 @@ function getPages(length, max) {
 COMPONENT('form', function() {
 
 	var self = this;
+	var autocenter;
 
 	if (!$cmanager.$$form) {
 		$cmanager.$$form = true;
@@ -594,6 +595,7 @@ COMPONENT('form', function() {
 		var width = self.attr('data-width') || '800px';
 		var submit = self.attr('data-submit');
 
+		autocenter = self.attr('data-autocenter') !== 'false';
 		self.condition = self.attr('data-if');
 		self.element.empty();
 
@@ -622,6 +624,19 @@ COMPONENT('form', function() {
 		var isHidden = !EVALUATE(self.path, self.condition);
 		self.element.toggleClass('hidden', isHidden);
 		if (!isHidden) {
+
+			if (autocenter) {
+				var ui = self.find('.ui-form');
+				var fh = ui.innerHeight();
+				var wh = $(window).height();
+
+				var r = (wh / 2) - (fh / 2);
+				if (r > 20)
+					ui.css({ marginTop: r + 'px' });
+				else
+					ui.css({ marginTop: '20px' });
+			}
+
 			var el = self.element.find('input');
 
 			if (el.length === 0)
@@ -1308,4 +1323,83 @@ $.components.$formatter.push(function(path, value, type) {
 	}
 
 	return value.format(2);
+});
+
+COMPONENT('codemirror', function() {
+
+	var self = this;
+	var editor;
+	var isRequired = self.attr('data-required') === 'true';
+	var skipA = false;
+	var skipB = false;
+	var timeout;
+
+	self.validate = function(value) {
+		return isRequired ? value && value.length > 0 : true;
+	};
+
+	self.make = function() {
+
+		var height = self.element.attr('data-height');
+		var icon = self.element.attr('data-icon');
+		var content = self.element.html();
+
+		self.element.empty();
+		self.element.append('<div class="ui-codemirror-label' + (isRequired ? ' ui-codemirror-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div><div class="ui-codemirror"></div>');
+		var container = self.element.find('.ui-codemirror');
+
+		editor = CodeMirror(container.get(0), { lineNumbers: self.attr('data-linenumbers') !== 'true', mode: self.attr('data-type') || 'htmlmixed', indentUnit: 4 });
+
+		if (height !== 'auto')
+			editor.setSize('100%', height || '200px');
+
+		editor.on('change', function(a, b) {
+			clearTimeout(timeout);
+
+			if (skipB) {
+				skipB = false;
+				return;
+			}
+
+			timeout = setTimeout(function() {
+				skipA = true;
+				self.reset(true);
+				self.dirty(false);
+				self.set(editor.getValue());
+			}, 1000);
+		});
+
+		skipB = true;
+	};
+
+	self.getter = null;
+	self.setter = function(value, path) {
+
+		if (skipA === true) {
+			skipA = false;
+			return;
+		}
+
+		skipB = true;
+		editor.setValue(value || '');
+		editor.refresh();
+		skipB = true;
+
+		CodeMirror.commands['selectAll'](editor);
+		var f = editor.getCursor(true);
+		var t = editor.getCursor(false);
+		skipB = true;
+		editor.autoFormatRange(f, t);
+		skipB = true;
+		editor.setValue(editor.getValue());
+		skipB = true;
+
+		setTimeout(function() {
+			editor.refresh();
+		}, 300);
+	};
+
+	self.state = function(type) {
+		self.element.find('.ui-codemirror').toggleClass('ui-codemirror-invalid', self.isInvalid());
+	};
 });
