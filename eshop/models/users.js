@@ -16,20 +16,20 @@ exports.createSession = function(profile) {
 };
 
 var User = NEWSCHEMA('User');
-User.define('id', String);
-User.define('idfacebook', String);
-User.define('idgoogle', String);
-User.define('idlinkedin', String);
-User.define('idinstagram', String);
-User.define('idyandex', String);
-User.define('iddropbox', String);
-User.define('idvk', String);
-User.define('idyahoo', String);
-User.define('idlive', String);
-User.define('ip', String);
-User.define('name', String, true);
-User.define('email', String);
-User.define('gender', String);
+User.define('id', 'String(10)');
+User.define('idfacebook', 'String(30)');
+User.define('idgoogle', 'String(30)');
+User.define('idlinkedin', 'String(30)');
+User.define('idinstagram', 'String(30)');
+User.define('idyandex', 'String(30)');
+User.define('iddropbox', 'String(30)');
+User.define('idvk', 'String(30)');
+User.define('idyahoo', 'String(30)');
+User.define('idlive', 'String(30)');
+User.define('ip', 'String(80)');
+User.define('name', 'String(50)', true);
+User.define('email', 'String(200)');
+User.define('gender', 'String(20)');
 User.define('datecreated', Date);
 
 // Gets a specific user

@@ -1,15 +1,14 @@
-var Fs = require('fs');
 var Product = NEWSCHEMA('Product');
-Product.define('id', String);
+Product.define('id', 'String(10)');
 Product.define('pictures', '[String]');
-Product.define('reference', String);
-Product.define('category', String, true);
-Product.define('name', String, true);
+Product.define('reference', 'String(20)');
+Product.define('category', 'String(50)', true);
+Product.define('name', 'String(50)', true);
 Product.define('price', Number, true);
 Product.define('body', String, true);
 Product.define('istop', Boolean);
-Product.define('linker', String);
-Product.define('linker_category', String);
+Product.define('linker', 'String(50)');
+Product.define('linker_category', 'String(50)');
 Product.define('datecreated', Date);
 
 // Sets default values
@@ -226,7 +225,7 @@ Product.addWorkflow('category', function(error, model, options, callback) {
 
 // Imports CSV
 Product.addWorkflow('import', function(error, model, filename, callback) {
-	Fs.readFile(filename, function(err, buffer) {
+	require('fs').readFile(filename, function(err, buffer) {
 
 		if (err) {
 			error.push(err);

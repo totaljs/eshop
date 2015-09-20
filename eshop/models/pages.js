@@ -8,20 +8,20 @@
 // "create-url"
 
 var Page = NEWSCHEMA('Page');
-Page.define('id', String);
-Page.define('parent', String);
-Page.define('template', String, true);
+Page.define('id', 'String(10)');
+Page.define('parent', 'String(10)');
+Page.define('template', 'String(30)', true);
 Page.define('language', 'String(3)');
-Page.define('url', String);
+Page.define('url', 'String(200)');
 Page.define('icon', 'String(20)');
 Page.define('navigations', '[String]');
 Page.define('widgets', '[String]'); // Widgets lists, contains Array of ID widget
 Page.define('settings', '[String]'); // Widget settings (according to widgets array index)
 Page.define('tags', '[String]');
 Page.define('pictures', '[String]') // URL address to first 5 pictures
-Page.define('name', String);
+Page.define('name', 'String(50)');
 Page.define('perex', 'String(500)');
-Page.define('title', String, true);
+Page.define('title', 'String(100)', true);
 Page.define('priority', Number);
 Page.define('ispartial', Boolean);
 Page.define('body', String);

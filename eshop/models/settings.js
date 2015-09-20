@@ -44,7 +44,6 @@ Settings.define('oauth2_vk_secret', String);
 Settings.define('oauth2_linkedin_key', String);
 Settings.define('oauth2_linkedin_secret', String);
 
-
 // Saves settings into the file
 Settings.setSave(function(error, model, options, callback) {
 	var settings = U.extend({}, model.$clean());
