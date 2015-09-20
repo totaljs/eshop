@@ -10,6 +10,6 @@
 .CMS_remove { padding-top: 2px; cursor: no-drop; }
 .CMS_edit { cursor: text; }
 .CMS_widget { background-color: #F0F0F0; text-align: center; padding: 20px 0; font-weight: bold; color: black; margin: 1px; }
-.CMS_widget pre { padding: 10px; margin: 10px 10px 0; display: block; background-color: white; font-weight: normal; text-align: left; }
+.CMS_widget pre { padding: 10px; margin: 10px 10px 0; display: block; background-color: white; font-weight: normal; text-align: center; }
 #CMS { margin: 20px 0; }
 .CMS_hidden { display: block !important; }

@@ -269,17 +269,17 @@ Page.addOperation('render', function(error, model, options, callback) {
 			if (!response.widgets)
 				return callback(response);
 
-
 			var Widget = GETSCHEMA('Widget');
 
 			// Loads widgets
 			Widget.workflow('load', null, response.widgets, function(err, widgets) {
 				var index = 0;
 				response.widgets.wait(function(key, next) {
-
+					// INIT WIDGET
 					var custom = {};
 					custom.settings = response.settings[index++];
 					custom.page = response;
+					custom.controller = options.controller;
 
 					if (!widgets[key]) {
 						F.error(new Error('Widget # ' + key + ' not found'), 'Page: ' + response.name, response.url);
@@ -299,7 +299,7 @@ Page.addOperation('render', function(error, model, options, callback) {
 					}, true);
 
 				}, function() {
-
+					// DONE
 					if (response.language)
 						response.body = F.translator(response.language, response.body);
 
@@ -490,7 +490,13 @@ F.eval(function() {
 		}
 
 		self.memorize('cache.' + url, '1 minute', DEBUG || cache !== true, function() {
-			GETSCHEMA('Page').operation('render', url, function(err, response) {
+
+			var options = {};
+
+			options.url = url;
+			options.controller = self;
+
+			GETSCHEMA('Page').operation('render', options, function(err, response) {
 
 				if (err) {
 					self.status = 404;
