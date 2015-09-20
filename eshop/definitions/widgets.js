@@ -7,6 +7,7 @@ GETSCHEMA('Widget').addTransform('Top products', function(error, model, data, ca
 
 	// data.settings
 	// data.page
+	// data.controller
 
 	var options = {};
 	options.max = 12;
