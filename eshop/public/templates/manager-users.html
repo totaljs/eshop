@@ -138,11 +138,6 @@
 						return;
 					$.components.DELETE(managerurl + '/api/users', { id: row.id }, function() {
 						users_refresh(true);
-
-						// Refresh dashboard informations
-						if (window.dashboard_refresh)
-							window.dashboard_refresh();
-
 					});
 					break;
 			}
@@ -167,10 +162,6 @@
 				hide();
 				users_refresh(true);
 				success();
-
-				// Refreshes dashboard informations
-				if (window.dashboard_refresh)
-					window.dashboard_refresh();
 			});
 		};
 	});
@@ -193,7 +184,7 @@
 		});
 	}
 
-	// Watchs changes in order filter
+	// Watchs changes in user filter
 	WATCH('users.filter.*', function(path, value) {
 		if (NOTMODIFIED('users.filter', users.filter))
 			return;
