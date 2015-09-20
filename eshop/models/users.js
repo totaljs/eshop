@@ -173,6 +173,7 @@ User.addWorkflow('login', function(error, model, options, callback) {
 	DB('users').one(filter, function(err, doc) {
 
 		if (!doc) {
+
 			// new user
 			doc = User.create();
 			doc.name = options.profile.name;
@@ -181,6 +182,10 @@ User.addWorkflow('login', function(error, model, options, callback) {
 			doc.ip = options.profile.ip;
 			doc[id] = options.profile[id];
 			DB('users').insert(doc.$clean(), F.error());
+
+			// Writes stats
+			MODULE('webcounter').increment('users');
+
 		} else {
 			if (doc[id] !== options.profile[id]) {
 				DB('users').update(function(user) {
