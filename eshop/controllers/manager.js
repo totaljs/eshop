@@ -27,6 +27,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/users/{id}/',         json_users_read);
 	F.route(CONFIG('manager-url') + '/api/users/',              json_users_save, ['put', '*User']);
 	F.route(CONFIG('manager-url') + '/api/users/',              json_users_remove, ['delete']);
+	F.route(CONFIG('manager-url') + '/api/users/clear/',        json_users_clear);
 
 	// PRODUCTS
 	F.route(CONFIG('manager-url') + '/api/products/',            json_products_query);
@@ -361,6 +362,12 @@ function json_users_read(id) {
 	var options = {};
 	options.id = id;
 	GETSCHEMA('User').get(options, self.callback());
+}
+
+// Clears all users
+function json_users_clear() {
+	var self = this;
+	GETSCHEMA('User').workflow('clear', null, null, self.callback(), true);
 }
 
 // ==========================================================================
