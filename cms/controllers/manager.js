@@ -131,6 +131,7 @@ function upload_base64() {
 // Clears all uploaded files
 function json_files_clear() {
 	var Fs = require('fs');
+
 	U.ls(DB('files').binary.directory, function(files) {
 		files.wait(function(item, next) {
 			Fs.unlink(item, next);
