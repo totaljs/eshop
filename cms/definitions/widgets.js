@@ -4,6 +4,10 @@
 
 GETSCHEMA('Widget').addTransform('Blogs', function(error, model, data, callback) {
 
+	// data.settings
+	// data.page
+	// data.controller
+
 	var prepare = function(doc) {
 		if (!doc.navigations)
 			return;
@@ -21,10 +25,19 @@ GETSCHEMA('Widget').addTransform('Blogs', function(error, model, data, callback)
 	DB('pages').sort(prepare, sort, function(err, docs) {
 		if (err)
 			return callback('');
-		callback(F.view('~widgets/blogs', docs));
+
+		var model = {};
+		model.max = U.parseInt(data.settings, 5);
+		model.items = docs;
+		callback(F.view('~widgets/blogs', model));
 	});
 });
 
 GETSCHEMA('Widget').addTransform('Contact form', function(error, model, data, callback) {
+
+	// data.settings
+	// data.page
+	// data.controller
+
 	callback(F.view('~widgets/contactform'));
 });

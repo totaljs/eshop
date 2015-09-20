@@ -1,11 +1,59 @@
-@{foreach m in model}
-<div class="row bloglisting">
-	<div class="col-md-12">
-		<a href="@{m.url}">@{m.title}</a>
-		<p>@{m.perex.max(220)}</p>
-		<div><b>@{new Date(m.datecreated).format('yyyy-MM-dd HH:mm')}</b></div>
+<div data-max="@{model.max}" data-component="blogs">
+	@{foreach m in model.items}
+	<div class="row bloglisting@{if index >= model.max} hidden@{fi}">
+		<div class="col-md-12">
+			<a href="@{m.url}">@{m.title}</a>
+			<p>@{m.perex.max(220)}</p>
+			<div><b>@{new Date(m.datecreated).format('yyyy-MM-dd HH:mm')}</b></div>
+		</div>
+	</div>
+	@{end}
+	<div class="blogs-more row hidden">
+		<div class="col-md-4"></div>
+		<div class="col-md-4">
+			<br />
+			<a href="javascript:void(0)" class="linkbutton">Show more blogs</a>
+		</div>
 	</div>
 </div>
-@{end}
+
 <br />
 <br />
+
+<script>
+	COMPONENT('blogs', function() {
+
+		var self = this;
+		var max;
+		var count = 0;
+		var blogs;
+
+		self.make = function() {
+			max = +self.attr('data-max');
+			if (isNaN(max))
+				max = 5;
+
+			blogs = self.find('.bloglisting');
+			self.more();
+
+			self.find('.blogs-more').on('click', function(e) {
+				self.more();
+			});
+		};
+
+		self.more = function() {
+
+			count += max;
+
+			var length = blogs.length;
+			var exist = length <= count;
+
+			blogs.each(function(index) {
+				if (index < count)
+					$(this).removeClass('hidden');
+			});
+
+			$('.blogs-more').toggleClass('hidden', exist);
+		};
+	});
+</script>
