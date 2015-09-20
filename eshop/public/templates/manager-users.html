@@ -1,0 +1,226 @@
+<div class="filter">
+	<div class="container">
+		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> @(Users)</div>
+		<div class="row">
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.filter.search" data-placeholder="@(Search users ...)" data-control-icon="fa-search"></div>
+				<div class="help" data-component="template" data-component-path="users.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div data-component="grid" data-component-path="users.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more users)" data-component-id="users.grid">
+		<script type="text/html">
+		<tr>
+			<td><span class="mr5">{{ name }}</span> {{ id | oauth2 }}</td>
+			<td style="width:220px" class="hidden-xs fs11">{{ email }}</td>
+			<td style="width:100px" class="ui-right hidden-xs">{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
+			<td style="width:80px" class="ui-right">
+				<button name="edit" title="@(Show)"><span class="fa fa-search"></span></button>
+				<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+			</td>
+		</tr>
+		</script>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(User evidence)" data-component-path="common.form" data-if="value === 'users'" data-width="900px" data-component-id="users.form">
+	<br />
+	<div data-component="template" data-component-path="users.form" class="padding" style="padding-bottom:0">
+		<script type="text/html">
+		<table class="table table-bordered" border="0">
+			<tbody>
+				<tr>
+					<td class="col-xs-4 active">@(# id)</td>
+					<td><a href="/checkout/{{ id }}/">{{ id }}</a></td>
+				</tr>
+				<tr>
+					<td class="col-xs-4 active">@(IP address)</td>
+					<td>{{ ip }}</td>
+				</tr>
+				<tr>
+					<td class="col-xs-4 active">@(Created)</td>
+					<td>{{ datecreated | format('yyyy-MM-dd') }}</td>
+				</tr>
+			</tbody>
+		</table>
+		</script>
+	</div>
+
+	<div class="padding" style="padding-bottom:0">
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-component="textbox" data-component-path="users.form.name" data-required="true">@(Name)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-component="textbox" data-component-path="users.form.email">@(Email)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-component="textbox" data-component-path="users.form.gender">@(Gender)</div>
+			</div>
+		</div>
+	</div>
+	<hr />
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.form.idfacebook">Facebook #</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.form.idgoogle">Google #</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.form.idlinkedin">LInkedIn #</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.form.idlive">Windows Live #</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.form.idyahoo">Yahoo #</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.form.iddropbox">Dropbox #</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.form.idinstagram">Instagram #</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.form.idvk">VKontakte #</div>
+			</div>
+		</div>
+	</div>
+
+	<div data-component="error" data-component-path="users.response"></div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="users.form">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<script>
+	var users = {};
+
+	users.filter = {};
+	users.filter.page = 1;
+	users.filter.type = 0;
+
+	users.grid = [];
+	users.form = {};
+	users.info = {};
+	users.response;
+
+	ON('#users.grid', function(component) {
+
+		// Max items per page
+		users.filter.max = component.max;
+		users_refresh(true);
+
+		component.click = function(index, row, button) {
+			switch ($(button).attr('name')) {
+				case 'edit':
+					$.components.GET(managerurl + '/api/users/' + row.id, null, function(response, err) {
+
+						// Error prevention
+						if (response instanceof Array)
+							response = {};
+
+						SET('users.form', $.extend({}, response), true);
+						SET('users.response', null);
+						SET('common.form', 'users');
+					});
+					break;
+
+				case 'remove':
+					if (!confirm('@(Do you want to remove selected user?)'))
+						return;
+					$.components.DELETE(managerurl + '/api/users', { id: row.id }, function() {
+						users_refresh(true);
+
+						// Refresh dashboard informations
+						if (window.dashboard_refresh)
+							window.dashboard_refresh();
+
+					});
+					break;
+			}
+		};
+
+		component.next = function(page) {
+			SET('users.filter.page', page);
+		};
+	});
+
+	ON('#users.form', function(component) {
+		// Submits user form
+		component.submit = function(hide) {
+
+			$.components.PUT(managerurl + '/api/users/', users.form, function(response) {
+
+				// Error handling
+				SET('users.response', response);
+				if (response instanceof Array)
+					return;
+
+				hide();
+				users_refresh(true);
+				success();
+
+				// Refreshes dashboard informations
+				if (window.dashboard_refresh)
+					window.dashboard_refresh();
+			});
+		};
+	});
+
+	// Method refreshes grid
+	function users_refresh(reset) {
+
+		if (reset) {
+			users.filter.page = 1;
+			users.grid = [];
+		}
+
+		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
+			SET((reset ? '' : '+') + 'users.grid', response.items);
+			if (!reset)
+				return;
+			users.info.count = response.count;
+			users.info.pages = response.pages;
+			UPDATE('users.info');
+		});
+	}
+
+	// Watchs changes in order filter
+	WATCH('users.filter.*', function(path, value) {
+		if (NOTMODIFIED('users.filter', users.filter))
+			return;
+		users_refresh(path !== 'users.filter.page');
+	});
+
+	Tangular.register('oauth2', function() {
+		var prop = ['idfacebook', 'idlinkedin', 'idgoogle', 'iddropbox', 'idinstagram', 'idyandex', 'idyahoo', 'idvk', 'idlive'];
+		var self = this;
+		var builder = '';
+		for (var i = 0, length = prop.length; i < length; i++) {
+			var id = self[prop[i]];
+			if (!id)
+				continue;
+			var icon = prop[i].replace('id', '');
+			switch (icon) {
+				case 'live':
+					icon = 'windows';
+					break;
+				case 'idyandex':
+					icon = 'search';
+					break;
+			}
+			builder += '<span class="mr5 fa blue fa-' + icon + '"></span>';
+		}
+
+		return builder;
+	});
+
+</script>

@@ -112,7 +112,7 @@ Product.setSave(function(error, model, options, callback) {
 			return doc;
 
 		count++;
-		return model;
+		return model.$clean();
 	};
 
 	// Updates database file

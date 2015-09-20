@@ -22,6 +22,12 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/orders/',              json_orders_remove, ['delete']);
 	F.route(CONFIG('manager-url') + '/api/orders/clear/',        json_orders_clear);
 
+	// USERS
+	F.route(CONFIG('manager-url') + '/api/users/',              json_users_query);
+	F.route(CONFIG('manager-url') + '/api/users/{id}/',         json_users_read);
+	F.route(CONFIG('manager-url') + '/api/users/',              json_users_save, ['put', '*User']);
+	F.route(CONFIG('manager-url') + '/api/users/',              json_users_remove, ['delete']);
+
 	// PRODUCTS
 	F.route(CONFIG('manager-url') + '/api/products/',            json_products_query);
 	F.route(CONFIG('manager-url') + '/api/products/',            json_products_save, ['post', '*Product']);
@@ -325,6 +331,36 @@ function json_orders_read(id) {
 	var options = {};
 	options.id = id;
 	GETSCHEMA('Order').get(options, self.callback());
+}
+
+// ==========================================================================
+// USERS
+// ==========================================================================
+
+// Reads all users
+function json_users_query() {
+	var self = this;
+	GETSCHEMA('User').query(self.query, self.callback());
+}
+
+// Saves specific user (user must exist)
+function json_users_save() {
+	var self = this;
+	self.body.$save(self.callback());
+}
+
+// Removes specific user
+function json_users_remove() {
+	var self = this;
+	GETSCHEMA('User').remove(self.body.id, self.callback());
+}
+
+// Reads a specific user by ID
+function json_users_read(id) {
+	var self = this;
+	var options = {};
+	options.id = id;
+	GETSCHEMA('User').get(options, self.callback());
 }
 
 // ==========================================================================

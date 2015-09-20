@@ -8,6 +8,7 @@ OrderItem.define('count', Number, true);
 
 var Order = NEWSCHEMA('Order');
 Order.define('id', String);
+Order.define('iduser', String);
 Order.define('status', 'String(100)');
 Order.define('delivery', 'String(30)', true);
 Order.define('firstname', 'String(40)', true);
@@ -48,6 +49,7 @@ Order.setQuery(function(error, options, callback) {
 	// options.type {String}
 	// options.page {String or Number}
 	// options.max {String or Number}
+	// options.iduser {String}
 
 	options.page = U.parseInt(options.page) - 1;
 	options.max = U.parseInt(options.max, 20);
@@ -88,6 +90,9 @@ Order.setQuery(function(error, options, callback) {
 
 		// Search
 		if (options.search && (doc.id + ' ' + doc.firstname + ' ' + doc.lastname).toSearch().indexOf(options.search) === -1)
+			return;
+
+		if (options.iduser && options.iduser !== doc.iduser)
 			return;
 
 		return doc;
@@ -205,7 +210,7 @@ Order.setSave(function(error, model, options, callback) {
 	var updater = function(doc) {
 		if (doc.id !== model.id)
 			return doc;
-		return model;
+		return model.$clean();
 	};
 
 	// Update order in database

@@ -54,6 +54,12 @@ if (can('settings')) {
 	});
 }
 
+if (can('users')) {
+	jRouting.route(managerurl + '/users/', function() {
+		SET('common.page', 'users');
+	});
+}
+
 if (can('pages')) {
 	jRouting.route(managerurl + '/pages/', function() {
 		SET('common.page', 'pages');

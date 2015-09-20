@@ -1,0 +1,59 @@
+@{title('Sign in')}
+@{sitemap('#account')}
+
+<div id="loading"></div>
+<div class="padding">
+	<br />
+	<h1 style="margin-bottom:0">@{title}</h1>
+	<br />
+	<br />
+	<div class="row">
+		<div class="col-md-2"></div>
+		<div class="col-md-8">
+			<div class="row social-oauth2">
+				@{if config.custom.oauth2_google_key && config.custom.oauth2_google_secret}
+				<div class="col-md-3 col-sm-6 col-xs-6">
+					<a href="/oauth2/google/" rel="nofollow"><span class="fa fa-google-plus"></span><b>Google+</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_facebook_key && config.custom.oauth2_facebook_secret}
+				<div class="col-md-3 col-sm-6 col-xs-6">
+					<a href="/oauth2/facebook/" rel="nofollow"><span class="fa fa-facebook"></span><b>Facebook</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_live_key && config.custom.oauth2_live_secret}
+				<div class="col-md-3 col-sm-6 col-xs-6">
+					<a href="/oauth2/live/" rel="nofollow"><span class="fa fa-windows"></span><b>Windows</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_linkedin_key && config.custom.oauth2_linkedin_secret}
+				<div class="col-md-3 col-sm-6 col-xs-6">
+					<a href="/oauth2/linkedin/" rel="nofollow"><span class="fa fa-linkedin"></span><b>LinkedIn</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_vk_key && config.custom.oauth2_vk_secret}
+				<div class="col-md-3 col-sm-6 col-xs-6">
+					<a href="/oauth2/vk/" rel="nofollow"><span class="fa fa-vk"></span><b>VKontakte</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_yahoo_key && config.custom.oauth2_yahoo_secret}
+				<div class="col-md-3 col-sm-6 col-xs-6">
+					<a href="/oauth2/yahoo/" rel="nofollow"><span class="fa fa-yahoo"></span><b>Yahoo</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_instagram_key && config.custom.oauth2_instagram_secret}
+				<div class="col-md-3 col-sm-6 col-xs-6">
+					<a href="/oauth2/instagram/" rel="nofollow"><span class="fa fa-instagram"></span><b>Instagram</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_dropbox_key && config.custom.oauth2_dropbox_secret}
+				<div class="col-md-3 col-sm-6 col-xs-6">
+					<a href="/oauth2/dropbox/" rel="nofollow"><span class="fa fa-dropbox"></span><b>Dropbox</b></a>
+				</div>
+				@{fi}
+			</div>
+		</div>
+	</div>
+	<br />
+	<br />
+</div>
