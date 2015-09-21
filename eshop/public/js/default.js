@@ -1,4 +1,14 @@
 $(document).ready(function() {
+
+	if (window.localStorage) {
+		// Loads last location (only for oauth2)
+		var oauth2 = window.localStorage.getItem('oauth2');
+		if (oauth2) {
+			window.localStorage.setItem('oauth2', '');
+			window.location.href = oauth2;
+		}
+	}
+
 	var path = window.location.pathname.substring(1).split('/');
 	$('.categories').find('a[href="/' + path[0] + '/' + path[1] + '/"]').addClass('selected');
 
