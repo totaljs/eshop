@@ -637,11 +637,7 @@ COMPONENT('form', function() {
 					ui.css({ marginTop: '20px' });
 			}
 
-			var el = self.element.find('input');
-
-			if (el.length === 0)
-				el = self.element.find('textarea');
-
+			var el = self.element.find('input,select,textarea');
 			if (el.length > 0)
 				el.eq(0).focus();
 
