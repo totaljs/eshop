@@ -25,7 +25,8 @@ function view_homepage() {
 		options.max = 12;
 		options.homepage = true;
 		GETSCHEMA('Product').query(options, function(err, response) {
-			self.page('#banners', '~index', response, false, true);
+			// Finds homepage page
+			self.page('/', '~index', response, false, true);
 		});
 	});
 }
