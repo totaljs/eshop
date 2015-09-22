@@ -145,7 +145,7 @@
 	// Saves last location after an user click to oauth2
 	$('.social-oauth2').on('click', 'a', function() {
 		if (window.localStorage)
-			window.localStorage.setItem('oauth2', '/checkout/');
+			window.localStorage.setItem('oauth2', window.location.pathname);
 	});
 
 	var common = {};
