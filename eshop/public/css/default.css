@@ -73,7 +73,7 @@ p { margin: 0; }
 .center { text-align: center; margin: 0 auto; }
 .red { color: #D63B32; }
 
-.links > div { margin: 0; border-left: 1px solid #F0F0F0; border-bottom: 1px solid #E0E0E0; padding: 0; }
+.links > div { margin: 0; border-left: 1px solid #F0F0F0; border-top: 1px solid #E0E0E0; border-bottom: 1px solid #E0E0E0; padding: 0; }
 .links > div:first-child { border-left: 0; }
 .links a { display: block; text-align: center; padding: 20px 0; color: gray; background-color: white; font-size: 18px; font-family: $font; font-weight: 200; text-transform: uppercase; }
 .links a:hover { text-decoration: none; background-color: #E0E0E0; }
