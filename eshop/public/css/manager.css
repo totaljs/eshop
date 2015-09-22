@@ -96,3 +96,7 @@ canvas { display: block; }
 	.table-xs td:before { content: attr(data-label); font-weight: bold; border-right: 1px solid #E0E0E0; width: 100px; float: left; margin-right: 10px; }
 	.table-xs tr { margin-bottom: 20px; display: block; }
 }
+
+.oauth2callback { font-size: 11px; white-space: pre-wrap; margin-bottom: 15px; color: silver; }
+.oauth2callback input { width: 100%; color: #505050; padding: 5px; cursor: text; background: #F8F8F8; border: 0; }
+.oauth2callback div { margin-bottom: 3px; }

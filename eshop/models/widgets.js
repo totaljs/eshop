@@ -1,6 +1,6 @@
 var Widget = NEWSCHEMA('Widget')
-Widget.define('id', String);
-Widget.define('name', String, true);
+Widget.define('id', 'String(10)');
+Widget.define('name', 'String(50)', true);
 Widget.define('body', String);
 Widget.define('icon', 'String(20)');
 Widget.define('istemplate', Boolean);

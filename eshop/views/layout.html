@@ -9,7 +9,7 @@
 	<meta name="robots" content="all,follow" />
 	@{head}
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700" />
+	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700" />
 	@{import('default.css', 'favicon.ico')}
 </head>
 <body>
@@ -23,6 +23,12 @@
 						@{foreach m in global.navigations.searchbar}
 						<a href="@{m.url}">@{m.name}</a>
 						@{end}
+					@{fi}
+					@{if user}
+						<a href="/account/" class="b">@{user.name}</a>
+						<a href="/account/logoff/" class="red">Sign out</a>
+					@{else}
+						<a href="/account/" class="b">My Account</a>
 					@{fi}
 				</div>
 			</div>

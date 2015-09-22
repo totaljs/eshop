@@ -10,6 +10,11 @@ exports.install = function() {
 	F.route('/checkout/');
 	F.route('/checkout/{linker}/',        view_checkout);
 	F.route('/checkout/{linker}/paypal/', process_payment_paypal);
+
+	// USER ACCOUNT
+	F.route('/account/',                  view_account, ['authorized']);
+	F.route('/account/logoff/',           redirect_account_logoff, ['authorized']);
+	F.route('/account/',                  'account-oauth2', ['unauthorized']);
 };
 
 // ============================================
@@ -147,4 +152,28 @@ function process_payment_paypal(linker) {
 			self.redirect('../?success=1');
 		}, true);
 	});
+}
+
+// ============================================
+// ACCOUNT
+// ============================================
+
+function view_account() {
+	var self = this;
+	var model = {};
+	var options = {};
+
+	options.type = 0;
+	options.iduser = self.user.id;
+	options.max = 100;
+
+	// Reads all orders
+	GETSCHEMA('Order').query(options, self.callback('account'));
+}
+
+// Logoff
+function redirect_account_logoff() {
+	var self = this;
+	MODEL('users').logoff(self.req, self.res, self.user);
+	self.redirect('/account/');
 }

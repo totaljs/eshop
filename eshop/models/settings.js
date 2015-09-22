@@ -26,6 +26,24 @@ Settings.define('paypalpassword', String);
 Settings.define('paypalsignature', String);
 Settings.define('paypaldebug', Boolean);
 
+// OAuth2
+Settings.define('oauth2_facebook_key', String);
+Settings.define('oauth2_facebook_secret', String);
+Settings.define('oauth2_google_key', String);
+Settings.define('oauth2_google_secret', String);
+Settings.define('oauth2_instagram_key', String);
+Settings.define('oauth2_instagram_secret', String);
+Settings.define('oauth2_yahoo_key', String);
+Settings.define('oauth2_yahoo_secret', String);
+Settings.define('oauth2_live_key', String);
+Settings.define('oauth2_live_secret', String);
+Settings.define('oauth2_dropbox_key', String);
+Settings.define('oauth2_dropbox_secret', String);
+Settings.define('oauth2_vk_key', String);
+Settings.define('oauth2_vk_secret', String);
+Settings.define('oauth2_linkedin_key', String);
+Settings.define('oauth2_linkedin_secret', String);
+
 // Saves settings into the file
 Settings.setSave(function(error, model, options, callback) {
 	var settings = U.extend({}, model.$clean());

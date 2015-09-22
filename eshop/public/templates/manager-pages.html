@@ -60,10 +60,9 @@
 			</div>
 		</div>
 	</div>
-
 </div>
 
-<div data-component="form" data-title="@(Page evidence)" data-component-path="common.form" data-if="value === 'pages'" data-width="1200px" data-component-id="pages.form">
+<div data-component="form" data-title="@(Page evidence)" data-component-path="common.form" data-if="value === 'pages'" data-width="1200px" data-component-id="pages.form" data-autocenter="false">
 	<div class="padding" style="padding-bottom:10px">
 		<div class="row">
 			<div class="col-md-4 m">
@@ -128,7 +127,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Widget evidence)" data-component-path="common.form" data-if="value === 'widgets'" data-width="600px" data-component-id="widgets.form">
+<div data-component="form" data-title="@(Widget evidence)" data-component-path="common.form" data-if="value === 'widgets'" data-width="800px" data-component-id="widgets.form">
 	<div class="padding" style="padding-bottom:0">
 		<div class="row">
 			<div class="col-md-12">
@@ -142,7 +141,7 @@
 	<div class="padding" style="padding-bottom:10px;padding-top:0">
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="textarea" data-component-path="widgets.form.body" data-height="250px" class="ui-textarea-code">@(Body)</div>
+				<div data-component="codemirror" data-component-path="widgets.form.body" data-height="250px" class="ui-textarea-code">@(Body)</div>
 			</div>
 		</div>
 		<div class="row">
@@ -241,7 +240,7 @@
 				<div class="silver">@(The form loads template from the server <u>without default content</u> and creates a new content according to <b>HTML</b> editor. The existing content will be replaced.)</div>
 				<hr />
 				<div data-component="dropdown" data-component-path="pages.editor.html.template" data-source="pages.dependencies.templates" class="m" data-empty="true" data-required="true">@(Template)</div>
-				<div data-component="textarea" data-component-path="pages.editor.html.body" data-icon="fa-code" data-height="300px" data-required="true" class="ui-textarea-code">@(HTML)</div>
+				<div data-component="codemirror" data-component-path="pages.editor.html.body" data-icon="fa-code" data-height="300px" data-required="true" class="ui-textarea-code">@(HTML)</div>
 			</div>
 		</div>
 	</div>
@@ -253,11 +252,11 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Editor source code)" data-component-path="pages.editor.window" data-if="value === 'source'" data-width="800px" data-top="true" data-component-id="page.editor.source">
+<div data-component="form" data-title="@(Source code editor)" data-component-path="pages.editor.window" data-if="value === 'source'" data-width="900px" data-top="true" data-component-id="page.editor.source">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
-				<div data-component="textarea" data-component-path="pages.editor.source" data-icon="fa-code" data-height="400px" data-required="true" class="ui-textarea-code">@(HTML)</div>
+				<div data-component="codemirror" data-component-path="pages.editor.source" data-icon="fa-code" data-height="400px" data-required="true" class="ui-textarea-code">@(HTML)</div>
 			</div>
 		</div>
 	</div>
@@ -657,6 +656,9 @@
 
 	// Editor: Shows form with creating custom HTML
 	function pages_new_content() {
+		SET('pages.editor.html.body', '  ');
+		SET('pages.editor.html.template', '');
+		RESET('pages.editor.html.*', true);
 		SET('pages.editor.window', 'html');
 	}
 
@@ -849,9 +851,10 @@
 
 			body.on('paste', function(e) {
 				e.preventDefault();
+				e.stopPropagation();
 				var iframe = self.element.get(0).contentWindow;
 				var text = e.originalEvent.clipboardData.getData('text/plain');
-				iframe.document.execCommand('insertHTML', false, text);
+				iframe.document.execCommand('insertText', false, text);
 			});
 
 			body.unbind('keydown').on('keydown', function(e) {

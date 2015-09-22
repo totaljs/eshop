@@ -1,13 +1,14 @@
 var OrderItem = NEWSCHEMA('OrderItem');
-OrderItem.define('id', String, true);
+OrderItem.define('id', 'String(10)', true);
 OrderItem.define('price', Number, true);
-OrderItem.define('name', String, true);
-OrderItem.define('reference', String);
+OrderItem.define('name', 'String(50)', true);
+OrderItem.define('reference', 'String(20)');
 OrderItem.define('pictures', '[String]');
 OrderItem.define('count', Number, true);
 
 var Order = NEWSCHEMA('Order');
-Order.define('id', String);
+Order.define('id', 'String(10)');
+Order.define('iduser', 'String(10)');
 Order.define('status', 'String(100)');
 Order.define('delivery', 'String(30)', true);
 Order.define('firstname', 'String(40)', true);
@@ -16,8 +17,8 @@ Order.define('email', 'String(200)', true);
 Order.define('phone', 'String(20)');
 Order.define('address', 'String(1000)', true);
 Order.define('message', 'String(500)');
-Order.define('note', String);
-Order.define('ip', String);
+Order.define('note', 'String(500)');
+Order.define('ip', 'String(80)');
 Order.define('iscompleted', Boolean);
 Order.define('datecreated', Date);
 Order.define('datecompleted', Date);
@@ -48,6 +49,7 @@ Order.setQuery(function(error, options, callback) {
 	// options.type {String}
 	// options.page {String or Number}
 	// options.max {String or Number}
+	// options.iduser {String}
 
 	options.page = U.parseInt(options.page) - 1;
 	options.max = U.parseInt(options.max, 20);
@@ -88,6 +90,9 @@ Order.setQuery(function(error, options, callback) {
 
 		// Search
 		if (options.search && (doc.id + ' ' + doc.firstname + ' ' + doc.lastname).toSearch().indexOf(options.search) === -1)
+			return;
+
+		if (options.iduser && options.iduser !== doc.iduser)
 			return;
 
 		return doc;
@@ -205,7 +210,7 @@ Order.setSave(function(error, model, options, callback) {
 	var updater = function(doc) {
 		if (doc.id !== model.id)
 			return doc;
-		return model;
+		return model.$clean();
 	};
 
 	// Update order in database

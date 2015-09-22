@@ -64,6 +64,10 @@
 			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_pages">@(Clear now)</a></td>
 		</tr>
 		<tr>
+			<td><span class="fa w18 fa-navicon"></span> @(Clear all users)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_users">@(Clear now)</a></td>
+		</tr>
+		<tr>
 			<td><span class="fa w18 fa-file-text"></span> @(Clear all widgets)</td>
 			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_widgets">@(Clear now)</a></td>
 		</tr>
@@ -130,6 +134,17 @@ function system_clear_orders() {
 		success();
 		if (window.orders_refresh)
 			window.orders_refresh(true);
+	});
+}
+
+function system_clear_users() {
+	if (!confirm('@(Please, confirm clearing of the database.)'))
+		return;
+	loading(true);
+	$.components.GET(managerurl + '/api/users/clear/', null, function() {
+		success();
+		if (window.users_refresh)
+			window.users_refresh(true);
 	});
 }
 

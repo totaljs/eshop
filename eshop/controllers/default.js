@@ -25,7 +25,8 @@ function view_homepage() {
 		options.max = 12;
 		options.homepage = true;
 		GETSCHEMA('Product').query(options, function(err, response) {
-			self.page('#banners', '~index', response, false, true);
+			// Finds homepage page
+			self.page('/', '~index', response, false, true);
 		});
 	});
 }
@@ -49,8 +50,8 @@ function view_page() {
 // FILES
 // ==========================================================================
 
-// Reads specific file from database
-// For images (jpg, gif, png) supports percentual resize according "?s=NUMBER" argument in query string e.g.: .jpg?s=50, .jpg?s=80 (for image galleries)
+// Reads a specific file from database
+// For images (jpg, gif, png) supports percentual resizing according "?s=NUMBER" argument in query string e.g.: .jpg?s=50, .jpg?s=80 (for image galleries)
 // URL: /download/*.*
 function file_read(req, res, is) {
 

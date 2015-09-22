@@ -21,7 +21,7 @@
 </div>
 
 <div class="container">
-	<div data-component="grid" data-component-path="products.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more products)" data-component-id="products.grid">
+	<div data-component="grid" data-component-path="products.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more products)" data-component-id="products.grid" data-autocenter="false">
 		<script type="text/html">
 		<tr>
 			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}</td>
@@ -36,8 +36,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Product evidence)" data-component-path="common.form" data-if="value === 'products'" data-width="900px" data-component-id="products.form">
-
+<div data-component="form" data-title="@(Product evidence)" data-component-path="common.form" data-if="value === 'products'" data-width="900px" data-component-id="products.form" data-autocenter="false">
 	<div data-component="visible" data-component-path="products.form.id">
 		<div data-component="template" data-component-path="products.form" class="padding" style="padding-bottom:0">
 			<script type="text/html">

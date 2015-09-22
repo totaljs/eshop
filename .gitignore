@@ -3,3 +3,4 @@ cms/tmp/
 eshop/databases/
 eshop/tmp/
 *.pid
+eshop-postgresql/

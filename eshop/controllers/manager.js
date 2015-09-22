@@ -1,6 +1,6 @@
 exports.install = function() {
 	// Auto-localize static HTML templates
-	F.localize('All templates', '/templates/');
+	F.localize('All templates', '/templates/', true);
 
 	// COMMON
 	F.route(CONFIG('manager-url') + '/*', '~manager');
@@ -21,6 +21,13 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/orders/',              json_orders_save, ['put', '*Order']);
 	F.route(CONFIG('manager-url') + '/api/orders/',              json_orders_remove, ['delete']);
 	F.route(CONFIG('manager-url') + '/api/orders/clear/',        json_orders_clear);
+
+	// USERS
+	F.route(CONFIG('manager-url') + '/api/users/',              json_users_query);
+	F.route(CONFIG('manager-url') + '/api/users/{id}/',         json_users_read);
+	F.route(CONFIG('manager-url') + '/api/users/',              json_users_save, ['put', '*User']);
+	F.route(CONFIG('manager-url') + '/api/users/',              json_users_remove, ['delete']);
+	F.route(CONFIG('manager-url') + '/api/users/clear/',        json_users_clear);
 
 	// PRODUCTS
 	F.route(CONFIG('manager-url') + '/api/products/',            json_products_query);
@@ -132,6 +139,7 @@ function upload_base64() {
 // Clears all uploaded files
 function json_files_clear() {
 	var Fs = require('fs');
+
 	U.ls(DB('files').binary.directory, function(files) {
 		files.wait(function(item, next) {
 			Fs.unlink(item, next);
@@ -324,6 +332,42 @@ function json_orders_read(id) {
 	var options = {};
 	options.id = id;
 	GETSCHEMA('Order').get(options, self.callback());
+}
+
+// ==========================================================================
+// USERS
+// ==========================================================================
+
+// Reads all users
+function json_users_query() {
+	var self = this;
+	GETSCHEMA('User').query(self.query, self.callback());
+}
+
+// Saves specific user (user must exist)
+function json_users_save() {
+	var self = this;
+	self.body.$save(self.callback());
+}
+
+// Removes specific user
+function json_users_remove() {
+	var self = this;
+	GETSCHEMA('User').remove(self.body.id, self.callback());
+}
+
+// Reads a specific user by ID
+function json_users_read(id) {
+	var self = this;
+	var options = {};
+	options.id = id;
+	GETSCHEMA('User').get(options, self.callback());
+}
+
+// Clears all users
+function json_users_clear() {
+	var self = this;
+	GETSCHEMA('User').workflow('clear', null, null, self.callback(), true);
 }
 
 // ==========================================================================

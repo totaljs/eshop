@@ -1,5 +1,5 @@
 var Contact = NEWSCHEMA('Contact');
-Contact.define('id', String);
+Contact.define('id', 'String(10)');
 Contact.define('firstname', 'String(40)', true);
 Contact.define('lastname', 'String(40)', true);
 Contact.define('email', 'String(200)', true);
@@ -13,7 +13,7 @@ Contact.define('datecreated', Date);
 Contact.setSave(function(error, model, options, callback) {
 
 	// Default values
-	model.id = U.GUID(8);
+	model.id = U.GUID(10);
 	model.datecreated = (new Date()).format();
 
 	// Saves to database

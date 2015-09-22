@@ -1,3 +1,13 @@
+======================== v2.0.0
+
+- added OAuth2
+- added Users into the eshop
+- added banners into the eshop
+- added CodeMirror editor into the CMS
+- updated CMS editor
+- most of admin windows are centered to middle
+- some bug fixes
+
 ======================== v1.0.3
 
 - added support for galleries and one gallery widget for example (CMS)

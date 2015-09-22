@@ -75,6 +75,7 @@ function json_products_categories() {
 function json_orders_create() {
 	var self = this;
 	self.body.ip = self.ip;
+	self.body.iduser = self.user ? self.user.id : '';
 	self.body.$workflow('create', self.callback());
 }
 

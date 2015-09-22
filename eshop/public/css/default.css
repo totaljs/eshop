@@ -73,7 +73,7 @@ p { margin: 0; }
 .center { text-align: center; margin: 0 auto; }
 .red { color: #D63B32; }
 
-.links > div { margin: 0; border-left: 1px solid #F0F0F0; border-bottom: 1px solid #E0E0E0; padding: 0; }
+.links > div { margin: 0; border-left: 1px solid #F0F0F0; border-top: 1px solid #E0E0E0; border-bottom: 1px solid #E0E0E0; padding: 0; }
 .links > div:first-child { border-left: 0; }
 .links a { display: block; text-align: center; padding: 20px 0; color: gray; background-color: white; font-size: 18px; font-family: $font; font-weight: 200; text-transform: uppercase; }
 .links a:hover { text-decoration: none; background-color: #E0E0E0; }
@@ -111,6 +111,17 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .linkbutton .fa { margin-right: 5px; }
 .linkbutton img { vertical-align: middle; margin: 1px 10px 0 0; }
 
+.orders > div { border: 1px solid #E0E0E0; border-top: 0; padding: 10px; }
+.orders > div:first-child { border-top: 1px solid #E0E0E0; }
+.orders > div:nth-child(odd) { background-color: #F8F8F8; }
+
+.social-oauth2 div { text-align: center; margin-bottom: 25px; }
+.social-oauth2 a { display: block; background-color: #F0F0F0; padding: 40px 0; border-radius: 4px; color: gray; }
+.social-oauth2 a span { font-size: 50px; text-decoration: none; }
+.social-oauth2 b { font-size: 12px; display: block; margin: 15px 0 0 0; font-weight: normal; }
+.social-oauth2 a:hover { text-decoration: none; background-color: #36CAFD; color: white; }
+.social-oauth2 a:active { box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+
 .message-success { background-color: #8CC152; color: white; padding: 18px 20px; text-align: center; font-size: 16px; }
 
 .bg-smoke { background-color: #F8F8F8; }
@@ -130,4 +141,6 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	.header-padding { padding: 0; }
 	.header-links-container { display: none; }
 	h1, h2 { font-size: 25px; }
+	.orders .col-sm-4 { border-bottom: 1px solid #E0E0E0; text-align: left !important; padding: 10px 0; }
+	.orders .col-sm-4:last-child { border-bottom: 0; }
 }
