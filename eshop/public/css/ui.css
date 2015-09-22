@@ -154,7 +154,7 @@ label span { vertical-align: middle; }
 
 .ui-codemirror-label { margin-bottom: 5px; font-size: 12px; color: #656D78; text-align: left; }
 .ui-codemirror-label .fa { width: 14px; }
-.ui-codemirror-label-required:before { color: red; content: '***'; margin-right: 5px; }
+.ui-codemirror-label-required:before { color: red; content: '*'; margin-right: 5px; }
 .ui-codemirror-invalid .CodeMirror { background-color: #FFF3F3 !important; border: 1px solid #E1A1A1 !important; }
 .CodeMirror { border: 1px solid #E0E0E0; border-radius: 3px; }
 
