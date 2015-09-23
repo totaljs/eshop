@@ -13,7 +13,7 @@ var fs = require('fs');
 var events = require('events');
 
 function WebCounter() {
-    this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0 };
+    this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0 };
     this.online = 0;
     this.arr = [0, 0];
     this.interval = 0;
@@ -195,8 +195,13 @@ WebCounter.prototype.counter = function(req, res) {
         if (date.getDate() !== now.getDate() || date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear())
             isUnique = true;
 
-    } else
+        if (date.diff('months') < 0)
+            stats.uniquemonth++;
+
+    } else {
         isUnique = true;
+        stats.uniquemonth++;
+    }
 
     if (isUnique) {
         stats.unique++;
@@ -483,7 +488,6 @@ function sum(a, b) {
             a[o] = 0;
         if (typeof(b[o]) !== 'undefined')
             a[o] += b[o];
-
     });
 }
 

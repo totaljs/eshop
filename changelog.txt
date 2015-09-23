@@ -1,3 +1,7 @@
+(BETA) ======================== v2.1.0
+
+- updated Webcounter (added uniquemonth value)
+
 ======================== v2.0.0
 
 - added OAuth2
