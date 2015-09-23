@@ -190,7 +190,7 @@ COMPONENT('textbox', function() {
 		else
 			value = value.toString();
 
-		is = isRequired ? self.type === 'email' ? value.match(/^[a-zA-Z_\.]+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/) !== null : self.type === 'currency' ? value > 0 : value.length > 0 : true;
+		is = isRequired ? self.type === 'email' ? value.match(/^[a-zA-Z0-9\-\.\_]+@[a-zA-Z0-9\-\.\_]+?\.[a-zA-Z0-9\-\.\_]{2,3}$/) !== null : self.type === 'currency' ? value > 0 : value.length > 0 : true;
 		return is;
 	};
 
