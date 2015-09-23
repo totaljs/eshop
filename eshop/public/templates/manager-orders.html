@@ -244,6 +244,7 @@
 				case 'reference':
 					orders_form_update(id, function(item) {
 						item[name] = el.val();
+						$.components.dirty('orders.form.*', false);
 					});
 					break;
 				case 'price':
