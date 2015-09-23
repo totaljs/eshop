@@ -199,7 +199,6 @@ User.addWorkflow('login', function(error, model, options, callback) {
 		exports.login(options.controller.req, options.controller.res, doc.id);
 		options.controller.req.user = exports.createSession(doc);
 
-		error.push('error-404-user');
 		callback(doc);
 	});
 });
