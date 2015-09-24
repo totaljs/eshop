@@ -66,33 +66,7 @@
 	<br />
 </div>
 
-<!-- HELPERS -->
-<input type="file" id="system_restore_backup" class="hidden" />
-
 <script>
-// Backup databases
-function system_backup_database() {
-	loading(true);
-	window.location.href = managerurl + '/api/backup/database/';
-	setTimeout(function() {
-		loading(false);
-	}, 5000);
-}
-
-// Restore databases
-function system_restore_database() {
-	$('#system_restore_backup').click();
-}
-
-// Backup website
-function system_backup_website() {
-	loading(true);
-	window.location.href = managerurl + '/api/backup/website/';
-	setTimeout(function() {
-		loading(false);
-	}, 5000);
-}
-
 function system_clear_products() {
 	if (!confirm('@(Please, confirm clearing of the database.)'))
 		return;
@@ -133,7 +107,7 @@ function system_clear_pages() {
 	$.components.GET(managerurl + '/api/pages/clear/', null, function() {
 		success();
 		if (window.pages_refresh)
-			window.pages_refresh();
+			window.pages_refresh(true);
 	});
 }
 
