@@ -1,6 +1,7 @@
 (BETA) ======================== v2.1.0
 
 - added postgresql version
+- fixed CMS editor and code mirror
 - updated Webcounter (added uniquemonth value)
 
 ======================== v2.0.0
