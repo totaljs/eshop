@@ -1,6 +1,3 @@
-var Fs = require('fs');
-var filename = F.path.databases('settings.json');
-
 var SuperUser = NEWSCHEMA('SuperUser');
 SuperUser.define('login', String, true);
 SuperUser.define('password', String, true);
