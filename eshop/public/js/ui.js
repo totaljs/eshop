@@ -1344,7 +1344,7 @@ COMPONENT('codemirror', function() {
 		self.element.append('<div class="ui-codemirror-label' + (isRequired ? ' ui-codemirror-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div><div class="ui-codemirror"></div>');
 		var container = self.element.find('.ui-codemirror');
 
-		editor = CodeMirror(container.get(0), { lineNumbers: self.attr('data-linenumbers') !== 'true', mode: self.attr('data-type') || 'htmlmixed', indentUnit: 4 });
+		editor = CodeMirror(container.get(0), { lineNumbers: self.attr('data-linenumbers') === 'true', mode: self.attr('data-type') || 'htmlmixed', indentUnit: 4 });
 
 		if (height !== 'auto')
 			editor.setSize('100%', height || '200px');
@@ -1362,7 +1362,7 @@ COMPONENT('codemirror', function() {
 				self.reset(true);
 				self.dirty(false);
 				self.set(editor.getValue());
-			}, 1000);
+			}, 200);
 		});
 
 		skipB = true;

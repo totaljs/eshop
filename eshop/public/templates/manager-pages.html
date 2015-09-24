@@ -628,9 +628,13 @@
 	// Editor: Creates custom HTML
 	ON('#page.editor.html', function(component) {
 		component.submit = function(hide) {
-			SET('pages.form.body', pages.editor.html.body);
-			SET('pages.form.template', pages.editor.html.template);
 			hide();
+			loading(true);
+			setTimeout(function() {
+				SET('pages.form.body', pages.editor.html.body);
+				SET('pages.form.template', pages.editor.html.template);
+				loading(false, 500);
+			}, 500);
 		};
 	});
 
@@ -648,6 +652,7 @@
 			}
 
 			editor.element.contents().find('#CMS').html(pages.editor.source);
+			editor.events();
 			editor.resize();
 			editor.change(true);
 			hide();
@@ -663,7 +668,7 @@
 	}
 
 	function pages_sourcecode() {
-		SET('pages.editor.source', FIND('cmseditor').getContent());
+		SET('pages.editor.source', FIND('cmseditor').getContent(), true);
 		SET('pages.editor.window', 'source');
 	}
 
