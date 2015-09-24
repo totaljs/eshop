@@ -155,7 +155,7 @@ function system_clear_pages() {
 	$.components.GET(managerurl + '/api/pages/clear/', null, function() {
 		success();
 		if (window.pages_refresh)
-			window.pages_refresh();
+			window.pages_refresh(true);
 	});
 }
 
