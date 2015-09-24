@@ -160,7 +160,7 @@ function json_files_clear() {
 	var sql = DB();
 	sql.remove('pg_largeobject');
 	sql.exec(F.error());
-	self.json(SUCCESS(true));
+	this.json(SUCCESS(true));
 }
 
 // ==========================================================================
