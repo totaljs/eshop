@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	@{meta}
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=10" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="robots" content="all,follow" />
+	@{head}
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700" />
+	@{import('default.css', 'favicon.ico')}
+</head>
+<body>
+	<a href="https://www.totaljs.com/eshop/" class="developer"><b>This eshop is example.</b> Click here for download the source-code.</a>
+	<div data-component="cookie" class="hidden">@(This site uses cookies for visitor statistics. By continuing to browse the site you are agreeing to our use of cookies.) <a href="/privacy/">@(Privacy Policy)</a></div>
+	<div class="header-container">
+		<div class="container">
+			<div class="header-links-container">
+				<div class="header-links">
+					@{if global.navigations.searchbar}
+						@{foreach m in global.navigations.searchbar}
+						<a href="@{m.url}">@{m.name}</a>
+						@{end}
+					@{fi}
+					@{if user}
+						<a href="/account/" class="b">@{user.name}</a>
+						<a href="/account/logoff/" class="red">Sign out</a>
+					@{else}
+						<a href="/account/" class="b">My Account</a>
+					@{fi}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-5 m xs-center">
+					<a href="/"><img src="/img/logo.png" border="0" alt="Eshop" height="70" /></a>
+				</div>
+				<div class="col-sm-3 m ui-right header-padding">
+					<a href="/checkout/" class="checkoutbutton-label hidden-xs"><span class="fa fa-shopping-cart"></span>@(Your shopping cart)</a>
+					<a href="/checkout/" class="checkoutbutton xs-center" data-component="checkout" data-currency="@{config.custom.currency}">&nbsp;</a>
+				</div>
+				<div class="col-sm-4 m header-padding">
+					<form action="/shop/" method="GET">
+						<div class="search">
+							<div class="search-icon"><span class="fa fa-search"></span></div>
+							<div class="search-input"><input type="text" name="q" placeholder="@(Search items ...)" autofocus="autofocus" value="@{query.q}" /></div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="padding-container">
+		<div class="container">
+			<div class="categories">
+				<div class="row">
+					@{foreach m in global.categories}
+						@{if m.count > 0}
+						<div class="col-xs-6 col-sm-4 col-md-4"><a href="/shop/@{m.linker}/">@{m.name}</a></div>
+						@{fi}
+					@{end}
+				</div>
+			</div>
+
+			<div class="content">
+				<nav class="breadcrumb hidden-xs">
+					<span class="fa fa-home"></span>
+					<ul>
+						@{foreach m in sitemap()}
+							<li>@{if !m.first}<span class="fa fa-caret-right"></span>@{fi}
+							@{if m.id === 'category'}
+								<a href="@{m.url.format(repository.linker_category)}">@{repository.category}</a>
+							@{else if m.id === 'detail'}
+								<a href="@{m.url.format(repository.linker_category, repository.linker)}">@{title}</a>
+							@{else if m.id === 'order'}
+								<a href="@{url}">@{title}</a>
+							@{else}
+								<a href="@{m.url}">@{m.name}</a>
+							@{fi}
+							</li>
+						@{end}
+					</ul>
+					<div class="breadcrumb-social hidden-xs">
+						<a href="https://www.facebook.com/totaljs.web.framework"><span class="fa fa-facebook-square"></span></a>
+						<a href="https://twitter.com/totalframework"><span class="fa fa-twitter-square"></span></a>
+						<a href="https://plus.google.com/u/0/+partialjs/posts"><span class="fa fa-google-plus-square"></span></a>
+					</div>
+				</nav>
+				@{body}
+			</div>
+
+			<br />
+			<div class="content">
+				<div class="links">
+					@{if global.navigations.footer}
+						@{foreach m in global.navigations.footer}
+						<div class="col-md-4"><a href="@{m.url}">@{m.title}</a></div>
+						@{end}
+					@{fi}
+				</div>
+				<div class="cl"></div>
+			</div>
+
+			<footer>
+				<div><a href="http://www.paypal.com"><img src="/img/paypal.png" alt="Payment Provider - PayPal" border="0" width="42" height="25" /></a></div>
+				<br />
+				<div class="social">
+					<a href="https://www.facebook.com/totaljs.web.framework"><span class="fa fa-facebook"></span></a>
+					<a href="https://twitter.com/totalframework"><span class="fa fa-twitter"></span></a>
+					<a href="https://plus.google.com/u/0/+partialjs/posts"><span class="fa fa-google"></span></a>
+				</div>
+				<br />
+				<div>&copy; 2015 @(All rights reserved.)</div>
+				<div><a href="http://www.totaljs.com">Powered by total.js - web application framework</a></div>
+			</footer>
+		</div>
+	</div>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	@{js('default.js')}
+	@{section('script')}
+
+</body>
+</html>

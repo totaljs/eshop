@@ -1,0 +1,1095 @@
+<div class="filter">
+	<div class="container">
+		<div class="caption"><span class="fa fa-navicon mr5"></span> @(Pages)</div>
+		<div class="row">
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="pages.filter.search" data-placeholder="@(Search pages ...)" data-control-icon="fa-search"></div>
+				<div class="help" data-component="template" data-component-path="pages.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="dropdown" data-component-path="pages.filter.navigation" data-source="pages.dependencies.navigations" data-empty="true" data-empty-text="@(All pages)"></div>
+			</div>
+			<div class="col-md-6 m">
+				<div class="row">
+					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" data-component-path="pages_new" class="linkbutton"><span class="fa fa-file-text"></span>@(Add new page)</a></div>
+					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" data-component-path="widgets_new" class="linkbutton"><span class="fa fa-plug"></span>@(Add new widget)</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+
+	<ul class="tabmenu" data-component="tabmenu" data-component-path="pages.tab">
+		<li data-value="pages">@(Pages)</li>
+		<li data-value="widgets">@(Widgets)</li>
+	</ul>
+
+	<div class="row" data-component="visible" data-component-path="pages.tab" data-if="value === 'pages'">
+		<div class="col-md-12">
+			<div data-component="grid" data-component-path="pages.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more pages)" data-component-id="pages.grid">
+				<script type="text/html">
+				<tr>
+					<td{{ if ispartial }} class="green"{{ fi }}>{{ if icon }}<span class="fa fa-{{ icon }} w18 mr5"></span>{{ fi }}{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ name }}</td>
+					<td class="col-xs-3 silver fs11 hidden-xs"><span class="fa fa-globe"></span> {{ url }}</td>
+					<td class="col-xs-2 silver fs11 hidden-xs">{{ if navigations && navigations.length > 0 }}<span class="fa fa-sitemap"></span> {{ navigations | join }}{{ fi }}</td>
+					<td style="width:110px" class="ui-right">{{ if ispartial }}<span class="fs11 silver">ID: {{ id }}</span>{{ else }}<a href="{{ url }}" class="fs11" target="_blank">@(show page)</a>{{ fi }}</td>
+					<td style="width:80px" class="ui-right">
+						<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
+						<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+					</td>
+				</tr>
+				</script>
+			</div>
+		</div>
+	</div>
+
+	<div class="row hidden" data-component="visible" data-component-path="pages.tab" data-if="value === 'widgets'">
+		<div class="col-md-12" data-component="visible" data-component-path="widgets.grid" data-if="value && value.length > 0">
+			<div data-component="grid" data-component-path="widgets.grid" data-options-page="@(All registered widgets ($))" data-max="10000" data-component-id="widgets.grid">
+				<script type="text/html">
+				<tr>
+					<td{{ if istemplate}} class="silver"{{ fi }}><span class="fa fa-{{ if icon }}{{ icon }}{{ else if istemplate }}code{{ else }}plug{{ fi }} w18 mr5"></span> {{ name }}</td>
+					<td style="width:80px" class="ui-right">
+						<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
+						<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+					</td>
+				</tr>
+				</script>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Page evidence)" data-component-path="common.form" data-if="value === 'pages'" data-width="1200px" data-component-id="pages.form" data-autocenter="false">
+	<div class="padding" style="padding-bottom:10px">
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-component="textbox" data-component-path="pages.form.title" data-required="true" data-placeholder="@(Page title)">@(Title)</div>
+				<div data-component="template" data-component-path="pages.form" class="fs11 mt5 silver">
+					<script type="text/html">
+						<b>ID:</b> {{ id | default('.....') }}
+					</script>
+				</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-component="textbox" data-component-path="pages.form.url" data-required="true" data-placeholder="@(Page relative URL address)" data-icon="fa-globe">@(URL address)</div>
+				<div data-component="checkbox" data-component-path="pages.form.ispartial" class="fs11 green mt5">@(Is partial content)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-component="dropdown" data-component-path="pages.form.template" data-source="pages.dependencies.templates" data-empty="true">@(Template)</div>
+				<div class="mt5 fs11" style="float:left"><a href="javascript:void(0)" data-component="click" data-component-path="pages_new_content"><span class="fa fa-code mr5"></span>@(Create custom content)</a></div>
+				<div class="cl"></div>
+			</div>
+		</div>
+	</div>
+	<hr style="margin:0 0 8px" />
+	<div class="help ui-center" style="margin-bottom:8px;padding:0 20px"><b>@(Editor formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L). <a href="javascript:void(0)" data-component="click" data-component-path="pages_sourcecode" class="black"><span class="fa fa-code w18"></span>Show source-code</a></div>
+	<div class="pages-editor"><iframe src="about:blank" data-component="cmseditor" data-component-path="pages.form.template"></iframe></div>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-component="dropdowncheckbox" data-component-path="pages.form.navigations" data-source="pages.dependencies.navigations" data-icon="fa-bars">@(Navigation)</div>
+				<div class="help">@(Where will be the page shown?)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-component="dropdown" data-component-path="pages.form.parent" data-source="pages.sitemap" data-source-text="name" data-source-value="id" data-empty="true" data-icon="fa-sitemap">@(Parent)</div>
+				<div class="help">@(Affects sitemap and breadcrumb.)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-component="textbox" data-component-path="pages.form.name">@(Name)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textboxtags" data-component-path="pages.form.tags">@(Internal tags)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-component="textbox" data-component-path="pages.form.priority" data-align="center" data-component-type="number" data-maxlength="3" data-increment="true" data-icon="fa-sort-amount-desc">@(Priority)</div>
+				<div class="help">@(Affects navigation ordering.)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-component="textbox" data-component-path="pages.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag">@(Language)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-component="textbox" data-component-path="pages.form.icon" data-align="center" data-maxlength="20" data-placeholder="e.g. home">@(Icon)</div>
+				<div class="help"><a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font-Awesome</a> @(without) <code>fa-</code></div>
+			</div>
+		</div>
+	</div>
+	<div data-component="error" data-component-path="pages.response"></div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="pages.form">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Widget evidence)" data-component-path="common.form" data-if="value === 'widgets'" data-width="800px" data-component-id="widgets.form">
+	<div class="padding" style="padding-bottom:0">
+		<div class="row">
+			<div class="col-md-12">
+				<div data-component="textbox" data-component-path="widgets.form.name" data-required="true">@(Name)</div>
+				<br />
+				<div data-component="checkbox" data-component-path="widgets.form.istemplate" class="b">@(Is only HTML template)</div>
+			</div>
+		</div>
+	</div>
+	<hr />
+	<div class="padding" style="padding-bottom:10px;padding-top:0">
+		<div class="row">
+			<div class="col-md-12 m">
+				<div data-component="codemirror" data-component-path="widgets.form.body" data-height="250px" class="ui-textarea-code">@(Body)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="widgets.form.icon" data-placeholder="e.g. home">@(Icon)</div>
+				<div class="help"><a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font-Awesome</a> @(without) <code>fa-</code></div>
+			</div>
+		</div>
+	</div>
+	<div data-component="error" data-component-path="widgets.response"></div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="widgets.form">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Select widget)" data-component-path="pages.editor.window" data-if="value === 'widgets'" data-width="500px" data-top="true" data-component-id="page.editor.widgets">
+	<div class="padding">
+		<div data-component="repeater" data-component-path="pages.editor.widgets">
+			<script type="text/html">
+				<div class="pages-editor-widget" data-id="{{ id }}" data-template="{{ istemplate }}" data-name="{{ name }}"><span class="fa fa-{{ if icon }}{{ icon }}{{ else if istemplate }}code{{ else }}plug{{ fi }} w18"></span> {{ name }}</div>
+			</script>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Picture editor)" data-component-path="pages.editor.window" data-if="value === 'picture'" data-width="1100px" data-top="true" data-component-id="page.editor.picture">
+	<div class="padding">
+		<div data-component="crop" data-component-path="pages.editor.crop.url" data-width="700" data-height="500" data-component-id="pages.editor.crop"></div>
+		<div class="row">
+			<br />
+			<div class="col-md-12 m">
+				<div data-component="textbox" data-component-path="pages.editor.crop.alt" data-required="true">@(Picture description)</div>
+			</div>
+			<div class="col-md-12" data-component="visible" data-component-path="pages.editor.crop.href" data-if="value && value.length > 0">
+				<div data-component="textbox" data-component-path="pages.editor.crop.href">@(URL address)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="pages.editor.crop">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Link editor)" data-component-path="pages.editor.window" data-if="value === 'link'" data-width="450px" data-top="true" data-component-id="page.editor.link">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="silver"><span class="fa fa-link"></span> @(<b>Change the target URL address</b> and other settings for the selected link.)</div>
+				<hr />
+				<div data-component="fileupload" data-component-path="pages.editor.link.file" data-placeholder="@(Browse device)" data-icon="fa-file" class="m">@(Upload file)</div>
+				<div data-component="textbox" data-component-path="pages.editor.link.href" data-required="true" class="m" data-icon="fa-globe">@(URL address)</div>
+				<div data-component="dropdown" data-component-path="pages.editor.link.target" data-required="true" data-options="@(Current tab or window)|_self;@(New tab or window)|_blank" class="m">@(Target)</div>
+				<div data-component="textbox" data-component-path="pages.editor.link.title" data-icon="fa-info-circle">@(Title)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="pages.editor.link">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Widget settings)" data-component-path="pages.editor.window" data-if="value === 'widget'" data-width="500px" data-top="true" data-component-id="page.editor.widget">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="silver"><span class="fa fa-plug"></span> @(Add a custom settings for the selected widget. The setting affects behavior of the widget.)</div>
+				<hr />
+				<div data-component="textarea" data-component-path="pages.editor.widget.settings" data-icon="fa-cog" data-height="150px" class="ui-textarea-code">@(Settings)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="pages.editor.widget">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Create custom HTML content)" data-component-path="pages.editor.window" data-if="value === 'html'" data-width="800px" data-top="true" data-component-id="page.editor.html">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="silver">@(The form loads template from the server <u>without default content</u> and creates a new content according to <b>HTML</b> editor. The existing content will be replaced.)</div>
+				<hr />
+				<div data-component="dropdown" data-component-path="pages.editor.html.template" data-source="pages.dependencies.templates" class="m" data-empty="true" data-required="true">@(Template)</div>
+				<div data-component="codemirror" data-component-path="pages.editor.html.body" data-icon="fa-code" data-height="300px" data-required="true" class="ui-textarea-code">@(HTML)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="pages.editor.html">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Source code editor)" data-component-path="pages.editor.window" data-if="value === 'source'" data-width="900px" data-top="true" data-component-id="page.editor.source">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-12">
+				<div data-component="codemirror" data-component-path="pages.editor.source" data-icon="fa-code" data-height="400px" data-required="true" class="ui-textarea-code">@(HTML)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="pages.editor.source">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<script>
+
+	// PAGES
+	var pages = {};
+	pages.grid = [];
+	pages.sitemap = [];
+	pages.tab = 'pages';
+
+	pages.filter = {};
+	pages.filter.page = 1;
+	pages.filter.navigation = '';
+	pages.filter.search = '';
+
+	pages.dependencies = {};
+	pages.form = {};
+	pages.info = {};
+	pages.editor = {};
+	pages.response = null;
+
+	pages.editor.widgets = null;
+	pages.editor.window = '';
+	pages.editor.crop = {};
+	pages.editor.link = {};
+	pages.editor.widget = {};
+	pages.editor.html = {};
+	pages.editor.source = '';
+
+	ON('#pages.grid', function(component) {
+
+		pages.filter.max = component.max;
+
+		pages_refresh_dependencies();
+		pages_refresh(true);
+		pages_refresh_sitemap();
+
+		component.click = function(index, row, button) {
+			switch ($(button).attr('name')) {
+				case 'edit':
+					loading(true);
+					$.components.GET(managerurl + '/api/pages/' + row.id, null, function(response, err) {
+						// Error prevention
+						if (response instanceof Array)
+							response = {};
+						SET('pages.response', null);
+						SET('pages.form', $.extend({ $index: index }, response), true);
+						SET('common.form', 'pages');
+						loading(false, 500);
+					});
+					break;
+				case 'remove':
+					if (!confirm('@(Do you want to remove) ' + row.name + '?'))
+						return;
+					$.components.DELETE(managerurl + '/api/pages', { id: row.id }, function() {
+						pages_refresh(true);
+					});
+					break;
+			}
+		};
+
+		component.next = function(page) {
+			SET('pages.filter.page', page);
+		};
+	});
+
+	ON('#pages.form', function(component) {
+		// Submit order form
+		component.submit = function(hide) {
+			var editor = FIND('cmseditor');
+			var widgets = editor.getWidgets();
+
+			pages.form.pictures = editor.getPictures();
+			pages.form.perex = editor.getPerex();
+			pages.form.widgets = widgets.widgets;
+			pages.form.settings = widgets.settings;
+			pages.form.body = editor.getContent();
+
+			$.components.POST(managerurl + '/api/pages/', pages.form, function(response) {
+
+				// Error handling
+				SET('pages.response', response);
+				if (response instanceof Array)
+					return;
+
+				hide();
+				success();
+				pages_refresh(true);
+
+				if (!pages.form.ispartial)
+					setTimeout(pages_refresh_sitemap, 2000);
+			});
+		};
+	});
+
+	// Watchs changes in order filter
+	WATCH('pages.filter.*', function(path, value) {
+		if (NOTMODIFIED('pages.filter', pages.filter))
+			return;
+		pages_refresh(path !== 'pages.filter.page');
+	});
+
+	// Method refreshes grid
+	function pages_refresh(reset) {
+		if (reset) {
+			pages.filter.page = 1;
+			pages.grid = [];
+		}
+
+		$.components.GET(managerurl + '/api/pages/', pages.filter, function(response) {
+
+			// Sorts pages by navigation priority
+			if (pages.filter.navigation) {
+				response.items.sort(function(a, b) {
+					if (a.priority > b.priority)
+						return -1;
+					return a.priority === b.priority ? 0 : 1;
+				});
+			}
+
+			SET((reset ? '' : '+') + 'pages.grid', response.items);
+
+			if (pages.tab !== 'pages')
+				SET('pages.tab', 'pages');
+
+			if (!reset)
+				return;
+
+			pages.info.count = response.count;
+			pages.info.pages = response.pages;
+			UPDATE('pages.info');
+		});
+	}
+
+	function pages_refresh_sitemap() {
+		$.components.GET(managerurl + '/api/pages/sitemap/', null, function(response) {
+			// Converts object to Array
+			var keys = Object.keys(response);
+			keys.sort();
+			var sitemap = [];
+			for (var i = 0, length = keys.length; i < length; i++)
+				sitemap.push(response[keys[i]]);
+			SET('pages.sitemap', sitemap);
+		});
+	}
+
+	// Refreshes templates and navigations
+	function pages_refresh_dependencies() {
+		$.components.GET(managerurl + '/api/pages/dependencies/', null, 'pages.dependencies');
+	}
+
+	function pages_new() {
+		SET('pages.response', null);
+		// CMS creates automatically URL when the URL field will contain "---"
+		SET('pages.form', { url: '---' }, true);
+		SET('common.form', 'pages');
+	}
+
+	// WIDGETS
+	var widgets = {};
+	widgets.grid = [];
+	widgets.form = {};
+	widgets.response = null;
+
+	ON('#widgets.grid', function(component) {
+		widgets_refresh(true);
+		component.click = function(index, row, button) {
+			switch ($(button).attr('name')) {
+				case 'edit':
+					loading(true);
+					$.components.GET(managerurl + '/api/widgets/' + row.id, null, function(response, err) {
+						// Error prevention
+						if (response instanceof Array)
+							response = {};
+
+						SET('widgets.response', null);
+						SET('widgets.form', $.extend({ $index: index }, response), true);
+						SET('common.form', 'widgets');
+						loading(false, 500);
+					});
+					break;
+				case 'remove':
+					if (!confirm('@(Do you want to remove) ' + row.name + '?'))
+						return;
+					$.components.DELETE(managerurl + '/api/widgets', { id: row.id }, function() {
+						widgets_refresh();
+					});
+					break;
+			}
+		};
+	});
+
+	ON('#widgets.form', function(component) {
+		// Submit order form
+		component.submit = function(hide) {
+			$.components.POST(managerurl + '/api/widgets/', widgets.form, function(response) {
+
+				// Error handling
+				SET('widgets.response', response);
+				if (response instanceof Array)
+					return;
+
+				if (pages.tab !== 'widgets')
+					SET('pages.tab', 'widgets');
+
+				hide();
+				success();
+				widgets_refresh();
+			});
+		};
+	});
+
+	// Method refreshes grid
+	function widgets_refresh() {
+		$.components.GET(managerurl + '/api/widgets/', null, function(response) {
+
+			response.sort(function(a, b) {
+				if (a.istemplate)
+					return 1;
+				return !a.istemplate && b.istemplate ? -1 : 0;
+			});
+
+			SET('widgets.grid', response);
+		});
+	}
+
+	function widgets_new() {
+		SET('widgets.response', null);
+		SET('widgets.form', {}, true);
+		SET('common.form', 'widgets');
+	}
+
+	// COMMON
+	// Editor: Widgets form
+	ON('#page.editor.widgets', function(component) {
+		component.element.on('click', '.pages-editor-widget', function() {
+			var el = $(this);
+			var id = el.attr('data-id');
+			var is = el.attr('data-template') === 'true';
+			var editor = FIND('cmseditor');
+
+			component.hide();
+
+			if (!is) {
+				editor.getTarget().append('<div class="CMS_widget CMS_remove" data-id="' + id + '">--- <span class="fa fa-plug"></span> ' + el.attr('data-name') + ' ---<pre></pre></div>');
+				editor.change(true);
+				editor.resize();
+				return;
+			}
+
+			loading(true);
+			$.components.GET(managerurl + '/api/widgets/' + id, null, function(response, err) {
+				editor.getTarget().append('<div class="CMS_remove">' + response.body + '</div>');
+				editor.change(true);
+				editor.resize();
+				loading(false, 1000);
+			});
+		});
+	});
+
+	// Editor: Picture form
+	ON('#page.editor.picture', function(component) {
+		component.submit = function(hide) {
+
+			var editor = FIND('cmseditor');
+			var target = editor.getTarget();
+			var cropper = FIND('#pages.editor.crop');
+
+			target.attr('alt', pages.editor.crop.alt);
+
+			if (pages.editor.crop.href)
+				target.parent('a').attr('href', pages.editor.crop.href);
+
+			editor.change(true);
+
+			// Is the picture changed?
+			if (cropper.dirty()) {
+				hide();
+				return;
+			}
+
+			var data = cropper.output();
+			loading(true);
+
+			$.components.POST(managerurl + '/upload/base64/', { file: data }, function(response) {
+
+				if (response) {
+					setTimeout(function() {
+						var size = target.attr('data-size');
+						if (size) {
+							target.attr('data-original', response);
+							target.attr('src', response + '?s=' + size.replace('%', ''));
+						} else
+							target.attr('src', response);
+					}, 1000);
+				}
+
+				setTimeout(hide, 1000);
+				loading(false, 1500);
+			});
+		};
+	});
+
+	// Editor: Link form
+	ON('#page.editor.link', function(component) {
+		component.submit = function(hide) {
+
+			var editor = FIND('cmseditor');
+			var target = editor.getTarget();
+			var link;
+
+			if (target.prop('tagName') === 'A')
+				link = target;
+			else
+				link = editor.getParentElement('A');
+
+			link.attr('href', pages.editor.link.href);
+
+			if (pages.editor.link.title)
+				link.attr('title', pages.editor.link.title);
+			else
+				link.removeAttr('title');
+
+			if (pages.editor.link.target === '_self')
+				link.removeAttr('target');
+			else
+				link.attr('target', pages.editor.link.target);
+
+			editor.change(true);
+			hide();
+		};
+
+		component.cancel = function(hide) {
+			var editor = FIND('cmseditor');
+			var target = editor.getTarget();
+			if (target.data('temporary'))
+				target.replaceWith(target.html());
+			hide();
+		};
+
+		WATCH('pages.editor.link.file', function(path, value) {
+			if (!value)
+				return;
+			SET('pages.editor.link.href', '/download/' + value);
+			CHANGE('pages.editor.link.href', true);
+		});
+	});
+
+	// Editor: Widget settings
+	ON('#page.editor.widget', function(component) {
+		component.submit = function(hide) {
+			var editor = FIND('cmseditor');
+			var target = editor.getTarget();
+			target.find('pre').text(pages.editor.widget.settings);
+			editor.change(true);
+			hide();
+		};
+	});
+
+	// Editor: Creates custom HTML
+	ON('#page.editor.html', function(component) {
+		component.submit = function(hide) {
+			hide();
+			loading(true);
+			setTimeout(function() {
+				SET('pages.form.body', pages.editor.html.body);
+				SET('pages.form.template', pages.editor.html.template);
+				loading(false, 500);
+			}, 500);
+		};
+	});
+
+	// Editor: Source-code
+	ON('#page.editor.source', function(component) {
+		component.submit = function(hide) {
+			var editor = FIND('cmseditor');
+			var target = editor.getTarget();
+			editor.toolbar().hide();
+
+			if (target) {
+				target.removeAttr('contentEditable');
+				target.removeClass('CMS_selected');
+				target = null;
+			}
+
+			editor.element.contents().find('#CMS').html(pages.editor.source);
+			editor.events();
+			editor.resize();
+			editor.change(true);
+			hide();
+		};
+	});
+
+	// Editor: Shows form with creating custom HTML
+	function pages_new_content() {
+		SET('pages.editor.html.body', '  ');
+		SET('pages.editor.html.template', '');
+		RESET('pages.editor.html.*', true);
+		SET('pages.editor.window', 'html');
+	}
+
+	function pages_sourcecode() {
+		SET('pages.editor.source', FIND('cmseditor').getContent(), true);
+		SET('pages.editor.window', 'source');
+	}
+
+	// CMS EDITOR
+	COMPONENT('cmseditor', function() {
+		var self = this;
+		var target;
+		var width;
+
+		self.noValid();
+
+		self.write = function(content) {
+			var iframe = self.element.get(0).contentWindow;
+			iframe.document.close();
+			if (!content) {
+				iframe.document.write('<html><head></head><body style="color:gray;text-align:center;padding:90px 0 0;margin:0;font-family:Arial;font-size:11px;color:#ADADAD;line-height:16px">@(<b>WITHOUT CONTENT</b><br />Choose the template for content editing.)</body></html>');
+				iframe.document.close();
+				self.element.css({ height: 'auto' });
+				return;
+			}
+
+			iframe.document.write(content);
+			iframe.document.close();
+			setTimeout(function() {
+				self.events();
+				self.resize(10);
+			}, 500);
+		};
+
+		self.getTarget = function() {
+			return target;
+		};
+
+		self.toolbar = function() {
+			return self.element.contents().find('#CMS_panel');
+		};
+
+		self.getParent = function(cls) {
+			var parent = target.parent();
+			for (var i = 0; i < 20; i++) {
+				if (parent.hasClass(cls))
+					return parent;
+				parent = parent.parent();
+			}
+			return null;
+		};
+
+		self.getParentElement = function(name) {
+			if (target.get(0).nodeName === name)
+				return target;
+			var parent = target.parent();
+			for (var i = 0; i < 20; i++) {
+				var el = parent.get(0);
+				if (!el)
+					break;
+				if (el.nodeName === name)
+					return parent;
+				parent = parent.parent();
+			}
+			return null;
+		};
+
+		self.state = function(type, who) {
+			if (who === 2)
+				self.resize(true);
+		};
+
+		self.getWidgets = function() {
+			var content = self.element.contents();
+			var settings = [];
+			var widgets = [];
+
+			content.find('.CMS_widget').each(function() {
+				var el = $(this);
+				widgets.push(el.attr('data-id'));
+				settings.push(el.find('pre').text());
+			});
+
+			return { widgets: widgets, settings: settings };
+		};
+
+		self.getPerex = function() {
+			return self.element.contents().find('.CMS_perex').html();
+		};
+
+		self.getPictures = function() {
+			var content = self.element.contents();
+			var pictures = [];
+
+			content.find('img.CMS_edit').each(function() {
+				var el = $(this);
+				var url = el.attr('src');
+				if (pictures.indexOf(url) !== -1)
+					return;
+				if (pictures.length < 5)
+					pictures.push(url);
+			});
+
+			return pictures;
+		};
+
+		self.getContent = function() {
+			var content = self.element.contents();
+			content.find('[contenteditable]').removeAttr('contenteditable');
+			content.find('.CMS_widget').html('');
+			content.find('.CMS_selected').removeClass('CMS_selected');
+			content.find('.CMS_edit:empty,.CMS_remove:empty,.CMS_widgets:empty').each(function() {
+				if (this.nodeName === 'IMG')
+					return;
+				if (this.getAttribute('class').indexOf('CMS_widget') === -1)
+					$(this).remove();
+			});
+			return (self.element.contents().find('#CMS').html() || '').trim();
+		};
+
+		self.events = function() {
+
+			var body = self.element.contents();
+
+			body.off('click');
+
+			body.on('click', '.CMS_edit,.CMS_repeat,.CMS_remove,.CMS_widgets', function(e) {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				var el = $(this);
+
+				if (target && this !== target.get(0)) {
+					target.removeClass('CMS_selected');
+					target.removeAttr('contenteditable');
+					target = null;
+				}
+
+				if (target)
+					return;
+
+				var off = el.offset();
+				var panel = self.toolbar();
+				var left = off.left;
+
+				if (left + 200 > width)
+					left = width - 210;
+
+				panel.css({ left: left, top: off.top - panel.innerHeight() - 5 });
+
+				// Firefox
+				setTimeout(function() {
+					panel.show();
+				}, 100);
+
+				var arr = el.attr('class').split(/\s+/);
+				target = el;
+
+				panel.find('span').each(function() {
+					var el = $(this);
+					var name = el.attr('data-name');
+
+					if (name === 'hide')
+						return;
+
+					var disabled = arr.indexOf('CMS_' + name) === -1;
+
+					if (name === 'link')
+						disabled = self.getParentElement('A') === null;
+
+					// Are some widgets?
+					if (name === 'widgets' && !disabled)
+						disabled = widgets.grid.length === 0;
+
+					if (name === 'edit' && target.hasClass('CMS_widget'))
+						disabled = false;
+
+					if (disabled && name === 'repeat')
+						disabled = self.getParent('CMS_repeat') === null;
+
+					if (disabled && name === 'remove')
+						disabled = self.getParent('CMS_remove') === null;
+
+					el.toggleClass('CMS_panel_disabled', disabled);
+				});
+
+				target.addClass('CMS_selected');
+			});
+
+			body.on('paste', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				var iframe = self.element.get(0).contentWindow;
+				var text = e.originalEvent.clipboardData.getData('text/plain');
+				iframe.document.execCommand('insertText', false, text);
+			});
+
+			body.unbind('keydown').on('keydown', function(e) {
+				if (!target)
+					return;
+
+				if (e.keyCode === 13 && target.hasClass('CMS_singleline')) {
+					e.preventDefault();
+					return;
+				}
+
+				if (!e.metaKey && !e.ctrlKey)
+					return;
+
+				if (e.keyCode === 66) {
+					// bold
+					self.element.get(0).contentWindow.document.execCommand('Bold', false, null);
+					e.preventDefault();
+					e.stopPropagation();
+					return;
+				}
+
+				if (e.keyCode === 76) {
+
+					// link
+
+					e.preventDefault();
+					e.stopPropagation();
+
+					var url = '#' + Date.now();
+					self.element.get(0).contentWindow.document.execCommand('CreateLink', false, url);
+					var tmp = self.getTarget().find('a[href="' + url + '"]');
+					if (tmp.length === 0)
+						return;
+
+					target.removeAttr('contentEditable');
+					target.removeClass('CMS_selected');
+					target = tmp;
+					target.data('temporary', true);
+
+					pages.editor.link.file = '';
+					pages.editor.link.href = '';
+					pages.editor.link.target = '_self';
+					pages.editor.link.title = '';
+
+					UPDATE('pages.editor.link', true);
+					SET('pages.editor.window', 'link');
+					return;
+				}
+
+				if (e.keyCode === 73) {
+					// italic
+					self.element.get(0).contentWindow.document.execCommand('Italic', false, null);
+					e.preventDefault();
+					e.stopPropagation();
+					return;
+				}
+
+				if (e.keyCode === 85) {
+					// underline
+					self.element.get(0).contentWindow.document.execCommand('Underline', false, null);
+					e.preventDefault();
+					e.stopPropagation();
+					return;
+				}
+			});
+
+			body.on('click', 'a', function(e) {
+				e.preventDefault();
+			});
+
+			body.find('#CMS_panel').on('click', 'span', function(e) {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				var el = $(this);
+				if (el.hasClass('CMS_panel_disabled'))
+					return;
+
+				var name = el.attr('data-name');
+				switch (name) {
+
+					case 'widgets':
+						SET('pages.editor.widgets', widgets.grid);
+						SET('pages.editor.window', 'widgets');
+						return;
+
+					case 'hide':
+						self.toolbar().hide();
+						target.removeAttr('contentEditable');
+						target.removeClass('CMS_selected');
+						target = null;
+						return;
+
+					case 'link':
+						var href = '';
+						var targ = '';
+						var title = '';
+
+						if (target.prop('tagName') === 'A') {
+							href = target.attr('href');
+							title = target.attr('title');
+							targ = target.attr('target') || '_self';
+						} else {
+							var tmp = self.getParentElement('A');
+							href = tmp.attr('href');
+							title = tmp.attr('title');
+							targ = tmp.attr('target') || '_self';
+						}
+
+						pages.editor.link.file = '';
+						pages.editor.link.href = href;
+						pages.editor.link.target = targ;
+						pages.editor.link.title = title;
+
+						UPDATE('pages.editor.link', true);
+						SET('pages.editor.window', 'link');
+						return;
+
+					case 'edit':
+
+						if (target.attr('contenteditable')) {
+							self.toolbar().hide();
+							target.removeAttr('contentEditable');
+							target.removeClass('CMS_selected');
+							target = null;
+							return;
+						}
+
+						if (target.hasClass('CMS_widget')) {
+							pages.editor.widget.settings = target.find('pre').text();
+							UPDATE('pages.editor.widget', true);
+							SET('pages.editor.window', 'widget');
+							return;
+						}
+
+						if (target.prop('tagName') === 'IMG') {
+							FIND('#pages.editor.crop').resize(parseInt(target.attr('data-width')), parseInt(target.attr('data-height')));
+							pages.editor.crop.url = target.attr('data-original') || target.attr('src');
+							pages.editor.crop.alt = target.attr('alt');
+							pages.editor.crop.href = '';
+
+							var parent = target.parent('a');
+							if (parent.length > 0)
+								pages.editor.crop.href = parent.attr('href');
+
+							UPDATE('pages.editor.crop', true);
+							SET('pages.editor.window', 'picture');
+							return;
+						}
+
+						target.attr('contenteditable', true).focus();
+						self.change(true);
+						break;
+
+					case 'remove':
+
+						if (!target.hasClass('CMS_remove')) {
+							target = self.getParent('CMS_remove');
+							if (!target) {
+								self.toolbar().hide();
+								return;
+							}
+						}
+
+						target.remove();
+						self.toolbar().hide();
+						self.change(true);
+						break;
+
+					case 'repeat':
+
+						if (target.hasClass('CMS_repeat')) {
+							target.after(target.clone().removeAttr('contentEditable').removeClass('CMS_selected').addClass('CMS_remove'));
+						} else {
+							var parent = self.getParent('CMS_repeat');
+							if (parent) {
+								target.removeClass('CMS_selected');
+								parent.after(parent.clone().removeAttr('contentEditable').removeClass('CMS_selected').addClass('CMS_remove'));
+							}
+						}
+
+						self.change(true);
+						break;
+				}
+			});
+
+			var index = 0;
+			body.find('.CMS_widget').each(function() {
+				var el = $(this);
+				var id = el.attr('data-id');
+				for (var i = 0, length = widgets.grid.length; i < length; i++) {
+					if (widgets.grid[i].id !== id)
+						continue;
+					el.html('--- <span class="fa fa-plug"></span> ' + widgets.grid[i].name + ' ---<pre>' + (pages.form.settings ? pages.form.settings[index].replace(/\</g, '&gt;').replace(/\>/g, '&lt;').replace(/\"/g, '&quot;') : '') + '</pre>');
+					break;
+				}
+				index++
+			});
+
+			self.resize(10);
+		};
+
+		self.resize = function(force) {
+			setTimeout(function() {
+				var contents = self.element.contents();
+				var h = contents.find('#CMS').innerHeight() + 100;
+				self.element.css({ height: h });
+				width = contents.width();
+			}, force ? 0 : 500);
+		};
+
+		self.setter = function(value, path, type) {
+
+			if (!value) {
+				self.write('');
+				return;
+			}
+
+			// The value has been changed by user.
+			if (type === 2)
+				pages.form.body = '';
+
+			loading(true);
+			$.components.POST(managerurl + '/api/pages/preview/', { template: pages.form.template, body: pages.form.body }, function(response) {
+				self.write(response.replace('</body>', '<div id="CMS_panel"><span class="fa fa-pencil" title="@(Edit)" data-name="edit"></span><span class="fa fa-link" title="@(Change link)" data-name="link"></span><span class="fa fa-copy" title="@(Duplicate)" data-name="repeat"></span></span><span class="fa fa-gears" title="@(Add widget)" data-name="widgets"></span><span class="fa fa-trash" title="@(Remove content)" data-name="remove"></span><span class="fa fa-toggle-down" title="@(Hide)" data-name="hide"></span></div></body>'));
+				loading(false, 500);
+			});
+		};
+	});
+
+</script>

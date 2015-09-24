@@ -1,0 +1,12 @@
+@{if model.pages > 1}
+<div class="row" style="margin-top:-20px">
+	<div class="pagination">
+		<div class="col-md-12">
+			<nav>
+				<!-- "pagination" helper is defined in /definitions/helpers.js -->
+				@{pagination(model)}
+			</nav>
+		</div>
+	</div>
+</div>
+@{fi}

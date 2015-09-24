@@ -1,0 +1,62 @@
+@{notranslate}
+
+<!-- ALL CMS CONTENT (FOR EDITOR) MUST BE WRAPPED IN <div id="CMS"> -->
+<div id="CMS">
+
+	@{if repository.preview}
+
+		@{if repository.page && repository.page.body}
+
+			<!-- RENDER UPDATED CONTENT -->
+			@{!repository.page.body}
+
+		@{else}
+
+			<!-- DEFAULT CONTENT FOR NEW PAGES FO THIS TEMPLATE -->
+			<div class="padding">
+
+				<h1 class="CMS_edit CMS_singleline">DISABLED MULTILINE</h1>
+				<hr />
+				<div class="row CMS_repeat CMS_remove">
+					<div class="col-md-4 center m"><a href="/"><img src="/img/empty.png" alt="" data-width="400" data-height="200" class="CMS_edit" /></a></div>
+					<div class="col-md-4 center m"><a href="/"><img src="/img/empty.png" alt="" data-width="400" data-height="200" class="CMS_edit" /></a></div>
+					<div class="col-md-4 center m"><a href="/"><img src="/img/empty.png" alt="" data-width="400" data-height="200" class="CMS_edit" /></a></div>
+				</div>
+				<hr />
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8 CMS_widgets">
+						<div class="CMS_edit CMS_repeat CMS_remove m">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus quisquam, iusto repellendus, similique iure nisi, maiores aliquid repellat velit iste repudiandae tempora atque natus cum necessitatibus at quasi quibusdam! Quisquam facilis amet excepturi deleniti pariatur fugit maiores quae odit voluptate suscipit placeat, aut accusamus. Dicta ducimus est nam totam sed?</div>
+					</div>
+				</div>
+				<hr />
+				<div class="CMS_remove">
+					<h2 class="center">Responsive</h2>
+					<br />
+				</div>
+				<div class="row CMS_repeat CMS_remove">
+					<div class="col-md-3 center m CMS_edit">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi unde, est ex, obcaecati libero optio? Possimus doloribus.</div>
+					<div class="col-md-3 center m CMS_edit">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Possimus doloribus, est? Totam ratione voluptatibus.</div>
+					<div class="col-md-3 center m CMS_edit">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime totam dolorum enim, officia natus maiores.</div>
+					<div class="col-md-3 center m"><b>DISABLED EDITING FOR THIS FIELD</b> ipsum dolor sit amet, consectetur adipisicing elit. Nam molestiae dicta optio libero ratione.</div>
+				</div>
+				<br />
+				<hr />
+				<div class="CMS_widgets">
+					<div style="cursor:pointer" class="CMS_hidden"><span class="fa fa-plus"></span> Widgets</div>
+					<br />
+				</div>
+			</div>
+
+		@{fi}
+
+	@{else}
+
+		<!-- RENDERING FOR VISITORS -->
+		<br />
+		<br />
+		<h1 style="margin-bottom:0">@{repository.page.name}</h1>
+		@{!repository.page.body}
+
+	@{fi}
+</div>

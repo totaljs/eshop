@@ -1,0 +1,118 @@
+@{title(repository.page.name)}
+@{sitemap('#contact')}
+
+<div id="loading"></div>
+<div class="padding" style="padding-bottom:0">
+	<h1 style="margin-bottom:0">@{title}</h1>
+</div>
+<!--
+<div class="padding">
+	<div class="row">
+		<div class="col-md-2"></div>
+		<div class="col-md-8 m">
+			<div style="font-size:16px"><span class="fa fa-building mr5"></span><strong>My Company Name</strong></div>
+			<div class="fs11 silver">The powerful company</div>
+			<br />
+			<div class="bg-smoke padding">
+				<div class="b" style="margin-bottom:10px"><span class="fa fa-map-marker"></span> Our address</div>
+				Street 12<br />
+				394039 Bratislava<br />
+				Slovakia
+			</div>
+			<br />
+			<br />
+
+			<table class="table table-bordered" id="contactform">
+				<tr>
+					<td class="col-xs-6 active">Phone number</td>
+					<td class="ui-center">+421903163302</td>
+				</tr>
+				<tr>
+					<td class="col-xs-6 active">Email address</td>
+					<td class="ui-center" data-component="emaildecode">info(at)totaljs(dot)com</td>
+				</tr>
+			</table>
+			<br />
+
+		</div>
+	</div>
+</div>
+-->
+
+@{!repository.page.body}
+
+<div class="padding" style="padding-top:0">
+	<div class="row">
+		<div class="col-md-2"></div>
+		<div class="col-md-8 m">
+
+			<div data-component="visible" data-component-path="common.success" data-if="value && value.success === true" class="hidden">
+				<div class="message-success"><span class="fa fa-check-circle"></span> @(Thanks, the contact form has been sent successfully.)</div>
+				<br />
+			</div>
+
+			<div data-component="visible" data-component-path="common.success" data-if="!value || !value.success">
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="form.firstname" data-required="true">@(First name)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="form.lastname" data-required="true">@(Last name)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="form.email" data-required="true" data-component-type="email">@(Email address)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="form.phone">@(Phone number)</div>
+					</div>
+				</div>
+				<br />
+				<div class="row">
+					<div class="col-md-12 m">
+						<div data-component="textarea" data-component-path="form.message" data-required="true" data-height="100px">@(Message)</div>
+					</div>
+				</div>
+				<div data-component="error" data-component-path="common.success"></div>
+				<br />
+				<div class="row">
+					<div class="col-md-6">
+						<div data-component="validation" data-component-path="form">
+							<button class="button" disabled="disabled" data-component="click" data-component-path="#submit">@(SUBMIT FORM)</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@{section script}
+<script>
+
+	var common = {};
+	var form = {};
+
+	form.email = '@';
+
+	OPERATION('submit', function() {
+		$.components.POST('/api/contact/', form, function(response) {
+			SET('common.success', response);
+		});
+	});
+
+	var query = $.components.parseQuery();
+
+	if (query.productid) {
+		form.message = '@(I need more informations about the product:) ' + query.productid + '.\n\nThanks';
+		$(window).animate({ scrollTo: $('#contactform').offset().top - 20 }, 1000);
+	}
+
+	if (query.orderid) {
+		form.message = '@(I want to cancel the order #) ' + query.orderid + '.\n\nThanks';
+		$(window).animate({ scrollTo: $('#contactform').offset().top - 20 }, 1000);
+	}
+
+</script>
+@{end}

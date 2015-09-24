@@ -1,0 +1,26 @@
+<div class="row">
+	@{foreach m in model.items}
+	<div class="col-md-3 col-sm-4 product">
+		@{if m.istop}<img src="/img/top.png" class="product-top" alt="TOP" width="40" />@{fi}
+		<a href="/shop/@{m.linker_category}/@{m.linker}/" class="product-picture"><img src="@{if !m.pictures || m.pictures.length === 0}/img/empty.png@{else}/images/small/@{m.pictures[0]}.jpg@{fi}" class="img-responsive" alt="@{m.name}" border="0" /></a>
+		<a href="/shop/@{m.linker_category}/" class="product-category">@{m.category}</a>
+		<a href="/shop/@{m.linker_category}/@{m.linker}/" class="product-name">@{m.name}</a>
+		<div class="product-price">@{m.price.format(2)} @{!config.custom.currency_entity}</div>
+	</div>
+	@{end}
+</div>
+
+@{if model.count === 0}
+	<div class="row" style="margin-top:30px;margin-bottom:100px">
+		<div class="col-md-3"></div>
+		<div class="col-md-6 m ui-center">
+			<div><span class="fa fa-search fa-5x"></span></div>
+			<br />
+			<br />
+			<div>
+				@(Currently we don't have any items sufficient for search criteria.)<br />
+				<b>@(Try to visit our page later)</b>.
+			</div>
+		</div>
+	</div>
+@{fi}
