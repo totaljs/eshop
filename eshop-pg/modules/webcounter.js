@@ -293,7 +293,6 @@ WebCounter.prototype.save = function() {
 
 		if (response.today) {
 			builder.inc(stats);
-			builder.raw('pages', 'hits / count');
 			builder.set('dateupdated', new Date());
 			sql.update('tbl_visitor').replace(builder).where('id', id);
 		} else {
