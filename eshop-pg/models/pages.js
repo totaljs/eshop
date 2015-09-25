@@ -217,9 +217,6 @@ Page.setSave(function(error, model, options, callback) {
 	if (!model.id)
 		model.id = U.GUID(10);
 
-	if (model.body)
-		model.body = U.minifyHTML(model.body.replace(/<br>/g, '<br />'));
-
 	// Sanitizes URL
 	if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
 		model.url = U.path(model.url);
@@ -374,6 +371,9 @@ Page.addOperation('render', function(error, model, options, callback) {
 					// DONE
 					if (response.language)
 						response.body = F.translator(response.language, response.body);
+
+					// Minify
+					response.body = U.minifyHTML(response.body.replace(/<br>/g, '<br />'))
 
 					// cleaner
 					response.body = response.body.replace(/(\s)class\=\".*?\"/g, function(text) {

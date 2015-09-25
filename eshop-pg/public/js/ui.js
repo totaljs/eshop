@@ -1385,8 +1385,6 @@ COMPONENT('codemirror', function() {
 		var f = editor.getCursor(true);
 		var t = editor.getCursor(false);
 		skipB = true;
-		editor.autoFormatRange(f, t);
-		skipB = true;
 		editor.setValue(editor.getValue());
 		skipB = true;
 
