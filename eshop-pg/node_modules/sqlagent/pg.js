@@ -382,7 +382,8 @@ SqlBuilder.column = function(name, schema) {
 	if (indexAS !== -1) {
 		plus = name.substring(indexAS);
 		name = name.substring(0, indexAS);
-	}
+	} else if (cast)
+		plus = ' as "' + name + '"';
 
 	if (raw)
 		return columns_cache[cachekey] = name + cast + plus;

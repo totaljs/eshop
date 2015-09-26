@@ -357,28 +357,6 @@ SqlBuilder.column = function(name, schema) {
 	if (val)
 		return val;
 
-	var indexAS = name.toLowerCase().indexOf(' as');
-	var plus = '';
-
-	if (indexAS !== -1) {
-		plus = name.substring(indexAS);
-		name = name.substring(0, indexAS);
-	}
-
-	var index = name.indexOf('.');
-	if (index === -1)
-		return columns_cache[cachekey] = (schema ? schema + '.' : '') + '[' + name + ']' + plus;
-	return columns_cache[cachekey] = name.substring(0, index) + '.[' + name.substring(index + 1) + ']' + plus;
-};
-
-
-SqlBuilder.column = function(name, schema) {
-
-	var cachekey = (schema ? schema + '.' : '') + name;
-	var val = columns_cache[cachekey];
-	if (val)
-		return val;
-
 	var raw = false;
 
 	if (name[0] === '!') {
@@ -426,7 +404,8 @@ SqlBuilder.column = function(name, schema) {
 	if (indexAS !== -1) {
 		plus = name.substring(indexAS);
 		name = name.substring(0, indexAS);
-	}
+	} else if (cast)
+		plus = ' as [' + name + ']';
 
 	if (raw)
 		return columns_cache[cachekey] = casting(name) + plus;

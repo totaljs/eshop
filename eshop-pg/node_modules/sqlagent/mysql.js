@@ -379,7 +379,8 @@ SqlBuilder.column = function(name, schema) {
 	if (indexAS !== -1) {
 		plus = name.substring(indexAS);
 		name = name.substring(0, indexAS);
-	}
+	} else if (cast)
+		plus = ' as `' + name + '`';
 
 	if (raw)
 		return columns_cache[cachekey] = casting(name) + plus;
@@ -878,7 +879,7 @@ Agent.prototype._update = function(item) {
 			params.push(value === undefined ? null : value);
 	}
 
-	return { type: item.type, name: name, query: 'UPDATE ' + table + ' SET ' + columns.join(',') + condition.toString(this.id), params: params, first: true, column: 'changedRows' };
+	return { type: item.type, name: name, query: 'UPDATE ' + table + ' SET ' + columns.join(',') + condition.toString(this.id), params: params, first: true, column: 'affectedRows' };
 };
 
 Agent.prototype._select = function(item) {
@@ -1285,6 +1286,7 @@ Agent.prototype._prepare = function(callback) {
 			current.query = current.query + current.condition.toString(self.id);
 
 		var query = function(err, rows) {
+
 			if (err) {
 				self.errors.push(err.message);
 				if (self.isTransaction)
@@ -1299,8 +1301,9 @@ Agent.prototype._prepare = function(callback) {
 				}
 
 				if (current.first && current.column) {
-					if (rows.length > 0)
-						self.results[current.name] = current.column === 'sqlagentcolumn_e' ? true : current.datatype === 1 ? parseFloat(rows[0][current.column] || 0) : rows[0][current.column];
+					var tmp = rows instanceof Array ? rows.length > 0 ? rows[0] : null : rows;
+					if (tmp)
+						self.results[current.name] = current.column === 'sqlagentcolumn_e' ? true : current.datatype === 1 ? parseFloat(tmp[current.column] || 0) : tmp[current.column];
 				} else if (current.first)
 					self.results[current.name] = rows instanceof Array ? rows[0] : rows;
 				else
