@@ -312,7 +312,7 @@ SqlBuilder.prototype.field = function(name) {
 	return self;
 };
 
-SqlBuilder.escape = function(value) {
+SqlBuilder.escape = SqlBuilder.prototype.escape = function(value) {
 
 	if (value === null || value === undefined)
 		return 'null';

@@ -301,7 +301,7 @@ SqlBuilder.prototype.clear = function() {
 	return this;
 };
 
-SqlBuilder.escape = function(value) {
+SqlBuilder.escape = SqlBuilder.prototype.escape = function(value) {
 
 	if (value === null || value === undefined)
 		return 'null';
