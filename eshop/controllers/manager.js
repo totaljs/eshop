@@ -36,7 +36,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/products/',            json_products_remove, ['delete']);
 	F.route(CONFIG('manager-url') + '/api/products/clear/',      json_products_clear);
 	F.route(CONFIG('manager-url') + '/api/products/import/',     json_products_import, ['upload'], 1024);
-	F.route(CONFIG('manager-url') + '/api/products/categories/', json_products_categories);
+	F.route(CONFIG('manager-url') + '/api/products/codelists/',  json_products_codelists);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   json_products_category_replace, ['post']);
 
 	// PAGES
@@ -274,14 +274,20 @@ function json_products_import() {
 	GETSCHEMA('Product').workflow('import', null, file.path, self.callback(), true);
 }
 
-// Reads all product categories
-function json_products_categories() {
+// Reads all product categories and manufacturers
+function json_products_codelists() {
 	var self = this;
 
 	if (!F.global.categories)
 		F.global.categories = [];
 
-	self.json(F.global.categories);
+	if (!F.global.manufacturers)
+		F.global.manufacturers = [];
+
+	var obj = {};
+	obj.manufacturers = F.global.manufacturers;
+	obj.categories = F.global.categories;
+	self.json(obj);
 }
 
 // Replaces old category with new

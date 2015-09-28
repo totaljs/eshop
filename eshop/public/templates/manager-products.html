@@ -24,7 +24,7 @@
 	<div data-component="grid" data-component-path="products.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more products)" data-component-id="products.grid" data-autocenter="false">
 		<script type="text/html">
 		<tr>
-			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}</td>
+			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}{{ if manufacturer }} <span class="fs11 silver">({{ manufacturer }})</span>{{ fi }}</td>
 			<td style="width:200px" class="silver hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
 			<td style="width:100px" class="ui-right active">{{ price | price(2) }}</td>
 			<td style="width:80px" class="ui-right">
@@ -72,6 +72,15 @@
 			</div>
 			<div class="col-md-6 m">
 				<div data-component="textbox" data-component-path="products.form.category" data-required="true">@(Category)</div>
+				<div class="fs11 mt5"><a href="javascript:void(0)" data-component="click" data-component-path="products_subcategory"><span class="fa fa-plus mr5"></span>@(Add new category)</a></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="dropdown" data-component-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="true" data-source-value="name">@(Existing manufacturer)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="products.form.manufacturer">@(Manufacturer)</div>
 			</div>
 		</div>
 		<div class="row">
@@ -112,7 +121,7 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
-				<div class="silver">@(Replacement old category with new category name in all products which have old category.)</div>
+				<div class="silver">@(Replace old category with new category name in all products which have old category.)</div>
 				<hr />
 				<div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="true" data-source-value="name" class="m">@(Existing category)</div>
 				<div data-component="textbox" data-component-path="products.category.category_new" data-required="true" class="m">@(New name)</div>
@@ -121,6 +130,22 @@
 	</div>
 	<div class="ui-form-buttons">
 		<div data-component="validation" data-component-path="products.category">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Add new category)" data-component-path="products.subcategory.visible" data-if="value === true" data-width="450px" data-top="true" data-component-id="products.subcategory">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-12">
+				<div data-component="textbox" data-component-path="products.subcategory.name" data-required="true" class="m">@(New category name)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="products.subcategory">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
@@ -141,15 +166,17 @@
 	products.info = {};
 	products.form = {};
 	products.categories = [];
+	products.manufacturers = [];
 	products.response = null;
-
 	products.category = {};
+	products.subcategory = {};
+	products.subcategory.visible = false;
 
 	ON('#products.grid', function(component) {
 
 		// Max items per page
 		products.filter.max = component.max;
-		products_refresh_categories();
+		products_refresh_codelists();
 		products_refresh(true);
 
 		component.click = function(index, row, button) {
@@ -195,7 +222,7 @@
 				if (!response.success)
 					return;
 				products_refresh(true);
-				products_refresh_categories();
+				products_refresh_codelists();
 			});
 		});
 	});
@@ -218,9 +245,8 @@
 
 				hide();
 
-				// Is a new category?
-				if (products.form.$index === undefined || products.grid[products.form.$index].category !== products.form.category)
-					setTimeout(products_refresh_categories, 2000);
+				if (products.form.$index === undefined || products.grid[products.form.$index].category !== products.form.category || products.grid[products.form.$index].manufacturer !== products.form.manufacturer)
+					setTimeout(products_refresh_codelists, 2000);
 
 				products_refresh(true);
 				success();
@@ -234,11 +260,28 @@
 			$.components.POST(managerurl + '/api/products/category/', products.category, function(response) {
 				setTimeout(function() {
 					hide();
-					products_refresh_categories();
+					products_refresh_codelists();
 					products_refresh(true);
 					success();
 				}, 1000);
 			});
+		};
+	});
+
+	ON('#products.subcategory', function(component) {
+		component.submit = function(hide) {
+			var arr = (products.form.category || '').split('/');
+			var clean = [];
+
+			for (var i = 0, length = arr.length; i < length; i++) {
+				var category = arr[i].trim();
+				if (category)
+					clean.push(category);
+			}
+
+			clean.push(products.subcategory.name);
+			SET('products.form.category', clean.join(' / '));
+			hide();
 		};
 	});
 
@@ -254,12 +297,13 @@
 	}
 
 	// Method refreshes categories
-	function products_refresh_categories() {
-		$.components.GET(managerurl + '/api/products/categories/', null, function(response) {
-			response.sort(function(a, b) {
+	function products_refresh_codelists() {
+		$.components.GET(managerurl + '/api/products/codelists/', null, function(response) {
+			response.categories.sort(function(a, b) {
 				return a.name.localeCompare(b.name);
 			});
-			SET('products.categories', response);
+			SET('products.categories', response.categories);
+			SET('products.manufacturers', response.manufacturers);
 		});
 	}
 
@@ -279,6 +323,11 @@
 			products.info.pages = response.pages;
 			UPDATE('products.info');
 		});
+	}
+
+	function products_subcategory() {
+		SET('products.subcategory.name', '', true);
+		SET('products.subcategory.visible', true);
 	}
 
 	function products_import() {

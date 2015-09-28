@@ -2,13 +2,15 @@ var Product = NEWSCHEMA('Product');
 Product.define('id', 'String(10)');
 Product.define('pictures', '[String]');
 Product.define('reference', 'String(20)');
-Product.define('category', 'String(50)', true);
+Product.define('category', 'String(300)', true);
+Product.define('manufacturer', 'String(50)');
 Product.define('name', 'String(50)', true);
 Product.define('price', Number, true);
 Product.define('body', String, true);
 Product.define('istop', Boolean);
 Product.define('linker', 'String(50)');
 Product.define('linker_category', 'String(50)');
+Product.define('linker_manufacturer', 'String(50)');
 Product.define('datecreated', Date);
 
 // Sets default values
@@ -46,7 +48,9 @@ Product.setQuery(function(error, options, callback) {
 
 	var filter = function(doc) {
 
-		if (options.category && doc.linker_category !== options.category)
+		if (options.category && !doc.linker_category.startsWith(options.category))
+			return;
+		if (options.manufacturer && doc.manufacturer !== options.manufacturer)
 			return;
 		if (options.search && doc.name.toSearch().indexOf(search) === -1 && doc.id !== options.search && doc.reference !== options.search)
 			return;
@@ -93,13 +97,28 @@ Product.setSave(function(error, model, options, callback) {
 
 	var count = 0;
 
-	// Default values
-
 	if (!model.id)
 		model.id = U.GUID(10);
 
 	model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
-	model.linker_category = model.category.slug();
+	model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
+
+	var category = model.category.split('/');
+	if (category.length > 1) {
+		// Parses subcategories
+		var builder_link = [];
+		var builder_text = [];
+
+		for (var i = 0, length = category.length; i < length; i++) {
+			var name = category[i].trim();
+			builder_link.push(name.slug());
+			builder_text.push(name);
+		}
+
+		model.linker_category = builder_link.join('/');
+		model.category = builder_text.join(' / ');
+	} else
+		model.linker_category = model.category.slug();
 
 	if (model.datecreated)
 		model.datecreated = model.datecreated.format();
@@ -203,12 +222,29 @@ Product.addWorkflow('category', function(error, model, options, callback) {
 	// options.category_new
 
 	var is = false;
+	var category = options.category_new.split('/');
+	var linker;
+
+	if (category.length > 1) {
+		var builder_link = [];
+		var builder_text = [];
+
+		for (var i = 0, length = category.length; i < length; i++) {
+			var name = category[i].trim();
+			builder_link.push(name.slug());
+			builder_text.push(name);
+		}
+
+		linker = builder_link.join('/');
+		options.category_new = builder_text.join(' / ');
+	} else
+		linker = category.slug();
 
 	var update = function(doc) {
 
 		if (doc.category === options.category_old) {
 			doc.category = options.category_new;
-			doc.linker_category = doc.category.slug();
+			doc.linker_category = linker;
 			is = true;
 		}
 
@@ -281,31 +317,79 @@ Product.addWorkflow('import', function(error, model, filename, callback) {
 	});
 });
 
-// Refreshes internal information (categories)
+// Refreshes internal information (categories and manufacturers)
 function refresh() {
 
-	var categories = {};
+	var db_categories = {};
+	var db_manufacturers = {};
 
 	var prepare = function(doc) {
-		if (categories[doc.category] === undefined)
-			categories[doc.category] = 1;
+		if (db_categories[doc.category] === undefined)
+			db_categories[doc.category] = { count: 1, linker: doc.linker_category };
 		else
-			categories[doc.category]++;
+			db_categories[doc.category].count++;
+
+		if (!doc.manufacturer)
+			return;
+
+		if (db_manufacturers[doc.manufacturer] === undefined)
+			db_manufacturers[doc.manufacturer] = { count: 1, linker: doc.linker_manufacturer };
+		else
+			db_manufacturers[doc.manufacturer].count++;
 	};
 
 	DB('products').all(prepare, function() {
 
-		var keys = Object.keys(categories);
-		var length = keys.length;
-		var arr = new Array(length);
+		// Prepares categories with their subcategories
+		var keys = Object.keys(db_categories);
+		var categories = new Array(length);
 
-		for (var i = 0; i < length; i++) {
+		for (var i = 0, length = keys.length; i < length; i++) {
 			var name = keys[i];
-			var linker = name.slug();
-			arr[i] = { name: name, linker: linker, count: categories[name] };
+			var item = db_categories[name];
+			categories[i] = { name: name, linker: item.linker, count: item.count };
 		}
 
-		F.global.categories = arr;
+		for (var i = 0, length = categories.length; i < length; i++) {
+			var item = categories[i];
+			if (item.name.indexOf('/') === -1) {
+				item.text = item.name;
+				item.level = 0;
+				item.parent = '';
+				continue;
+			}
+
+			var index = item.name.lastIndexOf('/');
+			item.level = item.name.match(/\//g).length;
+			item.text = item.name.substring(index + 1).trim();
+			item.parent = item.linker.substring(0, index - 1).trim();
+		}
+
+		categories.sort(function(a, b) {
+			if (a.level > b.level)
+				return 1;
+			return a.level < b.level ? -1 : 0;
+		});
+
+		for (var i = categories.length - 1; i > -1; i--) {
+			var item = categories[i];
+			categories.forEach(function(category) {
+				if (category.linker !== item.linke && category.parent === item.linker)
+					item.count++;
+			});
+		}
+
+		// Prepares manufacturers
+		keys = Object.keys(db_manufacturers);
+		var manufacturers = new Array(keys.length);
+		for (var i = 0, length = keys.length; i < length; i++) {
+			var name = keys[i];
+			var item = db_manufacturers[name];
+			manufacturers[i] = { name: name, linker: item.linker, count: item.count };
+		}
+
+		F.global.categories = categories;
+		F.global.manufacturers = manufacturers;
 	});
 }
 
