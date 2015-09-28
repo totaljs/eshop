@@ -1,6 +1,8 @@
 (BETA) ======================== v2.1.0
 
 - added postgresql version
+- eshop supports subcategories
+- eshop supports manufacturers
 - fixed CMS editor and code mirror
 - updated Webcounter (added uniquemonth value)
 
