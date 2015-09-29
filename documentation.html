@@ -120,8 +120,8 @@
 <script type="application/json" id="current">
 {
   "name": "ESHOP + CMS",
-  "modified": "2015-09-22 23:30:00",
-  "version": "2.0.0",
+  "modified": "2015-09-29 23:30:00",
+  "version": "3.0.0",
   "build": "",
   "default": "pages~Welcome",
   "api": [],
@@ -141,7 +141,7 @@
     },
     {
       "name": "Eshop",
-      "body": "__Eshop__ is composed from products and orders and it has own views (a little different than __CMS__ but can be mixed together). Learn from source-code.\n\n---\n\n## How does it work?\n\n- controller `/controllers/eshop.js` processes all requests to the eshop (visibly requests)\n- controller `/controllers/api.js` processs API (__form__) requests\n- views are loaded from `/views/eshop/` directory\n\n---\n\n## Models\n\n- `/models/orders.js` contains order definition and its operations\n- `/models/products.js` contains product definition and its operations\n\n---\n\n## Global properties\n\n```javascript\n// Contains all product categories from the eshop\n// Category: { name: String, url: String, count: Number }\nF.global.categories;\n```"
+      "body": "__Eshop__ is composed from products and orders and it has own views (a little different than __CMS__ but can be mixed together). Learn from source-code.\n\n---\n\n## How does it work?\n\n- controller `/controllers/eshop.js` processes all requests to the eshop (visibly requests)\n- controller `/controllers/api.js` processs API (__form__) requests\n- views are loaded from `/views/eshop/` directory\n\n---\n\n## Models\n\n- `/models/orders.js` contains order definition and its operations\n- `/models/products.js` contains product definition and its operations\n\n---\n\n## Global properties\n\n```javascript\n// Contains all product categories (with subcategories)\n// Category: { name: String, linker: String, count: Number, parent: String, text: String }\nF.global.categories;\n\n// Contains all product manufacturers\n// Manufacturer: { name: String, linker: String, count: Number }\nF.global.manufacturers;\n```"
     },
     {
       "name": "CMS",
