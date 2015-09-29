@@ -3,8 +3,8 @@ var PayPal = require('paypal-express-checkout');
 exports.install = function() {
 	// PRODUCTS
 	F.route('/shop/',                     view_products);
-	F.route('/shop/{category}/',          view_products_category);
-	F.route('/shop/{category}/{linker}/', view_products_detail);
+	F.route('/shop/{category}/*',         view_products_category);
+	F.route('/product/{linker}/',         view_products_detail);
 
 	// ORDERS
 	F.route('/checkout/');
@@ -43,11 +43,16 @@ function view_products_category(category) {
 	var self = this;
 	var options = {};
 
-	if (category)
-		options.category = category;
+	options.category = self.req.path.slice(1).join('/');
+
+	var category = F.global.categories.find('linker', options.category);;
+	if (!category)
+		return self.throw404();
 
 	if (self.query.page)
 		options.page = self.query.page;
+
+	self.repository.category = category;
 
 	// Increases the performance (1 minute cache)
 	self.memorize('cache.' + category + '.' + options.page, '1 minute', DEBUG, function() {
@@ -56,33 +61,33 @@ function view_products_category(category) {
 			if (data.items.length === 0)
 				return self.throw404();
 
-			self.repository.linker_category = category;
-			self.repository.category = data.items[0].category;
-
-			self.title(data.items[0].category);
+			self.repository.subcategories = F.global.categories.where('parent', options.category);
+			self.title(category.name);
 			self.view('products-category', data);
 		});
 	});
 }
 
 // Gets product detail
-function view_products_detail(category, linker) {
+function view_products_detail(linker) {
 	var self = this;
 	var options = {};
 
-	options.category = category;
 	options.linker = linker;
 
 	// Increases the performance (1 minute cache)
-	self.memorize('cache.' + category + '.' + linker, '1 minute', DEBUG, function() {
+	self.memorize('cache.product.' + linker, '1 minute', DEBUG, function() {
 		GETSCHEMA('Product').get(options, function(err, data) {
 
 			if (!data || err)
 				return self.throw404();
 
-			self.repository.linker_category = category;
-			self.repository.category = data.category;
+			self.repository.category = F.global.categories.find('linker', data.linker_category);
 
+			if (!self.repository.category)
+				return self.throw404();
+
+			self.repository.subcategories = F.global.categories.where('parent', data.linker_category);
 			self.repository.linker = linker;
 			self.repository.name = data.name;
 

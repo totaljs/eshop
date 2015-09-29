@@ -1,7 +1,12 @@
 @{sitemap('#category')}
 
-<div class="padding">
+<div class="padding npb">
 	<h1>@{title}</h1>
+</div>
+@{if repository.subcategories.length > 0 || repository.category.level > 0}
+	@{view('partial-subcategories')}
+@{fi}
+<div class="padding npt">
 	@{view('partial-products', model)}
 	@{view('partial-pagination', model)}
 </div>

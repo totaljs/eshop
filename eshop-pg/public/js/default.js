@@ -9,8 +9,9 @@ $(document).ready(function() {
 		}
 	}
 
-	var path = window.location.pathname.substring(1).split('/');
-	$('.categories').find('a[href="/' + path[0] + '/' + path[1] + '/"]').addClass('selected');
+	var path = $('.breadcrumb a').eq(2).attr('href');
+	if (path)
+		$('.categories').find('a[href="' + path + '"]').addClass('selected');
 
 	var buy = $('.detail-buy').on('click', function() {
 		var el = $(this);

@@ -57,7 +57,7 @@
 			<div class="categories">
 				<div class="row">
 					@{foreach m in global.categories}
-						@{if m.count > 0}
+						@{if m.count > 0 && m.level === 0}
 						<div class="col-xs-6 col-sm-4 col-md-4"><a href="/shop/@{m.linker}/">@{m.name}</a></div>
 						@{fi}
 					@{end}
@@ -71,9 +71,9 @@
 						@{foreach m in sitemap()}
 							<li>@{if !m.first}<span class="fa fa-caret-right"></span>@{fi}
 							@{if m.id === 'category'}
-								<a href="@{m.url.format(repository.linker_category)}">@{repository.category}</a>
+								@{sitemap_category(m.url, repository.category)}
 							@{else if m.id === 'detail'}
-								<a href="@{m.url.format(repository.linker_category, repository.linker)}">@{title}</a>
+								<a href="@{url}">@{title}</a>
 							@{else if m.id === 'order'}
 								<a href="@{url}">@{title}</a>
 							@{else}
