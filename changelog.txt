@@ -1,4 +1,4 @@
-(BETA) ======================== v2.1.0
+(BETA) ======================== v3.0.0
 
 - added postgresql version
 - eshop supports subcategories
