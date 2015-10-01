@@ -330,22 +330,37 @@ function refresh() {
 	sql.exec(function(err, response) {
 
 		// Prepares categories with their subcategories
-		var categories = response.categories;
+		var categories = [];
+		var categories_filter = {};
 
-		for (var i = 0, length = categories.length; i < length; i++) {
-			var item = categories[i];
-			if (item.name.indexOf('/') === -1) {
-				item.text = item.name;
-				item.level = 0;
-				item.parent = '';
-				continue;
-			}
+		for (var i = 0, length = response.categories.length; i < length; i++) {
 
-			var index = item.name.lastIndexOf('/');
-			item.level = item.name.match(/\//g).length;
-			item.text = item.name.substring(index + 1).trim();
-			item.parent = item.linker.substring(0, index - 1).trim();
+			var item = response.categories[i];
+			item.path = item.linker.split('/');
+			item.names = item.name.split('/').trim();
+
+			item.path.forEach(function(path, index) {
+				var key = item.path.slice(0, index + 1).join('/');
+
+				if (categories_filter[key]) {
+					categories_filter[key].count += item.count;
+					return;
+				}
+
+				var obj = {};
+				obj.linker = key;
+				obj.name = item.names.slice(0, index + 1).join(' / ');
+				obj.count = item.count;
+				obj.text = item.names[index];
+				obj.parent = item.path.slice(0, index).join('/');
+				obj.level = index;
+				categories_filter[key] = obj;
+			});
 		}
+
+		Object.keys(categories_filter).forEach(function(key) {
+			categories.push(categories_filter[key]);
+		});
 
 		categories.sort(function(a, b) {
 			if (a.level > b.level)
@@ -353,15 +368,7 @@ function refresh() {
 			return a.level < b.level ? -1 : 0;
 		});
 
-		for (var i = categories.length - 1; i > -1; i--) {
-			var item = categories[i];
-			categories.forEach(function(category) {
-				if (category.linker !== item.linke && category.parent === item.linker)
-					item.count++;
-			});
-		}
-
-		F.global.categories = response.categories;
+		F.global.categories = categories;
 		F.global.manufacturers = response.manufacturers;
 	});
 }
