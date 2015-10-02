@@ -174,7 +174,14 @@ Product.setGet(function(error, model, options, callback) {
 	});
 
 	sql.validate('item', 'error-404-product');
-	sql.exec(callback, 'item');
+	sql.exec(function(err, response) {
+		if (err)
+			return callback();
+
+		// Parse pictures as array
+		response.item.pictures = response.item.pictures.split(',');
+		callback(response.item);
+	});
 });
 
 // Removes product
