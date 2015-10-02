@@ -15,7 +15,7 @@ nav .highlight { background-color: #D0D0D0; color: gray; }
 h1 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 20px 0; padding: 0; color: black; font-size: 40px; }
 h1 b { font-weight: 400; }
 
-h2 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 8	px 0; padding: 0; color: gray; font-size: 24px; }
+h2 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 8px 0; padding: 0; color: gray; font-size: 24px; }
 h2 b { font-weight: 400; }
 
 #loading { background: rgba(255,255,255,0.9) url(../img/preloader.gif) no-repeat 50% 50%; position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 15; }
