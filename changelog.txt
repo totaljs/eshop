@@ -1,6 +1,7 @@
 (BETA) ======================== v3.0.0
 
 - added postgresql version
+- added animations
 - eshop supports subcategories
 - eshop supports manufacturers
 - fixed CMS editor and code mirror

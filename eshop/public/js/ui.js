@@ -632,7 +632,7 @@ COMPONENT('form', function() {
 
 				var r = (wh / 2) - (fh / 2);
 				if (r > 20)
-					ui.css({ marginTop: r + 'px' });
+					ui.css({ marginTop: (r - 15) + 'px' });
 				else
 					ui.css({ marginTop: '20px' });
 			}
@@ -642,7 +642,9 @@ COMPONENT('form', function() {
 				el.eq(0).focus();
 
 			self.element.animate({ scrollTop: 0 }, 0);
-		}
+			self.element.find('.ui-form').addClass('ui-form-animate');
+		} else
+			self.element.find('.ui-form').removeClass('ui-form-animate');
 	};
 });
 
