@@ -641,8 +641,12 @@ COMPONENT('form', function() {
 			if (el.length > 0)
 				el.eq(0).focus();
 
-			self.element.animate({ scrollTop: 0 }, 0);
-			self.element.find('.ui-form').addClass('ui-form-animate');
+			self.element.animate({ scrollTop: 0 }, 0, function() {
+				setTimeout(function() {
+					self.element.find('.ui-form').addClass('ui-form-animate');
+				}, 300);
+			});
+
 		} else
 			self.element.find('.ui-form').removeClass('ui-form-animate');
 	};
