@@ -14,7 +14,7 @@
 - added banners into the eshop
 - added CodeMirror editor into the CMS
 - updated CMS editor
-- most of admin windows are centered to middle
+- most of admin windows are centered into middle
 - some bug fixes
 
 ======================== v1.0.3
