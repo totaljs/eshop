@@ -1,5 +1,5 @@
 name                      : E-shop
-version                   : 2.1.0
+version                   : 3.0.0
 author                    : Peter Širka
 
 database                  : postgres://USER:PASSWORD@IP_OR_HOSTNAME/DATABASE_NAME
@@ -24,4 +24,4 @@ mail.smtp                 : YOUR.SMTPSERVER.COM
 
 // Image convertor for resizing of pictures
 // Default image converter: im = ImageMagick, gm = GraphicsMagick
-default-image-converter   : img
+default-image-converter   : gm
