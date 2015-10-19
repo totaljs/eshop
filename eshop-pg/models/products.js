@@ -108,22 +108,10 @@ Product.setSave(function(error, model, options, callback) {
 	model.search = (model.name + ' ' + model.reference).toSearch();
 	model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
 
-	var category = model.category.split('/');
-	if (category.length > 1) {
-		// Parses subcategories
-		var builder_link = [];
-		var builder_text = [];
+	var category = prepare_subcategories(model.category);
 
-		for (var i = 0, length = category.length; i < length; i++) {
-			var name = category[i].trim();
-			builder_link.push(name.slug());
-			builder_text.push(name);
-		}
-
-		model.linker_category = builder_link.join('/');
-		model.category = builder_text.join(' / ');
-	} else
-		model.linker_category = model.category.slug();
+	model.linker_category = category.linker;
+	model.category = category.name;
 
 	var sql = DB(error);
 	var isNew = model.id ? false : true;
@@ -226,28 +214,14 @@ Product.addWorkflow('category', function(error, model, options, callback) {
 
 	var is = false;
 	var sql = DB(error);
-	var category = options.category_new.split('/');
-	var linker;
+	var category_old = prepare_subcategories(options.category_old);
+	var category_new = prepare_subcategories(options.category_new);
 
-	if (category.length > 1) {
-		var builder_link = [];
-		var builder_text = [];
-
-		for (var i = 0, length = category.length; i < length; i++) {
-			var name = category[i].trim();
-			builder_link.push(name.slug());
-			builder_text.push(name);
-		}
-
-		linker = builder_link.join('/');
-		options.category_new = builder_text.join(' / ');
-	} else
-		linker = category.slug();
-
+	// @TODO: add replacement subcategories
 	sql.update('tbl_product').make(function(builder) {
-		builder.set('category', options.category_new);
-		builder.set('linker_category', linker);
-		builder.where('category', options.category_old);
+		builder.set('category', category_new.name);
+		builder.set('linker_category', category_new.linker);
+		builder.where('category', category_old.name);
 	});
 
 	sql.exec(function() {
@@ -378,6 +352,21 @@ function refresh() {
 		F.global.categories = categories;
 		F.global.manufacturers = response.manufacturers;
 	});
+}
+
+function prepare_subcategories(name) {
+
+	var builder_link = [];
+	var builder_text = [];
+	var category = name.split('/');
+
+	for (var i = 0, length = category.length; i < length; i++) {
+		var item = category[i].trim();
+		builder_link.push(item.slug());
+		builder_text.push(item);
+	}
+
+	return { linker: builder_link.join('/'), name: builder_text.join(' / ') };
 }
 
 setTimeout(refresh, 1000);
