@@ -103,22 +103,9 @@ Product.setSave(function(error, model, options, callback) {
 	model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
 	model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
 
-	var category = model.category.split('/');
-	if (category.length > 1) {
-		// Parses subcategories
-		var builder_link = [];
-		var builder_text = [];
-
-		for (var i = 0, length = category.length; i < length; i++) {
-			var name = category[i].trim();
-			builder_link.push(name.slug());
-			builder_text.push(name);
-		}
-
-		model.linker_category = builder_link.join('/');
-		model.category = builder_text.join(' / ');
-	} else
-		model.linker_category = model.category.slug();
+	var category = prepare_subcategories(model.category);
+	model.category = category.name;
+	model.linker_category = category.linker;
 
 	if (model.datecreated)
 		model.datecreated = model.datecreated.format();
@@ -222,29 +209,14 @@ Product.addWorkflow('category', function(error, model, options, callback) {
 	// options.category_new
 
 	var is = false;
-	var category = options.category_new.split('/');
-	var linker;
-
-	if (category.length > 1) {
-		var builder_link = [];
-		var builder_text = [];
-
-		for (var i = 0, length = category.length; i < length; i++) {
-			var name = category[i].trim();
-			builder_link.push(name.slug());
-			builder_text.push(name);
-		}
-
-		linker = builder_link.join('/');
-		options.category_new = builder_text.join(' / ');
-	} else
-		linker = category.slug();
+	var category_old = prepare_subcategories(options.category_old);
+	var category_new = prepare_subcategories(options.category_new);
 
 	var update = function(doc) {
 
-		if (doc.category === options.category_old) {
-			doc.category = options.category_new;
-			doc.linker_category = linker;
+		if (doc.category.startsWith(category_old.name)) {
+			doc.category = doc.category.replace(category_old.name, category_new.name);
+			doc.linker_category = doc.linker_category.replace(category_old.linker, category_new.linker);
 			is = true;
 		}
 
@@ -390,6 +362,21 @@ function refresh() {
 		F.global.categories = categories;
 		F.global.manufacturers = manufacturers;
 	});
+}
+
+function prepare_subcategories(name) {
+
+	var builder_link = [];
+	var builder_text = [];
+	var category = name.split('/');
+
+	for (var i = 0, length = category.length; i < length; i++) {
+		var item = category[i].trim();
+		builder_link.push(item.slug());
+		builder_text.push(item);
+	}
+
+	return { linker: builder_link.join('/'), name: builder_text.join(' / ') };
 }
 
 setTimeout(refresh, 1000);

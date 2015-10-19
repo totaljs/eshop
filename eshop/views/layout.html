@@ -69,17 +69,19 @@
 					<span class="fa fa-home"></span>
 					<ul>
 						@{foreach m in sitemap()}
-							<li>@{if !m.first}<span class="fa fa-caret-right"></span>@{fi}
 							@{if m.id === 'category'}
 								@{sitemap_category(m.url, repository.category)}
-							@{else if m.id === 'detail'}
-								<a href="@{url}">@{title}</a>
-							@{else if m.id === 'order'}
-								<a href="@{url}">@{title}</a>
 							@{else}
-								<a href="@{m.url}">@{m.name}</a>
+								<li>@{if !m.first}<span class="fa fa-caret-right"></span>@{fi}
+								@{if m.id === 'detail'}
+									<a href="@{url}">@{title}</a>
+								@{else if m.id === 'order'}
+									<a href="@{url}">@{title}</a>
+								@{else}
+									<a href="@{m.url}">@{m.name}</a>
+								@{fi}
+								</li>
 							@{fi}
-							</li>
 						@{end}
 					</ul>
 					<div class="breadcrumb-social hidden-xs">
