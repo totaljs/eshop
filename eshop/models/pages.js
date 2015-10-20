@@ -7,401 +7,404 @@
 // Supported workflows
 // "create-url"
 
-var Page = NEWSCHEMA('Page');
-Page.define('id', 'String(10)');
-Page.define('parent', 'String(10)');
-Page.define('template', 'String(30)', true);
-Page.define('language', 'String(3)');
-Page.define('url', 'String(200)');
-Page.define('icon', 'String(20)');
-Page.define('navigations', '[String]');
-Page.define('widgets', '[String]'); // Widgets lists, contains Array of ID widget
-Page.define('settings', '[String]'); // Widget settings (according to widgets array index)
-Page.define('tags', '[String]');
-Page.define('pictures', '[String]') // URL address to first 5 pictures
-Page.define('search', 'String(1000)');
-Page.define('name', 'String(50)');
-Page.define('perex', 'String(500)');
-Page.define('title', 'String(100)', true);
-Page.define('priority', Number);
-Page.define('ispartial', Boolean);
-Page.define('body', String);
-Page.define('datecreated', Date);
+NEWSCHEMA('Page').make(function(schema) {
 
-// Sets default values
-Page.setDefault(function(name) {
-	switch (name) {
-		case 'datecreated':
-			return new Date();
-	}
-});
+	schema.define('id', 'String(10)');
+	schema.define('parent', 'String(10)');
+	schema.define('template', 'String(30)', true);
+	schema.define('language', 'String(3)');
+	schema.define('url', 'String(200)');
+	schema.define('icon', 'String(20)');
+	schema.define('navigations', '[String]');
+	schema.define('widgets', '[String]'); // Widgets lists, contains Array of ID widget
+	schema.define('settings', '[String]'); // Widget settings (according to widgets array index)
+	schema.define('tags', '[String]');
+	schema.define('search', 'String(1000)');
+	schema.define('pictures', '[String]') // URL addresses for first 5 pictures
+	schema.define('name', 'String(50)');
+	schema.define('perex', 'String(500)');
+	schema.define('title', 'String(100)', true);
+	schema.define('priority', Number);
+	schema.define('ispartial', Boolean);
+	schema.define('body', String);
+	schema.define('datecreated', Date);
 
-// Gets listing
-Page.setQuery(function(error, options, callback) {
-
-	// options.search {String}
-	// options.navigation {String}
-	// options.language {String}
-	// options.ispartial {Boolean}
-	// options.page {String or Number}
-	// options.max {String or Number}
-
-	options.page = U.parseInt(options.page) - 1;
-	options.max = U.parseInt(options.max, 20);
-
-	if (options.page < 0)
-		options.page = 0;
-
-	var take = U.parseInt(options.max);
-	var skip = U.parseInt(options.page * options.max);
-
-	// Prepares searching
-	if (options.search)
-		options.search = options.search.toSearch();
-
-	// Filter for reading
-	var filter = function(doc) {
-
-		// Checks partial content
-		if (options.ispartial && doc.ispartial !== options.ispartial)
-			return;
-
-		// Checks language
-		if (options.language && doc.language !== options.language)
-			return;
-
-		// Checks navigations
-		if (options.navigation && (!doc.navigations || doc.navigations.indexOf(options.navigation) === -1))
-			return;
-
-		// Searchs in "title"
-		if (options.search) {
-			if (doc.search.indexOf(options.search) === -1)
-				return;
+	// Sets default values
+	schema.setDefault(function(name) {
+		switch (name) {
+			case 'datecreated':
+				return new Date();
 		}
-
-		return { id: doc.id, name: doc.name, parent: doc.parent, url: doc.url, navigations: doc.navigations, ispartial: doc.ispartial, priority: doc.priority, language: doc.language, icon: doc.icon };
-	};
-
-	// Sorting documents
-	var sorting = function(a, b) {
-		if (new Date(a.datecreated) > new Date(b.datecreated))
-			return -1;
-		return 1;
-	};
-
-	DB('pages').sort(filter, sorting, function(err, docs, count) {
-		var data = {};
-
-		data.count = count;
-		data.items = docs;
-
-		// Gets page count
-		data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
-
-		if (data.pages === 0)
-			data.pages = 1;
-
-		data.page = options.page + 1;
-
-		// Returns data
-		callback(data);
-	}, skip, take);
-});
-
-// Gets a specific page
-Page.setGet(function(error, model, options, callback) {
-
-	// options.url {String}
-	// options.id {String}
-	// options.language {String}
-
-	// Filter for reading
-	var filter = function(doc) {
-		if (doc.url !== options.url && doc.id !== options.id)
-			return;
-		if (options.language && doc.language !== options.language)
-			return;
-		return doc;
-	};
-
-	// Gets specific document
-	DB('pages').one(filter, function(err, doc) {
-
-		if (doc)
-			return callback(doc);
-
-		error.push('error-404-page');
-		callback();
 	});
-});
 
-// Removes a specific page
-Page.setRemove(function(error, id, callback) {
+	// Gets listing
+	schema.setQuery(function(error, options, callback) {
 
-	// Filters for removing
-	var updater = function(doc) {
-		if (doc.id !== id)
+		// options.search {String}
+		// options.navigation {String}
+		// options.language {String}
+		// options.ispartial {Boolean}
+		// options.page {String or Number}
+		// options.max {String or Number}
+
+		options.page = U.parseInt(options.page) - 1;
+		options.max = U.parseInt(options.max, 20);
+
+		if (options.page < 0)
+			options.page = 0;
+
+		var take = U.parseInt(options.max);
+		var skip = U.parseInt(options.page * options.max);
+
+		// Prepares searching
+		if (options.search)
+			options.search = options.search.toSearch();
+
+		// Filter for reading
+		var filter = function(doc) {
+
+			// Checks partial content
+			if (options.ispartial && doc.ispartial !== options.ispartial)
+				return;
+
+			// Checks language
+			if (options.language && doc.language !== options.language)
+				return;
+
+			// Checks navigations
+			if (options.navigation && (!doc.navigations || doc.navigations.indexOf(options.navigation) === -1))
+				return;
+
+			// Searchs in "title"
+			if (options.search) {
+				if (doc.search.indexOf(options.search) === -1)
+					return;
+			}
+
+			return { id: doc.id, name: doc.name, parent: doc.parent, url: doc.url, navigations: doc.navigations, ispartial: doc.ispartial, priority: doc.priority, language: doc.language, icon: doc.icon };
+		};
+
+		// Sorting documents
+		var sorting = function(a, b) {
+			if (new Date(a.datecreated) > new Date(b.datecreated))
+				return -1;
+			return 1;
+		};
+
+		DB('pages').sort(filter, sorting, function(err, docs, count) {
+			var data = {};
+
+			data.count = count;
+			data.items = docs;
+
+			// Gets page count
+			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
+
+			if (data.pages === 0)
+				data.pages = 1;
+
+			data.page = options.page + 1;
+
+			// Returns data
+			callback(data);
+		}, skip, take);
+	});
+
+	// Gets a specific page
+	schema.setGet(function(error, model, options, callback) {
+
+		// options.url {String}
+		// options.id {String}
+		// options.language {String}
+
+		// Filter for reading
+		var filter = function(doc) {
+			if (doc.url !== options.url && doc.id !== options.id)
+				return;
+			if (options.language && doc.language !== options.language)
+				return;
 			return doc;
-		return null;
-	};
+		};
 
-	// Updates database file
-	DB('pages').update(updater, callback);
+		// Gets specific document
+		DB('pages').one(filter, function(err, doc) {
 
-	// Refreshes internal informations e.g. sitemap
-	setTimeout(refresh, 1000);
-});
+			if (doc)
+				return callback(doc);
 
-// Saves the page into the database
-Page.setSave(function(error, model, options, callback) {
+			error.push('error-404-page');
+			callback();
+		});
+	});
 
-	// options.id {String}
-	// options.url {String}
+	// Removes a specific page
+	schema.setRemove(function(error, id, callback) {
 
-	if (!model.name)
-		model.name = model.title;
+		// Filters for removing
+		var updater = function(doc) {
+			if (doc.id !== id)
+				return doc;
+			return null;
+		};
 
-	var count = 0;
-
-	if (!model.id)
-		model.id = U.GUID(10);
-
-	if (model.datecreated)
-		model.datecreated = model.datecreated.format();
-
-	if (model.search)
-		model.search = model.search.toSearch();
-
-	// Sanitizes URL
-	if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
-		model.url = U.path(model.url);
-		if (model.url[0] !== '/')
-			model.url = '/' + model.url;
-	}
-
-	// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
-	var clean = model.$clean();
-
-	// Filter for updating
-	var updater = function(doc) {
-		if (doc.id !== clean.id)
-			return doc;
-		count++;
-		return clean;
-	};
-
-	// Updates database file
-	DB('pages').update(updater, function() {
-
-		// Creates record if not exists
-		if (count === 0)
-			DB('pages').insert(clean);
-
-		// Returns response
-		callback(SUCCESS(true));
+		// Updates database file
+		DB('pages').update(updater, callback);
 
 		// Refreshes internal informations e.g. sitemap
 		setTimeout(refresh, 1000);
 	});
-});
 
-Page.addWorkflow('create-url', function(error, model, options, callback) {
+	// Saves the page into the database
+	schema.setSave(function(error, model, options, callback) {
 
-	if (!model.parent) {
-		model.url = model.title.slug();
-		return callback();
-	}
+		// options.id {String}
+		// options.url {String}
 
-	var options = {};
-	options.id = model.parent;
+		if (!model.name)
+			model.name = model.title;
 
-	// Gets Parent
-	Page.get(options, function(err, response) {
+		var count = 0;
 
-		if (err) {
+		if (!model.id)
+			model.id = U.GUID(10);
+
+		if (model.datecreated)
+			model.datecreated = model.datecreated.format();
+
+		if (model.search)
+			model.search = model.search.toSearch();
+
+		// Sanitizes URL
+		if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
+			model.url = U.path(model.url);
+			if (model.url[0] !== '/')
+				model.url = '/' + model.url;
+		}
+
+		// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
+		var clean = model.$clean();
+
+		// Filter for updating
+		var updater = function(doc) {
+			if (doc.id !== clean.id)
+				return doc;
+			count++;
+			return clean;
+		};
+
+		// Updates database file
+		DB('pages').update(updater, function() {
+
+			// Creates record if not exists
+			if (count === 0)
+				DB('pages').insert(clean);
+
+			// Returns response
+			callback(SUCCESS(true));
+
+			// Refreshes internal informations e.g. sitemap
+			setTimeout(refresh, 1000);
+		});
+	});
+
+	schema.addWorkflow('create-url', function(error, model, options, callback) {
+
+		if (!model.parent) {
 			model.url = model.title.slug();
 			return callback();
 		}
 
-		// Gets parent URL and adds current page title
-		model.url = response.url + model.title.slug() + '/';
-		callback();
+		var options = {};
+		options.id = model.parent;
+
+		// Gets Parent
+		schema.get(options, function(err, response) {
+
+			if (err) {
+				model.url = model.title.slug();
+				return callback();
+			}
+
+			// Gets parent URL and adds current page title
+			model.url = response.url + model.title.slug() + '/';
+			callback();
+		});
 	});
-});
 
-// Renders page
-Page.addOperation('render', function(error, model, options, callback) {
+	// Renders page
+	schema.addOperation('render', function(error, model, options, callback) {
 
-	// options.id {String}
-	// options.url {String}
+		// options.id {String}
+		// options.url {String}
 
-	if (typeof(options) === 'string') {
-		var tmp = options;
-		options = {};
-		options.id = options.url = tmp;
-	}
-
-	// Gets the page
-	Page.get(options, function(err, response) {
-
-		if (err) {
-			error.push(err);
-			return callback();
+		if (typeof(options) === 'string') {
+			var tmp = options;
+			options = {};
+			options.id = options.url = tmp;
 		}
 
-		if (!response) {
-			error.push('error-404-page');
-			return callback();
-		}
+		// Gets the page
+		schema.get(options, function(err, response) {
 
-		// Loads breadcrumb
-		var key = (response.language ? response.language + ':' : '') + response.url;
-		Page.operation('breadcrumb', key, function(err, breadcrumb) {
+			if (err) {
+				error.push(err);
+				return callback();
+			}
 
-			if (breadcrumb && breadcrumb.length > 0)
-				breadcrumb[0].first = true;
+			if (!response) {
+				error.push('error-404-page');
+				return callback();
+			}
 
-			response.breadcrumb = breadcrumb;
+			// Loads breadcrumb
+			var key = (response.language ? response.language + ':' : '') + response.url;
+			schema.operation('breadcrumb', key, function(err, breadcrumb) {
 
-			if (response.body)
-				response.body = response.body.replace(' id="CMS"', '');
+				if (breadcrumb && breadcrumb.length > 0)
+					breadcrumb[0].first = true;
 
-			if (!response.widgets)
-				return callback(response);
+				response.breadcrumb = breadcrumb;
 
-			var Widget = GETSCHEMA('Widget');
+				if (response.body)
+					response.body = response.body.replace(' id="CMS"', '');
 
-			// Loads widgets
-			Widget.workflow('load', null, response.widgets, function(err, widgets) {
-				var index = 0;
-				response.widgets.wait(function(key, next) {
-					// INIT WIDGET
-					var custom = {};
-					custom.settings = response.settings[index++];
-					custom.page = response;
-					custom.controller = options.controller;
+				if (!response.widgets)
+					return callback(response);
 
-					if (!widgets[key]) {
-						F.error(new Error('Widget # ' + key + ' not found'), 'Page: ' + response.name, response.url);
-						return next();
-					}
+				var Widget = GETSCHEMA('Widget');
 
-					// Executes transform
-					Widget.transform(widgets[key].name, widgets[key], custom, function(err, content) {
+				// Loads widgets
+				Widget.workflow('load', null, response.widgets, function(err, widgets) {
+					var index = 0;
+					response.widgets.wait(function(key, next) {
+						// INIT WIDGET
+						var custom = {};
+						custom.settings = response.settings[index++];
+						custom.page = response;
+						custom.controller = options.controller;
 
-						if (err) {
-							F.error(err, 'Widget: ' + widgets[key].name + ' (page: ' + response.name + ')', response.url);
+						if (!widgets[key]) {
+							F.error(new Error('Widget # ' + key + ' not found'), 'Page: ' + response.name, response.url);
 							return next();
 						}
 
-						response.body = response.body.replace('data-id="' + key + '">', '>' + content);
-						next();
-					}, true);
+						// Executes transform
+						Widget.transform(widgets[key].name, widgets[key], custom, function(err, content) {
 
-				}, function() {
-					// DONE
-					if (response.language)
-						response.body = F.translator(response.language, response.body);
+							if (err) {
+								F.error(err, 'Widget: ' + widgets[key].name + ' (page: ' + response.name + ')', response.url);
+								return next();
+							}
 
-					response.body = U.minifyHTML(response.body.replace(/<br>/g, '<br />'));
+							response.body = response.body.replace('data-id="' + key + '">', '>' + content);
+							next();
+						}, true);
 
-					// cleaner
-					response.body = response.body.replace(/(\s)class\=\".*?\"/g, function(text) {
+					}, function() {
+						// DONE
+						if (response.language)
+							response.body = F.translator(response.language, response.body);
 
-						var is = text[0] === ' ';
-						var arr = text.substring(is ? 8 : 7, text.length - 1).split(' ');
-						var builder = '';
+						response.body = U.minifyHTML(response.body.replace(/<br>/g, '<br />'));
 
-						for (var i = 0, length = arr.length; i < length; i++) {
-							var cls = arr[i];
-							if (cls[0] === 'C' && cls[3] === '_' && cls !== 'CMS_hidden')
-								continue;
-							builder += (builder ? ' ' : '') + cls;
-						}
+						// cleaner
+						response.body = response.body.replace(/(\s)class\=\".*?\"/g, function(text) {
 
-						return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
+							var is = text[0] === ' ';
+							var arr = text.substring(is ? 8 : 7, text.length - 1).split(' ');
+							var builder = '';
+
+							for (var i = 0, length = arr.length; i < length; i++) {
+								var cls = arr[i];
+								if (cls[0] === 'C' && cls[3] === '_' && cls !== 'CMS_hidden')
+									continue;
+								builder += (builder ? ' ' : '') + cls;
+							}
+
+							return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
+						});
+
+						callback(response);
 					});
-
-					callback(response);
-				});
-			}, true);
+				}, true);
+			});
 		});
 	});
-});
 
-// Renders multiple page
-Page.addOperation('render-multiple', function(error, model, options, callback) {
+	// Renders multiple page
+	schema.addOperation('render-multiple', function(error, model, options, callback) {
 
-	// options.id {String Array}
-	// options.url {String Array}
-	// options.language {String}
+		// options.id {String Array}
+		// options.url {String Array}
+		// options.language {String}
 
-	var output = {};
-	var pending = [];
+		var output = {};
+		var pending = [];
 
-	if (options.url instanceof Array) {
-		for (var i = 0, length = options.url.length; i < length; i++) {
-			(function(id) {
-				pending.push(function(next) {
-					var custom = {};
-					custom.url = id;
-					custom.language = options.language;
-					Page.operation('render', custom, function(err, response) {
-						output[id] = response;
-						next();
+		if (options.url instanceof Array) {
+			for (var i = 0, length = options.url.length; i < length; i++) {
+				(function(id) {
+					pending.push(function(next) {
+						var custom = {};
+						custom.url = id;
+						custom.language = options.language;
+						schema.operation('render', custom, function(err, response) {
+							output[id] = response;
+							next();
+						});
 					});
-				});
-			})(options.url[i]);
+				})(options.url[i]);
+			}
 		}
-	}
 
-	if (options.id instanceof Array) {
-		for (var i = 0, length = options.id.length; i < length; i++) {
-			(function(id) {
-				pending.push(function(next) {
-					var custom = {};
-					custom.id = id;
-					custom.language = options.language;
-					Page.operation('render', custom, function(err, response) {
-						output[id] = response;
-						next();
+		if (options.id instanceof Array) {
+			for (var i = 0, length = options.id.length; i < length; i++) {
+				(function(id) {
+					pending.push(function(next) {
+						var custom = {};
+						custom.id = id;
+						custom.language = options.language;
+						schema.operation('render', custom, function(err, response) {
+							output[id] = response;
+							next();
+						});
 					});
-				});
-			})(options.id[i]);
+				})(options.id[i]);
+			}
 		}
-	}
 
-	pending.async(function() {
-		callback(output);
-	});
-});
-
-// Loads breadcrumb according to URL
-Page.addOperation('breadcrumb', function(error, model, url, callback) {
-
-	var arr = [];
-
-	while (true) {
-		var item = F.global.sitemap[url];
-		if (!item)
-			break;
-		arr.push(item);
-		url = item.parent;
-	};
-
-	arr.reverse();
-	callback(arr);
-});
-
-// Clears database
-Page.addWorkflow('clear', function(error, model, options, callback) {
-
-	DB('pages').clear(function() {
-		setTimeout(refresh, 1000);
+		pending.async(function() {
+			callback(output);
+		});
 	});
 
-	callback(SUCCESS(true));
+	// Loads breadcrumb according to URL
+	schema.addOperation('breadcrumb', function(error, model, url, callback) {
+
+		var arr = [];
+
+		while (true) {
+			var item = F.global.sitemap[url];
+			if (!item)
+				break;
+			arr.push(item);
+			url = item.parent;
+		};
+
+		arr.reverse();
+		callback(arr);
+	});
+
+	// Clears database
+	schema.addWorkflow('clear', function(error, model, options, callback) {
+
+		DB('pages').clear(function() {
+			setTimeout(refresh, 1000);
+		});
+
+		callback(SUCCESS(true));
+	});
+
 });
 
 // Refreshes internal informations (sitemap and navigations)

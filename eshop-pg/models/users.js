@@ -15,210 +15,212 @@ exports.createSession = function(profile) {
 	return online[profile.id];
 };
 
-var User = NEWSCHEMA('User');
-User.define('id', 'String(10)');
-User.define('idfacebook', 'String(30)');
-User.define('idgoogle', 'String(30)');
-User.define('idlinkedin', 'String(30)');
-User.define('idinstagram', 'String(30)');
-User.define('idyandex', 'String(30)');
-User.define('iddropbox', 'String(30)');
-User.define('idvk', 'String(30)');
-User.define('idyahoo', 'String(30)');
-User.define('idlive', 'String(30)');
-User.define('ip', 'String(80)');
-User.define('search', 'String(80)');
-User.define('name', 'String(50)', true);
-User.define('email', 'String(200)');
-User.define('gender', 'String(20)');
-User.define('datecreated', Date);
+NEWSCHEMA('User').make(function(schema) {
 
-// Gets a specific user
-User.setGet(function(error, model, options, callback) {
+	schema.define('id', 'String(10)');
+	schema.define('idfacebook', 'String(30)');
+	schema.define('idgoogle', 'String(30)');
+	schema.define('idlinkedin', 'String(30)');
+	schema.define('idinstagram', 'String(30)');
+	schema.define('idyandex', 'String(30)');
+	schema.define('iddropbox', 'String(30)');
+	schema.define('idvk', 'String(30)');
+	schema.define('idyahoo', 'String(30)');
+	schema.define('idlive', 'String(30)');
+	schema.define('ip', 'String(80)');
+	schema.define('search', 'String(80)');
+	schema.define('name', 'String(50)', true);
+	schema.define('email', 'String(200)');
+	schema.define('gender', 'String(20)');
+	schema.define('datecreated', Date);
 
-	// options.id {String}
+	// Gets a specific user
+	schema.setGet(function(error, model, options, callback) {
 
-	var sql = DB(error);
+		// options.id {String}
 
-	sql.select('item', 'tbl_user').make(function(builder) {
-		builder.where('isremoved', false);
-		builder.where('id', options.id);
-		builder.first();
-	});
+		var sql = DB(error);
 
-	sql.validate('item', 'error-404-user');
-	sql.exec(callback, 'item');
-});
-
-User.setSave(function(error, model, options, callback) {
-
-	var sql = DB(error);
-	var isNew = model.id ? false : true;
-
-	if (!model.id)
-		model.id = U.GUID(10);
-
-	model.search = (model.name + ' ' + (model.email || '')).toSearch().max(80);
-
-	sql.save('item', 'tbl_user', isNew, function(builder, isNew) {
-		builder.set(model);
-		if (isNew)
-			return;
-		builder.rem('id');
-		builder.rem('datecreated');
-		builder.where('id', model.id);
-	});
-
-	sql.exec(function() {
-		// Returns response
-		callback(SUCCESS(true));
-	});
-});
-
-// Removes user from DB
-User.setRemove(function(error, id, callback) {
-
-	var sql = DB(error);
-
-	sql.update('item', 'tbl_user').make(function(builder) {
-		builder.where('id', id);
-		builder.set('isremoved', true);
-	});
-
-	sql.exec(function() {
-		callback(SUCCESS(true));
-	});
-});
-
-// Clears DB
-User.addWorkflow('clear', function(error, model, options, callback) {
-	var sql = DB(error);
-	sql.remove('tbl_page');
-	sql.exec(function() {
-		callback(SUCCESS(true));
-	});
-});
-
-// Sets default values
-User.setDefault(function(name) {
-	switch (name) {
-		case 'id':
-			return U.GUID(10);
-		case 'datecreated':
-			return new Date();
-	}
-});
-
-// Gets listing
-User.setQuery(function(error, options, callback) {
-
-	// options.search {String}
-	// options.page {String or Number}
-	// options.max {String or Number}
-
-	options.page = U.parseInt(options.page) - 1;
-	options.max = U.parseInt(options.max, 20);
-
-	if (options.page < 0)
-		options.page = 0;
-
-	var take = U.parseInt(options.max);
-	var skip = U.parseInt(options.page * options.max);
-
-	var sql = DB(error);
-	var filter = sql.$; // Creates new SQLBuilder
-
-	filter.where('isremoved', false);
-
-	if (options.search)
-		filter.like('search', options.search.toSearch(), '*');
-
-	sql.select('items', 'tbl_user').make(function(builder) {
-		builder.replace(filter);
-		builder.sort('datecreated', true);
-		builder.skip(skip);
-		builder.take(take);
-	});
-
-	sql.count('count', 'tbl_user', 'id').make(function(builder) {
-		builder.replace(filter);
-	});
-
-	sql.exec(function(err, response) {
-
-		if (err)
-			return callback();
-
-		var data = {};
-		data.count = response.count;
-		data.items = response.items;
-		data.pages = Math.ceil(response.count / options.max);
-
-		if (data.pages === 0)
-			data.pages = 1;
-
-		data.page = options.page + 1;
-		callback(data);
-	});
-});
-
-User.addWorkflow('login', function(error, model, options, callback) {
-
-	// options.controller
-	// options.profile
-	// options.type
-
-	var id = 'id' + options.type;
-	var sql = DB(error);
-
-	sql.select('user', 'tbl_user').make(function(builder) {
-		builder.where('isremoved', false);
-		builder.scope(function() {
-			builder.where(id, options.profile[id]);
-			if (!options.profile.email)
-				return;
-			builder.or();
-			builder.where('email', options.profile.email);
+		sql.select('item', 'tbl_user').make(function(builder) {
+			builder.where('isremoved', false);
+			builder.where('id', options.id);
+			builder.first();
 		});
-		builder.first();
+
+		sql.validate('item', 'error-404-user');
+		sql.exec(callback, 'item');
 	});
 
-	sql.prepare(function(error, response, resume) {
+	schema.setSave(function(error, model, options, callback) {
 
-		if (response.user) {
-			if (response.user[id] !== options.profile[id]) {
-				sql.update('tbl_user').make(function(builder) {
-					builder.set(id, options.profile[id]);
-					builder.where('id', response.user.id);
-				});
+		var sql = DB(error);
+		var isNew = model.id ? false : true;
+
+		if (!model.id)
+			model.id = U.GUID(10);
+
+		model.search = (model.name + ' ' + (model.email || '')).toSearch().max(80);
+
+		sql.save('item', 'tbl_user', isNew, function(builder, isNew) {
+			builder.set(model);
+			if (isNew)
+				return;
+			builder.rem('id');
+			builder.rem('datecreated');
+			builder.where('id', model.id);
+		});
+
+		sql.exec(function() {
+			// Returns response
+			callback(SUCCESS(true));
+		});
+	});
+
+	// Removes user from DB
+	schema.setRemove(function(error, id, callback) {
+
+		var sql = DB(error);
+
+		sql.update('item', 'tbl_user').make(function(builder) {
+			builder.where('id', id);
+			builder.set('isremoved', true);
+		});
+
+		sql.exec(function() {
+			callback(SUCCESS(true));
+		});
+	});
+
+	// Clears DB
+	schema.addWorkflow('clear', function(error, model, options, callback) {
+		var sql = DB(error);
+		sql.remove('tbl_page');
+		sql.exec(function() {
+			callback(SUCCESS(true));
+		});
+	});
+
+	// Sets default values
+	schema.setDefault(function(name) {
+		switch (name) {
+			case 'id':
+				return U.GUID(10);
+			case 'datecreated':
+				return new Date();
+		}
+	});
+
+	// Gets listing
+	schema.setQuery(function(error, options, callback) {
+
+		// options.search {String}
+		// options.page {String or Number}
+		// options.max {String or Number}
+
+		options.page = U.parseInt(options.page) - 1;
+		options.max = U.parseInt(options.max, 20);
+
+		if (options.page < 0)
+			options.page = 0;
+
+		var take = U.parseInt(options.max);
+		var skip = U.parseInt(options.page * options.max);
+
+		var sql = DB(error);
+		var filter = sql.$; // Creates new SQLBuilder
+
+		filter.where('isremoved', false);
+
+		if (options.search)
+			filter.like('search', options.search.toSearch(), '*');
+
+		sql.select('items', 'tbl_user').make(function(builder) {
+			builder.replace(filter);
+			builder.sort('datecreated', true);
+			builder.skip(skip);
+			builder.take(take);
+		});
+
+		sql.count('count', 'tbl_user', 'id').make(function(builder) {
+			builder.replace(filter);
+		});
+
+		sql.exec(function(err, response) {
+
+			if (err)
+				return callback();
+
+			var data = {};
+			data.count = response.count;
+			data.items = response.items;
+			data.pages = Math.ceil(response.count / options.max);
+
+			if (data.pages === 0)
+				data.pages = 1;
+
+			data.page = options.page + 1;
+			callback(data);
+		});
+	});
+
+	schema.addWorkflow('login', function(error, model, options, callback) {
+
+		// options.controller
+		// options.profile
+		// options.type
+
+		var id = 'id' + options.type;
+		var sql = DB(error);
+
+		sql.select('user', 'tbl_user').make(function(builder) {
+			builder.where('isremoved', false);
+			builder.scope(function() {
+				builder.where(id, options.profile[id]);
+				if (!options.profile.email)
+					return;
+				builder.or();
+				builder.where('email', options.profile.email);
+			});
+			builder.first();
+		});
+
+		sql.prepare(function(error, response, resume) {
+
+			if (response.user) {
+				if (response.user[id] !== options.profile[id]) {
+					sql.update('tbl_user').make(function(builder) {
+						builder.set(id, options.profile[id]);
+						builder.where('id', response.user.id);
+					});
+				}
+			} else {
+				response.user = schema.create();
+				response.user.name = options.profile.name;
+				response.user.email = options.profile.email;
+				response.user.gender = options.profile.gender;
+				response.user.ip = options.profile.ip;
+				response.user.search = (options.profile.name + ' ' + (options.profile.email || '')).toSearch().max(80);
+				response.user[id] = options.profile[id];
+
+				// Inserts new user
+				sql.insert('tbl_user').set(response.user);
+
+				// Writes stats
+				MODULE('webcounter').increment('users');
 			}
-		} else {
-			response.user = User.create();
-			response.user.name = options.profile.name;
-			response.user.email = options.profile.email;
-			response.user.gender = options.profile.gender;
-			response.user.ip = options.profile.ip;
-			response.user.search = (options.profile.name + ' ' + (options.profile.email || '')).toSearch().max(80);
-			response.user[id] = options.profile[id];
 
-			// Inserts new user
-			sql.insert('tbl_user').set(response.user);
+			resume();
+		});
 
-			// Writes stats
-			MODULE('webcounter').increment('users');
-		}
+		sql.exec(function(err, response) {
 
-		resume();
-	});
+			if (response.user) {
+				exports.login(options.controller.req, options.controller.res, response.user.id);
+				options.controller.req.user = exports.createSession(response.user);
+			}
 
-	sql.exec(function(err, response) {
-
-		if (response.user) {
-			exports.login(options.controller.req, options.controller.res, response.user.id);
-			options.controller.req.user = exports.createSession(response.user);
-		}
-
-		callback(response.user);
+			callback(response.user);
+		});
 	});
 
 });
@@ -256,7 +258,7 @@ F.onAuthorization = function(req, res, flags, callback) {
 		return;
 	}
 
-	User.get(user, function(err, response) {
+	GETSCHEMA('User').get(user, function(err, response) {
 
 		if (err || !response) {
 			callback(false);

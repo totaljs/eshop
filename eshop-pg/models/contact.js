@@ -1,33 +1,36 @@
-var Contact = NEWSCHEMA('Contact');
-Contact.define('id', 'String(10)');
-Contact.define('firstname', 'String(40)', true);
-Contact.define('lastname', 'String(40)', true);
-Contact.define('email', 'String(200)', true);
-Contact.define('message', String, true);
-Contact.define('phone', 'String(20)');
-Contact.define('language', 'String(3)');
-Contact.define('ip', 'String(80)');
-Contact.define('datecreated', Date);
+NEWSCHEMA('Contact').make(function(schema) {
 
-// Saves the model into the database
-Contact.setSave(function(error, model, options, callback) {
+	schema.define('id', 'String(10)');
+	schema.define('firstname', 'String(40)', true);
+	schema.define('lastname', 'String(40)', true);
+	schema.define('email', 'String(200)', true);
+	schema.define('message', String, true);
+	schema.define('phone', 'String(20)');
+	schema.define('language', 'String(3)');
+	schema.define('ip', 'String(80)');
+	schema.define('datecreated', Date);
 
-	// Default values
-	model.id = U.GUID(10);
-	model.datecreated = (new Date()).format();
+	// Saves the model into the database
+	schema.setSave(function(error, model, options, callback) {
 
-	// Saves to database
-	var sql = DB();
-	sql.insert('tbl_contactform').set(model);
-	sql.exec(F.error());
+		// Default values
+		model.id = U.GUID(10);
+		model.datecreated = (new Date()).format();
 
-	// Returns response
-	callback(SUCCESS(true));
+		// Saves to database
+		var sql = DB();
+		sql.insert('tbl_contactform').set(model);
+		sql.exec(F.error());
 
-	// Writes stats
-	MODULE('webcounter').increment('contactforms');
+		// Returns response
+		callback(SUCCESS(true));
 
-	// Sends email
-	var mail = F.mail(F.config.custom.emailcontactform, 'Contact form # ' + model.id, '~mails/contact', model, model.language);
-	mail.reply(model.email, true);
+		// Writes stats
+		MODULE('webcounter').increment('contactforms');
+
+		// Sends email
+		var mail = F.mail(F.config.custom.emailcontactform, 'Contact form # ' + model.id, '~mails/contact', model, model.language);
+		mail.reply(model.email, true);
+	});
+
 });

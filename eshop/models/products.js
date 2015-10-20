@@ -1,292 +1,295 @@
-var Product = NEWSCHEMA('Product');
-Product.define('id', 'String(10)');
-Product.define('pictures', '[String]');
-Product.define('reference', 'String(20)');
-Product.define('category', 'String(300)', true);
-Product.define('manufacturer', 'String(50)');
-Product.define('name', 'String(50)', true);
-Product.define('price', Number, true);
-Product.define('body', String, true);
-Product.define('istop', Boolean);
-Product.define('linker', 'String(50)');
-Product.define('linker_category', 'String(50)');
-Product.define('linker_manufacturer', 'String(50)');
-Product.define('datecreated', Date);
+NEWSCHEMA('Product').make(function(schema) {
 
-// Sets default values
-Product.setDefault(function(name) {
-	switch (name) {
-		case 'datecreated':
-			return new Date();
-	}
-});
+	schema.define('id', 'String(10)');
+	schema.define('pictures', '[String]');
+	schema.define('reference', 'String(20)');
+	schema.define('category', 'String(300)', true);
+	schema.define('manufacturer', 'String(50)');
+	schema.define('name', 'String(50)', true);
+	schema.define('price', Number, true);
+	schema.define('body', String, true);
+	schema.define('istop', Boolean);
+	schema.define('linker', 'String(50)');
+	schema.define('linker_category', 'String(50)');
+	schema.define('linker_manufacturer', 'String(50)');
+	schema.define('datecreated', Date);
 
-// Gets listing
-Product.setQuery(function(error, options, callback) {
+	// Sets default values
+	schema.setDefault(function(name) {
+		switch (name) {
+			case 'datecreated':
+				return new Date();
+		}
+	});
 
-	// options.search {String}
-	// options.category {String}
-	// options.page {String or Number}
-	// options.max {String or Number}
-	// options.id {String}
+	// Gets listing
+	schema.setQuery(function(error, options, callback) {
 
-	options.page = U.parseInt(options.page) - 1;
-	options.max = U.parseInt(options.max, 20);
+		// options.search {String}
+		// options.category {String}
+		// options.page {String or Number}
+		// options.max {String or Number}
+		// options.id {String}
 
-	if (options.id && typeof(options.id) === 'string')
-		options.id = options.id.split(',');
+		options.page = U.parseInt(options.page) - 1;
+		options.max = U.parseInt(options.max, 20);
 
-	var search;
-	if (options.search)
-		search = options.search.toSearch();
+		if (options.id && typeof(options.id) === 'string')
+			options.id = options.id.split(',');
 
-	if (options.page < 0)
-		options.page = 0;
+		var search;
+		if (options.search)
+			search = options.search.toSearch();
 
-	var take = U.parseInt(options.max);
-	var skip = U.parseInt(options.page * options.max);
+		if (options.page < 0)
+			options.page = 0;
 
-	var filter = function(doc) {
+		var take = U.parseInt(options.max);
+		var skip = U.parseInt(options.page * options.max);
 
-		if (options.category && !doc.linker_category.startsWith(options.category))
-			return;
-		if (options.manufacturer && doc.manufacturer !== options.manufacturer)
-			return;
-		if (options.search && doc.name.toSearch().indexOf(search) === -1 && doc.id !== options.search && doc.reference !== options.search)
-			return;
-		if (options.id && options.id.indexOf(doc.id) === -1)
-			return;
-		if (options.skip && doc.id === options.skip)
-			return;
+		var filter = function(doc) {
 
-		// Cleans unnecessary properties.
-		delete doc.body;
-		return doc;
-	};
+			if (options.category && !doc.linker_category.startsWith(options.category))
+				return;
+			if (options.manufacturer && doc.manufacturer !== options.manufacturer)
+				return;
+			if (options.search && doc.name.toSearch().indexOf(search) === -1 && doc.id !== options.search && doc.reference !== options.search)
+				return;
+			if (options.id && options.id.indexOf(doc.id) === -1)
+				return;
+			if (options.skip && doc.id === options.skip)
+				return;
 
-	var sorting = function(a, b) {
+			// Cleans unnecessary properties.
+			delete doc.body;
+			return doc;
+		};
 
-		if (options.homepage) {
-			if (a.istop)
+		var sorting = function(a, b) {
+
+			if (options.homepage) {
+				if (a.istop)
+					return -1;
+				if (b.istop)
+					return 1;
+			}
+
+			if (new Date(a.datecreated) > new Date(b.datecreated))
 				return -1;
-			if (b.istop)
-				return 1;
-		}
+			return 1;
+		};
 
-		if (new Date(a.datecreated) > new Date(b.datecreated))
-			return -1;
-		return 1;
-	};
+		DB('products').sort(filter, sorting, function(err, docs, count) {
+			var data = {};
+			data.count = count;
+			data.items = docs;
+			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
 
-	DB('products').sort(filter, sorting, function(err, docs, count) {
-		var data = {};
-		data.count = count;
-		data.items = docs;
-		data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
+			if (data.pages === 0)
+				data.pages = 1;
 
-		if (data.pages === 0)
-			data.pages = 1;
-
-		data.page = options.page + 1;
-		callback(data);
-	}, skip, take);
-});
-
-// Saves the product into the database
-Product.setSave(function(error, model, options, callback) {
-
-	var count = 0;
-
-	if (!model.id)
-		model.id = U.GUID(10);
-
-	model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
-	model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
-
-	var category = prepare_subcategories(model.category);
-	model.category = category.name;
-	model.linker_category = category.linker;
-
-	if (model.datecreated)
-		model.datecreated = model.datecreated.format();
-
-	// Filter for updating
-	var updater = function(doc) {
-
-		if (doc.id !== model.id)
-			return doc;
-
-		count++;
-		return model.$clean();
-	};
-
-	// Updates database file
-	DB('products').update(updater, function() {
-
-		// Creates record if not exists
-		if (count === 0)
-			DB('products').insert(model);
-
-		// Returns response
-		callback(SUCCESS(true));
-
-		// Refreshes internal information e.g. categories
-		setTimeout(refresh, 1000);
-	});
-});
-
-// Gets a specific product
-Product.setGet(function(error, model, options, callback) {
-
-	// options.category {String}
-	// options.linker {String}
-	// options.id {String}
-
-	// Filter for reading
-	var filter = function(doc) {
-
-		if (options.category && doc.linker_category !== options.category)
-			return;
-
-		if (options.linker && doc.linker !== options.linker)
-			return;
-
-		if (options.id && doc.id !== options.id)
-			return;
-
-		return doc;
-	};
-
-	// Gets a specific document from DB
-	DB('products').one(filter, function(err, doc) {
-
-		if (doc)
-			return callback(doc);
-
-		error.push('error-404-product');
-		callback();
-	});
-});
-
-// Removes product
-Product.setRemove(function(error, id, callback) {
-
-	// Filter for removing
-	var updater = function(doc) {
-		if (doc.id !== id)
-			return doc;
-		return null;
-	};
-
-	// Updates database file
-	DB('products').update(updater, callback);
-
-	// Refreshes internal information e.g. categories
-	setTimeout(refresh, 1000);
-});
-
-// Clears product database
-Product.addWorkflow('clear', function(error, model, options, callback) {
-
-	DB('products').clear(function() {
-		// Refreshes internal information e.g. categories
-		setTimeout(refresh, 1000);
+			data.page = options.page + 1;
+			callback(data);
+		}, skip, take);
 	});
 
-	callback(SUCCESS(true));
-});
+	// Saves the product into the database
+	schema.setSave(function(error, model, options, callback) {
 
-// Refreshes categories
-Product.addWorkflow('refresh', function(error, model, options, callback) {
-	refresh();
-	callback(SUCCESS(true));
-});
-
-// Replaces category
-Product.addWorkflow('category', function(error, model, options, callback) {
-
-	// options.category_old
-	// options.category_new
-
-	var is = false;
-	var category_old = prepare_subcategories(options.category_old);
-	var category_new = prepare_subcategories(options.category_new);
-
-	var update = function(doc) {
-
-		if (doc.category.startsWith(category_old.name)) {
-			doc.category = doc.category.replace(category_old.name, category_new.name);
-			doc.linker_category = doc.linker_category.replace(category_old.linker, category_new.linker);
-			is = true;
-		}
-
-		return doc;
-	};
-
-	DB('products').update(update, function() {
-		// Refreshes internal information e.g. categories
-		if (is)
-			setTimeout(refresh, 1000);
-		callback(SUCCESS(true));
-	});
-});
-
-// Imports CSV
-Product.addWorkflow('import', function(error, model, filename, callback) {
-	require('fs').readFile(filename, function(err, buffer) {
-
-		if (err) {
-			error.push(err);
-			callback();
-			return;
-		}
-
-		buffer = buffer.toString('utf8').split('\n');
-
-		var properties = [];
-		var schema = GETSCHEMA('Product');
-		var isFirst = true;
 		var count = 0;
 
-		buffer.wait(function(line, next) {
+		if (!model.id)
+			model.id = U.GUID(10);
 
-			if (!line)
-				return next();
+		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
+		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
 
-			var data = line.replace(/\"/g, '').split(';')
-			var product = {};
+		var category = prepare_subcategories(model.category);
+		model.category = category.name;
+		model.linker_category = category.linker;
 
-			for (var i = 0, length = data.length; i < length; i++) {
-				var value = data[i];
-				if (!value)
-					continue;
+		if (model.datecreated)
+			model.datecreated = model.datecreated.format();
 
-				if (isFirst)
-					properties.push(value);
-				else
-					product[properties[i]] = value;
-			}
+		// Filter for updating
+		var updater = function(doc) {
 
-			if (isFirst) {
-				isFirst = false;
-				return next();
-			}
+			if (doc.id !== model.id)
+				return doc;
 
-			schema.make(product, function(err, model) {
-				if (err)
-					return next();
-				count++;
-				model.$save(next);
-			});
-		}, function() {
+			count++;
+			return model.$clean();
+		};
 
-			if (count)
-				refresh();
+		// Updates database file
+		DB('products').update(updater, function() {
 
-			// Done, returns response
-			callback(SUCCESS(count > 0));
+			// Creates record if not exists
+			if (count === 0)
+				DB('products').insert(model);
+
+			// Returns response
+			callback(SUCCESS(true));
+
+			// Refreshes internal information e.g. categories
+			setTimeout(refresh, 1000);
 		});
 	});
+
+	// Gets a specific product
+	schema.setGet(function(error, model, options, callback) {
+
+		// options.category {String}
+		// options.linker {String}
+		// options.id {String}
+
+		// Filter for reading
+		var filter = function(doc) {
+
+			if (options.category && doc.linker_category !== options.category)
+				return;
+
+			if (options.linker && doc.linker !== options.linker)
+				return;
+
+			if (options.id && doc.id !== options.id)
+				return;
+
+			return doc;
+		};
+
+		// Gets a specific document from DB
+		DB('products').one(filter, function(err, doc) {
+
+			if (doc)
+				return callback(doc);
+
+			error.push('error-404-product');
+			callback();
+		});
+	});
+
+	// Removes product
+	schema.setRemove(function(error, id, callback) {
+
+		// Filter for removing
+		var updater = function(doc) {
+			if (doc.id !== id)
+				return doc;
+			return null;
+		};
+
+		// Updates database file
+		DB('products').update(updater, callback);
+
+		// Refreshes internal information e.g. categories
+		setTimeout(refresh, 1000);
+	});
+
+	// Clears product database
+	schema.addWorkflow('clear', function(error, model, options, callback) {
+
+		DB('products').clear(function() {
+			// Refreshes internal information e.g. categories
+			setTimeout(refresh, 1000);
+		});
+
+		callback(SUCCESS(true));
+	});
+
+	// Refreshes categories
+	schema.addWorkflow('refresh', function(error, model, options, callback) {
+		refresh();
+		callback(SUCCESS(true));
+	});
+
+	// Replaces category
+	schema.addWorkflow('category', function(error, model, options, callback) {
+
+		// options.category_old
+		// options.category_new
+
+		var is = false;
+		var category_old = prepare_subcategories(options.category_old);
+		var category_new = prepare_subcategories(options.category_new);
+
+		var update = function(doc) {
+
+			if (doc.category.startsWith(category_old.name)) {
+				doc.category = doc.category.replace(category_old.name, category_new.name);
+				doc.linker_category = doc.linker_category.replace(category_old.linker, category_new.linker);
+				is = true;
+			}
+
+			return doc;
+		};
+
+		DB('products').update(update, function() {
+			// Refreshes internal information e.g. categories
+			if (is)
+				setTimeout(refresh, 1000);
+			callback(SUCCESS(true));
+		});
+	});
+
+	// Imports CSV
+	schema.addWorkflow('import', function(error, model, filename, callback) {
+		require('fs').readFile(filename, function(err, buffer) {
+
+			if (err) {
+				error.push(err);
+				callback();
+				return;
+			}
+
+			buffer = buffer.toString('utf8').split('\n');
+
+			var properties = [];
+			var schema = GETSCHEMA('Product');
+			var isFirst = true;
+			var count = 0;
+
+			buffer.wait(function(line, next) {
+
+				if (!line)
+					return next();
+
+				var data = line.replace(/\"/g, '').split(';')
+				var product = {};
+
+				for (var i = 0, length = data.length; i < length; i++) {
+					var value = data[i];
+					if (!value)
+						continue;
+
+					if (isFirst)
+						properties.push(value);
+					else
+						product[properties[i]] = value;
+				}
+
+				if (isFirst) {
+					isFirst = false;
+					return next();
+				}
+
+				schema.make(product, function(err, model) {
+					if (err)
+						return next();
+					count++;
+					model.$save(next);
+				});
+			}, function() {
+
+				if (count)
+					refresh();
+
+				// Done, returns response
+				callback(SUCCESS(count > 0));
+			});
+		});
+	});
+
 });
 
 // Refreshes internal information (categories and manufacturers)
