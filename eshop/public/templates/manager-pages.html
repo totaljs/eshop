@@ -343,6 +343,7 @@
 			pages.form.widgets = widgets.widgets;
 			pages.form.settings = widgets.settings;
 			pages.form.body = editor.getContent();
+			pages.form.search = editor.getKeywords();
 
 			$.components.POST(managerurl + '/api/pages/', pages.form, function(response) {
 
@@ -518,7 +519,25 @@
 
 			loading(true);
 			$.components.GET(managerurl + '/api/widgets/' + id, null, function(response, err) {
-				editor.getTarget().append('<div class="CMS_remove">' + response.body + '</div>');
+				var target = editor.getTarget();
+				var content = '<div class="CMS_template CMS_remove">' + response.body + '</div>';
+
+				if (!target.hasClass('CMS_widgets')) {
+					var tmp = editor.getParent('CMS_widget', 5);
+					if (!tmp)
+						tmp = editor.getParent('CMS_template', 5);
+					if (!tmp)
+						tmp = editor.getParent('CMS_widgets', 5);
+					if (!tmp)
+						return;
+					target = tmp;
+				}
+
+				if (target.hasClass('CMS_widgets'))
+					target.append(content);
+				else
+					target.after(content);
+
 				editor.change(true);
 				editor.resize();
 				loading(false, 1000);
@@ -706,9 +725,16 @@
 			return self.element.contents().find('#CMS_panel');
 		};
 
-		self.getParent = function(cls) {
+		self.getParent = function(cls, max) {
+
+			if (target.hasClass(cls))
+				return target;
+
 			var parent = target.parent();
-			for (var i = 0; i < 20; i++) {
+			if (!max)
+				max = 20;
+
+			for (var i = 0; i < max; i++) {
 				if (parent.hasClass(cls))
 					return parent;
 				parent = parent.parent();
@@ -753,6 +779,74 @@
 		self.getPerex = function() {
 			return self.element.contents().find('.CMS_perex').html();
 		};
+
+		self.getKeywords = function() {
+
+			var text = '';
+
+			self.element.contents().find('.CMS_edit').each(function(index) {
+				text += ' ' + this.innerText;
+			});
+
+			return find_keywords(text);
+		};
+
+		function find_keywords(content, alternative, count, max, min) {
+
+			min = min || 2;
+			count = count || 200;
+			max = max || 20;
+
+			var words = content.toLowerCase().match(/[a-ž]+/gi);
+
+			if (words === null)
+				words = [];
+
+			var length = words.length;
+			var dic = {};
+			var counter = 0;
+
+			for (var i = 0; i < length; i++) {
+				var word = words[i].trim();
+
+				if (word.length < min)
+					continue;
+
+				if (counter >= count)
+					break;
+
+				if (alternative)
+					word = word.substring(0, (word.length / 100) * 80);
+
+				if (word.length < min || word.length > max)
+					continue;
+
+				if (dic[word])
+					dic[word]++;
+				else
+					dic[word] = 1;
+
+				counter++;
+			}
+
+			var keys = Object.keys(dic);
+
+			keys.sort(function(a, b) {
+
+				var countA = dic[a];
+				var countB = dic[b];
+
+				if (countA > countB)
+					return -1;
+
+				if (countA < countB)
+					return 1;
+
+				return 0;
+			});
+
+			return keys.join(' ');
+		}
 
 		self.getPictures = function() {
 			var content = self.element.contents();
@@ -847,6 +941,9 @@
 
 					if (disabled && name === 'remove')
 						disabled = self.getParent('CMS_remove') === null;
+
+					if (disabled && name === 'widgets')
+						disabled = self.getParent('CMS_widgets', 5) === null;
 
 					el.toggleClass('CMS_panel_disabled', disabled);
 				});

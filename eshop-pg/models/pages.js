@@ -21,7 +21,7 @@ Page.define('tags', '[String]');
 Page.define('pictures', '[String]') // URL address to first 5 pictures
 Page.define('name', 'String(50)');
 Page.define('perex', 'String(500)');
-Page.define('search', 'String(80)');
+Page.define('search', 'String(200)');
 Page.define('title', 'String(100)', true);
 Page.define('priority', Number);
 Page.define('ispartial', Boolean);
@@ -230,7 +230,7 @@ Page.setSave(function(error, model, options, callback) {
 	clean.pictures = clean.pictures.join(';');
 	clean.tags = clean.tags.join(';');
 	clean.navigations = clean.navigations.join(';');
-	clean.search = (model.title + model.perex).toSearch().max(80);
+	clean.search = (model.search).toSearch().max(200);
 
 	delete clean.settings;
 	delete clean.widgets;

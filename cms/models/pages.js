@@ -18,7 +18,8 @@ Page.define('navigations', '[String]');
 Page.define('widgets', '[String]'); // Widgets lists, contains Array of ID widget
 Page.define('settings', '[String]'); // Widget settings (according to widgets array index)
 Page.define('tags', '[String]');
-Page.define('pictures', '[String]') // URL address to first 5 pictures
+Page.define('search', 'String(1000)');
+Page.define('pictures', '[String]') // URL addresses for first 5 pictures
 Page.define('name', 'String(50)');
 Page.define('perex', 'String(500)');
 Page.define('title', 'String(100)', true);
@@ -75,7 +76,7 @@ Page.setQuery(function(error, options, callback) {
 
 		// Searchs in "title"
 		if (options.search) {
-			if (doc.title.toSearch().indexOf(options.search) === -1)
+			if (doc.search.indexOf(options.search) === -1)
 				return;
 		}
 
@@ -168,6 +169,9 @@ Page.setSave(function(error, model, options, callback) {
 
 	if (model.datecreated)
 		model.datecreated = model.datecreated.format();
+
+	if (model.search)
+		model.search = model.search.toSearch();
 
 	// Sanitizes URL
 	if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
