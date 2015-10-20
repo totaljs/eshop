@@ -31,7 +31,7 @@
 			<div data-component="grid" data-component-path="pages.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more pages)" data-component-id="pages.grid">
 				<script type="text/html">
 				<tr>
-					<td{{ if ispartial }} class="green"{{ fi }}>{{ if icon }}<span class="fa fa-{{ icon }} w18 mr5"></span>{{ fi }}{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ name }}</td>
+					<td{{ if ispartial }} class="green"{{ fi }}>{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ if icon }}<span class="fa fa-{{ icon }} w18 mr5"></span>{{ fi }}{{ name }}</td>
 					<td class="col-xs-3 silver fs11 hidden-xs"><span class="fa fa-globe"></span> {{ url }}</td>
 					<td class="col-xs-2 silver fs11 hidden-xs">{{ if navigations && navigations.length > 0 }}<span class="fa fa-sitemap"></span> {{ navigations | join }}{{ fi }}</td>
 					<td style="width:110px" class="ui-right">{{ if ispartial }}<span class="fs11 silver">ID: {{ id }}</span>{{ else }}<a href="{{ url }}" class="fs11" target="_blank">@(show page)</a>{{ fi }}</td>
