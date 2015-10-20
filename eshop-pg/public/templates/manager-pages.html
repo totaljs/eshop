@@ -1164,7 +1164,7 @@
 		self.resize = function(force) {
 			setTimeout(function() {
 				var contents = self.element.contents();
-				var h = contents.find('#CMS').innerHeight() + 100;
+				var h = contents.height();
 				self.element.css({ height: h });
 				width = contents.width();
 			}, force ? 0 : 500);
