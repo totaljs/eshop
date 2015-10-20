@@ -574,7 +574,8 @@ F.eval(function() {
 
 			var options = {};
 
-			options.url = url;
+			options.url = self.url;
+			options.language = self.language;
 			options.controller = self;
 
 			GETSCHEMA('Page').operation('render', options, function(err, response) {
