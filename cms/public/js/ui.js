@@ -1304,8 +1304,8 @@ COMPONENT('tabmenu', function() {
 });
 
 Tangular.register('pluralize', function(value, zero, one, other, many) {
-	if (value === 0)
-		return value + ' ' + zero;
+	if (!value)
+		return '0 ' + zero;
 	if (value === 1)
 		return value + ' ' + one;
 	if (value > 4)
