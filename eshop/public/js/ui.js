@@ -1396,7 +1396,11 @@ COMPONENT('codemirror', function() {
 
 		setTimeout(function() {
 			editor.refresh();
-		}, 300);
+		}, 200);
+
+		setTimeout(function() {
+			editor.refresh();
+		}, 1000);
 	};
 
 	self.state = function(type) {
