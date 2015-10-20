@@ -671,7 +671,6 @@
 			}
 
 			editor.element.contents().find('#CMS').html(pages.editor.source);
-			editor.events();
 			editor.resize();
 			editor.change(true);
 			hide();
@@ -711,6 +710,9 @@
 
 			iframe.document.write(content);
 			iframe.document.close();
+
+			self.element.css({ height: 'auto' });
+
 			setTimeout(function() {
 				self.events();
 				self.resize(10);
@@ -881,9 +883,7 @@
 		self.events = function() {
 
 			var body = self.element.contents();
-
 			body.off('click');
-
 			body.on('click', '.CMS_edit,.CMS_repeat,.CMS_remove,.CMS_widgets', function(e) {
 
 				e.preventDefault();
@@ -951,6 +951,7 @@
 				target.addClass('CMS_selected');
 			});
 
+			body.off('paste');
 			body.on('paste', function(e) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -1167,7 +1168,7 @@
 				var h = contents.height();
 				self.element.css({ height: h });
 				width = contents.width();
-			}, force ? 0 : 500);
+			}, force ? 10 : 500);
 		};
 
 		self.setter = function(value, path, type) {
