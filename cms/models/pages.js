@@ -423,7 +423,7 @@ function refresh() {
 		var key = (doc.language ? doc.language + ':' : '') + doc.url;
 
 		helper[doc.id] = key;
-		sitemap[key] = { id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, language: doc.language, icon: doc.icon };
+		sitemap[key] = { id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, language: doc.language, icon: doc.icon, tags: doc.tags };
 
 		if (!doc.navigations)
 			return;
@@ -433,7 +433,7 @@ function refresh() {
 			var name = doc.navigations[i];
 			if (!navigation[name])
 				navigation[name] = [];
-			navigation[name].push({ url: doc.url, name: doc.name, title: doc.title, priority: doc.priority, language: doc.language, icon: doc.icon });
+			navigation[name].push({ url: doc.url, name: doc.name, title: doc.title, priority: doc.priority, language: doc.language, icon: doc.icon, tags: doc.tags });
 		}
 	};
 

@@ -488,7 +488,7 @@ function refresh() {
 
 	sql.select('pages', 'tbl_page').make(function(builder) {
 		builder.where('isremoved', false);
-		builder.fields('id', 'url', 'name', 'title', 'parent', 'language', 'icon', 'ispartial', 'navigations');
+		builder.fields('id', 'url', 'name', 'title', 'parent', 'language', 'icon', 'ispartial', 'navigations', 'tags');
 	});
 
 	sql.exec(function(err, response) {
@@ -510,7 +510,7 @@ function refresh() {
 				var name = page.navigations[j];
 				if (!navigation[name])
 					navigation[name] = [];
-				navigation[name].push({ url: page.url, name: page.name, title: page.title, priority: page.priority, language: page.language, icon: page.icon });
+				navigation[name].push({ url: page.url, name: page.name, title: page.title, priority: page.priority, language: page.language, icon: page.icon, tags: page.tags });
 			}
 		}
 
