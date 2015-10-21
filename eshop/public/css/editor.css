@@ -13,3 +13,4 @@
 .CMS_widget pre { padding: 10px; margin: 10px 10px 0; display: block; background-color: white; font-weight: normal; text-align: center; }
 #CMS { margin: 20px 0; }
 .CMS_hidden { display: block !important; }
+.CMS_widgets { min-height: 100px; }
