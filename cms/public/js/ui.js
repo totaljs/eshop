@@ -820,7 +820,10 @@ COMPONENT('fileupload', function() {
 					}
 				}
 
-				self.push(response);
+				if (self.attr('data-singlefile') === 'true')
+					self.set(response[0]);
+				else
+					self.push(response);
 			});
 		});
 	};
