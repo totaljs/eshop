@@ -786,9 +786,15 @@
 
 			var text = '';
 
-			self.element.contents().find('.CMS_edit').each(function(index) {
+			self.element.contents().find('.CMS_search').each(function(index) {
 				text += ' ' + this.innerText;
 			});
+
+			if (!text) {
+				self.element.contents().find('.CMS_edit').each(function(index) {
+					text += ' ' + this.innerText;
+				});
+			}
 
 			return find_keywords(text);
 		};
