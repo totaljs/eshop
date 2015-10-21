@@ -77,10 +77,10 @@ NEWSCHEMA('Settings').make(function(schema) {
 		}
 
 		// Writes settings into the file
-		Fs.writeFile(filename, JSON.stringify(settings), NOOP);
-
-		// Returns response
-		callback(SUCCESS(true));
+		Fs.writeFile(filename, JSON.stringify(settings), function() {
+			// Returns response
+			callback(SUCCESS(true));
+		});
 	});
 
 	// Gets settings
