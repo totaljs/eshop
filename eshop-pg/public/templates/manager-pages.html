@@ -613,6 +613,9 @@
 			else
 				link.attr('target', pages.editor.link.target);
 
+			if (target.data('temporary'))
+				target.removeData('temporary');
+
 			editor.change(true);
 			hide();
 		};
@@ -620,8 +623,12 @@
 		component.cancel = function(hide) {
 			var editor = FIND('cmseditor');
 			var target = editor.getTarget();
-			if (target.data('temporary'))
+
+			if (target.data('temporary')) {
+				target.removeData('temporary');
 				target.replaceWith(target.html());
+			}
+
 			hide();
 		};
 
@@ -786,9 +793,15 @@
 
 			var text = '';
 
-			self.element.contents().find('.CMS_edit').each(function(index) {
+			self.element.contents().find('.CMS_search').each(function(index) {
 				text += ' ' + this.innerText;
 			});
+
+			if (!text) {
+				self.element.contents().find('.CMS_edit').each(function(index) {
+					text += ' ' + this.innerText;
+				});
+			}
 
 			return find_keywords(text);
 		};
@@ -993,6 +1006,7 @@
 					if (tmp.length === 0)
 						return;
 
+					tmp.attr('class', 'CMS_edit');
 					target.removeAttr('contentEditable');
 					target.removeClass('CMS_selected');
 					target = tmp;
