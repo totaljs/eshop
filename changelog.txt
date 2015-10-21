@@ -2,6 +2,7 @@
 
 - added postgresql version
 - added animations
+- added font-awesome editor into the CMS
 - eshop supports subcategories
 - eshop supports manufacturers
 - fixed CMS editor and code mirror

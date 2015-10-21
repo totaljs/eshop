@@ -85,6 +85,10 @@ canvas { display: block; }
 .tabmenu .selected { background-color: white; top: 1px; border-color: #E0E0E0; color: black; }
 .tabmenu .fa { margin-right: 8px; }
 
+.font-awesome-editor > div { text-align: center; }
+.font-awesome-editor .fa { font-size: 18px; padding: 10px 0; color: #AAB2BD; cursor: pointer; }
+.font-awesome-editor .fa:hover { color: black; }
+
 @media(max-width: 767px) {
 	header { height: 45px; }
 	nav { font-size: 16px; text-align: center; }
