@@ -22,7 +22,7 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('pictures', '[String]') // URL addresses for first 5 pictures
 	schema.define('name', 'String(50)');
 	schema.define('perex', 'String(500)');
-	schema.define('search', 'String(200)');
+	schema.define('search', 'String(2000)');
 	schema.define('title', 'String(100)', true);
 	schema.define('priority', Number);
 	schema.define('ispartial', Boolean);
@@ -231,7 +231,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		clean.pictures = clean.pictures.join(';');
 		clean.tags = clean.tags.join(';');
 		clean.navigations = clean.navigations.join(';');
-		clean.search = (model.search).toSearch().max(200);
+		clean.search = (model.search).toSearch().max(2000);
 
 		delete clean.settings;
 		delete clean.widgets;
