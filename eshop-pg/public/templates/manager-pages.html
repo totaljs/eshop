@@ -352,7 +352,7 @@
 			pages.form.perex = editor.getPerex();
 			pages.form.widgets = widgets.widgets;
 			pages.form.settings = widgets.settings;
-			pages.form.body = editor.getContent();
+			pages.form.body = editor.getContent().replace(/\n[\s\t]+\n/g, '\n');
 			pages.form.search = editor.getKeywords();
 
 			$.components.POST(managerurl + '/api/pages/', pages.form, function(response) {
@@ -703,7 +703,7 @@
 	}
 
 	function pages_sourcecode() {
-		SET('pages.editor.source', FIND('cmseditor').getContent(), true);
+		SET('pages.editor.source', FIND('cmseditor').getContent().replace(/\n[\s\t]+\n/g, '\n'), true);
 		SET('pages.editor.window', 'source');
 	}
 
