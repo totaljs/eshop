@@ -437,6 +437,7 @@ COMPONENT('textboxtags', function() {
 COMPONENT('page', function() {
 	var self = this;
 	var isProcessed = false;
+	var isProcessing = false;
 
 	self.hide = function() {
 		self.set('');
@@ -444,6 +445,10 @@ COMPONENT('page', function() {
 
 	self.getter = null;
 	self.setter = function(value) {
+
+		if (isProcessing)
+			return;
+
 		var el = self.element;
 		var is = el.attr('data-if') == value;
 
@@ -453,7 +458,9 @@ COMPONENT('page', function() {
 		}
 
 		loading(true);
+		isProcessing = true;
 		INJECT(el.attr('data-template'), el, function() {
+			isProcessing = false;
 			var init = el.attr('data-init');
 			if (init) {
 				var fn = GET(init || '');
