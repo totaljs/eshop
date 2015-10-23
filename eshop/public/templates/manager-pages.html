@@ -981,6 +981,8 @@
 				e.stopPropagation();
 				var iframe = self.element.get(0).contentWindow;
 				var text = e.originalEvent.clipboardData.getData('text/plain');
+				if (target.hasClass('CMS_singleline'))
+					text = text.replace(/\n\r/g, ' ');
 				iframe.document.execCommand('insertText', false, text);
 			});
 
