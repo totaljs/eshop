@@ -55,7 +55,7 @@ function view_products_category(category) {
 	self.repository.category = category;
 
 	// Increases the performance (1 minute cache)
-	self.memorize('cache.' + category + '.' + options.page, '1 minute', DEBUG, function() {
+	self.memorize('cache.' + options.category + '.' + options.page, '1 minute', DEBUG, function() {
 		GETSCHEMA('Product').query(options, function(err, data) {
 
 			if (data.items.length === 0)
