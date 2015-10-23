@@ -712,12 +712,14 @@
 		var self = this;
 		var target;
 		var width;
+		var offsetter = '<span id="cmseditorheight"></span>';
 
 		self.noValid();
 
 		self.write = function(content) {
 			var iframe = self.element.get(0).contentWindow;
-			iframe.document.close();
+			iframe.document.open('text/html', 'replace');
+
 			if (!content) {
 				iframe.document.write('<html><head></head><body style="color:gray;text-align:center;padding:90px 0 0;margin:0;font-family:Arial;font-size:11px;color:#ADADAD;line-height:16px">@(<b>WITHOUT CONTENT</b><br />Choose the template for content editing.)</body></html>');
 				iframe.document.close();
@@ -725,9 +727,8 @@
 				return;
 			}
 
-			iframe.document.write(content);
+			iframe.document.write(content.replace('</body>', offsetter + '</body>'));
 			iframe.document.close();
-
 			self.element.css({ height: 'auto' });
 
 			setTimeout(function() {
@@ -901,7 +902,7 @@
 				if (cls.indexOf('CMS_widget') === -1 && cls.indexOf('fa') === -1)
 					$(this).remove();
 			});
-			return (self.element.contents().find('#CMS').html() || '').trim();
+			return (self.element.contents().find('#CMS').html() || '').trim().replace(offsetter, '');
 		};
 
 		self.events = function() {
@@ -1208,7 +1209,7 @@
 		self.resize = function(force) {
 			setTimeout(function() {
 				var contents = self.element.contents();
-				var h = contents.height();
+				var h = navigator.userAgent.indexOf('Safari') === -1 ? contents.outerHeight() + 20 : contents.find('#cmseditorheight').offset().top + 20;
 				self.element.css({ height: h });
 				width = contents.width();
 			}, force ? 10 : 500);
