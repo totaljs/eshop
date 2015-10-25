@@ -1497,6 +1497,14 @@ COMPONENT('calendar', function() {
 	self.months = self.attr('data-months').split(',');
 	self.first = parseInt(self.attr('data-firstday'));
 	self.today = self.attr('data-today');
+	self.months_short = [];
+
+	for (var i = 0, length = self.months.length; i < length; i++) {
+		var m = self.months[i];
+		if (m.length > 4)
+			m = m.substring(0, 3) + '.';
+		self.months_short.push(m);
+	}
 
 	self.readonly();
 	self.click = function(date) {};

@@ -171,19 +171,19 @@
 			var year = (new Date()).getFullYear();
 
 			data = {};
-			data.labels = months;
+			data.labels = window.$calendar.months_short;
 			data.datasets = [{ fillColor: '#FFCE54', data: dashboard_charts_bar_items(response.webcounter.stats, 'count', year) }, { fillColor: '#FC6E51', data: dashboard_charts_bar_items(response.webcounter.stats, 'unique', year) }];
 			dashboard.cache.visitors = new Chart($('#dashboard-monthly-visitors').get(0).getContext('2d'));
 			dashboard.cache.visitors.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false });
 
 			data = {};
-			data.labels = months;
+			data.labels = window.$calendar.months_short;
 			data.datasets = [{ fillColor: '#48CFAD', data: dashboard_charts_bar_items(response.webcounter.stats, 'contactforms', year) }];
 			dashboard.cache.orders = new Chart($('#dashboard-monthly-contactforms').get(0).getContext('2d'));
 			dashboard.cache.orders.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
 
 			data = {};
-			data.labels = months;
+			data.labels = window.$calendar.months_short;
 			data.datasets = [{ fillColor: '#AC92EC', data: dashboard_charts_bar_items(response.webcounter.stats, 'hits', year) }];
 			dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'));
 			dashboard.cache.hits.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
