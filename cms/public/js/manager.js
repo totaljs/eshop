@@ -20,57 +20,60 @@ $(document).ready(function() {
 	resizer();
 });
 
-jRouting.route(managerurl + '/', function() {
+// Because of login form
+if (window.su) {
+	jRouting.route(managerurl + '/', function() {
 
-	if (can('dashboard')) {
-		SET('common.page', 'dashboard');
-		return;
+		if (can('dashboard')) {
+			SET('common.page', 'dashboard');
+			return;
+		}
+
+		jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
+	});
+
+	if (can('orders')) {
+		jRouting.route(managerurl + '/orders/', function() {
+			SET('common.page', 'orders');
+		});
 	}
 
-	jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
-});
+	if (can('products')) {
+		jRouting.route(managerurl + '/products/', function() {
+			SET('common.page', 'products');
+		});
+	}
 
-if (can('orders')) {
-	jRouting.route(managerurl + '/orders/', function() {
-		SET('common.page', 'orders');
+	if (can('newsletter')) {
+		jRouting.route(managerurl + '/newsletter/', function() {
+			SET('common.page', 'newsletter');
+		});
+	}
+
+	if (can('settings')) {
+		jRouting.route(managerurl + '/settings/', function() {
+			SET('common.page', 'settings');
+		});
+	}
+
+	if (can('pages')) {
+		jRouting.route(managerurl + '/pages/', function() {
+			SET('common.page', 'pages');
+		});
+	}
+
+	if (can('system')) {
+		jRouting.route(managerurl + '/system/', function() {
+			SET('common.page', 'system');
+		});
+	}
+
+	jRouting.on('location', function(url) {
+		var nav = $('nav');
+		nav.find('.selected').removeClass('selected');
+		nav.find('a[href="' + url + '"]').addClass('selected');
 	});
 }
-
-if (can('products')) {
-	jRouting.route(managerurl + '/products/', function() {
-		SET('common.page', 'products');
-	});
-}
-
-if (can('newsletter')) {
-	jRouting.route(managerurl + '/newsletter/', function() {
-		SET('common.page', 'newsletter');
-	});
-}
-
-if (can('settings')) {
-	jRouting.route(managerurl + '/settings/', function() {
-		SET('common.page', 'settings');
-	});
-}
-
-if (can('pages')) {
-	jRouting.route(managerurl + '/pages/', function() {
-		SET('common.page', 'pages');
-	});
-}
-
-if (can('system')) {
-	jRouting.route(managerurl + '/system/', function() {
-		SET('common.page', 'system');
-	});
-}
-
-jRouting.on('location', function(url) {
-	var nav = $('nav');
-	nav.find('.selected').removeClass('selected');
-	nav.find('a[href="' + url + '"]').addClass('selected');
-});
 
 function loading(v, timeout) {
 	setTimeout(function() {
@@ -81,6 +84,8 @@ function loading(v, timeout) {
 function resizer() {
 	var h = $(window).height();
 	var el = $('#body');
+	if (!el.length)
+		return;
 	var t = el.offset().top + 100;
 	el.css('min-height', h - t);
 }

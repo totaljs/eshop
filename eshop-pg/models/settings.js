@@ -123,7 +123,8 @@ NEWSCHEMA('Settings').make(function(schema) {
 			var users = {};
 			for (var i = 0, length = F.config.custom.users.length; i < length; i++) {
 				var user = F.config.custom.users[i];
-				users[user.login + ':' + user.password] = user;
+				var key = (user.login + ':' + user.password).hash();
+				users[key] = user;
 			}
 
 			F.config.custom.users = users;

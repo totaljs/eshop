@@ -22,4 +22,4 @@ mail.smtp                 : YOUR.SMTPSERVER.COM
 
 // Image convertor for resizing of pictures
 // Default image converter: im = ImageMagick, gm = GraphicsMagick
-default-image-converter   : gm
+default-image-converter   : im

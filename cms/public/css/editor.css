@@ -6,11 +6,10 @@
 #CMS_panel span:last-child { background-color: #DF452D; color: white; }
 .CMS_panel_disabled { color: #303030 !important; cursor: not-allowed; background-color: #151515 !important; }
 .CMS_selected { background-color: rgba(0,0,0,0.1) !important; }
-.CMS_repeat { padding-top: 2px; cursor: crosshair; }
-.CMS_remove { padding-top: 2px; cursor: no-drop; }
-.CMS_edit { cursor: text; }
+.CMS_edit { cursor: crosshair; }
 .CMS_widget { background-color: #F0F0F0; text-align: center; padding: 20px 0; font-weight: bold; color: black; margin: 1px; }
 .CMS_widget pre { padding: 10px; margin: 10px 10px 0; display: block; background-color: white; font-weight: normal; text-align: center; }
 #CMS { padding: 20px 0; }
-.CMS_widgets { border-top: 1px dotted #E0E0E0; cursor: pointer; padding: 15px 0; min-height: 30px; }
+.CMS_widgets { border-top: 1px dotted #E0E0E0; cursor: crosshair; padding: 15px 0; min-height: 30px; }
 .CMS_hidden { display: block !important; }
+*[contentEditable] { cursor: text; }

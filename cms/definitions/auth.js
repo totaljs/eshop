@@ -7,16 +7,14 @@ F.on('controller', function(controller, name) {
 	if (!controller.url.startsWith(CONFIG('manager-url'), true))
 		return;
 
-	// Check protection
-	if (protection[controller.req.ip] > 5) {
-		controller.plain('401: Unauthorized (BLOCKED)');
+	// Checks protection
+	if (protection[controller.req.ip] > 10) {
+		controller.throw401();
 		controller.cancel();
 		return;
 	}
 
-	var auth = controller.baa();
-	var user = F.config.custom.users[auth.user + ':' + auth.password];
-
+	var user = F.config.custom.users[U.parseInt(controller.req.cookie('__manager'))];
 	if (user) {
 		controller.req.user = user;
 		return;
@@ -27,10 +25,11 @@ F.on('controller', function(controller, name) {
 	else
 		protection[controller.req.ip]++;
 
-	controller.baa('Content Management System (' + protection[controller.req.ip] + ')');
+	controller.cancel();
+	controller.view('manager-login');
 });
 
-// Clear blocked IP addreses
+// Clears blocked IP addreses
 F.on('service', function(interval) {
 	if (interval % 30 === 0)
 		protection = {};

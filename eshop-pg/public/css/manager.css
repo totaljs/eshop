@@ -12,11 +12,11 @@ nav a:hover { color: #303030; text-decoration: none; }
 nav .selected { background-color: white; color: black; }
 nav .highlight { background-color: #D0D0D0; color: gray; }
 
-h1 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 20px 0; padding: 0; color: black; font-size: 40px; }
+h1 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 20px 0; padding: 0; color: black; font-size: 30px; }
 h1 b { font-weight: 400; }
 
-h2 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 8px 0; padding: 0; color: gray; font-size: 24px; }
-h2 b { font-weight: 400; }
+h2 { font-weight: 400; font-family: 'Source Sans Pro'; margin: 0 0 8px 0; padding: 0; color: gray; font-size: 24px; }
+h2 b { font-weight: 700; }
 
 #loading { background: rgba(255,255,255,0.9) url(../img/preloader.gif) no-repeat 50% 50%; position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 15; }
 #success { width: 200px; height: 200px; left: 50%; top: 50%; margin-left: -100px; margin-top: -100px; background-color: #66B258; border-radius: 100px; font-size: 100px; line-height: 0; position: fixed; z-index: 20; color: white; text-align: center; padding-top: 40px; border: 10px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: none; }
