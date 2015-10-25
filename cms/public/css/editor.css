@@ -4,6 +4,7 @@
 #CMS_panel * { user-select: none; }
 #CMS_panel span { position: relative; display: inline-block; background-color: #303030; font-size: 14px; cursor: pointer; padding: 5px 0; margin: 1px 2px; width: 28px; text-align: center; border-radius: 4px; color: gray; }
 #CMS_panel span:last-child { background-color: #DF452D; color: white; }
+#CMS_panel span:hover { background-color: #404040; }
 .CMS_panel_disabled { color: #303030 !important; cursor: not-allowed; background-color: #151515 !important; }
 .CMS_selected { background-color: rgba(0,0,0,0.1) !important; }
 .CMS_edit { cursor: crosshair; }
