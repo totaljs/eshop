@@ -221,6 +221,7 @@
 						editor.setSettings(response.settings);
 
 						SET('pages.response', null);
+						FIND('#pages.editor').setTemplate(response.template);
 						SET('pages.form', $.extend({ $index: index }, response), true);
 						SET('common.form', 'pages');
 						loading(false, 500);
@@ -242,6 +243,8 @@
 
 		WATCH('pages.form.template', function(path, value, type) {
 			FIND('#pages.editor').setTemplate(value);
+			if (type === 2)
+				SET('pages.form.body', '');
 		});
 	});
 
