@@ -1337,7 +1337,35 @@ Tangular.register('pluralize', function(value, zero, one, other, many) {
 	return value + ' ' + other;
 });
 
+$.components.$parser.push(function(path, value, type) {
+
+	if (type === 'date') {
+		if (value instanceof Date)
+			return value;
+
+		if (!value)
+			return null;
+
+		var isEN = value.indexOf('.') === -1;
+		var tmp = isEN ? value.split('-') : value.split('.');
+		if (tmp.length !== 3)
+			return null;
+		var dt = isEN ? new Date(parseInt(tmp[0]) || 0, (parseInt(tmp[1], 10) || 0) - 1, parseInt(tmp[2], 10) || 0) : new Date(parseInt(tmp[2]) || 0, (parseInt(tmp[1], 10) || 0) - 1, parseInt(tmp[0], 10) || 0);
+		return dt;
+	}
+
+	return value;
+});
+
 $.components.$formatter.push(function(path, value, type) {
+
+	if (type === 'date') {
+		if (value instanceof Date)
+			return value.format(this.attr('data-component-format'));
+		if (!value)
+			return value;
+		return new Date(Date.parse(value)).format(this.attr('data-component-format'));
+	}
 
 	if (type !== 'currency')
 		return value;
