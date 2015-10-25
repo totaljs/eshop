@@ -204,6 +204,7 @@ COMPONENT('textbox', function() {
 		else
 			value = value.toString();
 
+		window.$calendar.hide();
 		is = isRequired ? self.type === 'email' ? value.isEmail() : self.type === 'currency' ? value > 0 : value.length > 0 : true;
 		return is;
 	};
