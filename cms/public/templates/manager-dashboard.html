@@ -160,11 +160,11 @@
 			dashboard.cache.processed = true;
 
 			var data = [];
-			data.push(dashboard_charts_pie_item(response.webcounter.today.search, 'Organic search', '#61E727'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.social, 'Social networks', '#479AD0'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.direct, 'Direct', '#E22926'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.advert, 'Advert', '#FFEE32'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.unknown, 'Other', '#585858'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.search, '@(Organic search)', '#61E727'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.social, '@(Social networks)', '#479AD0'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.direct, '@(Direct)', '#E22926'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.advert, '@(Advert)', '#FFEE32'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.unknown, '@(Other)', '#585858'));
 			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'));
 			dashboard.cache.online.Doughnut(data, { responsive: true });
 
