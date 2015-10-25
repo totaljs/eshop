@@ -110,6 +110,7 @@ button { outline: 0; }
 .button:hover { border: 1px solid silver; }
 .button:active { background: white; color: #A4A4A4; }
 .button:disabled { color: silver; border: 1px solid #E0E0E0; cursor: not-allowed; background: white; }
+.button-small { padding: 13px 0; }
 
 .ui-disabled { background-color: #F0F0F0; cursor: not-allowed; }
 .ui-disabled > div { background-color: #F0F0F0; }
