@@ -206,7 +206,6 @@ COMPONENT('textbox', function() {
 
 		if (window.$calendar)
 			window.$calendar.hide();
-
 		is = isRequired ? self.type === 'email' ? value.isEmail() : self.type === 'currency' ? value > 0 : value.length > 0 : true;
 		return is;
 	};
@@ -634,6 +633,7 @@ COMPONENT('form', function() {
 		var content = self.element.html();
 		var width = self.attr('data-width') || '800px';
 		var submit = self.attr('data-submit');
+		var enter = self.attr('data-enter');
 
 		autocenter = self.attr('data-autocenter') !== 'false';
 		self.condition = self.attr('data-if');
@@ -660,6 +660,17 @@ COMPONENT('form', function() {
 					break;
 			}
 		});
+
+		if (enter === 'true') {
+			self.element.on('keydown', 'input', function(e) {
+				if (e.keyCode !== 13)
+					return;
+				var btn = self.element.find('button[name="submit"]');
+				if (btn.get(0).disabled)
+					return;
+				self.submit(hide);
+			});
+		}
 
 		return true;
 	};
