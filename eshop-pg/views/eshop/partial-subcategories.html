@@ -4,7 +4,7 @@
 	<div><span class="fa fa-folder mr5"></span><strong>Subcategories</strong>:</div>
 	<div class="subcategories">
 		<div class="row">
-		@{if repository.category.level > 0}
+		@{if repository.category.level}
 			<div class="col-md-3"><a href="../" class="up"><span class="fa fa-caret-left"></span>Back</a></div>
 		@{fi}
 		@{foreach m in repository.subcategories}
