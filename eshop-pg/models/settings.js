@@ -107,7 +107,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 
 	// Loads settings + rewrites framework configuration
 	schema.addWorkflow('load', function(error, model, options, callback) {
-		Settings.get(null, function(err, settings) {
+		schema.get(null, function(err, settings) {
 
 			F.config.custom = settings;
 
