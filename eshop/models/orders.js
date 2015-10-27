@@ -214,6 +214,8 @@ NEWSCHEMA('Order').make(function(schema) {
 		var updater = function(doc) {
 			if (doc.id !== model.id)
 				return doc;
+			doc.datebackuped = new Date().format();
+			DB('orders_backup').insert(doc);
 			return model.$clean();
 		};
 

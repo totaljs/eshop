@@ -189,6 +189,8 @@ NEWSCHEMA('Page').make(function(schema) {
 			if (doc.id !== clean.id)
 				return doc;
 			count++;
+			doc.datebackuped = new Date().format();
+			DB('pages_backup').insert(doc);
 			return clean;
 		};
 

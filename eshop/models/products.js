@@ -118,6 +118,8 @@ NEWSCHEMA('Product').make(function(schema) {
 				return doc;
 
 			count++;
+			doc.datebackuped = new Date().format();
+			DB('products_backup').insert(doc);
 			return model.$clean();
 		};
 

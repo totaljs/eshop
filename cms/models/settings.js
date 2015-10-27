@@ -26,6 +26,10 @@ NEWSCHEMA('Settings').make(function(schema) {
 		if (settings.url.endsWith('/'))
 			settings.url = settings.url.substring(0, settings.url.length - 1);
 
+		settings.datebackuped = new Date().format();
+		DB('settings_backup').insert(JSON.parse(JSON.stringify(settings)));
+		delete settings.datebackuped;
+
 		// Writes settings into the file
 		Fs.writeFile(filename, JSON.stringify(settings), function() {
 			// Returns response

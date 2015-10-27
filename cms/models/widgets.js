@@ -89,6 +89,8 @@ NEWSCHEMA('Widget').make(function(schema) {
 			if (doc.id !== model.id)
 				return doc;
 			count++;
+			doc.datebackuped = new Date().format();
+			DB('widgets_backup').insert(doc);
 			return model;
 		};
 

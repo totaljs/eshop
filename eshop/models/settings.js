@@ -76,6 +76,10 @@ NEWSCHEMA('Settings').make(function(schema) {
 				break;
 		}
 
+		settings.datebackuped = new Date().format();
+		DB('settings_backup').insert(JSON.parse(JSON.stringify(settings)));
+		delete settings.datebackuped;
+
 		// Writes settings into the file
 		Fs.writeFile(filename, JSON.stringify(settings), function() {
 			// Returns response
