@@ -95,7 +95,7 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .social a:hover { color: black; }
 
 .newsletter { background-color: #F0F0F0; }
-.newsletter-input { margin-right: 150px; padding: 0 20px; }
+.newsletter-input { margin-right: 150px; padding: 0 20px; background-color: white; }
 .newsletter-input input { width: 100%; background-color: transparent; border: 0; font-size: 16px; height: 40px; outline: 0; color: black; }
 .newsletter-button { width: 150px; float: right; margin: 0; padding: 0; }
 .newsletter-button button { width: 100%; background-color: #D0D0D0; border: 0; height: 40px; }
