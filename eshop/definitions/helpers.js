@@ -5,7 +5,7 @@ F.helpers.pagination = function(model) {
 
 	for (var i = 0; i < model.pages; i++) {
 		var page = i + 1;
-		builder += '<li><a href="?page=' + page + '"' + (model.page === page ? ' class="selected"' : '') + '>' + page + '</a></li>';
+		builder += '<a href="?page=' + page + '"' + (model.page === page ? ' class="selected"' : '') + '>' + page + '</a>';
 	}
 
 	return builder;

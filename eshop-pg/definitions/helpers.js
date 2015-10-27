@@ -5,7 +5,7 @@ F.helpers.pagination = function(model) {
 
 	for (var i = 0; i < model.pages; i++) {
 		var page = i + 1;
-		builder += '<li><a href="?page=' + page + '"' + (model.page === page ? ' class="selected"' : '') + '>' + page + '</a></li>';
+		builder += '<a href="?page=' + page + '"' + (model.page === page ? ' class="selected"' : '') + '>' + page + '</a>';
 	}
 
 	return builder;
@@ -22,7 +22,7 @@ F.helpers.sitemap_category = function(url, category) {
 
 	for (var i = 0, length = a.length; i < length; i++) {
 		linker += (linker ? '/' : '') + b[i];
-		builder += (i ? '<span class="fa fa-caret-right"></span>' : '') + '<a href="{0}">{1}</a>'.format(url.format(linker), a[i].trim());
+		builder += '<li><span class="fa fa-caret-right"></span><a href="{0}">{1}</a></li>'.format(url.format(linker), a[i].trim());
 	}
 
 	return builder;
