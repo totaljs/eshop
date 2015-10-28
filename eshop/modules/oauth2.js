@@ -25,7 +25,7 @@ function facebook_profile(key, secret, code, url, callback) {
 		if (data.indexOf('"error"') !== -1)
 			return callback(JSON.parse(data), null);
 
-		U.request('https://graph.facebook.com/me?' + data + '&fields=email,first_name,last_name,gender,hometown,locale,name,address,id,timezone,picture', ['get'], '', function(err, data, status) {
+		U.request('https://graph.facebook.com/me?' + data + '&fields=email,first_name,last_name,gender,hometown,locale,name,id,timezone,picture', ['get'], '', function(err, data, status) {
 
 			if (err)
 				return callback(err, null);
