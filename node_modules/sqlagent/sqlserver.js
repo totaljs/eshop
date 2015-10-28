@@ -177,6 +177,9 @@ SqlBuilder.prototype.inc = function(name, type, value) {
 				return self;
 		}
 
+		if (value === 0)
+			return self;
+
 		name = type + name;
 		self._set[name] = value === '$' ? '#00#' : value;
 		return self;
@@ -194,6 +197,9 @@ SqlBuilder.prototype.inc = function(name, type, value) {
 			if (isNaN(val))
 				continue;
 		}
+
+		if (val === 0)
+			continue;
 
 		key = type + key;
 		self._set[key] = val === '$' ? '#00#' : val;
