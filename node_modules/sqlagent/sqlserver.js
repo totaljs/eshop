@@ -454,8 +454,12 @@ SqlBuilder.column = function(name, schema) {
 SqlBuilder.prototype.group = function(names) {
 	var self = this;
 
-	if (names)
-		self._group = 'GROUP BY ' + (names instanceof Array ? names.join(',') : SqlBuilder.column(names, self._schema));
+	if (names instanceof Array) {
+		for (var i = 0, length = names.length; i < length; i++)
+			names[i] = SqlBuilder.column(names[i], self._schema);
+		self._group = 'GROUP BY ' + names.join(',');
+	} else if (names)
+		self._group = 'GROUP BY ' + SqlBuilder.column(names, self._schema);
 	else
 		delete self._group;
 
@@ -592,7 +596,7 @@ SqlBuilder.prototype.toString = function(id) {
 		throw new Error('ORDER BY is missing.');
 
 	if (self.builder.length === 0)
-		return (join ? join + ' ' : '') + order + plus;
+		return (join ? join + ' ' : '') + (self._group ? ' ' + self._group : '') + (self._having ? ' ' + self._having : '') + order + plus;
 
 	var where = self.builder.join(' ');
 
