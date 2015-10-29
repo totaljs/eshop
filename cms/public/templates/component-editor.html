@@ -404,6 +404,13 @@
 			return pictures;
 		};
 
+		self.getSourceCode = function() {
+			var content = self.getContents();
+			content.find('[contenteditable]').removeAttr('contenteditable');
+			content.find('.CMS_selected').removeClass('CMS_selected');
+			return (content.find('#CMS').html() || '').trim().replace(offsetter, '');
+		};
+
 		self.getContent = function() {
 			var content = self.getContents();
 			content.find('[contenteditable]').removeAttr('contenteditable');
@@ -790,7 +797,7 @@
 		};
 
 		self.showSourceCode = function() {
-			SET('cmseditor.source', self.getContent().replace(/\n[\s\t]+\n/g, '\n'), true);
+			SET('cmseditor.source', self.getSourceCode().replace(/\n[\s\t]+\n/g, '\n'), true);
 			SET('cmseditor.window', 'source');
 		};
 	});
@@ -804,8 +811,24 @@
 
 			component.hide();
 
+			var target = editor.getTarget();
+			if (!target.hasClass('CMS_widgets')) {
+				var tmp = editor.getParent('CMS_widget', 5);
+				if (!tmp)
+					tmp = editor.getParent('CMS_template', 5);
+				if (!tmp)
+					tmp = editor.getParent('CMS_widgets', 5);
+				if (!tmp)
+					return;
+				target = tmp;
+			}
+
 			if (!is) {
-				editor.getTarget().append('<div class="CMS_widget CMS_remove" data-id="' + id + '">--- <span class="fa fa-plug"></span> ' + el.attr('data-name') + ' ---<pre></pre></div>');
+				var content = '<div class="CMS_widget CMS_remove" data-id="' + id + '">--- <span class="fa fa-plug"></span> ' + el.attr('data-name') + ' ---<pre></pre></div>';
+				if (target.hasClass('CMS_widgets'))
+					target.append(content);
+				else
+					target.after(content);
 				editor.change(true);
 				editor.resize();
 				return;
@@ -813,25 +836,11 @@
 
 			loading(true);
 			$.components.GET(managerurl + '/api/widgets/' + id, null, function(response, err) {
-				var target = editor.getTarget();
 				var content = '<div class="CMS_template CMS_remove">' + response.body + '</div>';
-
-				if (!target.hasClass('CMS_widgets')) {
-					var tmp = editor.getParent('CMS_widget', 5);
-					if (!tmp)
-						tmp = editor.getParent('CMS_template', 5);
-					if (!tmp)
-						tmp = editor.getParent('CMS_widgets', 5);
-					if (!tmp)
-						return;
-					target = tmp;
-				}
-
 				if (target.hasClass('CMS_widgets'))
 					target.append(content);
 				else
 					target.after(content);
-
 				editor.change(true);
 				editor.resize();
 				loading(false, 1000);

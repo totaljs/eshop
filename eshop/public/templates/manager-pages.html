@@ -51,6 +51,7 @@
 				<script type="text/html">
 				<tr>
 					<td{{ if istemplate}} class="silver"{{ fi }}><span class="fa fa-{{ if icon }}{{ icon }}{{ else if istemplate }}code{{ else }}plug{{ fi }} w18 mr5"></span> {{ name }}</td>
+					<td class="col-xs-3 silver fs11 hidden-xs">{{ category }}</td>
 					<td style="width:80px" class="ui-right">
 						<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
 						<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
