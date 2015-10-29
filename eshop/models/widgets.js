@@ -2,6 +2,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 	schema.define('id', 'String(10)');
 	schema.define('name', 'String(50)', true);
+	schema.define('category', 'String(50)');
 	schema.define('body', String);
 	schema.define('icon', 'String(20)');
 	schema.define('istemplate', Boolean);
@@ -19,7 +20,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 	schema.setQuery(function(error, options, callback) {
 
 		var filter = function(doc) {
-			return { id: doc.id, icon: doc.icon, name: doc.name, istemplate: doc.istemplate };
+			return { id: doc.id, icon: doc.icon, name: doc.name, category: doc.category, istemplate: doc.istemplate };
 		};
 
 		DB('widgets').all(filter, function(err, docs, count) {

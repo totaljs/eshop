@@ -920,6 +920,76 @@ COMPONENT('repeater', function() {
 	};
 });
 
+COMPONENT('repeater-group', function() {
+
+	var self = this;
+	var template_group;
+	var group;
+
+	self.readonly();
+
+	self.make = function() {
+		group = self.attr('data-group');
+		self.element.find('script').each(function(index) {
+			var element = $(this);
+			var html = element.html();
+			element.remove();
+
+			if (index === 0) {
+				self.template = Tangular.compile(html);
+				return;
+			}
+
+			template_group = Tangular.compile(html);
+		});
+	};
+
+	self.setter = function(value) {
+
+		if (!value || value.length === 0) {
+			self.element.html('');
+			return;
+		}
+
+		var length = value.length;
+		var groups = {};
+
+		for (var i = 0; i < length; i++) {
+			var name = value[i][group];
+			if (!name)
+				name = '0';
+
+			if (!groups[name])
+				groups[name] = [value[i]];
+			else
+				groups[name].push(value[i]);
+		}
+
+		var index = 0;
+		var builder = '';
+		var keys = Object.keys(groups);
+		keys.sort();
+		keys.forEach(function(key) {
+			var arr = groups[key];
+
+			if (key !== '0') {
+				var options = {};
+				options[group] = key;
+				options.length = arr.length;
+				builder += template_group(options);
+			}
+
+			for (var i = 0, length = arr.length; i < length; i++) {
+				var item = arr[i];
+				item.index = index++;
+				builder += self.template(item).replace(/\$index/g, index.toString()).replace(/\$/g, self.path + '[' + index + ']');
+			}
+		});
+
+		self.element.empty().append(builder);
+	};
+});
+
 COMPONENT('error', function() {
 	var self = this;
 	var element;

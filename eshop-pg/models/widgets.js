@@ -2,6 +2,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 	schema.define('id', 'String(10)');
 	schema.define('name', 'String(50)', true);
+	schema.define('category', 'String(50)');
 	schema.define('body', String);
 	schema.define('icon', 'String(20)');
 	schema.define('istemplate', Boolean);
@@ -22,7 +23,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 		sql.select('items', 'tbl_widget').make(function(builder) {
 			builder.where('isremoved', false);
-			builder.fields('id', 'icon', 'name', 'istemplate');
+			builder.fields('id', 'icon', 'name', 'istemplate', 'category');
 		});
 
 		sql.exec(callback, 'items');

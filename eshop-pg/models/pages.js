@@ -14,6 +14,7 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('template', 'String(30)', true);
 	schema.define('language', 'String(3)');
 	schema.define('url', 'String(200)');
+	schema.define('keywords', 'String(200)');
 	schema.define('icon', 'String(20)');
 	schema.define('navigations', '[String]');
 	schema.define('widgets', '[String]'); // Widgets lists, contains Array of ID widget
@@ -84,7 +85,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		sql.select('items', 'tbl_page').make(function(builder) {
 			builder.replace(filter);
 			builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
-			builder.sort('datecreated', true);
+			builder.sort('name');
 			builder.skip(skip);
 			builder.take(take);
 		});
@@ -231,7 +232,9 @@ NEWSCHEMA('Page').make(function(schema) {
 		clean.pictures = clean.pictures.join(';');
 		clean.tags = clean.tags.join(';');
 		clean.navigations = clean.navigations.join(';');
-		clean.search = (model.search).toSearch().max(2000);
+
+		if (clean.search)
+			clean.search = ((clean.title || '') + ' ' + (clean.keywords || '') + ' ' + clean.search).toSearch().max(2000);
 
 		delete clean.settings;
 		delete clean.widgets;

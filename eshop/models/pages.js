@@ -14,6 +14,7 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('template', 'String(30)', true);
 	schema.define('language', 'String(3)');
 	schema.define('url', 'String(200)');
+	schema.define('keywords', 'String(200)');
 	schema.define('icon', 'String(20)');
 	schema.define('navigations', '[String]');
 	schema.define('widgets', '[String]'); // Widgets lists, contains Array of ID widget
@@ -77,7 +78,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 			// Searchs in "title"
 			if (options.search) {
-				if (doc.search.indexOf(options.search) === -1)
+				if (!doc.search || doc.search.indexOf(options.search) === -1)
 					return;
 			}
 
@@ -172,7 +173,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			model.datecreated = model.datecreated.format();
 
 		if (model.search)
-			model.search = model.search.toSearch();
+			model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).toSearch();
 
 		// Sanitizes URL
 		if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {

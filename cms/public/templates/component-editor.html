@@ -1,8 +1,12 @@
 <div data-component="form" data-title="@(Select widget)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="500px" data-top="true" data-component-id="cmseditor_widgets">
 	<div class="padding">
-		<div data-component="repeater" data-component-path="cmseditor.widgets">
+		<div data-component="repeater-group" data-component-path="cmseditor.widgets" data-group="category">
 			<script type="text/html">
 				<div class="pages-editor-widget" data-id="{{ id }}" data-template="{{ istemplate }}" data-name="{{ name }}"><span class="fa fa-{{ if icon }}{{ icon }}{{ else if istemplate }}code{{ else }}plug{{ fi }} w18"></span> {{ name }}</div>
+			</script>
+			<script type="text/html">
+				<br />
+				<div class="silver fs11" style="margin-bottom:5px">{{ category }}</div>
 			</script>
 		</div>
 	</div>
@@ -231,9 +235,7 @@
 		self.refreshWidgets = function() {
 			$.components.GET(managerurl + '/api/widgets/', null, function(response) {
 				response.sort(function(a, b) {
-					if (a.istemplate)
-						return 1;
-					return !a.istemplate && b.istemplate ? -1 : 0;
+					return a.name.localeCompare(b.name);
 				});
 				SET('cmseditor.widgets', response);
 			});
@@ -463,7 +465,7 @@
 
 					var disabled = arr.indexOf('CMS_' + name) === -1;
 
-					if (disabled)
+					if (disabled && name === 'attribute')
 						disabled = arr.indexOf('CMS_edit') === -1;
 
 					if (name === 'link')
