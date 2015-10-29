@@ -12,6 +12,7 @@ Please do not change the code, just create a new issues. I solve all problems as
 __Both__:
 
 - new window animations (CSS 3)
+- many fixes
 
 __Eshop__:
 
@@ -22,5 +23,8 @@ __Eshop__:
 __CMS__:
 
 - new widgets can be added between widgets
-- add search field (CMSEDITOR creates keywords from the content)
+- added search field (CMS EDITOR creates keywords from the content)
+- added keywords field
+- added Font-Awesome lists for CMS EDITOR
+- added categorization for widgets
 - fixed height of CMS editor
