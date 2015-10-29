@@ -434,11 +434,6 @@
 	// Method refreshes grid
 	function widgets_refresh() {
 		$.components.GET(managerurl + '/api/widgets/', null, function(response) {
-
-			response.sort(function(a, b) {
-				return a.name.localeCompare(b.name);
-			});
-
 			SET('widgets.grid', response);
 		});
 	}

@@ -24,6 +24,11 @@ NEWSCHEMA('Widget').make(function(schema) {
 		};
 
 		DB('widgets').all(filter, function(err, docs, count) {
+
+			docs.sort(function(a, b) {
+				return a.name.removeDiacritics().localeCompare(b.name.removeDiacritics());
+			});
+
 			callback(docs);
 		});
 	});
