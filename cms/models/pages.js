@@ -87,7 +87,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		// Sorting documents
 		var sorting = function(a, b) {
-			return a.name.localeCompare(b.name);
+			return a.name.removeDiacritics().localeCompare(b.name.removeDiacritics());
 		};
 
 		DB('pages').sort(filter, sorting, function(err, docs, count) {
