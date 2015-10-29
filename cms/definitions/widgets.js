@@ -2,7 +2,9 @@
 // Widget transformations
 // ====================================================
 
-GETSCHEMA('Widget').addTransform('Blogs', function(error, model, data, callback) {
+// Blogs
+// d5467a1697 is Widget ID
+GETSCHEMA('Widget').addTransform('d5467a1697', function(error, model, data, callback) {
 
 	// data.settings
 	// data.page
@@ -33,7 +35,9 @@ GETSCHEMA('Widget').addTransform('Blogs', function(error, model, data, callback)
 	});
 });
 
-GETSCHEMA('Widget').addTransform('Contact form', function(error, model, data, callback) {
+// Contact form
+// 23cee236ba is Widget ID
+GETSCHEMA('Widget').addTransform('23cee236ba', function(error, model, data, callback) {
 
 	// data.settings
 	// data.page

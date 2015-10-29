@@ -3,7 +3,7 @@
 // ====================================================
 
 // Widget: Top products
-GETSCHEMA('Widget').addTransform('Top products', function(error, model, data, callback) {
+GETSCHEMA('Widget').addTransform('TYPE_WIDGET_ID', function(error, model, data, callback) {
 
 	// data.settings
 	// data.page

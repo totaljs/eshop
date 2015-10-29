@@ -139,16 +139,21 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div data-component="textbox" data-component-path="widgets.form.name" data-required="true">@(Name)</div>
-				<br />
-				<div data-component="checkbox" data-component-path="widgets.form.istemplate" class="b">@(Is only HTML template)</div>
+				<div data-component="template" data-component-path="widgets.form" class="fs11 mt5 silver">
+					<script type="text/html">
+						<b>ID:</b> {{ id | default('.....') }}
+					</script>
+				</div>
 			</div>
 		</div>
 	</div>
 	<hr />
 	<div class="padding" style="padding-bottom:10px;padding-top:0">
+		<div data-component="checkbox" data-component-path="widgets.form.istemplate" class="b">@(Is only HTML template)</div>
+		<br />
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="codemirror" data-component-path="widgets.form.body" data-height="250px" class="ui-textarea-code" data-icon="fa-code">@(Body)</div>
+				<div data-component="codemirror" data-component-path="widgets.form.body" data-height="350px" class="ui-textarea-code" data-icon="fa-code">@(Body)</div>
 			</div>
 		</div>
 		<div class="row">

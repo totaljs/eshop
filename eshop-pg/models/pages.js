@@ -360,10 +360,10 @@ NEWSCHEMA('Page').make(function(schema) {
 						}
 
 						// Executes transform
-						Widget.transform(widgets[key].name, widgets[key], custom, function(err, content) {
+						Widget.transform(key, widgets[key], custom, function(err, content) {
 
 							if (err) {
-								F.error(err, 'Widget: ' + widgets[key].name + ' (page: ' + response.name + ')', response.url);
+								F.error(err, 'Widget: ' + widgets[key].name + ' - ' + key + ' (page: ' + response.name + ')', response.url);
 								return next();
 							}
 

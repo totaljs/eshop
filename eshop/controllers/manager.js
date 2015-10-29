@@ -6,6 +6,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/*', '~manager');
 	F.route(CONFIG('manager-url') + '/upload/',                  upload, ['post', 'upload'], 3084); // 3 MB
 	F.route(CONFIG('manager-url') + '/upload/base64/',           upload_base64, ['post'], 2048); // 2 MB
+	F.route(CONFIG('manager-url') + '/logoff/',                  redirect_logoff);
 
 	// FILES
 	F.route(CONFIG('manager-url') + '/api/files/clear/',         json_files_clear);
@@ -130,6 +131,13 @@ function upload_base64() {
 	}
 
 	self.json('/download/' + id);
+}
+
+// Logoff
+function redirect_logoff() {
+	var self = this;
+	self.res.cookie('__manager', '', '-1 days');
+	self.redirect(CONFIG('manager-url'));
 }
 
 // ==========================================================================
