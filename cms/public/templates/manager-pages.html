@@ -28,7 +28,7 @@
 
 	<div class="row" data-component="visible" data-component-path="pages.tab" data-if="value === 'pages'">
 		<div class="col-md-12">
-			<div data-component="grid" data-component-path="pages.grid" data-max="1000" data-component-id="pages.grid">
+			<div data-component="grid" data-component-path="pages.grid" data-max="100" data-options-page="@(Page: #)" data-options-button="@(Show more pages)" data-component-id="pages.grid">
 				<script type="text/html">
 				<tr>
 					<td{{ if ispartial }} class="green"{{ fi }}>{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ if icon }}<span class="fa fa-{{ icon }} w18 mr5"></span>{{ fi }}{{ name }}</td>
@@ -317,11 +317,6 @@
 		}
 
 		$.components.GET(managerurl + '/api/pages/', pages.filter, function(response) {
-
-			// Sorts pages A-Z
-			response.items.sort(function(a, b) {
-				return a.name.localeCompare(b.name);
-			});
 
 			if (pages.filter.navigation) {
 				// Sorts pages by priority
