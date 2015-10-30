@@ -58,8 +58,11 @@ NEWSCHEMA('Page').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 
 		// Prepares searching
+		if (typeof(options.search) === 'string')
+			options.search = options.search.toSearch().split(' ');
+
 		if (options.search)
-			options.search = options.search.toSearch();
+			options.search_length = options.search.length;
 
 		// Filter for reading
 		var filter = function(doc) {
@@ -76,10 +79,14 @@ NEWSCHEMA('Page').make(function(schema) {
 			if (options.navigation && (!doc.navigations || doc.navigations.indexOf(options.navigation) === -1))
 				return;
 
-			// Searchs in "title"
-			if (options.search) {
-				if (!doc.search || doc.search.indexOf(options.search) === -1)
+			// Searchs
+			if (options.search_length) {
+				if (!doc.search)
 					return;
+				for (var i = 0; i < options.search_length; i++) {
+					if (doc.search.indexOf(options.search[i]) === -1)
+						return;
+				}
 			}
 
 			return { id: doc.id, name: doc.name, parent: doc.parent, url: doc.url, navigations: doc.navigations, ispartial: doc.ispartial, priority: doc.priority, language: doc.language, icon: doc.icon };
@@ -91,6 +98,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		};
 
 		DB('pages').sort(filter, sorting, function(err, docs, count) {
+
 			var data = {};
 
 			data.count = count;
