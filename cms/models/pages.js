@@ -59,7 +59,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		// Prepares searching
 		if (typeof(options.search) === 'string')
-			options.search = options.search.toSearch().split(' ');
+			options.search = options.search ? options.search.toSearch().split(' ') : [];
 
 		if (options.search)
 			options.search_length = options.search.length;
