@@ -9,8 +9,7 @@ var REG_ROBOT = /bot|crawler/i;
 var FILE_CACHE = 'webcounter.cache';
 var FILE_STATS = 'webcounter.nosql';
 
-var fs = require('fs');
-var events = require('events');
+var Fs = require('fs');
 
 function WebCounter() {
     this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0 };
@@ -67,8 +66,6 @@ WebCounter.prototype = {
     }
 };
 
-WebCounter.prototype.__proto__ = new events.EventEmitter();
-
 /**
  * Clean up
  * @return {Module]
@@ -119,11 +116,8 @@ WebCounter.prototype.clean = function() {
     if (tmp0 !== arr[0] || tmp1 !== arr[1]) {
         var online = arr[0] + arr[1];
         if (online != self.last) {
-
             if (self.allowIP)
                 self.ip = self.ip.slice(tmp0);
-
-            self.emit('change', online, self.ip);
             self.last = online;
         }
     }
@@ -210,7 +204,6 @@ WebCounter.prototype.counter = function(req, res) {
             stats.desktop++;
         else
             stats.mobile++;
-        stats.visitors++;
     }
 
     arr[1]++;
@@ -222,14 +215,11 @@ WebCounter.prototype.counter = function(req, res) {
 
     var online = self.online;
 
-    self.emit('online', req);
-
-    if (self.last !== online) {
+    if (self.last !== online)
         self.last = online;
-        self.emit('change', online, self.ip);
-    }
 
     stats.count++;
+    stats.visitors++;
 
     if (self.isAdvert(req)) {
         stats.advert++;
@@ -274,9 +264,8 @@ WebCounter.prototype.save = function() {
     var filename = framework.path.databases(FILE_CACHE);
     var stats = Utils.copy(self.stats);
     stats.pages = stats.hits > 0 && stats.count > 0 ? (stats.hits / stats.count).floor(2) : 0;
-    fs.writeFile(filename, JSON.stringify(stats), utils.noop);
+    Fs.writeFile(filename, JSON.stringify(stats), utils.noop);
     return self;
-
 };
 
 /**
@@ -288,7 +277,7 @@ WebCounter.prototype.load = function() {
     var self = this;
     var filename = framework.path.databases(FILE_CACHE);
 
-    fs.readFile(filename, function(err, data) {
+    Fs.readFile(filename, function(err, data) {
 
         if (err)
             return;
@@ -310,7 +299,7 @@ WebCounter.prototype.load = function() {
 WebCounter.prototype.append = function() {
     var self = this;
     var filename = framework.path.databases(FILE_STATS);
-    fs.appendFile(filename, JSON.stringify(self.stats) + '\n', utils.noop);
+    Fs.appendFile(filename, JSON.stringify(self.stats) + '\n', utils.noop);
     return self;
 };
 
@@ -432,7 +421,7 @@ WebCounter.prototype.statistics = function(callback) {
 
     var self = this;
     var filename = framework.path.databases(FILE_STATS);
-    var stream = fs.createReadStream(filename);
+    var stream = Fs.createReadStream(filename);
     var data = '';
     var stats = {};
 
@@ -484,6 +473,12 @@ function sum(a, b) {
     Object.keys(b).forEach(function(o) {
         if (o === 'day' || o === 'year' || o === 'month')
             return;
+
+        if (o === 'visitors') {
+            a[o] = Math.max(a[o] || 0, b[o] || 0);
+            return;
+        }
+
         if (typeof(a[o]) === 'undefined')
             a[o] = 0;
         if (typeof(b[o]) !== 'undefined')
@@ -507,7 +502,7 @@ var delegate_request = function(controller, name) {
 };
 
 module.exports.name = 'webcounter';
-module.exports.version = 'v1.01';
+module.exports.version = 'v3.00';
 module.exports.instance = webcounter;
 
 framework.on('controller', delegate_request);

@@ -7,8 +7,6 @@ var COOKIE = '__webcounter';
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows.?Phone/i;
 var REG_ROBOT = /bot|crawler/i;
 
-var events = require('events');
-
 function WebCounter() {
 	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0, orders: 0, newsletter: 0, contactforms: 0, users: 0 };
 	this.history = U.copy(this.stats);
@@ -61,8 +59,6 @@ WebCounter.prototype = {
 	}
 };
 
-WebCounter.prototype.__proto__ = new events.EventEmitter();
-
 /**
  * Clean up
  * @return {Module]
@@ -102,11 +98,8 @@ WebCounter.prototype.clean = function() {
 	if (tmp0 !== arr[0] || tmp1 !== arr[1]) {
 		var online = arr[0] + arr[1];
 		if (online != self.last) {
-
 			if (self.allowIP)
 				self.ip = self.ip.slice(tmp0);
-
-			self.emit('change', online, self.ip);
 			self.last = online;
 		}
 	}
@@ -192,10 +185,8 @@ WebCounter.prototype.counter = function(req, res) {
 	}
 
 	if (isUnique) {
-
 		stats.unique++;
 		history.unique++;
-
 		var agent = req.headers['user-agent'] || '';
 		if (agent.match(REG_MOBILE) === null) {
 			stats.desktop++;
@@ -204,9 +195,6 @@ WebCounter.prototype.counter = function(req, res) {
 			stats.mobile++;
 			history.mobile++;
 		}
-
-		stats.visitors++;
-		history.visitors++;
 	}
 
 	arr[1]++;
@@ -219,13 +207,11 @@ WebCounter.prototype.counter = function(req, res) {
 
 	var online = self.online;
 
-	self.emit('online', req);
-
-	if (self.last !== online) {
+	if (self.last !== online)
 		self.last = online;
-		self.emit('change', online, self.ip);
-	}
 
+	stats.visitors++;
+	history.visitors++;
 	stats.count++;
 	history.count++;
 
@@ -464,7 +450,7 @@ var delegate_request = function(controller, name) {
 };
 
 module.exports.name = 'webcounter';
-module.exports.version = 'v1.01';
+module.exports.version = 'v3.00';
 module.exports.instance = webcounter;
 
 framework.on('controller', delegate_request);
