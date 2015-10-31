@@ -79,6 +79,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			filter.like('navigations', options.navigation, '*');
 
 		// Searchs in "title"
+		// @TODO: improve full-text search
 		if (options.search)
 			filter.like('search', options.search, '*');
 
