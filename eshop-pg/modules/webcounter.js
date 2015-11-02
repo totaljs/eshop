@@ -450,7 +450,7 @@ var delegate_request = function(controller, name) {
 };
 
 module.exports.name = 'webcounter';
-module.exports.version = 'v3.00';
+module.exports.version = 'v3.0.0';
 module.exports.instance = webcounter;
 
 framework.on('controller', delegate_request);
