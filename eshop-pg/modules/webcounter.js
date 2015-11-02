@@ -40,8 +40,8 @@ function WebCounter() {
 		return (req.query['utm_medium'] || '').length > 0 || (req.query['utm_source'] || '').length > 0;
 	};
 
-	// every 30 seconds
-	setInterval(this.clean.bind(this), 1000 * 30);
+	// every 45 seconds
+	setInterval(this.clean.bind(this), 1000 * 45);
 }
 
 WebCounter.prototype = {
