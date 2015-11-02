@@ -12,58 +12,58 @@ var FILE_STATS = 'webcounter.nosql';
 var Fs = require('fs');
 
 function WebCounter() {
-    this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0 };
-    this.online = 0;
-    this.arr = [0, 0];
-    this.interval = 0;
-    this.intervalClean = null;
-    this.current = 0;
-    this.last = 0;
-    this.lastvisit = null;
-    this.social = ['plus.url.google', 'plus.google', 'twitter', 'facebook', 'linkedin', 'tumblr', 'flickr', 'instagram'];
-    this.search = ['google', 'bing', 'yahoo', 'duckduckgo'];
-    this.ip = [];
-    this.url = [];
-    this.allowXHR = true;
-    this.allowIP = false;
-    this.onValid = null;
+	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0 };
+	this.online = 0;
+	this.arr = [0, 0];
+	this.interval = 0;
+	this.intervalClean = null;
+	this.current = 0;
+	this.last = 0;
+	this.lastvisit = null;
+	this.social = ['plus.url.google', 'plus.google', 'twitter', 'facebook', 'linkedin', 'tumblr', 'flickr', 'instagram'];
+	this.search = ['google', 'bing', 'yahoo', 'duckduckgo'];
+	this.ip = [];
+	this.url = [];
+	this.allowXHR = true;
+	this.allowIP = false;
+	this.onValid = null;
 
-    this._onValid = function(req) {
-        var self = this;
-        var agent = req.headers['user-agent'] || '';
-        if (agent.length === 0)
-            return false;
-        if (req.headers['x-moz'] === 'prefetch')
-            return false;
-        if (self.onValid !== null && !self.onValid(req))
-            return false;
-        return agent.match(REG_ROBOT) === null;
-    };
+	this._onValid = function(req) {
+		var self = this;
+		var agent = req.headers['user-agent'] || '';
+		if (agent.length === 0)
+			return false;
+		if (req.headers['x-moz'] === 'prefetch')
+			return false;
+		if (self.onValid !== null && !self.onValid(req))
+			return false;
+		return agent.match(REG_ROBOT) === null;
+	};
 
-    this.isAdvert = function(req) {
-        return (req.query['utm_medium'] || '').length > 0 || (req.query['utm_source'] || '').length > 0;
-    };
+	this.isAdvert = function(req) {
+		return (req.query['utm_medium'] || '').length > 0 || (req.query['utm_source'] || '').length > 0;
+	};
 
-    this.load();
+	this.load();
 
-    // every 30 seconds
-    this.intervalClean = setInterval(this.clean.bind(this), 1000 * 30);
+	// every 45 seconds
+	this.intervalClean = setInterval(this.clean.bind(this), 1000 * 45);
 }
 
 WebCounter.prototype = {
 
-    get online() {
-        var arr = this.arr;
-        return arr[0] + arr[1];
-    },
+	get online() {
+		var arr = this.arr;
+		return arr[0] + arr[1];
+	},
 
-    get today() {
-        var self = this;
-        var stats = utils.copy(self.stats);
-        stats.last = self.lastvisit;
-        stats.pages = stats.hits > 0 && stats.count > 0 ? (stats.hits / stats.count).floor(2) : 0;
-        return stats;
-    }
+	get today() {
+		var self = this;
+		var stats = utils.copy(self.stats);
+		stats.last = self.lastvisit;
+		stats.pages = stats.hits > 0 && stats.count > 0 ? (stats.hits / stats.count).floor(2) : 0;
+		return stats;
+	}
 };
 
 /**
@@ -72,57 +72,57 @@ WebCounter.prototype = {
  */
 WebCounter.prototype.clean = function() {
 
-    var self = this;
+	var self = this;
 
-    self.interval++;
+	self.interval++;
 
-    if (self.interval % 2 === 0)
-        self.save();
+	if (self.interval % 2 === 0)
+		self.save();
 
-    var now = new Date();
-    var stats = self.stats;
+	var now = new Date();
+	var stats = self.stats;
 
-    self.current = now.getTime();
+	self.current = now.getTime();
 
-    var day = now.getDate();
-    var month = now.getMonth() + 1;
-    var year = now.getFullYear();
-    var length = 0;
+	var day = now.getDate();
+	var month = now.getMonth() + 1;
+	var year = now.getFullYear();
+	var length = 0;
 
-    if (stats.day !== day || stats.month !== month || stats.year !== year) {
-        if (stats.day !== 0 || stats.month !== 0 || stats.year !== 0) {
-            self.append();
-            var visitors = stats.visitors;
-            var keys = Object.keys(stats);
-            length = keys.length;
-            for (var i = 0; i < length; i++)
-                stats[keys[i]] = 0;
-            stats.visitors = visitors;
-        }
-        stats.day = day;
-        stats.month = month;
-        stats.year = year;
-        self.save();
-    }
+	if (stats.day !== day || stats.month !== month || stats.year !== year) {
+		if (stats.day !== 0 || stats.month !== 0 || stats.year !== 0) {
+			self.append();
+			var visitors = stats.visitors;
+			var keys = Object.keys(stats);
+			length = keys.length;
+			for (var i = 0; i < length; i++)
+				stats[keys[i]] = 0;
+			stats.visitors = visitors;
+		}
+		stats.day = day;
+		stats.month = month;
+		stats.year = year;
+		self.save();
+	}
 
-    var arr = self.arr;
+	var arr = self.arr;
 
-    var tmp1 = arr[1];
-    var tmp0 = arr[0];
+	var tmp1 = arr[1];
+	var tmp0 = arr[0];
 
-    arr[1] = 0;
-    arr[0] = tmp1;
+	arr[1] = 0;
+	arr[0] = tmp1;
 
-    if (tmp0 !== arr[0] || tmp1 !== arr[1]) {
-        var online = arr[0] + arr[1];
-        if (online != self.last) {
-            if (self.allowIP)
-                self.ip = self.ip.slice(tmp0);
-            self.last = online;
-        }
-    }
+	if (tmp0 !== arr[0] || tmp1 !== arr[1]) {
+		var online = arr[0] + arr[1];
+		if (online != self.last) {
+			if (self.allowIP)
+				self.ip = self.ip.slice(tmp0);
+			self.last = online;
+		}
+	}
 
-    return self;
+	return self;
 };
 
 /**
@@ -131,14 +131,14 @@ WebCounter.prototype.clean = function() {
  */
 WebCounter.prototype.increment = function(type) {
 
-    var self = this;
+	var self = this;
 
-    if (typeof(self.stats[type]) === 'undefined')
-        self.stats[type] = 1;
-    else
-        self.stats[type]++;
+	if (typeof(self.stats[type]) === 'undefined')
+		self.stats[type] = 1;
+	else
+		self.stats[type]++;
 
-    return self;
+	return self;
 };
 
 /**
@@ -147,112 +147,112 @@ WebCounter.prototype.increment = function(type) {
  */
 WebCounter.prototype.counter = function(req, res) {
 
-    var self = this;
+	var self = this;
 
-    if (!self._onValid(req))
-        return false;
+	if (!self._onValid(req))
+		return false;
 
-    if (req.xhr && !self.allowXHR)
-        return false;
+	if (req.xhr && !self.allowXHR)
+		return false;
 
-    if (req.method !== 'GET')
-        return false;
+	if (req.method !== 'GET')
+		return false;
 
-    if ((req.headers['accept'] || '').length === 0 || (req.headers['accept-language'] || '').length === 0)
-        return false;
+	if ((req.headers['accept'] || '').length === 0 || (req.headers['accept-language'] || '').length === 0)
+		return false;
 
-    var arr = self.arr;
-    var user = req.cookie(COOKIE).parseInt();
-    var now = new Date();
-    var ticks = now.getTime();
-    var sum = user === 0 ? 1000 : (ticks - user) / 1000;
-    var exists = sum < 31;
-    var stats = self.stats;
-    var referer = req.headers['x-referer'] || req.headers['referer'] || '';
+	var arr = self.arr;
+	var user = req.cookie(COOKIE).parseInt();
+	var now = new Date();
+	var ticks = now.getTime();
+	var sum = user === 0 ? 1000 : (ticks - user) / 1000;
+	var exists = sum < 81;
+	var stats = self.stats;
+	var referer = req.headers['x-referer'] || req.headers['referer'] || '';
 
-    stats.hits++;
+	stats.hits++;
 
-    self.refreshURL(referer, req);
+	self.refreshURL(referer, req);
 
-    if (exists)
-        return true;
+	if (exists)
+		return true;
 
-    var isUnique = false;
+	var isUnique = false;
 
-    if (user > 0) {
+	if (user > 0) {
 
-        sum = Math.abs(self.current - user) / 1000;
-        if (sum < 41)
-            return true;
+		sum = Math.abs(self.current - user) / 1000;
+		if (sum < 91)
+			return true;
 
-        var date = new Date(user);
-        if (date.getDate() !== now.getDate() || date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear())
-            isUnique = true;
+		var date = new Date(user);
+		if (date.getDate() !== now.getDate() || date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear())
+			isUnique = true;
 
-        if (date.diff('months') < 0)
-            stats.uniquemonth++;
+		if (date.diff('months') < 0)
+			stats.uniquemonth++;
 
-    } else {
-        isUnique = true;
-        stats.uniquemonth++;
-    }
+	} else {
+		isUnique = true;
+		stats.uniquemonth++;
+	}
 
-    if (isUnique) {
-        stats.unique++;
-        var agent = req.headers['user-agent'] || '';
-        if (agent.match(REG_MOBILE) === null)
-            stats.desktop++;
-        else
-            stats.mobile++;
-    }
+	if (isUnique) {
+		stats.unique++;
+		var agent = req.headers['user-agent'] || '';
+		if (agent.match(REG_MOBILE) === null)
+			stats.desktop++;
+		else
+			stats.mobile++;
+	}
 
-    arr[1]++;
-    self.lastvisit = new Date();
-    res.cookie(COOKIE, ticks, now.add('d', 5));
+	arr[1]++;
+	self.lastvisit = new Date();
+	res.cookie(COOKIE, ticks, now.add('5 days'));
 
-    if (self.allowIP)
-        self.ip.push({ ip: req.ip, url: req.uri.href });
+	if (self.allowIP)
+		self.ip.push({ ip: req.ip, url: req.uri.href });
 
-    var online = self.online;
+	var online = self.online;
 
-    if (self.last !== online)
-        self.last = online;
+	if (self.last !== online)
+		self.last = online;
 
-    stats.count++;
-    stats.visitors++;
+	stats.count++;
+	stats.visitors++;
 
-    if (self.isAdvert(req)) {
-        stats.advert++;
-        return true;
-    }
+	if (self.isAdvert(req)) {
+		stats.advert++;
+		return true;
+	}
 
-    referer = getReferer(referer);
+	referer = getReferer(referer);
 
-    if (referer === null) {
-        stats.direct++;
-        return true;
-    }
+	if (referer === null) {
+		stats.direct++;
+		return true;
+	}
 
-    var length = self.social.length;
+	var length = self.social.length;
 
-    for (var i = 0; i < length; i++) {
-        if (referer.indexOf(self.social[i]) !== -1) {
-            stats.social++;
-            return true;
-        }
-    }
+	for (var i = 0; i < length; i++) {
+		if (referer.indexOf(self.social[i]) !== -1) {
+			stats.social++;
+			return true;
+		}
+	}
 
-    var length = self.search.length;
+	var length = self.search.length;
 
-    for (var i = 0; i < length; i++) {
-        if (referer.indexOf(self.search[i]) !== -1) {
-            stats.search++;
-            return true;
-        }
-    }
+	for (var i = 0; i < length; i++) {
+		if (referer.indexOf(self.search[i]) !== -1) {
+			stats.search++;
+			return true;
+		}
+	}
 
-    stats.unknown++;
-    return true;
+	stats.unknown++;
+	return true;
 };
 
 /**
@@ -260,12 +260,12 @@ WebCounter.prototype.counter = function(req, res) {
  * @return {Module]
  */
 WebCounter.prototype.save = function() {
-    var self = this;
-    var filename = framework.path.databases(FILE_CACHE);
-    var stats = Utils.copy(self.stats);
-    stats.pages = stats.hits > 0 && stats.count > 0 ? (stats.hits / stats.count).floor(2) : 0;
-    Fs.writeFile(filename, JSON.stringify(stats), utils.noop);
-    return self;
+	var self = this;
+	var filename = framework.path.databases(FILE_CACHE);
+	var stats = Utils.copy(self.stats);
+	stats.pages = stats.hits > 0 && stats.count > 0 ? (stats.hits / stats.count).floor(2) : 0;
+	Fs.writeFile(filename, JSON.stringify(stats), utils.noop);
+	return self;
 };
 
 /**
@@ -274,22 +274,22 @@ WebCounter.prototype.save = function() {
  */
 WebCounter.prototype.load = function() {
 
-    var self = this;
-    var filename = framework.path.databases(FILE_CACHE);
+	var self = this;
+	var filename = framework.path.databases(FILE_CACHE);
 
-    Fs.readFile(filename, function(err, data) {
+	Fs.readFile(filename, function(err, data) {
 
-        if (err)
-            return;
+		if (err)
+			return;
 
-        try
-        {
-            self.stats = utils.copy(JSON.parse(data.toString('utf8')));
-        } catch (ex) {}
+		try
+		{
+			self.stats = utils.copy(JSON.parse(data.toString('utf8')));
+		} catch (ex) {}
 
-    });
+	});
 
-    return self;
+	return self;
 };
 
 /**
@@ -297,10 +297,10 @@ WebCounter.prototype.load = function() {
  * @return {Module]
  */
 WebCounter.prototype.append = function() {
-    var self = this;
-    var filename = framework.path.databases(FILE_STATS);
-    Fs.appendFile(filename, JSON.stringify(self.stats) + '\n', utils.noop);
-    return self;
+	var self = this;
+	var filename = framework.path.databases(FILE_STATS);
+	Fs.appendFile(filename, JSON.stringify(self.stats) + '\n', utils.noop);
+	return self;
 };
 
 /**
@@ -309,29 +309,29 @@ WebCounter.prototype.append = function() {
  * @return {Module]
  */
 WebCounter.prototype.daily = function(callback) {
-    var self = this;
-    self.statistics(function(arr) {
+	var self = this;
+	self.statistics(function(arr) {
 
-        var length = arr.length;
-        var output = [];
+		var length = arr.length;
+		var output = [];
 
-        for (var i = 0; i < length; i++) {
+		for (var i = 0; i < length; i++) {
 
-            var value = arr[i] || '';
+			var value = arr[i] || '';
 
-            if (value.length === 0)
-                continue;
+			if (value.length === 0)
+				continue;
 
-            try
-            {
-                output.push(JSON.parse(value));
-            } catch (ex) {}
-        }
+			try
+			{
+				output.push(JSON.parse(value));
+			} catch (ex) {}
+		}
 
-        callback(output);
-    });
+		callback(output);
+	});
 
-    return self;
+	return self;
 };
 
 /**
@@ -341,36 +341,36 @@ WebCounter.prototype.daily = function(callback) {
  */
 WebCounter.prototype.monthly = function(callback) {
 
-    var self = this;
-    self.statistics(function(arr) {
+	var self = this;
+	self.statistics(function(arr) {
 
-        var length = arr.length;
-        var stats = {};
+		var length = arr.length;
+		var stats = {};
 
-        for (var i = 0; i < length; i++) {
+		for (var i = 0; i < length; i++) {
 
-            var value = arr[i] || '';
+			var value = arr[i] || '';
 
-            if (value.length === 0)
-                continue;
+			if (value.length === 0)
+				continue;
 
-            try
-            {
-                var current = JSON.parse(value);
-                var key = current.month + '-' + current.year;
+			try
+			{
+				var current = JSON.parse(value);
+				var key = current.month + '-' + current.year;
 
-                if (!stats[key])
-                    stats[key] = current;
-                else
-                    sum(stats[key], current);
+				if (!stats[key])
+					stats[key] = current;
+				else
+					sum(stats[key], current);
 
-            } catch (ex) {}
-        }
+			} catch (ex) {}
+		}
 
-        callback(stats);
-    });
+		callback(stats);
+	});
 
-    return self;
+	return self;
 };
 
 /**
@@ -380,36 +380,36 @@ WebCounter.prototype.monthly = function(callback) {
  */
 WebCounter.prototype.yearly = function(callback) {
 
-    var self = this;
-    self.statistics(function(arr) {
+	var self = this;
+	self.statistics(function(arr) {
 
-        var stats = {};
-        var length = arr.length;
+		var stats = {};
+		var length = arr.length;
 
-        for (var i = 0; i < length; i++) {
+		for (var i = 0; i < length; i++) {
 
-            var value = arr[i] || '';
+			var value = arr[i] || '';
 
-            if (value.length === 0)
-                continue;
+			if (value.length === 0)
+				continue;
 
-            try
-            {
-                var current = JSON.parse(value);
-                var key = current.year.toString();
+			try
+			{
+				var current = JSON.parse(value);
+				var key = current.year.toString();
 
-                if (!stats[key])
-                    stats[key] = current;
-                else
-                    sum(stats[key], current);
+				if (!stats[key])
+					stats[key] = current;
+				else
+					sum(stats[key], current);
 
-            } catch (ex) {}
-        }
+			} catch (ex) {}
+		}
 
-        callback(stats);
-    });
+		callback(stats);
+	});
 
-    return self;
+	return self;
 };
 
 /**
@@ -419,27 +419,27 @@ WebCounter.prototype.yearly = function(callback) {
  */
 WebCounter.prototype.statistics = function(callback) {
 
-    var self = this;
-    var filename = framework.path.databases(FILE_STATS);
-    var stream = Fs.createReadStream(filename);
-    var data = '';
-    var stats = {};
+	var self = this;
+	var filename = framework.path.databases(FILE_STATS);
+	var stream = Fs.createReadStream(filename);
+	var data = '';
+	var stats = {};
 
-    stream.on('error', function() {
-        callback([]);
-    });
+	stream.on('error', function() {
+		callback([]);
+	});
 
-    stream.on('data', function(chunk) {
-        data += chunk.toString();
-    });
+	stream.on('data', function(chunk) {
+		data += chunk.toString();
+	});
 
-    stream.on('end', function() {
-        callback(data.split('\n'));
-    });
+	stream.on('end', function() {
+		callback(data.split('\n'));
+	});
 
-    stream.resume();
+	stream.resume();
 
-    return self;
+	return self;
 };
 
 /**
@@ -450,55 +450,55 @@ WebCounter.prototype.statistics = function(callback) {
  */
 WebCounter.prototype.refreshURL = function(referer, req) {
 
-    if (referer.length === 0)
-        return;
+	if (referer.length === 0)
+		return;
 
-    var self = this;
+	var self = this;
 
-    if (!self.allowIP)
-        return;
+	if (!self.allowIP)
+		return;
 
-    var length = self.ip.length;
+	var length = self.ip.length;
 
-    for (var i = 0; i < length; i++) {
-        var item = self.ip[i];
-        if (item.ip === req.ip && item.url === referer) {
-            item.url = req.uri.href;
-            return;
-        }
-    }
+	for (var i = 0; i < length; i++) {
+		var item = self.ip[i];
+		if (item.ip === req.ip && item.url === referer) {
+			item.url = req.uri.href;
+			return;
+		}
+	}
 };
 
 function sum(a, b) {
-    Object.keys(b).forEach(function(o) {
-        if (o === 'day' || o === 'year' || o === 'month')
-            return;
+	Object.keys(b).forEach(function(o) {
+		if (o === 'day' || o === 'year' || o === 'month')
+			return;
 
-        if (o === 'visitors') {
-            a[o] = Math.max(a[o] || 0, b[o] || 0);
-            return;
-        }
+		if (o === 'visitors') {
+			a[o] = Math.max(a[o] || 0, b[o] || 0);
+			return;
+		}
 
-        if (typeof(a[o]) === 'undefined')
-            a[o] = 0;
-        if (typeof(b[o]) !== 'undefined')
-            a[o] += b[o];
-    });
+		if (typeof(a[o]) === 'undefined')
+			a[o] = 0;
+		if (typeof(b[o]) !== 'undefined')
+			a[o] += b[o];
+	});
 }
 
 function getReferer(host) {
-    if (host.length === 0)
-        return null;
-    var index = host.indexOf('/') + 2;
-    host = host.substring(index, host.indexOf('/', index));
-    return host;
+	if (host.length === 0)
+		return null;
+	var index = host.indexOf('/') + 2;
+	host = host.substring(index, host.indexOf('/', index));
+	return host;
 }
 
 // Instance
 var webcounter = new WebCounter();
 
 var delegate_request = function(controller, name) {
-    webcounter.counter(controller.req, controller.res);
+	webcounter.counter(controller.req, controller.res);
 };
 
 module.exports.name = 'webcounter';
@@ -508,32 +508,32 @@ module.exports.instance = webcounter;
 framework.on('controller', delegate_request);
 
 module.exports.usage = function() {
-    var stats = utils.extend({}, webcounter.stats);
-    stats.online = webcounter.online;
-    return stats;
+	var stats = utils.extend({}, webcounter.stats);
+	stats.online = webcounter.online;
+	return stats;
 };
 
 module.exports.online = function() {
-    return webcounter.online;
+	return webcounter.online;
 };
 
 module.exports.today = function() {
-    return webcounter.today;
+	return webcounter.today;
 };
 
 module.exports.increment = function(type) {
-    webcounter.increment(type);
-    return this;
+	webcounter.increment(type);
+	return this;
 };
 
 module.exports.monthly = function(callback) {
-    return webcounter.monthly(callback);
+	return webcounter.monthly(callback);
 };
 
 module.exports.yearly = function(callback) {
-    return webcounter.yearly(callback);
+	return webcounter.yearly(callback);
 };
 
 module.exports.daily = function(callback) {
-    return webcounter.daily(callback);
+	return webcounter.daily(callback);
 };
