@@ -492,7 +492,7 @@ function refresh() {
 
 	sql.select('pages', 'tbl_page').make(function(builder) {
 		builder.where('isremoved', false);
-		builder.fields('id', 'url', 'name', 'title', 'parent', 'language', 'icon', 'ispartial', 'navigations', 'tags');
+		builder.fields('id', 'url', 'name', 'title', 'parent', 'language', 'icon', 'ispartial', 'navigations', 'tags', 'priority');
 	});
 
 	sql.exec(function(err, response) {
