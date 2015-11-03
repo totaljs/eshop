@@ -166,7 +166,7 @@ WebCounter.prototype.counter = function(req, res) {
 	var now = new Date();
 	var ticks = now.getTime();
 	var sum = user === 0 ? 1000 : (ticks - user) / 1000;
-	var exists = sum < 81;
+	var exists = sum < 91;
 	var stats = self.stats;
 	var referer = req.headers['x-referer'] || req.headers['referer'] || '';
 
@@ -182,7 +182,7 @@ WebCounter.prototype.counter = function(req, res) {
 	if (user > 0) {
 
 		sum = Math.abs(self.current - user) / 1000;
-		if (sum < 91)
+		if (sum < 101)
 			return true;
 
 		var date = new Date(user);

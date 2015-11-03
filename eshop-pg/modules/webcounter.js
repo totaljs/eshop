@@ -200,7 +200,7 @@ WebCounter.prototype.counter = function(req, res) {
 	arr[1]++;
 	self.lastvisit = new Date();
 
-	res.cookie(COOKIE, ticks, now.add('d', 5));
+	res.cookie(COOKIE, ticks, now.add('5 days'));
 
 	if (self.allowIP)
 		self.ip.push({ ip: req.ip, url: req.uri.href });
