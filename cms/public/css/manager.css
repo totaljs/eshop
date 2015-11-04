@@ -10,9 +10,9 @@ nav a { color: gray; border-right: 1px solid #D0D0D0; padding: 6px 0 0; position
 nav a:first-child { border-left: 1px solid #D0D0D0; }
 nav a:hover { color: #303030; text-decoration: none; }
 nav .selected { background-color: white; color: black; }
-nav .highlight { background-color: #D0D0D0; color: gray; }
-nav .logoff { float: right; border-right: 0; background-color: #D0D0D0; color: #E7331F !important; min-width: 44px; padding-left: 4px; }
-nav .logoff:hover { background-color: #F0F0F0; }
+nav .highlight { background-color: #D0D0D0 !important; color: gray; }
+nav .logoff { float: right; border-right: 0; background-color: #E7331F; color: white !important; padding-left: 4px; }
+nav .logoff:hover { background-color: #E74839; }
 
 h1 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 20px 0; padding: 0; color: black; font-size: 30px; }
 h1 b { font-weight: 400; }
@@ -87,15 +87,30 @@ canvas { display: block; }
 .tabmenu .selected { background-color: white; top: 1px; border-color: #E0E0E0; color: black; }
 .tabmenu .fa { margin-right: 8px; }
 
+.mainmenu { display: none; height: 40px; }
+.mainmenu > div { float: left; margin-top: 13px; font-size: 12px; color: gray; text-shadow: 1px 1px 1px white; background-color: white; border-radius: 10px; padding: 1px 12px; }
+.mainmenu-button { font-size: 25px; margin-top: 4px; color: gray; float: right; }
+.mainmenu-visible { display: block; }
+
 .font-awesome-editor > div { text-align: center; }
 .font-awesome-editor .fa { font-size: 18px; padding: 10px 0; color: #AAB2BD; cursor: pointer; }
 .font-awesome-editor .fa:hover { color: black; }
 
+.oauth2callback { font-size: 11px; white-space: pre-wrap; margin-bottom: 15px; color: silver; }
+.oauth2callback input { width: 100%; color: #505050; padding: 5px; cursor: text; background: #F8F8F8; border: 0; }
+.oauth2callback div { margin-bottom: 3px; }
+
 @media(max-width: 767px) {
-	header { height: 45px; }
-	nav { font-size: 16px; text-align: center; }
-	nav a { min-width: 42px; height: 45px; padding-top: 12px; }
-	nav .logoff { float: none; min-width: 42px; }
+	.mainmenu { display: block; }
+	header { min-height: 45px; height: auto; }
+	nav { font-size: 20px; display: none; float: none; margin: 10px 0 15px; }
+	nav a { min-width: 25% !important; height: 55px; padding-top: 12px; border-bottom: 1px solid #D0D0D0; border-right: 0; background-color: #F9F9F9; }
+	nav a:nth-child(odd) { background-color: #E9E9E9; }
+	nav a:first-child { border-left: 0; }
+	nav .logoff { float: none; min-width: 25%; background-color: #E7331F !important; }
+	nav .logoff:hover { background-color: #E74839 !important; }
+	nav .selected { background-color: black !important; color: white; }
+	nav .highlight { background-color: #E9E9E9 !important; }
 	.ui-form-buttons button[name="submit"] { width: 140px; }
 	.table-xs thead { display: none; }
 	.table-xs tbody { margin-top: 15px; display: block; }

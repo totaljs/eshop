@@ -152,3 +152,11 @@ function getSelectionStartNode(context){
 	var startNode = (node.nodeName == "#text" ? node.parentNode : node);
 	return startNode;
 }
+
+function mainmenu() {
+	$('header nav').toggleClass('mainmenu-visible');
+}
+
+jRouting.on('location', function() {
+	$('header nav').removeClass('mainmenu-visible');
+});
