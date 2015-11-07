@@ -31,18 +31,6 @@ if (window.su) {
 		jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
 	});
 
-	if (can('orders')) {
-		jRouting.route(managerurl + '/orders/', function() {
-			SET('common.page', 'orders');
-		});
-	}
-
-	if (can('products')) {
-		jRouting.route(managerurl + '/products/', function() {
-			SET('common.page', 'products');
-		});
-	}
-
 	if (can('newsletter')) {
 		jRouting.route(managerurl + '/newsletter/', function() {
 			SET('common.page', 'newsletter');
