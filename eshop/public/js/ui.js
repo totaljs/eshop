@@ -330,6 +330,113 @@ COMPONENT('textarea', function() {
 	};
 });
 
+COMPONENT('template', function() {
+	var self = this;
+
+	self.noDirty();
+	self.noValid();
+	self.getter = null;
+
+	self.make = function(template) {
+
+		if (template) {
+			self.template = Tangular.compile(template);
+			return;
+		}
+
+		var script = self.element.find('script');
+		self.template = Tangular.compile(script.html());
+		script.remove();
+	};
+
+	self.setter = function(value) {
+		if (value === null)
+			return self.element.addClass('hidden');
+		if (NOTMODIFIED(self.id, value))
+			return;
+		self.element.html(self.template(value)).removeClass('hidden');
+	};
+});
+
+COMPONENT('repeater', function() {
+
+	var self = this;
+	self.readonly();
+
+	self.make = function() {
+		var element = self.element.find('script');
+		var html = element.html();
+		element.remove();
+		self.template = Tangular.compile(html);
+	};
+
+	self.setter = function(value) {
+
+		if (!value || value.length === 0) {
+			self.element.html('');
+			return;
+		}
+
+		var builder = '';
+		for (var i = 0, length = value.length; i < length; i++) {
+			var item = value[i];
+			item.index = i;
+			builder += self.template(item).replace(/\$index/g, i.toString()).replace(/\$/g, self.path + '[' + i + ']');
+		}
+
+		self.element.empty().append(builder);
+	};
+});
+
+COMPONENT('error', function() {
+	var self = this;
+	var element;
+
+	self.readonly();
+
+	self.make = function() {
+		self.element.append('<ul class="ui-error hidden"></ul>');
+		element = self.element.find('ul');
+	};
+
+	self.setter = function(value) {
+
+		if (!(value instanceof Array) || value.length === 0) {
+			element.addClass('hidden');
+			return;
+		}
+
+		var builder = [];
+		for (var i = 0, length = value.length; i < length; i++)
+			builder.push('<li><span class="fa fa-times-circle"></span> ' + value[i].error + '</li>');
+
+		element.html(builder.join(''));
+		element.removeClass('hidden');
+	};
+});
+
+COMPONENT('cookie', function() {
+	var self = this;
+	self.make = function() {
+		var cookie = localStorage.getItem('cookie');
+		if (cookie) {
+			self.element.addClass('hidden');
+			return;
+		}
+
+		self.element.removeClass('hidden').addClass('ui-cookie');
+		self.element.append('<button>' + (self.attr('data-button') || 'OK') + '</button>');
+		self.element.on('click', 'button', function() {
+			localStorage.setItem('cookie', '1');
+			self.element.addClass('hidden');
+		});
+	};
+});
+
+// ==========================================================
+// @{BLOCK manager}
+// ==========================================================
+
 COMPONENT('textboxtags', function() {
 
 	var self = this;
@@ -791,34 +898,6 @@ COMPONENT('pictures', function() {
 	};
 });
 
-COMPONENT('template', function() {
-	var self = this;
-
-	self.noDirty();
-	self.noValid();
-	self.getter = null;
-
-	self.make = function(template) {
-
-		if (template) {
-			self.template = Tangular.compile(template);
-			return;
-		}
-
-		var script = self.element.find('script');
-		self.template = Tangular.compile(script.html());
-		script.remove();
-	};
-
-	self.setter = function(value) {
-		if (value === null)
-			return self.element.addClass('hidden');
-		if (NOTMODIFIED(self.id, value))
-			return;
-		self.element.html(self.template(value)).removeClass('hidden');
-	};
-});
-
 COMPONENT('fileupload', function() {
 
 	var self = this;
@@ -890,36 +969,6 @@ COMPONENT('fileupload', function() {
 	};
 });
 
-COMPONENT('repeater', function() {
-
-	var self = this;
-	self.readonly();
-
-	self.make = function() {
-		var element = self.element.find('script');
-		var html = element.html();
-		element.remove();
-		self.template = Tangular.compile(html);
-	};
-
-	self.setter = function(value) {
-
-		if (!value || value.length === 0) {
-			self.element.html('');
-			return;
-		}
-
-		var builder = '';
-		for (var i = 0, length = value.length; i < length; i++) {
-			var item = value[i];
-			item.index = i;
-			builder += self.template(item).replace(/\$index/g, i.toString()).replace(/\$/g, self.path + '[' + i + ']');
-		}
-
-		self.element.empty().append(builder);
-	};
-});
-
 COMPONENT('repeater-group', function() {
 
 	var self = this;
@@ -987,33 +1036,6 @@ COMPONENT('repeater-group', function() {
 		});
 
 		self.element.empty().append(builder);
-	};
-});
-
-COMPONENT('error', function() {
-	var self = this;
-	var element;
-
-	self.readonly();
-
-	self.make = function() {
-		self.element.append('<ul class="ui-error hidden"></ul>');
-		element = self.element.find('ul');
-	};
-
-	self.setter = function(value) {
-
-		if (!(value instanceof Array) || value.length === 0) {
-			element.addClass('hidden');
-			return;
-		}
-
-		var builder = [];
-		for (var i = 0, length = value.length; i < length; i++)
-			builder.push('<li><span class="fa fa-times-circle"></span> ' + value[i].error + '</li>');
-
-		element.html(builder.join(''));
-		element.removeClass('hidden');
 	};
 });
 
@@ -1403,92 +1425,6 @@ COMPONENT('crop', function() {
 	}
 });
 
-COMPONENT('cookie', function() {
-	var self = this;
-	self.make = function() {
-		var cookie = localStorage.getItem('cookie');
-		if (cookie) {
-			self.element.addClass('hidden');
-			return;
-		}
-
-		self.element.removeClass('hidden').addClass('ui-cookie');
-		self.element.append('<button>' + (self.attr('data-button') || 'OK') + '</button>');
-		self.element.on('click', 'button', function() {
-			localStorage.setItem('cookie', '1');
-			self.element.addClass('hidden');
-		});
-	};
-});
-
-COMPONENT('tabmenu', function() {
-	var self = this;
-	self.make = function() {
-		self.element.on('click', 'li', function() {
-			var el = $(this);
-			if (el.hasClass('selected'))
-				return;
-			self.set(el.attr('data-value'));
-		});
-	};
-	self.setter = function(value) {
-		self.element.find('.selected').removeClass('selected');
-		self.element.find('li[data-value="' + value + '"]').addClass('selected');
-	};
-});
-
-Tangular.register('pluralize', function(value, zero, one, other, many) {
-	if (!value)
-		return '0 ' + zero;
-	if (value === 1)
-		return value + ' ' + one;
-	if (value > 4)
-		return value + ' ' +  many;
-	return value + ' ' + other;
-});
-
-$.components.$parser.push(function(path, value, type) {
-
-	if (type === 'date') {
-		if (value instanceof Date)
-			return value;
-
-		if (!value)
-			return null;
-
-		var isEN = value.indexOf('.') === -1;
-		var tmp = isEN ? value.split('-') : value.split('.');
-		if (tmp.length !== 3)
-			return null;
-		var dt = isEN ? new Date(parseInt(tmp[0]) || 0, (parseInt(tmp[1], 10) || 0) - 1, parseInt(tmp[2], 10) || 0) : new Date(parseInt(tmp[2]) || 0, (parseInt(tmp[1], 10) || 0) - 1, parseInt(tmp[0], 10) || 0);
-		return dt;
-	}
-
-	return value;
-});
-
-$.components.$formatter.push(function(path, value, type) {
-
-	if (type === 'date') {
-		if (value instanceof Date)
-			return value.format(this.attr('data-component-format'));
-		if (!value)
-			return value;
-		return new Date(Date.parse(value)).format(this.attr('data-component-format'));
-	}
-
-	if (type !== 'currency')
-		return value;
-
-	if (typeof(value) !== 'number') {
-		value = parseFloat(value);
-		if (isNaN(value))
-			value = 0;
-	}
-
-	return value.format(2);
-});
-
 COMPONENT('codemirror', function() {
 
 	var self = this;
@@ -1813,4 +1749,76 @@ COMPONENT('calendar', function() {
 
 		self.element.html('<div class="ui-calendar-header"><button class="ui-calendar-header-prev" name="prev" data-date="' + output.year + '-' + output.month + '"><span class="fa fa-chevron-left"></span></button><div class="ui-calendar-header-info">' + self.months[value.getMonth()] + ' ' + value.getFullYear() + '</div><button class="ui-calendar-header-next" name="next" data-date="' + output.year + '-' + output.month + '"><span class="fa fa-chevron-right"></span></button></div><table cellpadding="0" cellspacing="0" border="0"><thead>' + header.join('') + '</thead><tbody>' + builder.join('') + '</tbody></table>' + (self.today ? '<div><a href="javascript:void(0)" class="ui-calendar-today">' + self.today + '</a></div>' : ''));
 	};
+});
+
+COMPONENT('tabmenu', function() {
+	var self = this;
+	self.make = function() {
+		self.element.on('click', 'li', function() {
+			var el = $(this);
+			if (el.hasClass('selected'))
+				return;
+			self.set(el.attr('data-value'));
+		});
+	};
+	self.setter = function(value) {
+		self.element.find('.selected').removeClass('selected');
+		self.element.find('li[data-value="' + value + '"]').addClass('selected');
+	};
+});
+
+// ==========================================================
+// @{end}
+// ==========================================================
+
+Tangular.register('pluralize', function(value, zero, one, other, many) {
+	if (!value)
+		return '0 ' + zero;
+	if (value === 1)
+		return value + ' ' + one;
+	if (value > 4)
+		return value + ' ' +  many;
+	return value + ' ' + other;
+});
+
+$.components.$parser.push(function(path, value, type) {
+
+	if (type === 'date') {
+		if (value instanceof Date)
+			return value;
+
+		if (!value)
+			return null;
+
+		var isEN = value.indexOf('.') === -1;
+		var tmp = isEN ? value.split('-') : value.split('.');
+		if (tmp.length !== 3)
+			return null;
+		var dt = isEN ? new Date(parseInt(tmp[0]) || 0, (parseInt(tmp[1], 10) || 0) - 1, parseInt(tmp[2], 10) || 0) : new Date(parseInt(tmp[2]) || 0, (parseInt(tmp[1], 10) || 0) - 1, parseInt(tmp[0], 10) || 0);
+		return dt;
+	}
+
+	return value;
+});
+
+$.components.$formatter.push(function(path, value, type) {
+
+	if (type === 'date') {
+		if (value instanceof Date)
+			return value.format(this.attr('data-component-format'));
+		if (!value)
+			return value;
+		return new Date(Date.parse(value)).format(this.attr('data-component-format'));
+	}
+
+	if (type !== 'currency')
+		return value;
+
+	if (typeof(value) !== 'number') {
+		value = parseFloat(value);
+		if (isNaN(value))
+			value = 0;
+	}
+
+	return value.format(2);
 });
