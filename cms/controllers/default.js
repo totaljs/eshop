@@ -53,10 +53,17 @@ function file_read(req, res, is) {
 
 	if (!resize) {
 		// Reads specific file by ID
-		DB('files').binary.read(id, function(err, stream, header) {
-			if (err)
-				return res.throw404();
-			res.stream(header.type, stream);
+		F.exists(req, res, function(next, filename) {
+			DB('files').binary.read(id, function(err, stream, header) {
+				if (err)
+					return res.throw404();
+				var writer = require('fs').createWriteStream(filename);
+				CLEANUP(writer, function() {
+					F.responseFile(req, res, filename);
+					next();
+				});
+				stream.pipe(writer);
+			});
 		});
 		return;
 	}
