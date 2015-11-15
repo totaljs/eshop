@@ -152,7 +152,7 @@
 	var form = {};
 	var datasource;
 
-	common.deliverytypes = '@{config.custom.deliverytypes.join(",")}'.split(',');
+	SET('common.deliverytypes', '@{config.custom.deliverytypes.join(",")}'.split(','));
 
 	form.email = '@';
 	form.address = '';
