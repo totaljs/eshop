@@ -88,6 +88,13 @@ NEWSCHEMA('Product').make(function(schema) {
 			if (err)
 				return callback();
 
+			for (var i = 0, length = response.items.length; i < length; i++) {
+				if (response.items[i].pictures)
+					response.items[i].pictures = response.items[i].pictures.split(',');
+				else
+					response.items[i].pictures = new Array(0);
+			}
+
 			var data = {};
 			data.count = response.count;
 			data.items = response.items;
