@@ -39,7 +39,7 @@
 					<tbody data-component="repeater" data-component-path="datasource">
 						<script type="text/html">
 							<tr>
-								<td><a href="/shop/{{ linker_category }}/{{ linker }}/">{{ name }}</a></td>
+								<td><a href="/product/{{ linker }}/">{{ name }}</a></td>
 								<td class="ui-right col-xs-2 hidden-xs">{{ price | format(2) }} @{!config.custom.currency_entity}</td>
 								<td class="ui-right col-xs-2 col-sm-1 active"><input type="text" value="{{ count }}" data-id="{{ id }}" maxlength="2" /></td>
 								<td class="ui-right col-xs-3 col-sm-2 b warning">{{ price | sum(2) }} @{!config.custom.currency_entity}<span class="fa fa-times-circle hidden-xs" data-id="{{ id }}"></span></td>
