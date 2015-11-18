@@ -235,7 +235,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	});
 
 	// Imports CSV
-	schema.addWorkflow('import', function(error, model, filename, callback) {
+	schema.addWorkflow('import.csv', function(error, model, filename, callback) {
 		require('fs').readFile(filename, function(err, buffer) {
 
 			if (err) {
@@ -275,6 +275,50 @@ NEWSCHEMA('Product').make(function(schema) {
 					return next();
 				}
 
+				schema.make(product, function(err, model) {
+					if (err)
+						return next();
+					count++;
+					model.$save(next);
+				});
+			}, function() {
+
+				if (count)
+					refresh();
+
+				// Done, returns response
+				callback(SUCCESS(count > 0));
+			});
+		});
+	});
+
+	// Imports XML
+	schema.addWorkflow('import.xml', function(error, model, filename, callback) {
+
+		var products = [];
+		var count = 0;
+		var stream = require('fs').createReadStream(filename);
+
+		stream.on('data', U.streamer('</product>', function(value) {
+
+			var index = value.indexOf('<product>');
+			if (index === -1)
+				return;
+
+			value = value.substring(index).trim();
+			xml = value.parseXML();
+
+			var obj = {};
+
+			Object.keys(xml).forEach(function(key) {
+				obj[key.replace('product.', '')] = xml[key];
+			});
+
+			products.push(obj);
+		}));
+
+		CLEANUP(stream, function() {
+			products.wait(function(product, next) {
 				schema.make(product, function(err, model) {
 					if (err)
 						return next();

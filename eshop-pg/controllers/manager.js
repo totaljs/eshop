@@ -293,7 +293,13 @@ function json_products_clear() {
 function json_products_import() {
 	var self = this;
 	var file = self.files[0];
-	GETSCHEMA('Product').workflow('import', null, file.path, self.callback(), true);
+
+	if (file.type !== 'text/xml' && file.type !== 'text/csv') {
+		self.json(SUCCESS(false, 'The file type is not supported.'));
+		return;
+	}
+
+	GETSCHEMA('Product').workflow('import.' + file.type.substring(5), null, file.path, self.callback(), true);
 }
 
 // Reads all product categories and manufacturers

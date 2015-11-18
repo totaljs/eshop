@@ -12,7 +12,7 @@
 			<div class="col-md-6 m">
 				<div class="row">
 					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_new"><span class="fa fa-plus-circle"></span>@(Add product)</a></div>
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_import"><span class="fa fa-cloud-upload"></span>@(Import CSV)</a></div>
+					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_import"><span class="fa fa-cloud-upload"></span>@(Import CSV or XML)</a></div>
 					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_category"><span class="fa fa-folder"></span>@(Replace category)</a></div>
 				</div>
 			</div>
@@ -152,8 +152,8 @@
 	</div>
 </div>
 
-<!-- IMPORT CSV FILE -->
-<input type="file" id="products_file_cvs" class="hidden" accept="text/csv" />
+<!-- IMPORT CSV/XML FILE -->
+<input type="file" id="products_file_cvsxml" class="hidden" accept="text/*" />
 
 <script>
 
@@ -209,7 +209,7 @@
 		};
 
 		// CSV file uploading
-		$('#products_file_cvs').on('change', function(e) {
+		$('#products_file_cvsxml').on('change', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
 			loading(true);
@@ -331,6 +331,6 @@
 	}
 
 	function products_import() {
-		$('#products_file_cvs').click();
+		$('#products_file_cvsxml').click();
 	}
 </script>
