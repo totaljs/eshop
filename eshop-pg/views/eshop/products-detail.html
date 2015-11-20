@@ -1,0 +1,44 @@
+@{title(model.name)}
+@{sitemap('#detail')}
+
+<div class="padding">
+	<h1>@{title}</h1>
+	<div class="row">
+		<div class="col-md-2"></div>
+		<div class="col-md-8">
+			<div class="detail-category">@(Category:) <a href="/shop/@{model.linker_category}/">@{model.category}</a></div>
+			@{if model.reference}
+				<div class="detail-reference">@(Item) # <b>@{model.reference}</b></div>
+			@{fi}
+
+			<br />
+			<p>@{!model.body}</p>
+			<br />
+
+			<div class="detail-checkout">
+				<div>@(The product <b>@{model.name}</b> is in your shopping cart) <b class="data-checkout-count"></b>.</div>
+				<span class="fa fa-shopping-cart mr5"></span><a href="/checkout/" class="b">@(Order it now)</a>
+			</div>
+
+			<br />
+
+			<div class="row">
+				<div class="col-md-6">
+					<div><button class="detail-buy" data-id="@{model.id}" data-price="@{model.price}">@(Buy:) <b>@{model.price.format(2)} @{!config.custom.currency_entity}</b></button></div>
+					<div style="margin-top:15px"><span class="fa fa-envelope silver mr5"></span><a href="/contact/?productid=@{if model.reference}@{model.reference}@{else}@{model.id}@{fi}#contactform">@(Do you need more informations?)</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br />
+	<hr />
+	<br />
+	@{foreach m in model.pictures}
+		<div><img src="/images/large/@{m}.jpg" alt="@{m.name}" border="0" class="img-responsive center" /></div>
+		<br />
+		<hr />
+	@{end}
+	<br />
+	<h2>@(Related) @{model.category}</h2>
+	<div data-component="related" data-category="@{model.linker_category}" data-id="@{model.id}"></div>
+</div>

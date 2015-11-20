@@ -49,13 +49,21 @@ function file_read(req, res, is) {
 		return req.path[0] === 'download';
 
 	var id = req.path[1].replace('.' + req.extension, '');
+	var resize = req.query.s && (req.extension === 'jpg' || req.extension === 'gif' || req.extension === 'png') ? true : false;
 
-	if (!req.query.s || (req.extension !== 'jpg' && req.extension !== 'gif' && req.extension !== 'png')) {
+	if (!resize) {
 		// Reads specific file by ID
-		DB('files').binary.read(id, function(err, stream, header) {
-			if (err)
-				return res.throw404();
-			res.stream(header.type, stream);
+		F.exists(req, res, function(next, filename) {
+			DB('files').binary.read(id, function(err, stream, header) {
+				if (err)
+					return res.throw404();
+				var writer = require('fs').createWriteStream(filename);
+				CLEANUP(writer, function() {
+					F.responseFile(req, res, filename);
+					next();
+				});
+				stream.pipe(writer);
+			});
 		});
 		return;
 	}
@@ -64,7 +72,8 @@ function file_read(req, res, is) {
 
 	// Small hack for the file cache.
 	// F.exists() uses req.uri.pathname for creating temp identificator and skips all query strings by creating (because this hack).
-	req.uri.pathname = req.uri.pathname.replace('.', req.query.s + '.');
+	if (req.query.s)
+		req.uri.pathname = req.uri.pathname.replace('.', req.query.s + '.');
 
 	// Below method checks if the file exists (processed) in temporary directory
 	// More information in total.js documentation

@@ -1,44 +1,46 @@
 var Fs = require('fs');
 var filename = F.path.databases('newsletter.csv');
 
-var Newsletter = NEWSCHEMA('Newsletter');
-Newsletter.define('email', 'String(200)', true);
-Newsletter.define('ip', 'String(80)');
-Newsletter.define('language', 'String(3)');
+NEWSCHEMA('Newsletter').make(function(schema) {
 
-// Saves the model into the database
-Newsletter.setSave(function(error, model, options, callback) {
+	schema.define('email', 'String(200)', true);
+	schema.define('ip', 'String(80)');
+	schema.define('language', 'String(3)');
 
-	// Appends new email into tohe newsletter file
-	Fs.appendFile(filename, model.email + ';' + model.ip + ';' + model.language + ';' + (new Date()).format('yyyy-MM-dd') + '\n');
+	// Saves the model into the database
+	schema.setSave(function(error, model, options, callback) {
 
-	// Writes stats
-	MODULE('webcounter').increment('newsletter');
+		// Appends new email into tohe newsletter file
+		Fs.appendFile(filename, model.email + ';' + model.ip + ';' + model.language + ';' + (new Date()).format('yyyy-MM-dd') + '\n');
 
-	// Returns response
-	callback(SUCCESS(true));
-});
+		// Writes stats
+		MODULE('webcounter').increment('newsletter');
 
-// Gets listing
-Newsletter.setQuery(function(error, options, callback) {
-	Fs.readFile(filename, function(err, buffer) {
-		if (err)
-			buffer = '';
-		else if (buffer)
-			buffer = buffer.toString('utf8');
-		callback(buffer);
+		// Returns response
+		callback(SUCCESS(true));
 	});
-});
 
-// Performs download
-Newsletter.addWorkflow('download', function(error, model, controller, callback) {
-	// Returns CSV
-	controller.file('~' + filename, 'newsletter.csv');
-	callback();
-});
+	// Gets listing
+	schema.setQuery(function(error, options, callback) {
+		Fs.readFile(filename, function(err, buffer) {
+			if (err)
+				buffer = '';
+			else if (buffer)
+				buffer = buffer.toString('utf8');
+			callback(buffer);
+		});
+	});
 
-// Clears DB
-Newsletter.addWorkflow('clear', function(error, model, options, callback) {
-	Fs.unlink(filename, NOOP);
-	callback(SUCCESS(true));
+	// Performs download
+	schema.addWorkflow('download', function(error, model, controller, callback) {
+		// Returns CSV
+		controller.file('~' + filename, 'newsletter.csv');
+		callback();
+	});
+
+	// Clears DB
+	schema.addWorkflow('clear', function(error, model, options, callback) {
+		Fs.unlink(filename, NOOP);
+		callback(SUCCESS(true));
+	});
 });

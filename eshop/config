@@ -1,5 +1,5 @@
 name                      : E-shop
-version                   : 2.0.0
+version                   : 3.0.0
 author                    : Peter Širka
 
 // A relative URL address into the eshop management
@@ -22,4 +22,4 @@ mail.smtp                 : YOUR.SMTPSERVER.COM
 
 // Image convertor for resizing of pictures
 // Default image converter: im = ImageMagick, gm = GraphicsMagick
-default-image-converter   : im
+default-image-converter   : gm

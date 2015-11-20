@@ -1,0 +1,150 @@
+@{title('@(Order) # ' + model.id)}
+@{sitemap('#order')}
+
+@{if query.success === '1' && !model.ispaid}
+	<div class="message-success"><span class="fa fa-check-circle"></span> @(Many thanks for the order. <b>Your order has been created successfully.</b>.)</div>
+@{fi}
+
+@{if query.success === '1' && model.ispaid}
+	<div class="message-success"><span class="fa fa-check-circle"></span> @(Many thanks for your payment. Your order will be processed as soon as possible.)</div>
+@{fi}
+
+<div class="padding">
+	<h1>@{title}</h1>
+	<div class="row">
+		<div class="col-md-2"></div>
+		<div class="col-md-8">
+			<hr style="margin-top:0" />
+			<div class="ui-center">
+				<div style="font-size:11px" class="silver">@(ORDER STATUS)</div>
+				@{!model.status}
+			</div>
+			<hr />
+			@{if !model.iscompleted}
+			<div><a href="/contact/?orderid=@{model.id}#contactform">@(Do you want to <b>cancel this order</b>?)</a></div>
+			@{fi}
+			<br />
+			<table class="table table-bordered" border="0">
+				<tbody>
+					<tr>
+						<td class="col-xs-4 active"># id</td>
+						<td>@{model.id}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-4 active">@(Created)</td>
+						<td>@{new Date(model.datecreated).format('@(yyyy-MM-dd)')}</td>
+					</tr>
+					@{if model.ispaid}
+					<tr>
+						<td class="col-xs-4 active"><span class="fa fa-paypal"></span> @(Paid)</td>
+						<td class="green">@{new Date(model.datepaid).format('@(yyyy-MM-dd)')}</td>
+					</tr>
+					@{fi}
+					<tr>
+						<td class="col-xs-4 active">@(IP address)</td>
+						<td>@{model.ip}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-4 active b">@(Total price)</td>
+						<td class="b">@{if model.ispaid}<span class="green">@(paid)</span>@{fi} @{model.price.format(2)} @{!config.custom.currency_entity}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-4 active">@(Items count)</td>
+						<td>@{model.count}x</td>
+					</tr>
+				</tbody>
+			</table>
+
+			@{if !model.ispaid}
+			<br />
+			<div class="row">
+				<div class="col-md-3"></div>
+				<div class="col-md-6 ui-center blue m">
+					@(Pay bill now via) <span class="fa fa-paypal mr5"></span><b>PayPal</b>.
+					<div class="fs11 silver">@(You will be redirect to secured PayPal payment page.)</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3"></div>
+				<div class="col-md-6"><a href="?pay=1" class="linkbutton pay"><img src="/img/paypal.png" border="0" alt="PayPal" width="42" height="25" /> @(Pay Bill Now)</a></div>
+			</div>
+			<br />
+			@{fi}
+
+			<br />
+			<table class="table table-bordered" border="0">
+				<tbody>
+					<tr>
+						<td class="col-xs-4 active">@(Customer)</td>
+						<td>@{model.firstname} @{model.lastname}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-4 active">@(Email address)</td>
+						<td>@{model.email}</td>
+					</tr>
+					@{if model.phone}
+					<tr>
+						<td class="col-xs-4 active">@(Phone number)</td>
+						<td>@{model.phone}</td>
+					</tr>
+					@{fi}
+				</tbody>
+			</table>
+			<br />
+			<div class="b"><span class="fa fa-truck"></span> @(Delivery address)</div>
+			<br />
+			<div>@{!model.address.encode().replace(/\n/g, '<br />')}</div>
+			<br />
+			<hr />
+			<br />
+			<div class="b"><span class="fa fa-navicon"></span> @(Ordered items) (@{model.count})</div>
+			<br />
+			<table class="table table-bordered" border="0">
+				<thead>
+					<tr class="b">
+						<th>@(Item name)</th>
+						<th class="ui-center col-xs-2 hidden-xs">@(Price)</th>
+						<th class="ui-center col-xs-2 col-sm-1">@(Qt.)</th>
+						<th class="ui-center col-xs-3 col-sm-2">@(Total)</th>
+					</tr>
+				</thead>
+				<tbody>
+					@{foreach m in model.products}
+						<tr>
+							<td>@{ m.name }</td>
+							<td class="ui-center col-xs-2 hidden-xs">@{m.price.format(2)} @{!config.custom.currency_entity}</td>
+							<td class="ui-center col-xs-2 col-sm-1">@{m.count}x</td>
+							<td class="ui-center col-xs-3 col-sm-2">@{(m.price * m.count).format(2)} @{!config.custom.currency_entity}</td>
+						</tr>
+					@{end}
+					<tr class="warning b">
+						<td>@(Summarize)</td>
+						<td class="ui-center col-xs-2 hidden-xs">&nbsp;</td>
+						<td class="ui-center col-xs-2 col-sm-1">@{model.count}x</td>
+						<td class="ui-center col-xs-3 col-sm-2">@{model.price.format(2)} @{!config.custom.currency_entity}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<br />
+	<hr />
+	<br />
+	<br />
+	<div class="row">
+		<div class="col-md-3"></div>
+		<div class="col-md-6">
+			<a href="/shop/" class="linkbutton"><span class="fa fa-shopping-cart"></span> @(Buy other products)</a>
+		</div>
+	</div>
+	<br />
+	<br />
+</div>
+
+@{section script}
+<script>
+	$('.pay').on('click', function(e) {
+		$(document.body).append('<div id="loading"></div>');
+	});
+</script>
+@{end}

@@ -11,7 +11,7 @@
 	<meta name="robots" content="all,follow" />
 	@{head}
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700" />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/codemirror.min.css" />
 	@{import('manager.css', 'favicon.ico')}
 	<script>
@@ -27,6 +27,10 @@
 
 	<header>
 		<div class="container">
+			<div class="mainmenu">
+				<div><b>@{config.name}</b> v@{config.version}</div>
+				<a href="javascript:mainmenu()" class="mainmenu-button"><span class="fa fa-navicon"></span></a>
+			</div>
 			<nav>
 				<a href="/" title="E-shop" class="highlight"><span class="fa fa-globe"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/" title="@(Dashboard)" data-role="dashboard"><span class="fa fa-dashboard"></span></a>
@@ -34,6 +38,8 @@
 				<a class="jrouting" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/settings/" title="@(Settings)" data-role="settings"><span class="fa fa-cog"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/system/" title="@(System)" data-role="system"><span class="fa fa-database"></span></a>
+				@{place('manager-menu')}
+				<a class="logoff" href="@{CONFIG('manager-url')}/logoff/" title="@(Sign out)"><span class="fa fa-sign-out"></span></a>
 			</nav>
 		</div>
 	</header>
@@ -44,7 +50,10 @@
 		<div data-component="page" data-component-path="common.page" data-if="newsletter" data-template="/templates/manager-newsletter.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="settings" data-template="/templates/manager-settings.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="system" data-template="/templates/manager-system.html"></div>
+		@{place('manager-page')}
 	</div>
+
+	<div data-component="calendar" data-days="@(SU,MO,TU,WE,TH,FR,SO)" data-months="@(January,February,March,April,May,Juny,July,August,September,October,November,December)" data-today="@(Set date to today)" data-firstday="0"></div>
 
 	<footer>
 		<div>&copy; 2015 <a href="http://www.totaljs.com">@{config.author}</a>.</div>
@@ -60,6 +69,7 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/mode/css/css.min.js"></script>
 
 	@{js('manager.js')}
+	@{place('manager-script')}
 	@{section('script')}
 
 </body>

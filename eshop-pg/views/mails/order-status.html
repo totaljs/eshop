@@ -1,0 +1,57 @@
+@{layout('~mails/layout')}
+
+<div>@(Dear) <b>@{model.firstname}</b>,</div>
+<div style="margin-top:5px">@(the order has been updated. Please review the status of this order.)</div>
+<br />
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Order number)</div>
+	<div class="float:left">: @{model.id}</div>
+</div>
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Status)</div>
+	<div class="float:left">: <b style="color:#CA4441">@{model.status}</b></div>
+</div>
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Created)</div>
+	<div class="float:left">: @{model.datecreated.format('yyyy-MM-dd')}</div>
+</div>
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Delivery)</div>
+	<div class="float:left">: @{model.delivery}</div>
+</div>
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Customer)</div>
+	<div class="float:left">: @{model.firstname} @{model.lastname}</div>
+</div>
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Email address)</div>
+	<div class="float:left">: @{model.email}</div>
+</div>
+@{if model.phone}
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Phone number)</div>
+	<div class="float:left">: @{model.phone}</div>
+</div>
+@{fi}
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Total price)</div>
+	<div class="float:left">: @{model.price.format(2)} @{!config.custom.currency_entity}</div>
+</div>
+<br />
+<div style="background-color:#F0F0F0;padding:20px;border-radius:4px;margin-top:5px">
+	<div style="margin-bottom:10px"><b>@(Delivery address):</b></div>
+	<div>@{!model.address.encode().replace(/\n/g, '<br />')}</div>
+</div>
+<div style="margin:25px 0 10px"><strong>@(Ordered items) (@{model.count})</strong></div>
+@{foreach m in model.products}
+<div style="border-bottom:1px solid #E0E0E0;padding:5px 0 3px;height:20px">
+    <div style="float:left">@{m.name}</div>
+    <div style="float:right;text-align:right;width:100px">@{m.price.format(2)} @{!config.custom.currency_entity}</div>
+    <div style="float:right;text-align:right;width:60px;font-size:11px;color:#AAB2BD">@{m.count}x</div>
+</div>
+@{end}
+<br />
+<br />
+<div style="color:#AAB2BD;font-size:11px">@(Track your order):</div>
+<div><a href="@{config.custom.url}/checkout/@{model.id}/" style="color:#1DA9FC">@{config.custom.url}/checkout/@{model.id}/</a></div>
+<br />

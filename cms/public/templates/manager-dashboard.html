@@ -26,7 +26,7 @@
 						</tr>
 						<tr>
 							<td>@(Visitors)</td>
-							<td class="col-xs-3 ui-right">{{ webcounter.today.visitors | format(0) }}x</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.count | format(0) }}x</td>
 						</tr>
 						<tr>
 							<td>@(Unique visitors)</td>
@@ -160,30 +160,30 @@
 			dashboard.cache.processed = true;
 
 			var data = [];
-			data.push(dashboard_charts_pie_item(response.webcounter.today.search, 'Organic search', '#61E727'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.social, 'Social networks', '#479AD0'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.direct, 'Direct', '#E22926'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.advert, 'Advert', '#FFEE32'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.unknown, 'Other', '#585858'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.search, '@(Organic search)', '#61E727'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.social, '@(Social networks)', '#479AD0'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.direct, '@(Direct)', '#E22926'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.advert, '@(Advert)', '#FFEE32'));
+			data.push(dashboard_charts_pie_item(response.webcounter.today.unknown, '@(Other)', '#585858'));
 			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'));
 			dashboard.cache.online.Doughnut(data, { responsive: true });
 
 			var year = (new Date()).getFullYear();
 
 			data = {};
-			data.labels = months;
+			data.labels = window.$calendar.months_short;
 			data.datasets = [{ fillColor: '#FFCE54', data: dashboard_charts_bar_items(response.webcounter.stats, 'count', year) }, { fillColor: '#FC6E51', data: dashboard_charts_bar_items(response.webcounter.stats, 'unique', year) }];
 			dashboard.cache.visitors = new Chart($('#dashboard-monthly-visitors').get(0).getContext('2d'));
 			dashboard.cache.visitors.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false });
 
 			data = {};
-			data.labels = months;
+			data.labels = window.$calendar.months_short;
 			data.datasets = [{ fillColor: '#48CFAD', data: dashboard_charts_bar_items(response.webcounter.stats, 'contactforms', year) }];
 			dashboard.cache.orders = new Chart($('#dashboard-monthly-contactforms').get(0).getContext('2d'));
 			dashboard.cache.orders.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
 
 			data = {};
-			data.labels = months;
+			data.labels = window.$calendar.months_short;
 			data.datasets = [{ fillColor: '#AC92EC', data: dashboard_charts_bar_items(response.webcounter.stats, 'hits', year) }];
 			dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'));
 			dashboard.cache.hits.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });

@@ -1,5 +1,5 @@
 // All models use this validation delegate
-F.onValidation = function(name, value) {
+F.onValidate = function(name, value) {
 	switch (name) {
 		// common
 		case 'email':

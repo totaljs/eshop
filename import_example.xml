@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product>
+		<name>Chino Shorts</name>
+		<price>23.00</price>
+		<body>Lorem ipsum dolor sit amet, consectetur adipisicing elit. In fugit, quisquam adipisci voluptatum labore ex id consectetur assumenda provident nobis!</body>
+		<category>Shorts / Men</category>
+		<manufacturer>Addidas</manufacturer>
+		<istop>true</istop>
+		<reference>1</reference>
+	</product>
+	<product>
+		<name>Washbasket Shirt</name>
+		<price>69.99</price>
+		<body>Lorem ipsum dolor sit amet, consectetur adipisicing elit. In fugit, quisquam adipisci voluptatum labore ex id consectetur assumenda provident nobis!</body>
+		<category>Shirts</category>
+		<manufacturer>Puma</manufacturer>
+	</product>
+</products>

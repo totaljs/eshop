@@ -1,0 +1,27 @@
+name                      : E-shop
+version                   : 3.0.0
+author                    : Peter Širka
+
+database                  : postgres://USER:PASSWORD@IP_OR_HOSTNAME/DATABASE_NAME
+
+// A relative URL address into the eshop management
+manager-url               : /$manager
+
+// Hidden super admin in the form username:password
+manager-superadmin        : admin:admin
+
+// Custom SMTP settings
+mail.smtp                 : YOUR.SMTPSERVER.COM
+// mail.smtp.options         : {"user":"","password":"","timeout":2000}
+
+// Gmail SMTP settings
+// mail.smtp                : smtp.gmail.com
+// mail.smtp.options        : {"port":465,"secure":true,"user":"ENTER_YOUR_EMAIL","password":"ENTER_YOUR_PASSWORD","rejectUnauthorized":true}
+
+// Office365 SMTP settings
+// mail.smtp                : smtp.office365.com
+// mail.smtp.options        : {"port":587,"secure":false,"user":"ENTER_YOUR_EMAIL","password":"ENTER_YOUR_PASSWORD","tls":{"ciphers":"SSLv3"}}
+
+// Image convertor for resizing of pictures
+// Default image converter: im = ImageMagick, gm = GraphicsMagick
+default-image-converter   : gm
