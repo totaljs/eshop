@@ -28,3 +28,15 @@ __CMS__:
 - added Font-Awesome lists for CMS EDITOR
 - added categorization for widgets
 - fixed height of CMS editor
+
+## Do you need VPS hosting for your eshops?
+
+Sign up on <https://www.webhostingy.com/totaljs>
+
+- you can provide more than 5 eshops
+- price around 15 EUR per month
+- easy configuration (DNS, SMTP sender, etc.)
+- ddos prevention
+- everything under control
+
+![VPS hosting](https://www.totaljs.com/img/eshop-vps-hosting.jpg)
