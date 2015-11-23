@@ -35,7 +35,7 @@ Sign up on <https://www.webhostingy.com/totaljs>
 
 - you can provide more than 5 eshops
 - price around 15 EUR per month
-- easy configuration (DNS, SMTP sender, etc.)
+- easy configuration (DNS, Mail / SMTP, FTP, SFTP, etc.)
 - ddos prevention
 - everything under control
 
