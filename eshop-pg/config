@@ -1,5 +1,5 @@
 name                      : E-shop
-version                   : 3.0.0
+version                   : 3.1.0
 author                    : Peter Širka
 
 database                  : postgres://USER:PASSWORD@IP_OR_HOSTNAME/DATABASE_NAME
