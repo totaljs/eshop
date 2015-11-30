@@ -1,0 +1,19 @@
+{
+  "name": "Eshop",
+  "description": "Simple and powerful eshop solution written in total.js / node.js.",
+  "version": "1.0.1",
+  "main": "release.js",
+  "dependencies": {
+    "paypal-express-checkout": "^1.0.3",
+    "total.js": "^1.9.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "eshop",
+    "ecommerce"
+  ],
+  "author": "Peter Širka",
+  "license": "You can't share and resell the source code and its modification. You can sell the eshop as end product to end user."
+}
