@@ -7,6 +7,13 @@ Please do not change the code, just create a new issues. I solve all problems as
 
 ---
 
+## The source-code
+
+- `cms` NoSQL embedded version
+- `eshop` NoSQL embedded version
+- `eshop-pg` PostgreSQL version
+- `eshop-mongodb` MongoDB version
+
 ## What's new?
 
 __Both__:
