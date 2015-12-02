@@ -3,4 +3,6 @@ cms/tmp/
 eshop/databases/
 eshop/tmp/
 eshop-pg/tmp/
+eshop-mongo/tmp/
 *.pid
+node_modules/mongodb
