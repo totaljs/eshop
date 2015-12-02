@@ -72,7 +72,6 @@ exports.install = function() {
 function upload() {
 
 	var self = this;
-	var async = [];
 	var id = [];
 
 	self.files.wait(function(file, next) {

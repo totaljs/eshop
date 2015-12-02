@@ -55,8 +55,12 @@ function file_read(req, res, is) {
 		// Reads specific file by ID
 		F.exists(req, res, function(next, filename) {
 			DB('files').binary.read(id, function(err, stream, header) {
-				if (err)
+
+				if (err) {
+					next();
 					return res.throw404();
+				}
+
 				var writer = require('fs').createWriteStream(filename);
 				CLEANUP(writer, function() {
 					F.responseFile(req, res, filename);
