@@ -240,12 +240,13 @@
 	OPERATION('submit', function() {
 		form.products = datasource;
 		$.components.POST('/api/checkout/create/', form, function(response) {
-			if (response.success) {
-				FIND('checkout').clear();
-				window.location.href += response.value + '/?success=1';
+			if (!response.success) {
+				SET('common.success', response);
 				return;
 			}
-			SET('common.success', response);
+
+			FIND('checkout').clear();
+			window.location.href = jRouting.path(window.location.pathname) + response.value + '/?success=1';
 		});
 	});
 
