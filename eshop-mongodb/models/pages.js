@@ -64,47 +64,41 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (options.search)
 			options.search_length = options.search.length;
 
-		// Filter for reading
-		var filter = function(doc) {
+		var builder = new MongoBuilder();
 
-			// Checks partial content
-			if (options.ispartial && doc.ispartial !== options.ispartial)
-				return;
+		builder.where('isremoved', false);
 
-			// Checks language
-			if (options.language && doc.language !== options.language)
-				return;
+		// Checks partial content
+		if (options.ispartial)
+			builder.where('ispartial', options.ispartial);
 
-			// Checks navigations
-			if (options.navigation && (!doc.navigations || doc.navigations.indexOf(options.navigation) === -1))
-				return;
+		// Checks language
+		if (options.language)
+			builder.where('language', options.language);
 
-			// Searchs
-			if (options.search_length) {
-				if (!doc.search)
+		// Checks navigations
+		if (options.navigation)
+			builder.in('navigations', options.navigation);
+
+		if (options.search) {
+			/*
+			for (var i = 0; i < options.search_length; i++) {
+				if (doc.search.indexOf(options.search[i]) === -1)
 					return;
-				for (var i = 0; i < options.search_length; i++) {
-					if (doc.search.indexOf(options.search[i]) === -1)
-						return;
-				}
-			}
+			}*/
+			builder.like('search', options.search.join(' '));
+		}
 
-			return { id: doc.id, name: doc.name, parent: doc.parent, url: doc.url, navigations: doc.navigations, ispartial: doc.ispartial, priority: doc.priority, language: doc.language, icon: doc.icon };
-		};
-
-		// Sorting documents
-		var sorting = function(a, b) {
-			return a.name.removeDiacritics().localeCompare(b.name.removeDiacritics());
-		};
-
-		DB('pages').sort(filter, sorting, function(err, docs, count) {
+		builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
+		builder.sort('name');
+		builder.take(take);
+		builder.skip(skip);
+		builder.findCount(DB('pages'), function(err, docs, count) {
 
 			var data = {};
 
 			data.count = count;
 			data.items = docs;
-
-			// Gets page count
 			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
 
 			if (data.pages === 0)
@@ -114,7 +108,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 			// Returns data
 			callback(data);
-		}, skip, take);
+		});
 	});
 
 	// Gets a specific page
@@ -124,21 +118,23 @@ NEWSCHEMA('Page').make(function(schema) {
 		// options.id {String}
 		// options.language {String}
 
-		// Filter for reading
-		var filter = function(doc) {
-			if (doc.url !== options.url && doc.id !== options.id)
-				return;
-			if (options.language && doc.language !== options.language)
-				return;
-			return doc;
-		};
+		var builder = new MongoBuilder();
+
+		builder.where('isremoved', false);
+
+		if (options.url)
+			builder.where('url', options.url);
+
+		if (options.id)
+			builder.where('id', options.id);
+
+		if (options.language)
+			builder.where('language', options.language);
 
 		// Gets specific document
-		DB('pages').one(filter, function(err, doc) {
-
+		builder.findOne(DB('pages'), function(err, doc) {
 			if (doc)
 				return callback(doc);
-
 			error.push('error-404-page');
 			callback();
 		});
@@ -147,15 +143,12 @@ NEWSCHEMA('Page').make(function(schema) {
 	// Removes a specific page
 	schema.setRemove(function(error, id, callback) {
 
-		// Filters for removing
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			return null;
-		};
+		var builder = new MongoBuilder();
+		builder.where('id', id);
+		builder.where('isremoved', false);
 
 		// Updates database file
-		DB('pages').update(updater, callback);
+		builder.updateOne(DB('pages'), callback);
 
 		// Refreshes internal informations e.g. sitemap
 		setTimeout(refresh, 1000);
@@ -171,12 +164,14 @@ NEWSCHEMA('Page').make(function(schema) {
 			model.name = model.title;
 
 		var count = 0;
+		var isnew = false;
 
-		if (!model.id)
+		if (!model.id) {
 			model.id = U.GUID(10);
-
-		if (model.datecreated)
-			model.datecreated = model.datecreated.format();
+			model.datecreated = new Date();
+			isnew = true;
+		} else
+			model.dateupdated = new Date();
 
 		if (model.search)
 			model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).toSearch();
@@ -188,32 +183,26 @@ NEWSCHEMA('Page').make(function(schema) {
 				model.url = '/' + model.url;
 		}
 
+		model.isremoved = false;
+
 		// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
-		var clean = model.$clean();
+		var builder = new MongoBuilder();
 
-		// Filter for updating
-		var updater = function(doc) {
-			if (doc.id !== clean.id)
-				return doc;
-			count++;
-			doc.datebackuped = new Date().format();
-			DB('pages_backup').insert(doc);
-			return clean;
-		};
-
-		// Updates database file
-		DB('pages').update(updater, function() {
-
-			// Creates record if not exists
-			if (count === 0)
-				DB('pages').insert(clean);
-
+		// Callback
+		var cb = function() {
 			// Returns response
 			callback(SUCCESS(true));
-
 			// Refreshes internal informations e.g. sitemap
 			setTimeout(refresh, 1000);
-		});
+		};
+
+		builder.set(model);
+
+		if (isnew)
+			builder.insert(DB('pages'), cb);
+		else
+			builder.updateOne(DB('pages'), cb);
+
 	});
 
 	schema.addWorkflow('create-url', function(error, model, options, callback) {
@@ -406,8 +395,9 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	// Clears database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
+		var builder = new MongoBuilder();
 
-		DB('pages').clear(function() {
+		builder.remove(DB('pages'), function() {
 			setTimeout(refresh, 1000);
 		});
 
@@ -423,11 +413,12 @@ function refresh() {
 	var helper = {};
 	var navigation = {};
 
-	var prepare = function(doc) {
+	var builder = new MongoBuilder();
+	builder.where('isremoved', false);
+	builder.where('ispartial', false);
+	builder.fields('id', 'language', 'url', 'name', 'title', 'parent', 'language', 'icon', 'tags', 'navigations');
 
-		// Partial content is skipped
-		if (doc.ispartial)
-			return;
+	var prepare = function(doc) {
 
 		var key = (doc.language ? doc.language + ':' : '') + doc.url;
 
@@ -446,7 +437,10 @@ function refresh() {
 		}
 	};
 
-	DB('pages').all(prepare, function() {
+	builder.find(DB('pages'), function(err, docs) {
+
+		for (var i = 0, length = docs.length; i < length; i++)
+			prepare(docs[i]);
 
 		// Pairs parents by URL
 		Object.keys(sitemap).forEach(function(key) {
@@ -551,4 +545,4 @@ F.middleware('page', function(req, res, next, options, controller) {
 	});
 });
 
-// setTimeout(refresh, 1000);
+F.on('database', refresh);

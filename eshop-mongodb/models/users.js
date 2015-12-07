@@ -31,20 +31,16 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('name', 'String(50)', true);
 	schema.define('email', 'String(200)');
 	schema.define('gender', 'String(20)');
+	schema.define('isblocked', Boolean);
 	schema.define('datecreated', Date);
 
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
-
 		// options.id {String}
-
-		var filter = function(doc) {
-			if (options.id && doc.id !== options.id)
-				return;
-			return doc;
-		};
-
-		DB('users').one(filter, function(err, doc) {
+		var builder = new MongoBuilder();
+		builder.where('id', options.id);
+		builder.where('isremoved', false);
+		builder.findOne(DB('users'), function(err, doc) {
 			if (doc)
 				return callback(doc);
 			error.push('error-404-user');
@@ -54,17 +50,14 @@ NEWSCHEMA('User').make(function(schema) {
 
 	schema.setSave(function(error, model, options, callback) {
 
-		if (model.datecreated)
-			model.datecreated = model.datecreated.format();
+		model.dateupdated = new Date();
 
-		var updater = function(doc) {
-			if (doc.id !== model.id)
-				return doc;
-			return model.$clean();
-		};
+		var builder = new MongoBuilder();
+		builder.where('id', model.id);
+		builder.set('isremoved', false);
+		builder.set(model);
 
-		// Update order in database
-		DB('users').update(updater, function() {
+		builder.updateOne(DB('users'), function() {
 			// Returns response
 			callback(SUCCESS(true));
 		});
@@ -72,21 +65,17 @@ NEWSCHEMA('User').make(function(schema) {
 
 	// Removes user from DB
 	schema.setRemove(function(error, id, callback) {
-
-		// Filter for removing
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			return null;
-		};
-
-		// Updates database file
-		DB('users').update(updater, callback);
+		var builder = new MongoBuilder();
+		builder.where('id', id);
+		builder.where('isremoved', false);
+		builder.set('isremoved', true);
+		builder.removeOne(DB('users'), callback);
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		DB('users').clear(NOOP);
+		var builder = new MongoBuilder();
+		builder.remove(DB('users'), F.error());
 		callback(SUCCESS(true));
 	});
 
@@ -120,31 +109,19 @@ NEWSCHEMA('User').make(function(schema) {
 		if (options.search)
 			options.search = options.search.toSearch();
 
-		// Filter for reading
-		var filter = function(doc) {
-			// Searchs in "title"
-			if (options.search) {
-				if (doc.name.toSearch().indexOf(options.search) === -1)
-					return;
-			}
+		var builder = new MongoBuilder();
 
-			return doc;
-		};
+		builder.where('isremoved', false);
 
-		// Sorting documents
-		var sorting = function(a, b) {
-			if (new Date(a.datecreated) > new Date(b.datecreated))
-				return -1;
-			return 1;
-		};
+		if (options.search)
+			builder.like('search', options.search);
 
-		DB('users').sort(filter, sorting, function(err, docs, count) {
+		builder.sort('_id', true);
+		builder.findCount(DB('users'), function(err, docs, count) {
 			var data = {};
 
 			data.count = count;
 			data.items = docs;
-
-			// Gets page count
 			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
 
 			if (data.pages === 0)
@@ -164,14 +141,16 @@ NEWSCHEMA('User').make(function(schema) {
 		// options.type
 
 		var id = 'id' + options.type;
+		var builder = new MongoBuilder();
 
-		var filter = function(doc) {
-			if (doc[id] === options.profile[id] || (doc.email && options.profile.email && doc.email === options.profile.email))
-				return doc;
-			return;
-		};
+		builder.where('isremoved', false);
 
-		DB('users').one(filter, function(err, doc) {
+		var or = builder.or();
+		or.where(id, options.profile[id]);
+		or.where('email', options.profile.email);
+		or.end();
+
+		builder.findOne(DB('users'), function(err, doc) {
 
 			if (!doc) {
 
@@ -181,20 +160,28 @@ NEWSCHEMA('User').make(function(schema) {
 				doc.email = options.profile.email;
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
+				doc.isremoved = false;
 				doc[id] = options.profile[id];
-				DB('users').insert(doc.$clean(), F.error());
+
+				builder = new MongoBuilder();
+				builder.set(doc);
+				builder.insert(DB('users'), F.error());
 
 				// Writes stats
 				MODULE('webcounter').increment('users');
 
 			} else {
 				if (doc[id] !== options.profile[id]) {
-					DB('users').update(function(user) {
-						if (user.id === doc.id)
-							user[id] = options.profile[id];
-						return user;
-					});
+					var builder = new MongoBuilder();
+					builder.where('id', doc.id);
+					builder.set(id, options.profile[id]);
+					builder.updateOne(DB('users'), F.error());
 				}
+			}
+
+			if (doc.isblocked) {
+				error.push('error-user-blocked');
+				return callback();
 			}
 
 			exports.login(options.controller.req, options.controller.res, doc.id);
@@ -241,6 +228,11 @@ F.onAuthorization = function(req, res, flags, callback) {
 	GETSCHEMA('User').get(user, function(err, response) {
 
 		if (err || !response) {
+			callback(false);
+			return;
+		}
+
+		if (response.isblocked) {
 			callback(false);
 			return;
 		}

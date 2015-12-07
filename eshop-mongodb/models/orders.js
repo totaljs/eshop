@@ -69,53 +69,38 @@ NEWSCHEMA('Order').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var type = U.parseInt(options.type);
 
-		// Filtering documents
-		var filter = function(doc) {
+		var builder = new MongoBuilder();
 
-			// Uncompleted
-			if (type === 1 && doc.iscompleted)
-				return;
+		builder.where('isremoved', false);
 
-			// Uncompleted and not paid
-			if (type === 2 && (doc.iscompleted || doc.ispaid))
-				return;
+		if (type === 1)
+			builder.where('iscompleted', false); // uncompleted
+		else if (type === 2)
+			builder.or().where('iscompleted', false).where('ispaid', false).end(); // uncompleted and not paid
+		else if (type === 3)
+			builder.or().where('iscompleted', false).where('ispaid', true).end(); // uncompleted and paid
+		else if (type === 4)
+			builder.where('iscompleted', true); // completed
 
-			// Uncompleted and paid
-			if (type === 3 && (doc.iscompleted || !doc.ispaid))
-				return;
+		if (options.delivery)
+			builder.where('delivery', delivery); // by delivery
 
-			// Completed
-			if (type === 4 && !doc.iscompleted)
-				return;
+		if (options.search)
+			builder.like('search', options.search);
 
-			// Delivery
-			if (options.delivery && doc.delivery !== delivery)
-				return;
+		if (options.iduser)
+			builder.where('iduser', options.iduser);
 
-			// Search
-			if (options.search && (doc.id + ' ' + doc.firstname + ' ' + doc.lastname).toSearch().indexOf(options.search) === -1)
-				return;
+		builder.sort('_id', true);
+		builder.take(take);
+		builder.skip(skip);
 
-			if (options.iduser && options.iduser !== doc.iduser)
-				return;
+		builder.findCount(DB('orders'), function(err, docs, count) {
 
-			return doc;
-		};
-
-		// Sorting documents
-		var sorting = function(a, b) {
-			if (new Date(a.datecreated) > new Date(b.datecreated))
-				return -1;
-			return 1;
-		};
-
-		DB('orders').sort(filter, sorting, function(err, docs, count) {
 			var data = {};
 
 			data.count = count;
 			data.items = docs;
-
-			// Gets page count
 			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
 
 			if (data.pages === 0)
@@ -126,7 +111,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			// Returns data
 			callback(data);
 
-		}, skip, take);
+		});
 	});
 
 	// Creates order
@@ -144,6 +129,8 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.id = U.GUID(8);
 		model.price = price;
 		model.count = count;
+		model.isremoved = false;
+		model.search = (model.id + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).toSearch();
 
 		if (model.isnewsletter) {
 			var newsletter = GETSCHEMA('Newsletter').create();
@@ -157,8 +144,12 @@ NEWSCHEMA('Order').make(function(schema) {
 		delete model.isterms;
 		delete model.isemail;
 
+		var builder = new MongoBuilder();
+
+		builder.set(model.$clean());
+
 		// Inserts order into the database
-		DB('orders').insert(model);
+		builder.insert(DB('orders'), F.error());
 
 		// Returns response with order id
 		callback(SUCCESS(true, model.id));
@@ -173,16 +164,11 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Gets a specific order
 	schema.setGet(function(error, model, options, callback) {
-
 		// options.id {String}
-
-		var filter = function(doc) {
-			if (options.id && doc.id !== options.id)
-				return;
-			return doc;
-		};
-
-		DB('orders').one(filter, function(err, doc) {
+		var builder = new MongoBuilder();
+		builder.where('id', options.id);
+		builder.where('isremoved', false);
+		builder.findOne(DB('order'), function(err, doc) {
 			if (doc)
 				return callback(doc);
 			error.push('error-404-order');
@@ -200,27 +186,21 @@ NEWSCHEMA('Order').make(function(schema) {
 		delete model.isterms;
 		delete model.isemail;
 
-		if (model.datecompleted)
-			model.datecompleted = model.datecompleted.format();
-		else if (model.iscompleted && !model.datecompleted)
-			model.datecompleted = (new Date()).format();
+		model.search = (model.id + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).toSearch();
+		model.isremoved = false;
 
-		if (model.datecreated)
-			model.datecreated = model.datecreated.format();
+		if (model.iscompleted && !model.datecompleted)
+			model.datecompleted = new Date();
 
 		if (model.ispaid && !model.datepaid)
-			model.datepaid = (new Date()).format();
+			model.datepaid = new Date();
 
-		var updater = function(doc) {
-			if (doc.id !== model.id)
-				return doc;
-			doc.datebackuped = new Date().format();
-			DB('orders_backup').insert(doc);
-			return model.$clean();
-		};
+		var builder = new MongoBuilder();
+		builder.set(model.$clean());
+		builder.where('id', model.id);
 
 		// Update order in database
-		DB('orders').update(updater, function() {
+		builder.updateOne(DB('orders'), function() {
 			// Returns response
 			callback(SUCCESS(true));
 		});
@@ -235,21 +215,17 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Removes order from DB
 	schema.setRemove(function(error, id, callback) {
-
-		// Filter for removing
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			return null;
-		};
-
-		// Updates database file
-		DB('orders').update(updater, callback);
+		var builder = new MongoBuilder();
+		builder.where('id', id);
+		builder.where('isremoved', false);
+		builder.set('isremoved', true);
+		builder.updateOne(DB('orders'), callback);
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		DB('orders').clear(NOOP);
+		var builder = MongoBuilder();
+		builder.remove(DB('orders'), F.error());
 		callback(SUCCESS(true));
 	});
 
@@ -262,6 +238,19 @@ NEWSCHEMA('Order').make(function(schema) {
 		stats.completed_price = 0;
 		stats.pending = 0;
 		stats.pending_price = 0;
+
+		callback(stats);
+		return;
+
+		var pending = [];
+
+		pending.push(function(next) {
+			var builder = new MongoBuilder();
+			builder.where('iscompleted', true);
+			builder.group('_id.price.price', 'count.$sum.$price');
+		});
+
+		// @TODO: complete dashboard with orders
 
 		var prepare = function(doc) {
 
@@ -285,18 +274,13 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Sets the payment status to paid
 	schema.addWorkflow('paid', function(error, model, id, callback) {
-
-		// Filter for update
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			doc.ispaid = true;
-			doc.datepaid = (new Date()).format();
-			return doc;
-		};
-
-		// Updates database file
-		DB('orders').update(updater, callback);
+		var builder = new MongoBuilder();
+		builder.where('id', id);
+		builder.where('isremoved', false);
+		builder.where('ispaid', false);
+		builder.set('ispaid', true);
+		builder.set('datepaid', new Date());
+		builder.updateOne(DB('orders'), callback);
 	});
 
 });

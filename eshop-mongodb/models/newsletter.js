@@ -1,6 +1,3 @@
-var Fs = require('fs');
-var filename = F.path.databases('newsletter.csv');
-
 NEWSCHEMA('Newsletter').make(function(schema) {
 
 	schema.define('email', 'String(200)', true);
@@ -13,7 +10,9 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 		var builder = new MongoBuilder();
 
 		model.datecreated = new Date();
-		builder.set(model.$clean());
+		builder.where('email', model.email);
+
+		builder.set(model);
 		builder.insert(DB('newsletter'));
 
 		// Writes stats
@@ -25,25 +24,39 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
-		Fs.readFile(filename, function(err, buffer) {
-			if (err)
-				buffer = '';
-			else if (buffer)
-				buffer = buffer.toString('utf8');
+		var builder = new MongoBuilder();
+		builder.find(DB('newsletter'), function(err, docs) {
+			var buffer = '';
+			for (var i = 0, length = docs.length; i < length; i++) {
+				var doc = docs[i];
+				buffer += doc.email + ';' + doc.ip + ';' + doc.language + ';' + doc.datecreated.format('yyyy-MM-dd') + '\n';
+			}
 			callback(buffer);
 		});
 	});
 
 	// Performs download
 	schema.addWorkflow('download', function(error, model, controller, callback) {
-		// Returns CSV
-		controller.file('~' + filename, 'newsletter.csv');
-		callback();
+		var builder = new MongoBuilder();
+		builder.find(DB('newsletter'), function(err, docs) {
+			var buffer = '';
+			for (var i = 0, length = docs.length; i < length; i++) {
+				var doc = docs[i];
+				buffer += doc.email + ';' + doc.ip + ';' + doc.language + ';' + doc.datecreated.format('yyyy-MM-dd') + '\n';
+			}
+
+			// Returns CSV
+			controller.binary(new Buffer(buffer, 'utf8'), 'text/csv', 'utf8', 'newsletter.csv');
+			callback();
+
+		});
+
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		Fs.unlink(filename, NOOP);
+		var builder = new MongoBuilder();
+		builder.remove(DB('newsletter'), F.error());
 		callback(SUCCESS(true));
 	});
 });

@@ -5,3 +5,4 @@ error-404-order                  : Order not found.
 error-404-widget                 : Widget not found.
 error-404-user                   : User not found.
 error-501                        : Not implemented.
+error-user-blocked               : Sorry, you have ban.

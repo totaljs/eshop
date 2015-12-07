@@ -61,7 +61,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			builder.in('id', options.id);
 
 		if (options.skip)
-			builder.where('id', '<>', doc.id);
+			builder.where('id', '<>', options.id);
 
 		builder.limit(take);
 		builder.skip(skip);
@@ -71,7 +71,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		else
 			builder.sort('_id', false);
 
-		builder.findArrayCount(DB('products'), function(err, docs, count) {
+		builder.findCount(DB('products'), function(err, docs, count) {
 
 			var data = {};
 			data.count = count;
@@ -105,6 +105,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		var category = prepare_subcategories(model.category);
 		model.category = category.name;
 		model.linker_category = category.linker;
+		model.isremoved = false;
 
 		var builder = new MongoBuilder();
 		var cb = function(err, response) {
@@ -114,8 +115,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			setTimeout(refresh, 1000);
 		};
 
-		builder.set(model.$clean());
-		builder.set('isremoved', false);
+		builder.set(model);
 
 		if (isnew)
 			builder.insert(DB('products'), cb);
@@ -410,4 +410,4 @@ function prepare_subcategories(name) {
 	return { linker: builder_link.join('/'), name: builder_text.join(' / ') };
 }
 
-setTimeout(refresh, 2000);
+F.on('database', refresh);

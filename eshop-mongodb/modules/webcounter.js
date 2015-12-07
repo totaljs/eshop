@@ -6,10 +6,8 @@
 var COOKIE = '__webcounter';
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows.?Phone/i;
 var REG_ROBOT = /bot|crawler/i;
-var FILE_CACHE = 'webcounter.cache';
-var FILE_STATS = 'webcounter.nosql';
 
-var Fs = require('fs');
+require('mongodb-addons');
 
 function WebCounter() {
 	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0 };
@@ -44,7 +42,11 @@ function WebCounter() {
 		return (req.query['utm_medium'] || '').length > 0 || (req.query['utm_source'] || '').length > 0;
 	};
 
-	this.load();
+	var self = this;
+
+	F.on('database', function() {
+		self.load();
+	});
 
 	// every 45 seconds
 	this.intervalClean = setInterval(this.clean.bind(this), 1000 * 45);
@@ -133,7 +135,7 @@ WebCounter.prototype.increment = function(type) {
 
 	var self = this;
 
-	if (typeof(self.stats[type]) === 'undefined')
+	if (self.stats[type] === undefined)
 		self.stats[type] = 1;
 	else
 		self.stats[type]++;
@@ -261,10 +263,13 @@ WebCounter.prototype.counter = function(req, res) {
  */
 WebCounter.prototype.save = function() {
 	var self = this;
-	var filename = framework.path.databases(FILE_CACHE);
-	var stats = Utils.copy(self.stats);
-	stats.pages = stats.hits > 0 && stats.count > 0 ? (stats.hits / stats.count).floor(2) : 0;
-	Fs.writeFile(filename, JSON.stringify(stats), utils.noop);
+	var id = (F.id === null ? '0' : F.id.toString()) + '-cache';
+	self.stats.pages = self.stats.hits > 0 && self.stats.count > 0 ? (self.stats.hits / self.stats.count).floor(2) : 0;
+	var builder = new MongoBuilder();
+	builder.set(self.stats);
+	builder.set('_id', id);
+	builder.save(DB('webcounter'));
+	delete self.stats.pages;
 	return self;
 };
 
@@ -273,22 +278,14 @@ WebCounter.prototype.save = function() {
  * @return {Module]
  */
 WebCounter.prototype.load = function() {
-
 	var self = this;
-	var filename = framework.path.databases(FILE_CACHE);
-
-	Fs.readFile(filename, function(err, data) {
-
-		if (err)
-			return;
-
-		try
-		{
-			self.stats = utils.copy(JSON.parse(data.toString('utf8')));
-		} catch (ex) {}
-
+	var id = (F.id === null ? '0' : F.id.toString()) + '-cache';
+	var builder = new MongoBuilder();
+	builder.where('_id', id);
+	builder.findOne(DB('webcounter'), function(err, data) {
+		if (data)
+			self.stats = data;
 	});
-
 	return self;
 };
 
@@ -298,8 +295,16 @@ WebCounter.prototype.load = function() {
  */
 WebCounter.prototype.append = function() {
 	var self = this;
-	var filename = framework.path.databases(FILE_STATS);
-	Fs.appendFile(filename, JSON.stringify(self.stats) + '\n', utils.noop);
+	var builder = new MongoBuilder();
+	var id = (self.stats.year + '' + self.stats.month.padLeft(2) + '' + self.stats.day.padLeft(2)).parseInt();
+	builder.inc(self.stats);
+	builder.where('_id', id);
+	builder.updateOne(DB('webcounter'), function(err, response) {
+		if (response)
+			return;
+		builder.set('_id', id);
+		builder.insert(DB('webcounter'), F.error());
+	});
 	return self;
 };
 
@@ -310,27 +315,7 @@ WebCounter.prototype.append = function() {
  */
 WebCounter.prototype.daily = function(callback) {
 	var self = this;
-	self.statistics(function(arr) {
-
-		var length = arr.length;
-		var output = [];
-
-		for (var i = 0; i < length; i++) {
-
-			var value = arr[i] || '';
-
-			if (value.length === 0)
-				continue;
-
-			try
-			{
-				output.push(JSON.parse(value));
-			} catch (ex) {}
-		}
-
-		callback(output);
-	});
-
+	self.statistics(callback);
 	return self;
 };
 
@@ -340,36 +325,19 @@ WebCounter.prototype.daily = function(callback) {
  * @return {Module]
  */
 WebCounter.prototype.monthly = function(callback) {
-
 	var self = this;
 	self.statistics(function(arr) {
-
-		var length = arr.length;
 		var stats = {};
-
-		for (var i = 0; i < length; i++) {
-
-			var value = arr[i] || '';
-
-			if (value.length === 0)
-				continue;
-
-			try
-			{
-				var current = JSON.parse(value);
-				var key = current.month + '-' + current.year;
-
-				if (!stats[key])
-					stats[key] = current;
-				else
-					sum(stats[key], current);
-
-			} catch (ex) {}
+		for (var i = 0, length = arr.length; i < length; i++) {
+			var current = arr[i];
+			var key = current.month + '-' + current.year;
+			if (!stats[key])
+				stats[key] = current;
+			else
+				sum(stats[key], current);
 		}
-
 		callback(stats);
 	});
-
 	return self;
 };
 
@@ -379,66 +347,34 @@ WebCounter.prototype.monthly = function(callback) {
  * @return {Module]
  */
 WebCounter.prototype.yearly = function(callback) {
-
 	var self = this;
 	self.statistics(function(arr) {
-
 		var stats = {};
-		var length = arr.length;
-
-		for (var i = 0; i < length; i++) {
-
-			var value = arr[i] || '';
-
-			if (value.length === 0)
-				continue;
-
-			try
-			{
-				var current = JSON.parse(value);
-				var key = current.year.toString();
-
-				if (!stats[key])
-					stats[key] = current;
-				else
-					sum(stats[key], current);
-
-			} catch (ex) {}
+		for (var i = 0, length = arr.length; i < length; i++) {
+			var current = arr[i];
+			var key = current.year.toString();
+			if (!stats[key])
+				stats[key] = current;
+			else
+				sum(stats[key], current);
 		}
-
 		callback(stats);
 	});
-
 	return self;
 };
 
 /**
- * Read stats from the file
+ * Read stats from DB
  * @param {Function(stats)} callback
  * @return {Module]
  */
 WebCounter.prototype.statistics = function(callback) {
-
 	var self = this;
-	var filename = framework.path.databases(FILE_STATS);
-	var stream = Fs.createReadStream(filename);
-	var data = '';
-	var stats = {};
-
-	stream.on('error', function() {
-		callback([]);
+	var builder = new MongoBuilder();
+	builder.where('_id', '>', 0);
+	builder.find(DB('webcounter'), function(err, response) {
+		callback(response);
 	});
-
-	stream.on('data', function(chunk) {
-		data += chunk.toString();
-	});
-
-	stream.on('end', function() {
-		callback(data.split('\n'));
-	});
-
-	stream.resume();
-
 	return self;
 };
 
@@ -495,10 +431,11 @@ function getReferer(host) {
 }
 
 // Instance
-var webcounter = new WebCounter();
+var webcounter = new WebCounter()
 
 var delegate_request = function(controller, name) {
 	webcounter.counter(controller.req, controller.res);
+	module.exports.instance = webcounter;
 };
 
 module.exports.name = 'webcounter';

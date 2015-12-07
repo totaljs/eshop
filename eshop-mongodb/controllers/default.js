@@ -63,15 +63,16 @@ function file_read(req, res, is) {
 	if (!req.query.s || (req.extension !== 'jpg' && req.extension !== 'gif' && req.extension !== 'png')) {
 		// Reads specific file by ID
 		F.exists(req, res, function(next, filename) {
-			DB('files').binary.read(id, function(err, stream, header) {
-				if (err)
+			GridStore.readFile(DB(), ObjectID.parse(id), function(err, fs, close) {
+				if (err) {
+					next();
 					return res.throw404();
-				var writer = require('fs').createWriteStream(filename);
-				CLEANUP(writer, function() {
+				}
+
+				fs.stream(true).on('end', function() {
 					F.responseFile(req, res, filename);
 					next();
-				});
-				stream.pipe(writer);
+				}).pipe(require('fs').createWriteStream(filename));
 			});
 		});
 		return;
@@ -87,18 +88,15 @@ function file_read(req, res, is) {
 	// Below method checks if the file exists (processed) in temporary directory
 	// More information in total.js documentation
 	F.exists(req, res, 10, function(next, filename) {
-
 		// Reads specific file by ID
-		DB('files').binary.read(id, function(err, stream, header) {
+		GridStore.readFile(DB(), ObjectID.parse(id), function(err, fs, close) {
 
 			if (err) {
 				next();
 				return res.throw404();
 			}
 
-			var writer = require('fs').createWriteStream(filename);
-			stream.pipe(writer);
-			stream.on('end', function() {
+			fs.stream(true).on('end', function() {
 
 				// Image processing
 				F.responseImage(req, res, filename, function(image) {
@@ -111,7 +109,7 @@ function file_read(req, res, is) {
 
 				// Releases F.exists()
 				next();
-			});
+			}).pipe(require('fs').createWriteStream(filename));
 		});
 	});
 }
@@ -126,18 +124,14 @@ function file_image(req, res, is) {
 	// Below method checks if the file exists (processed) in temporary directory
 	// More information in total.js documentation
 	F.exists(req, res, 10, function(next, filename) {
-
-		// Reads specific file by ID
-		DB('files').binary.read(req.path[2].replace('.jpg', ''), function(err, stream, header) {
+		GridStore.readFile(DB(), ObjectID.parse(req.path[2].replace('.jpg', '')), function(err, fs, close) {
 
 			if (err) {
 				next();
 				return res.throw404();
 			}
 
-			var writer = require('fs').createWriteStream(filename);
-			stream.pipe(writer);
-			stream.on('end', function() {
+			fs.stream(true).on('end', function() {
 
 				// Image processing
 				F.responseImage(req, res, filename, function(image) {
@@ -154,7 +148,7 @@ function file_image(req, res, is) {
 
 				// Releases F.exists()
 				next();
-			});
+			}).pipe(require('fs').createWriteStream(filename));
 		});
 	});
 }

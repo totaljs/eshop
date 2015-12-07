@@ -19,7 +19,7 @@ NEWSCHEMA('Contact').make(function(schema) {
 
 		var builder = new MongoBuilder();
 
-		builder.set(model.$clean());
+		builder.set(model);
 		builder.insert(DB('contactforms'));
 
 		// Returns response

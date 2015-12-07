@@ -1,15 +1,14 @@
-var MC = require('mongodb').MongoClient;
-var DB = null;
-var Addons = require('mongodb-addons');
+var db = null;
 
-MC.connect(CONFIG('database'), function(err, db) {
+require('mongobuilder').init(CONFIG('database'), function(err, instance) {
 	if (err)
 		F.error(err);
-	DB = db;
+	db = instance;
+	F.emit('database');
 });
 
 F.database = function(collection) {
 	if (collection)
-		return DB.collection(collection);
-	return DB;
+		return db.collection(collection);
+	return db;
 };
