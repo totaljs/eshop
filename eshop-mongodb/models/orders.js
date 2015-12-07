@@ -58,10 +58,6 @@ NEWSCHEMA('Order').make(function(schema) {
 		options.page = U.parseInt(options.page) - 1;
 		options.max = U.parseInt(options.max, 20);
 
-		// Prepares searching
-		if (options.search)
-			options.search = options.search.toSearch();
-
 		if (options.page < 0)
 			options.page = 0;
 
@@ -86,7 +82,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			builder.where('delivery', delivery); // by delivery
 
 		if (options.search)
-			builder.like('search', options.search);
+			builder.in('search', options.search.keywords(true, true));
 
 		if (options.iduser)
 			builder.where('iduser', options.iduser);
@@ -130,7 +126,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.price = price;
 		model.count = count;
 		model.isremoved = false;
-		model.search = (model.id + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).toSearch();
+		model.search = (model.id + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true);
 
 		if (model.isnewsletter) {
 			var newsletter = GETSCHEMA('Newsletter').create();
@@ -186,7 +182,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		delete model.isterms;
 		delete model.isemail;
 
-		model.search = (model.id + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).toSearch();
+		model.search = (model.id + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true);
 		model.isremoved = false;
 
 		if (model.iscompleted && !model.datecompleted)

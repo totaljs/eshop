@@ -38,8 +38,6 @@ NEWSCHEMA('Product').make(function(schema) {
 			options.id = options.id.split(',');
 
 		var search;
-		if (options.search)
-			search = options.search.toSearch();
 
 		if (options.page < 0)
 			options.page = 0;
@@ -48,20 +46,22 @@ NEWSCHEMA('Product').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var builder = new MongoBuilder();
 
+		builder.where('isremoved', false);
+
 		if (options.category)
 			builder.regex('linker_category', new RegExp('^' + options.category));
 
 		if (options.manufacturer)
 			builder.where('manufacturer', options.manufacturer);
 
-		// @TODO: make search
-		// if (options.search)
+		if (options.search)
+			builder.in('search', options.search.keywords(true, true));
 
 		if (options.id)
 			builder.in('id', options.id);
 
 		if (options.skip)
-			builder.where('id', '<>', options.id);
+			builder.where('id', '<>', options.skip);
 
 		builder.limit(take);
 		builder.skip(skip);
@@ -101,6 +101,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
 		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
+		model.search = (model.name + ' ' + model.manufacturer + ' ' + model.category).keywords(true, true);
 
 		var category = prepare_subcategories(model.category);
 		model.category = category.name;
@@ -119,8 +120,10 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		if (isnew)
 			builder.insert(DB('products'), cb);
-		else
+		else {
+			builder.where('id', model.id);
 			builder.updateOne(DB('products'), cb);
+		}
 	});
 
 	// Gets a specific product

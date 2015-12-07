@@ -51,6 +51,7 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.setSave(function(error, model, options, callback) {
 
 		model.dateupdated = new Date();
+		model.search = (model.name + ' ' + model.email).keywords(true, true);
 
 		var builder = new MongoBuilder();
 		builder.where('id', model.id);
@@ -104,17 +105,12 @@ NEWSCHEMA('User').make(function(schema) {
 
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
-
-		// Prepares searching
-		if (options.search)
-			options.search = options.search.toSearch();
-
 		var builder = new MongoBuilder();
 
 		builder.where('isremoved', false);
 
 		if (options.search)
-			builder.like('search', options.search);
+			builder.in('search', options.search.keywords(true, true));
 
 		builder.sort('_id', true);
 		builder.findCount(DB('users'), function(err, docs, count) {
@@ -161,6 +157,7 @@ NEWSCHEMA('User').make(function(schema) {
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
 				doc.isremoved = false;
+				doc.search = (doc.name + ' ' + doc.email).keywords(true, true);
 				doc[id] = options.profile[id];
 
 				builder = new MongoBuilder();

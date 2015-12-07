@@ -56,14 +56,6 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
-
-		// Prepares searching
-		if (typeof(options.search) === 'string')
-			options.search = options.search ? options.search.toSearch().split(' ') : [];
-
-		if (options.search)
-			options.search_length = options.search.length;
-
 		var builder = new MongoBuilder();
 
 		builder.where('isremoved', false);
@@ -81,12 +73,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			builder.in('navigations', options.navigation);
 
 		if (options.search) {
-			/*
-			for (var i = 0; i < options.search_length; i++) {
-				if (doc.search.indexOf(options.search[i]) === -1)
-					return;
-			}*/
-			builder.like('search', options.search.join(' '));
+			builder.in('search', options.search.keywords(true, true));
 		}
 
 		builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
@@ -174,7 +161,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			model.dateupdated = new Date();
 
 		if (model.search)
-			model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).toSearch();
+			model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).keywords(true, true);
 
 		// Sanitizes URL
 		if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
