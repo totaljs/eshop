@@ -103,8 +103,6 @@ NEWSCHEMA('Page').make(function(schema) {
 
 			data.count = count;
 			data.items = docs;
-
-			// Gets page count
 			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
 
 			if (data.pages === 0)

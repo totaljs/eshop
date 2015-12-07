@@ -63,7 +63,7 @@ NEWSCHEMA('User').make(function(schema) {
 			return model.$clean();
 		};
 
-		// Update order in database
+		// Update user in database
 		DB('users').update(updater, function() {
 			// Returns response
 			callback(SUCCESS(true));
@@ -143,8 +143,6 @@ NEWSCHEMA('User').make(function(schema) {
 
 			data.count = count;
 			data.items = docs;
-
-			// Gets page count
 			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
 
 			if (data.pages === 0)
