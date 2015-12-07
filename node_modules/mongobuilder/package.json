@@ -1,0 +1,26 @@
+{
+    "author": {
+        "name": "Peter \u0160irka"
+    },
+    "contributors": [
+        "Peter \u0160irka <petersirka@gmail.com>"
+    ],
+    "description": "MongoDB add-ons",
+    "engines": {
+        "node": ">=0.8.0"
+    },
+    "keywords": [
+        "mongodb"
+    ],
+    "license": "MIT",
+    "main": "./index.js",
+    "name": "mongobuilder",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/petersirka/mongodb-addons.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "version": "1.0.0"
+}
