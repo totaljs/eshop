@@ -1,6 +1,3 @@
-var Fs = require('fs');
-var filename = F.path.databases('settings.json');
-
 NEWSCHEMA('SuperUser').make(function(schema) {
 
 	schema.define('login', String, true);
@@ -76,12 +73,10 @@ NEWSCHEMA('Settings').make(function(schema) {
 				break;
 		}
 
-		settings.datebackuped = new Date().format();
-		DB('settings_backup').insert(JSON.parse(JSON.stringify(settings)));
-		delete settings.datebackuped;
-
-		// Writes settings into the file
-		Fs.writeFile(filename, JSON.stringify(settings), function() {
+		var builder = new MongoBuilder();
+		builder.set(model);
+		builder.set('_id', 'settings');
+		builder.save(DB('common'), function() {
 			// Returns response
 			callback(SUCCESS(true));
 		});
@@ -89,11 +84,19 @@ NEWSCHEMA('Settings').make(function(schema) {
 
 	// Gets settings
 	schema.setGet(function(error, model, options, callback) {
-		Fs.readFile(filename, function(err, data) {
-			var settings = {};
-			if (!err)
-				settings = JSON.parse(data.toString('utf8'));
-			callback(settings);
+
+		var builder = new MongoBuilder();
+		builder.where('_id', 'settings');
+		builder.findOne(DB('common'), function(err, doc) {
+
+			if (!doc) {
+				model.currency = 'EUR';
+				model.currency_entity = '&euro;';
+				callback();
+				return;
+			}
+
+			callback(doc);
 		});
 	});
 
