@@ -17,10 +17,10 @@
     "name": "mongobuilder",
     "repository": {
         "type": "git",
-        "url": "https://github.com/petersirka/mongodb-addons.git"
+        "url": "https://github.com/petersirka/mongobuilder.git"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "version": "1.0.0"
+    "version": "1.1.0"
 }

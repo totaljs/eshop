@@ -378,17 +378,7 @@ MongoBuilder.prototype.set = function(name, model, skip) {
 		return self;
 	}
 
-	for (var m in name) {
-		if (m[0] === '$')
-			continue;
-		if (m === '_id')
-			continue;
-		var val = name[m];
-		if (typeof(val) === 'function')
-			continue;
-		self._upd.$set[m] = val;
-	}
-
+	extend(self._upd.$set, name, true);
 	return self;
 };
 
@@ -570,15 +560,7 @@ MongoBuilder.prototype.inc = function(name, model) {
 		return self;
 	}
 
-	for (var m in name) {
-		if (m === '_id' || m[0] === '$')
-			continue;
-		var val = name[m];
-		if (typeof(val) === 'function')
-			continue;
-		self._upd.$inc[m] = val;
-	}
-
+	extend(self._upd.$inc, name, true);
 	return self;
 };
 
@@ -1143,8 +1125,14 @@ MongoBuilder.prototype.getUpdate = function() {
 MongoBuilder.prototype.getInsert = function() {
 	var self = this;
 	var ins = {};
-	if (self._upd && self._upd.$set)
-		ins = self._upd.$set;
+
+	if (self._upd) {
+		if (self._upd.$inc)
+			extend(ins, self._upd.$inc, false);
+		if (self._upd.$set)
+			extend(ins, self._upd.$set, false);
+	}
+
 	if (!ins._id)
 		ins._id = new ObjectID();
 	if (self.onInsert)
@@ -1406,6 +1394,19 @@ function writeBuffer(db, id, buffer, name, meta, callback) {
 			grid = null;
 		});
 	});
+}
+
+function extend(target, source, id) {
+	for (var m in source) {
+		if (m[0] === '$')
+			continue;
+		if (id && m === '_id')
+			continue;
+		var val = source[m];
+		if (typeof(val) === 'function')
+			continue;
+		target[m] = val;
+	}
 }
 
 exports.init = function(options, callback) {
