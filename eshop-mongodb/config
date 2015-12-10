@@ -2,6 +2,8 @@ name                      : E-shop
 version                   : 3.1.0
 author                    : Peter Širka
 
+// IMPORTANT: PLEASE CREATE YOUR OWN DB on your server or on some MongoDB cloud.
+// DON'T CHANGE DATA
 database                  : mongodb://eshop:123456@ds061374.mongolab.com:61374/eshop
 
 // A relative URL address into the eshop management
@@ -24,4 +26,4 @@ mail.smtp                 : YOUR.SMTPSERVER.COM
 
 // Image convertor for resizing of pictures
 // Default image converter: im = ImageMagick, gm = GraphicsMagick
-default-image-converter   : im
+default-image-converter   : gm
