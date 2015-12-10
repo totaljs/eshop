@@ -164,7 +164,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		var builder = new MongoBuilder();
 		builder.where('id', options.id);
 		builder.where('isremoved', false);
-		builder.findOne(DB('order'), function(err, doc) {
+		builder.findOne(DB('orders'), function(err, doc) {
 			if (doc)
 				return callback(doc);
 			error.push('error-404-order');
@@ -235,35 +235,23 @@ NEWSCHEMA('Order').make(function(schema) {
 		stats.pending = 0;
 		stats.pending_price = 0;
 
-		callback(stats);
-		return;
+		var builder = new MongoBuilder();
+		builder.where('isremoved', false);
+		builder.group('_id.iscompleted', 'sum.$sum.price');
+		builder.group('_id.iscompleted', 'count.$sum.1');
+		builder.aggregate(DB('orders'), function(err, res) {
 
-		var pending = [];
-
-		pending.push(function(next) {
-			var builder = new MongoBuilder();
-			builder.where('iscompleted', true);
-			builder.group('_id.price.price', 'count.$sum.$price');
-		});
-
-		// @TODO: complete dashboard with orders
-
-		var prepare = function(doc) {
-
-			if (doc.iscompleted) {
-				stats.completed++;
-				stats.completed_price += doc.price;
-			} else {
-				stats.pending++;
-				stats.pending_price += doc.price;
+			for (var i = 0, length = res.length; i < length; i++) {
+				var agg = res[i];
+				if (agg._id) {
+					stats.completed = agg.count;
+					stats.completed_price = agg.sum;
+				} else {
+					stats.pending = agg.count;
+					stats.pending_price = agg.sum;
+				}
 			}
 
-			// Saves memory
-			return 0;
-		};
-
-		DB('orders').all(prepare, function(err) {
-			// Returns stats for dashboard
 			callback(stats);
 		});
 	});
