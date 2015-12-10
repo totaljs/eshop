@@ -11,7 +11,7 @@ Please do not change the code, just create a new issues. I solve all problems as
 
 - `cms` NoSQL embedded version
 - `eshop` NoSQL embedded version
-- `eshop-pg` PostgreSQL version
+- `eshop-postgresql` PostgreSQL version
 - `eshop-mongodb` MongoDB version
 
 ## What's new?
