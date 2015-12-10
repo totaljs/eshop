@@ -7,7 +7,7 @@ var COOKIE = '__webcounter';
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows.?Phone/i;
 var REG_ROBOT = /bot|crawler/i;
 
-require('mongodb-addons');
+require('mongobuilder');
 
 function WebCounter() {
 	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0 };
@@ -268,7 +268,7 @@ WebCounter.prototype.save = function() {
 	var builder = new MongoBuilder();
 	builder.set(self.stats);
 	builder.set('_id', id);
-	builder.save(DB('webcounter'));
+	builder.save(DB('stats'));
 	delete self.stats.pages;
 	return self;
 };
@@ -282,7 +282,8 @@ WebCounter.prototype.load = function() {
 	var id = (F.id === null ? '0' : F.id.toString()) + '-cache';
 	var builder = new MongoBuilder();
 	builder.where('_id', id);
-	builder.findOne(DB('webcounter'), function(err, data) {
+	builder.findOne(DB('stats'), function(err, data) {
+		F.error(err);
 		if (data)
 			self.stats = data;
 	});
@@ -299,11 +300,12 @@ WebCounter.prototype.append = function() {
 	var id = (self.stats.year + '' + self.stats.month.padLeft(2) + '' + self.stats.day.padLeft(2)).parseInt();
 	builder.inc(self.stats);
 	builder.where('_id', id);
-	builder.updateOne(DB('webcounter'), function(err, response) {
+	builder.updateOne(DB('stats'), function(err, response) {
+		F.error(err);
 		if (response)
 			return;
 		builder.set('_id', id);
-		builder.insert(DB('webcounter'), F.error());
+		builder.insert(DB('stats'), F.error());
 	});
 	return self;
 };
@@ -372,7 +374,7 @@ WebCounter.prototype.statistics = function(callback) {
 	var self = this;
 	var builder = new MongoBuilder();
 	builder.where('_id', '>', 0);
-	builder.find(DB('webcounter'), function(err, response) {
+	builder.find(DB('stats'), function(err, response) {
 		callback(response);
 	});
 	return self;
