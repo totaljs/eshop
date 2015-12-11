@@ -225,11 +225,29 @@ NEWSCHEMA('Product').make(function(schema) {
 		var category_old = prepare_subcategories(options.category_old);
 		var category_new = prepare_subcategories(options.category_new);
 
-		// @TODO: add replacement subcategories
-		sql.update('tbl_product').make(function(builder) {
-			builder.set('category', category_new.name);
-			builder.set('linker_category', category_new.linker);
-			builder.where('category', category_old.name);
+		sql.select('product', 'tbl_product').make(function(builder) {
+			builder.where('isremoved', false);
+
+			builder.scope(function() {
+				builder.query('SUBSTRING(linker_category, 0, ' + (category_old.linker.length + 2) + ')=' + builder.escape(category_old.linker + '/'));
+				builder.or();
+				builder.query('linker_category=' + builder.escape(category_old.linker));
+			});
+
+			builder.group('linker_category', 'category');
+			builder.fields('linker_category', 'category');
+		});
+
+		sql.prepare(function(error, response, resume) {
+			for (var i = 0, length = response.product.length; i < length; i++) {
+				var product = response.product[i];
+				sql.update('tbl_product').make(function(builder) {
+					builder.set('linker_category', product.linker_category.replace(category_old.linker, category_new.linker));
+					builder.set('category', product.category.replace(category_old.name, category_new.name));
+					builder.where('linker_category', product.linker_category);
+				});
+			}
+			resume();
 		});
 
 		sql.exec(function() {
