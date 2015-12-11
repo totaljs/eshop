@@ -222,7 +222,7 @@
 				if (!response.success)
 					return;
 				products_refresh(true);
-				products_refresh_codelists();
+				setTimeout(products_refresh_codelists, 2000);
 			});
 		});
 	});
@@ -257,10 +257,12 @@
 	ON('#products.category', function(component) {
 		component.submit = function(hide) {
 			RESET('products.category.*');
+			hide();
+			loading(true);
 			$.components.POST(managerurl + '/api/products/category/', products.category, function(response) {
+				loading(false);
 				setTimeout(function() {
-					hide();
-					products_refresh_codelists();
+					setTimeout(products_refresh_codelists, 2000);
 					products_refresh(true);
 					success();
 				}, 1000);
