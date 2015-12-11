@@ -37,8 +37,6 @@ NEWSCHEMA('Product').make(function(schema) {
 		if (options.id && typeof(options.id) === 'string')
 			options.id = options.id.split(',');
 
-		var search;
-
 		if (options.page < 0)
 			options.page = 0;
 
@@ -189,26 +187,31 @@ NEWSCHEMA('Product').make(function(schema) {
 		// options.category_old
 		// options.category_new
 
-		var is = false;
 		var category_old = prepare_subcategories(options.category_old);
 		var category_new = prepare_subcategories(options.category_new);
+		var updates = [];
 
-		var update = function(doc) {
+		var builder = new MongoBuilder();
+		builder.regex('linker_category', new RegExp('^' + category_old.linker));
+		builder.fields('linker_category', 'category');
 
-			if (doc.category.startsWith(category_old.name)) {
-				doc.category = doc.category.replace(category_old.name, category_new.name);
-				doc.linker_category = doc.linker_category.replace(category_old.linker, category_new.linker);
-				is = true;
+		builder.find(DB('products'), function(err, docs) {
+
+			for (var i = 0, length = docs.length; i < length; i++) {
+				var doc = docs[i];
+				updates.push({ _id: doc._id, category: doc.category.replace(category_old.name, category_new.name), linker_category: doc.linker_category.replace(category_old.linker, category_new.linker) });
 			}
 
-			return doc;
-		};
-
-		DB('products').update(update, function() {
-			// Refreshes internal information e.g. categories
-			if (is)
-				setTimeout(refresh, 1000);
-			callback(SUCCESS(true));
+			updates.wait(function(item, next) {
+				var builder = new MongoBuilder();
+				builder.where('_id', item._id);
+				builder.set(item);
+				builder.updateOne(DB('products'), next);
+			}, function() {
+				if (updates.length)
+					setTimeout(refresh, 100);
+				callback(SUCCESS(true));
+			});
 		});
 	});
 
