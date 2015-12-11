@@ -1,8 +1,6 @@
 exports.install = function() {
 	// CMS rendering through the 404
 	F.route('#404', view_page);
-	F.route('/test/');
-	// F.route('/', 'test');
 
 	// FILES
 	F.file('Files', file_read);
