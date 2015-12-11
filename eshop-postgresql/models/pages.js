@@ -59,7 +59,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		// Prepares searching
 		if (options.search)
-			options.search = options.search.toSearch();
+			options.search = options.search.keywords(true, true).join(' ');
 
 		var sql = DB();
 		var filter = sql.$;
@@ -235,7 +235,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		clean.navigations = clean.navigations.join(';');
 
 		if (clean.search)
-			clean.search = ((clean.title || '') + ' ' + (clean.keywords || '') + ' ' + clean.search).toSearch().max(2000);
+			clean.search = ((clean.title || '') + ' ' + (clean.keywords || '') + ' ' + clean.search).keywords(true, true).join(' ');
 
 		delete clean.settings;
 		delete clean.widgets;
