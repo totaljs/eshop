@@ -2,7 +2,7 @@
 
 Please do not change the code, just create a new issues. I solve all problems as soon as possible. Do you want special upgrades? Contact me <petersirka@gmail.com>.
 
-- Current version: `v3.0.0`
+- Current version: `v4.0.0`
 - [Documentation](http://docs.totaljs.com/eshop-cms/latest.html)
 
 ---
@@ -10,9 +10,11 @@ Please do not change the code, just create a new issues. I solve all problems as
 ## The source-code
 
 - `cms` NoSQL embedded version
+- `cms-templates` Different CMS templates (designs)
 - `eshop` NoSQL embedded version
 - `eshop-postgresql` PostgreSQL version
 - `eshop-mongodb` MongoDB version
+- `eshop-templates` Different eshop templates (designs)
 
 ## What's new?
 
