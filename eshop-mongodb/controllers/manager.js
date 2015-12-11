@@ -150,8 +150,22 @@ function redirect_logoff() {
 
 // Clears all uploaded files
 function json_files_clear() {
-	// @TODO: remove all files from GridFS
-	self.json(SUCCESS(true));
+	var async = [];
+	var self = this;
+
+	async.push(function(next) {
+		DB('fs.chunks').drop(F.error());
+		next();
+	});
+
+	async.push(function(next) {
+		DB('fs.files').drop(F.error());
+		next();
+	});
+
+	async.async(function() {
+		self.json(SUCCESS(true));
+	});
 }
 
 // ==========================================================================
