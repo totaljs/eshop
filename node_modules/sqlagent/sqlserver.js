@@ -465,9 +465,12 @@ SqlBuilder.prototype.group = function(names) {
 		for (var i = 0, length = names.length; i < length; i++)
 			names[i] = SqlBuilder.column(names[i], self._schema);
 		self._group = 'GROUP BY ' + names.join(',');
-	} else if (names)
-		self._group = 'GROUP BY ' + SqlBuilder.column(names, self._schema);
-	else
+	} else if (names) {
+		var arr = new Array(arguments.length);
+		for (var i = 0; i < arguments.length; i++)
+			arr[i] = SqlBuilder.column(arguments[i.toString()], self._schema);
+		self._group = 'GROUP BY ' + arr.join(',');
+	} else
 		delete self._group;
 
 	return self;

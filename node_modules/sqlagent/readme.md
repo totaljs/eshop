@@ -879,7 +879,8 @@ add a condition after SQL WHERE
 #### builder.group()
 
 ```plain
-builder.group(names)
+builder.group(name)
+builder.group(name1, name2, name3); // +v2.9.1
 ```
 creates a group by in SQL query
 
