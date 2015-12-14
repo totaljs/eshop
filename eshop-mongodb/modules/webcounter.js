@@ -4,7 +4,6 @@
  */
 
 var COOKIE = '__webcounter';
-var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows.?Phone/i;
 var REG_ROBOT = /bot|crawler/i;
 
 require('mongobuilder');
@@ -14,12 +13,11 @@ function WebCounter() {
 	this.online = 0;
 	this.arr = [0, 0];
 	this.interval = 0;
-	this.intervalClean = null;
 	this.current = 0;
 	this.last = 0;
 	this.lastvisit = null;
-	this.social = ['plus.url.google', 'plus.google', 'twitter', 'facebook', 'linkedin', 'tumblr', 'flickr', 'instagram'];
-	this.search = ['google', 'bing', 'yahoo', 'duckduckgo'];
+	this.social = ['plus.url.google', 'plus.google', 'twitter', 'facebook', 'linkedin', 'tumblr', 'flickr', 'instagram', 'vkontakte'];
+	this.search = ['google', 'bing', 'yahoo', 'duckduckgo', 'yandex'];
 	this.ip = [];
 	this.url = [];
 	this.allowXHR = true;
@@ -28,18 +26,16 @@ function WebCounter() {
 
 	this._onValid = function(req) {
 		var self = this;
-		var agent = req.headers['user-agent'] || '';
-		if (agent.length === 0)
+		var agent = req.headers['user-agent'];
+		if (!agent || req.headers['x-moz'] === 'prefetch')
 			return false;
-		if (req.headers['x-moz'] === 'prefetch')
-			return false;
-		if (self.onValid !== null && !self.onValid(req))
+		if (self.onValid && !self.onValid(req))
 			return false;
 		return agent.match(REG_ROBOT) === null;
 	};
 
 	this.isAdvert = function(req) {
-		return (req.query['utm_medium'] || '').length > 0 || (req.query['utm_source'] || '').length > 0;
+		return (req.query['utm_medium'] || req.query['utm_source']) ? true : false;
 	};
 
 	var self = this;
@@ -49,7 +45,7 @@ function WebCounter() {
 	});
 
 	// every 45 seconds
-	this.intervalClean = setInterval(this.clean.bind(this), 1000 * 45);
+	setInterval(this.clean.bind(this), 1000 * 45);
 }
 
 WebCounter.prototype = {
@@ -63,7 +59,7 @@ WebCounter.prototype = {
 		var self = this;
 		var stats = utils.copy(self.stats);
 		stats.last = self.lastvisit;
-		stats.pages = stats.hits > 0 && stats.count > 0 ? (stats.hits / stats.count).floor(2) : 0;
+		stats.pages = stats.hits && stats.count ? (stats.hits / stats.count).floor(2) : 0;
 		return stats;
 	}
 };
@@ -160,17 +156,17 @@ WebCounter.prototype.counter = function(req, res) {
 	if (req.method !== 'GET')
 		return false;
 
-	if ((req.headers['accept'] || '').length === 0 || (req.headers['accept-language'] || '').length === 0)
+	if (!req.headers['accept'] || !req.headers['accept-language'])
 		return false;
 
 	var arr = self.arr;
 	var user = req.cookie(COOKIE).parseInt();
 	var now = new Date();
 	var ticks = now.getTime();
-	var sum = user === 0 ? 1000 : (ticks - user) / 1000;
+	var sum = user ? (ticks - user) / 1000 : 1000;
 	var exists = sum < 91;
 	var stats = self.stats;
-	var referer = req.headers['x-referer'] || req.headers['referer'] || '';
+	var referer = req.headers['x-referer'] || req.headers['referer'];
 
 	stats.hits++;
 
@@ -181,7 +177,7 @@ WebCounter.prototype.counter = function(req, res) {
 
 	var isUnique = false;
 
-	if (user > 0) {
+	if (user) {
 
 		sum = Math.abs(self.current - user) / 1000;
 		if (sum < 101)
@@ -201,11 +197,10 @@ WebCounter.prototype.counter = function(req, res) {
 
 	if (isUnique) {
 		stats.unique++;
-		var agent = req.headers['user-agent'] || '';
-		if (agent.match(REG_MOBILE) === null)
-			stats.desktop++;
-		else
+		if (req.mobile)
 			stats.mobile++;
+		else
+			stats.desktop++;
 	}
 
 	arr[1]++;
@@ -230,8 +225,9 @@ WebCounter.prototype.counter = function(req, res) {
 
 	referer = getReferer(referer);
 
-	if (referer === null) {
+	if (!referer || (webcounter.hostname && referer.indexOf(webcounter.hostname) !== -1)) {
 		stats.direct++;
+		history.direct++;
 		return true;
 	}
 
@@ -264,7 +260,7 @@ WebCounter.prototype.counter = function(req, res) {
 WebCounter.prototype.save = function() {
 	var self = this;
 	var id = (F.id === null ? '0' : F.id.toString()) + '-cache';
-	self.stats.pages = self.stats.hits > 0 && self.stats.count > 0 ? (self.stats.hits / self.stats.count).floor(2) : 0;
+	self.stats.pages = self.stats.hits && self.stats.count ? (self.stats.hits / self.stats.count).floor(2) : 0;
 	var builder = new MongoBuilder();
 	builder.set(self.stats);
 	builder.set('_id', id);
@@ -388,7 +384,7 @@ WebCounter.prototype.statistics = function(callback) {
  */
 WebCounter.prototype.refreshURL = function(referer, req) {
 
-	if (referer.length === 0)
+	if (!referer)
 		return;
 
 	var self = this;
@@ -425,11 +421,10 @@ function sum(a, b) {
 }
 
 function getReferer(host) {
-	if (host.length === 0)
+	if (!host)
 		return null;
 	var index = host.indexOf('/') + 2;
-	host = host.substring(index, host.indexOf('/', index));
-	return host;
+	return host.substring(index, host.indexOf('/', index)).toLowerCase();
 }
 
 // Instance
@@ -445,6 +440,29 @@ module.exports.version = 'v3.0.0';
 module.exports.instance = webcounter;
 
 framework.on('controller', delegate_request);
+
+function refresh_hostname() {
+	var url;
+	if (F.config.custom)
+		url = F.config.custom;
+	if (!url)
+		url = F.config.url || F.config.hostname;
+	if (!url)
+		return;
+	url = url.toString().replace(/(http|https)\:\/\/(www\.)/gi, '');
+	var index = url.indexOf('/');
+	if (index !== -1)
+		url = url.substring(0, index);
+	webcounter.hostname = url.toLowerCase();
+}
+
+module.exports.install = function() {
+	setTimeout(refresh_hostname, 10000);
+	F.on('service', function(counter) {
+		if (counter % 120 === 0)
+			refresh_hostname();
+	});
+};
 
 module.exports.usage = function() {
 	var stats = utils.extend({}, webcounter.stats);
