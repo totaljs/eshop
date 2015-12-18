@@ -1,3 +1,6 @@
+// Online visitors counter
+PING('GET /api/ping/');
+
 COMPONENT('emaildecode', function() {
 	var self = this;
 	self.readonly();

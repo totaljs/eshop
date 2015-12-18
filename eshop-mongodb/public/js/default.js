@@ -1,3 +1,6 @@
+// Online visitors counter
+PING('GET /api/ping/');
+
 $(document).ready(function() {
 
 	if (window.localStorage) {
