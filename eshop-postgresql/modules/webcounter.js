@@ -170,8 +170,11 @@ WebCounter.prototype.counter = function(req, res) {
 		sum = Math.abs(self.current - user) / 1000;
 
 		// 20 minutes
-		if (sum < 1200)
+		if (sum < 1200) {
+			arr[1]++;
+			self.lastvisit = new Date();
 			return true;
+		}
 
 		var date = new Date(user);
 		if (date.getDate() !== now.getDate() || date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear()) {

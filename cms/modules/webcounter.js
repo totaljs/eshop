@@ -132,7 +132,7 @@ WebCounter.prototype.clean = function() {
  * Custom counter
  * @return {Module]
  */
-WebCounter.prototype.increment = function(type) {
+WebCounter.prototype.increment = WebCounter.prototype.inc = function(type) {
 
 	var self = this;
 
@@ -187,8 +187,11 @@ WebCounter.prototype.counter = function(req, res) {
 		sum = Math.abs(self.current - user) / 1000;
 
 		// 20 minutes
-		if (sum < 1200)
+		if (sum < 1200) {
+			arr[1]++;
+			self.lastvisit = new Date();
 			return true;
+		}
 
 		var date = new Date(user);
 		if (date.getDate() !== now.getDate() || date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear())
@@ -516,11 +519,7 @@ module.exports.install = function() {
 };
 
 function refresh_hostname() {
-	var url;
-	if (F.config.custom)
-		url = F.config.custom;
-	if (!url)
-		url = F.config.url || F.config.hostname;
+	var url = F.config.url || F.config.hostname;
 	if (!url)
 		return;
 	url = url.toString().replace(/(http|https)\:\/\/(www\.)/gi, '');
