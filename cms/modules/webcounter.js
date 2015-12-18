@@ -190,6 +190,7 @@ WebCounter.prototype.counter = function(req, res) {
 		if (sum < 1200) {
 			arr[1]++;
 			self.lastvisit = new Date();
+			res.cookie(COOKIE, ticks, now.add('5 days'));
 			return true;
 		}
 
