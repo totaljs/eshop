@@ -4,7 +4,7 @@
  */
 
 var COOKIE = '__webcounter';
-var REG_ROBOT = /bot|crawler/i;
+var REG_ROBOT = /search|agent|bot|crawler/i;
 
 function WebCounter() {
 	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0, orders: 0, newsletter: 0, contactforms: 0, users: 0, robots: 0 };
@@ -168,7 +168,9 @@ WebCounter.prototype.counter = function(req, res) {
 	var isUnique = false;
 	if (user) {
 		sum = Math.abs(self.current - user) / 1000;
-		if (sum < 91)
+
+		// 20 minutes
+		if (sum < 1200)
 			return true;
 
 		var date = new Date(user);

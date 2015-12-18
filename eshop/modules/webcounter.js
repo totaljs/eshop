@@ -4,7 +4,7 @@
  */
 
 var COOKIE = '__webcounter';
-var REG_ROBOT = /bot|crawler/i;
+var REG_ROBOT = /search|agent|bot|crawler/i;
 var FILE_CACHE = 'webcounter.cache';
 var FILE_STATS = 'webcounter.nosql';
 
@@ -185,7 +185,9 @@ WebCounter.prototype.counter = function(req, res) {
 	if (user) {
 
 		sum = Math.abs(self.current - user) / 1000;
-		if (sum < 101)
+
+		// 20 minutes
+		if (sum < 1200)
 			return true;
 
 		var date = new Date(user);
