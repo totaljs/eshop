@@ -2,12 +2,24 @@
 // This API uses the website
 
 exports.install = function() {
+	// COMMON
+	F.route('/api/ping/',        json_ping);
+
 	// NEWSLETTER
 	F.route('/api/newsletter/',  json_newsletter, ['post', '*Newsletter']);
 
 	// CONTACTFORM
 	F.route('/api/contact/',     json_contact, ['post', '*Contact']);
 };
+
+// ==========================================================================
+// COMMON
+// ==========================================================================
+
+function json_ping() {
+	var self = this;
+	self.plain('null');
+}
 
 // ==========================================================================
 // NEWSLETTER

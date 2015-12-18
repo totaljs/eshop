@@ -2,6 +2,9 @@
 // This API uses the website
 
 exports.install = function() {
+	// COMMON
+	F.route('/api/ping/',                 json_ping);
+
 	// ORDERS
 	F.route('/api/checkout/create/',      json_orders_create, ['post', '*Order']);
 	F.route('/api/checkout/{id}/',        json_orders_read);
@@ -17,6 +20,15 @@ exports.install = function() {
 	// CONTACTFORM
 	F.route('/api/contact/',              json_contact, ['post', '*Contact']);
 };
+
+// ==========================================================================
+// COMMON
+// ==========================================================================
+
+function json_ping() {
+	var self = this;
+	self.plain('null');
+}
 
 // ==========================================================================
 // PRODUCTS
