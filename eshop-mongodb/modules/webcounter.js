@@ -9,7 +9,7 @@ var REG_ROBOT = /bot|crawler/i;
 require('mongobuilder');
 
 function WebCounter() {
-	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0 };
+	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0, robots: 0 };
 	this.online = 0;
 	this.arr = [0, 0];
 	this.interval = 0;
@@ -29,9 +29,16 @@ function WebCounter() {
 		var agent = req.headers['user-agent'];
 		if (!agent || req.headers['x-moz'] === 'prefetch')
 			return false;
+
 		if (self.onValid && !self.onValid(req))
 			return false;
-		return agent.match(REG_ROBOT) === null;
+
+		if (agent.match(REG_ROBOT)) {
+			self.stats.robots++;
+			return false;
+		}
+
+		return true;
 	};
 
 	this.isAdvert = function(req) {
