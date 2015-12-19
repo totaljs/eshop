@@ -5,6 +5,7 @@
 
 var COOKIE = '__webcounter';
 var REG_ROBOT = /search|agent|bot|crawler/i;
+var TIMEOUT_VISITORS = 1200; // 20 MINUTES
 
 function WebCounter() {
 	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0, orders: 0, newsletter: 0, contactforms: 0, users: 0, robots: 0 };
@@ -156,11 +157,18 @@ WebCounter.prototype.counter = function(req, res) {
 	var stats = self.stats;
 	var history = self.history;
 	var referer = req.headers['x-referer'] || req.headers['referer'];
+	var ping = req.headers['x-ping'];
 
-	stats.hits++;
-	history.hits++;
+	if (user)
+		sum = Math.abs(self.current - user) / 1000;
 
-	self.track(referer, req);
+	var isHits = user ? sum >= TIMEOUT_VISITORS : true;
+
+	if (!ping || isHits) {
+		stats.hits++;
+		history.hits++;
+		self.track(referer, req);
+	}
 
 	if (exists)
 		return true;
@@ -170,7 +178,7 @@ WebCounter.prototype.counter = function(req, res) {
 		sum = Math.abs(self.current - user) / 1000;
 
 		// 20 minutes
-		if (sum < 1200) {
+		if (sum < TIMEOUT_VISITORS) {
 			arr[1]++;
 			self.lastvisit = new Date();
 			res.cookie(COOKIE, ticks, now.add('5 days'));
@@ -417,7 +425,7 @@ WebCounter.prototype.track = function(referer, req) {
 	for (var i = 0, length = self.ip.length; i < length; i++) {
 		var item = self.ip[i];
 		if (item.ip === req.ip && item.url === referer) {
-			item.url = req.uri.href;
+			item.url = req.headers['x-ping'] || req.uri.href;
 			return;
 		}
 	}
@@ -490,7 +498,7 @@ module.exports.install = function() {
 function refresh_hostname() {
 	var url;
 	if (F.config.custom)
-		url = F.config.custom;
+		url = F.config.custom.url;
 	if (!url)
 		url = F.config.url || F.config.hostname;
 	if (!url)

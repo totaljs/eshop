@@ -5,6 +5,7 @@
 
 var COOKIE = '__webcounter';
 var REG_ROBOT = /search|agent|bot|crawler/i;
+var TIMEOUT_VISITORS = 1200; // 20 MINUTES
 
 require('mongobuilder');
 
@@ -174,10 +175,17 @@ WebCounter.prototype.counter = function(req, res) {
 	var exists = sum < 91;
 	var stats = self.stats;
 	var referer = req.headers['x-referer'] || req.headers['referer'];
+	var ping = req.headers['x-ping'];
 
-	stats.hits++;
+	if (user)
+		sum = Math.abs(self.current - user) / 1000;
 
-	self.refreshURL(referer, req);
+	var isHits = user ? sum >= TIMEOUT_VISITORS : true;
+
+	if (!ping || isHits) {
+		stats.hits++;
+		self.refreshURL(referer, req);
+	}
 
 	if (exists)
 		return true;
@@ -189,7 +197,7 @@ WebCounter.prototype.counter = function(req, res) {
 		sum = Math.abs(self.current - user) / 1000;
 
 		// 20 minutes
-		if (sum < 1200) {
+		if (sum < TIMEOUT_VISITORS) {
 			arr[1]++;
 			self.lastvisit = new Date();
 			res.cookie(COOKIE, ticks, now.add('5 days'));
@@ -410,7 +418,7 @@ WebCounter.prototype.refreshURL = function(referer, req) {
 	for (var i = 0; i < length; i++) {
 		var item = self.ip[i];
 		if (item.ip === req.ip && item.url === referer) {
-			item.url = req.uri.href;
+			item.url = req.headers['x-ping'] || req.uri.href;
 			return;
 		}
 	}
@@ -457,7 +465,7 @@ framework.on('controller', delegate_request);
 function refresh_hostname() {
 	var url;
 	if (F.config.custom)
-		url = F.config.custom;
+		url = F.config.custom.url;
 	if (!url)
 		url = F.config.url || F.config.hostname;
 	if (!url)
