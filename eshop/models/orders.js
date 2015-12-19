@@ -219,6 +219,9 @@ NEWSCHEMA('Order').make(function(schema) {
 
 		// Update order in database
 		DB('orders').update(updater, function() {
+
+			F.emit('orders.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});

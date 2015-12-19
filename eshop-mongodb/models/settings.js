@@ -74,9 +74,12 @@ NEWSCHEMA('Settings').make(function(schema) {
 		}
 
 		var builder = new MongoBuilder();
-		builder.set(model);
+		builder.set(settings);
 		builder.set('_id', 'settings');
 		builder.save(DB('common'), function() {
+
+			F.emit('settings.save', settings);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});

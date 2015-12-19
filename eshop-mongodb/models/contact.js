@@ -15,12 +15,14 @@ NEWSCHEMA('Contact').make(function(schema) {
 
 		// Default values
 		model.id = U.GUID(10);
-		model.datecreated = (new Date()).format();
+		model.datecreated = new Date();
 
 		var builder = new MongoBuilder();
 
 		builder.set(model);
 		builder.insert(DB('contactforms'));
+
+		F.emit('contact.save', model);
 
 		// Returns response
 		callback(SUCCESS(true));

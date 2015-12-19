@@ -192,11 +192,14 @@ NEWSCHEMA('Order').make(function(schema) {
 			model.datepaid = new Date();
 
 		var builder = new MongoBuilder();
-		builder.set(model.$clean());
+		builder.set(model);
 		builder.where('id', model.id);
 
 		// Update order in database
 		builder.updateOne(DB('orders'), function() {
+
+			F.emit('orders.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});

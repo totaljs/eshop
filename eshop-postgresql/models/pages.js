@@ -271,6 +271,8 @@ NEWSCHEMA('Page').make(function(schema) {
 			if (err)
 				error.push(err);
 
+			F.emit('pages.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 

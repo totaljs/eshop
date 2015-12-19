@@ -89,6 +89,9 @@ NEWSCHEMA('Widget').make(function(schema) {
 		});
 
 		sql.exec(function(err) {
+
+			F.emit('widgets.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});

@@ -15,6 +15,8 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 		builder.set(model);
 		builder.insert(DB('newsletter'));
 
+		F.emit('newsletter.save', model);
+
 		// Writes stats
 		MODULE('webcounter').increment('newsletter');
 

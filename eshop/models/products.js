@@ -6,6 +6,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('category', 'String(300)', true);
 	schema.define('manufacturer', 'String(50)');
 	schema.define('name', 'String(50)', true);
+	schema.define('tags', '[String(30)]');
 	schema.define('price', Number, true);
 	schema.define('body', String, true);
 	schema.define('istop', Boolean);
@@ -129,6 +130,8 @@ NEWSCHEMA('Product').make(function(schema) {
 			// Creates record if not exists
 			if (count === 0)
 				DB('products').insert(model);
+
+			F.emit('products.save', model);
 
 			// Returns response
 			callback(SUCCESS(true));

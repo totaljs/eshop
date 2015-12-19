@@ -264,6 +264,9 @@ NEWSCHEMA('Order').make(function(schema) {
 		}
 
 		sql.exec(function(err) {
+
+			F.emit('orders.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});

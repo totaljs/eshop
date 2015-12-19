@@ -13,6 +13,8 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 		// Appends new email into tohe newsletter file
 		Fs.appendFile(filename, model.email + ';' + model.ip + ';' + model.language + ';' + (new Date()).format('yyyy-MM-dd') + '\n');
 
+		F.emit('newsletter.save', model);
+
 		// Writes stats
 		MODULE('webcounter').increment('newsletter');
 

@@ -81,6 +81,9 @@ NEWSCHEMA('Settings').make(function(schema) {
 		});
 
 		sql.exec(function() {
+
+			F.emit('settings.save', settings);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});

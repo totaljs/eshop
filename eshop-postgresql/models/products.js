@@ -7,6 +7,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('manufacturer', 'String(50)');
 	schema.define('name', 'String(50)', true);
 	schema.define('search', 'String(80)', true);
+	schema.define('tags', '[String(30)]');
 	schema.define('price', Number, true);
 	schema.define('body', String, true);
 	schema.define('istop', Boolean);
@@ -141,6 +142,9 @@ NEWSCHEMA('Product').make(function(schema) {
 		});
 
 		sql.exec(function(err) {
+
+			F.emit('products.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 

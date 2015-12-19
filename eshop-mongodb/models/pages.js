@@ -177,6 +177,9 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		// Callback
 		var cb = function() {
+
+			F.emit('pages.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 			// Refreshes internal informations e.g. sitemap

@@ -209,6 +209,8 @@ NEWSCHEMA('Page').make(function(schema) {
 			// Returns response
 			callback(SUCCESS(true));
 
+			F.emit('pages.save', model);
+
 			// Refreshes internal informations e.g. sitemap
 			setTimeout(refresh, 1000);
 		});

@@ -65,6 +65,9 @@ NEWSCHEMA('User').make(function(schema) {
 
 		// Update user in database
 		DB('users').update(updater, function() {
+
+			F.emit('users.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});

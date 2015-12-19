@@ -206,6 +206,8 @@ NEWSCHEMA('Page').make(function(schema) {
 			if (count === 0)
 				DB('pages').insert(clean);
 
+			F.emit('pages.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 

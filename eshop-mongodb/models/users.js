@@ -59,6 +59,9 @@ NEWSCHEMA('User').make(function(schema) {
 		builder.set(model);
 
 		builder.updateOne(DB('users'), function() {
+
+			F.emit('users.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});

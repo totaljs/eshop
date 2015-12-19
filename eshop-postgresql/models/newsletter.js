@@ -23,6 +23,8 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 		sql.insert('tbl_newsletter').set(model).primary('email');
 		sql.exec(F.error());
 
+		F.emit('newsletter.save', model);
+
 		// Writes stats
 		MODULE('webcounter').increment('newsletter');
 

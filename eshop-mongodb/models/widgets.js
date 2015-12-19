@@ -79,6 +79,9 @@ NEWSCHEMA('Widget').make(function(schema) {
 		builder.set(model);
 
 		var cb = function(err, doc) {
+
+			F.emit('widgets.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		};

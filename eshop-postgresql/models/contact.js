@@ -15,12 +15,14 @@ NEWSCHEMA('Contact').make(function(schema) {
 
 		// Default values
 		model.id = U.GUID(10);
-		model.datecreated = (new Date()).format();
+		model.datecreated = new Date();
 
 		// Saves to database
 		var sql = DB();
 		sql.insert('tbl_contactform').set(model);
 		sql.exec(F.error());
+
+		F.emit('contact.save', model);
 
 		// Returns response
 		callback(SUCCESS(true));

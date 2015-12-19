@@ -18,7 +18,9 @@ NEWSCHEMA('Contact').make(function(schema) {
 		model.datecreated = (new Date()).format();
 
 		// Saves to database
-		DB('contactforms').insert(model);
+		DB('contactforms').insert(model.$clean());
+
+		F.emit('contact.save', model);
 
 		// Returns response
 		callback(SUCCESS(true));
