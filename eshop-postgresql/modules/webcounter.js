@@ -518,7 +518,7 @@ module.exports.today = function() {
 	return webcounter.today;
 };
 
-module.exports.increment = function(type) {
+module.exports.increment = module.exports.inc = function(type) {
 	webcounter.increment(type);
 	return this;
 };
