@@ -6,7 +6,6 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('category', 'String(300)', true);
 	schema.define('manufacturer', 'String(50)');
 	schema.define('name', 'String(50)', true);
-	schema.define('tags', '[String(30)]');
 	schema.define('price', Number, true);
 	schema.define('body', String, true);
 	schema.define('istop', Boolean);
@@ -296,24 +295,63 @@ NEWSCHEMA('Product').make(function(schema) {
 			var obj = {};
 
 			Object.keys(xml).forEach(function(key) {
-				obj[key.replace('product.', '')] = xml[key];
+				var prop = key.replace('product.', '');
+				obj[prop] = xml[key];
 			});
 
 			products.push(obj);
 		}));
 
 		CLEANUP(stream, function() {
+
+			var filename = F.path.temp(U.GUID(10) + '.jpg');
+			var Fs = require('fs');
+			var id;
+
 			products.wait(function(product, next) {
-				schema.make(product, function(err, model) {
-					if (err)
-						return next();
-					count++;
-					model.$save(next);
+
+				var fn = function() {
+					schema.make(product, function(err, model) {
+						if (err)
+							return next();
+						count++;
+						model.$save(next);
+					});
+				};
+
+				if (!product.pictures)
+					return fn();
+
+				id = [];
+
+				product.pictures.split(',').wait(function(picture, next) {
+					U.download(picture.trim(), ['get', 'dnscache'], function(err, response) {
+						if (err)
+							return next();
+						var writer = Fs.createWriteStream(filename);
+						response.pipe(writer);
+						CLEANUP(writer, function() {
+							var tmp = new ObjectID();
+							GridStore.writeFile(DB(), tmp, filename, U.getName(picture), null, function(err) {
+								if (err)
+									return next();
+								id.push(tmp.toString());
+								setTimeout(next, 200);
+							});
+						});
+					});
+				}, function() {
+					product.pictures = id;
+					fn();
 				});
+
 			}, function() {
 
 				if (count)
 					refresh();
+
+				if (id)
+					Fs.unlink(filename, NOOP);
 
 				// Done, returns response
 				callback(SUCCESS(count > 0));
@@ -321,6 +359,58 @@ NEWSCHEMA('Product').make(function(schema) {
 		});
 	});
 
+	schema.addWorkflow('export.xml', function(error, model, options, callback) {
+		var builder = new MongoBuilder();
+		builder.where('isremoved', false);
+		builder.find(DB('products'), function(err, docs) {
+
+			var xml = [];
+
+			for (var i = 0, length = docs.length; i < length; i++) {
+				var doc = docs[i];
+				var keys = Object.keys(doc);
+				var line = '<product>';
+
+				keys.forEach(function(key) {
+
+					if (key === 'id' || key === '_id' || key === 'linker_category' || key === 'linker_manufacturer' || key === 'isremoved' || key === 'search' || key === 'linker')
+						return;
+
+					var val = doc[key];
+					var tmp;
+
+					if (val === null)
+						val = '';
+
+					if (key === 'pictures') {
+
+						tmp = '';
+
+						val.forEach(function(id) {
+							tmp += (tmp ? ',' : '') + F.config.custom.url + '/download/' + id + '.jpg';
+						});
+
+						val = tmp;
+
+					} else if (val instanceof Date) {
+						val = val.format();
+					} else if (val instanceof Array) {
+						val = val.join(',');
+					} else if (typeof(val) !== 'string')
+						val = val.toString();
+
+					if (!val)
+						return;
+
+					line += '<{0}>{1}</{0}>'.format(key, val.encode());
+				});
+
+				xml.push(line + '</product>');
+			}
+
+			callback('<?xml version="1.0" encoding="UTF-8"?><products>' + xml.join('') + '</products>');
+		});
+	});
 });
 
 // Refreshes internal information (categories and manufacturers)

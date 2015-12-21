@@ -7,7 +7,6 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('manufacturer', 'String(50)');
 	schema.define('name', 'String(50)', true);
 	schema.define('search', 'String(80)', true);
-	schema.define('tags', '[String(30)]');
 	schema.define('price', Number, true);
 	schema.define('body', String, true);
 	schema.define('istop', Boolean);
@@ -345,13 +344,50 @@ NEWSCHEMA('Product').make(function(schema) {
 		}));
 
 		CLEANUP(stream, function() {
+
+			var sql = DB();
+
 			products.wait(function(product, next) {
-				schema.make(product, function(err, model) {
-					if (err)
-						return next();
-					count++;
-					model.$save(next);
+
+				var fn = function() {
+					schema.make(product, function(err, model) {
+						if (err)
+							return next();
+						count++;
+						model.$save(next);
+					});
+				};
+
+				if (!product.pictures)
+					return fn();
+
+				id = [];
+
+				product.pictures.split(',').wait(function(picture, next) {
+					sql.writeStream(function(writer) {
+						U.download(picture.trim(), ['get', 'dnscache'], function(err, response) {
+							response.pipe(writer);
+						});
+					}, function(err, oid) {
+						if (err)
+							return next();
+
+						var tmp = oid.toString();
+						var count = 0;
+
+						// Simple prevention for DDOS querying
+						for (var i = 0, length = tmp.length; i < length; i++)
+							count += tmp.charCodeAt(i);
+
+						id.push(oid + 'x' + count);
+						setTimeout(next, 100);
+					});
+
+				}, function() {
+					product.pictures = id;
+					fn();
 				});
+
 			}, function() {
 
 				if (count)
@@ -363,6 +399,59 @@ NEWSCHEMA('Product').make(function(schema) {
 		});
 	});
 
+	schema.addWorkflow('export.xml', function(error, model, options, callback) {
+		var sql = DB();
+		sql.select('products', 'tbl_product').where('isremoved', false);
+		sql.exec(function(err, response) {
+
+			var xml = [];
+			var docs = response.products;
+
+			for (var i = 0, length = docs.length; i < length; i++) {
+				var doc = docs[i];
+				var keys = Object.keys(doc);
+				var line = '<product>';
+
+				keys.forEach(function(key) {
+
+					if (key === 'id' || key === 'linker' || key === 'linker_category' || key === 'linker_manufacturer' || key === 'search' || key === 'isremoved')
+						return;
+
+					var val = doc[key];
+					var tmp;
+
+					if (val === null)
+						val = '';
+
+					if (key === 'pictures') {
+
+						tmp = '';
+
+						val.split(',').forEach(function(id) {
+							tmp += (tmp ? ',' : '') + F.config.custom.url + '/download/' + id + '.jpg';
+						});
+
+						val = tmp;
+
+					} else if (val instanceof Date) {
+						val = val.format();
+					} else if (val instanceof Array) {
+						val = val.join(',');
+					} else if (typeof(val) !== 'string')
+						val = val.toString();
+
+					if (!val)
+						return;
+
+					line += '<{0}>{1}</{0}>'.format(key, val.encode());
+				});
+
+				xml.push(line + '</product>');
+			}
+
+			callback('<?xml version="1.0" encoding="UTF-8"?><products>' + xml.join('') + '</products>');
+		});
+	});
 });
 
 // Refreshes internal information (categories)
