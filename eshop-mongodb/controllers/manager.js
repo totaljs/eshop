@@ -4,8 +4,8 @@ exports.install = function() {
 
 	// COMMON
 	F.route(CONFIG('manager-url') + '/*', '~manager');
-	F.route(CONFIG('manager-url') + '/upload/',                  upload, ['post', 'upload'], 3084); // 3 MB
-	F.route(CONFIG('manager-url') + '/upload/base64/',           upload_base64, ['post'], 2048); // 2 MB
+	F.route(CONFIG('manager-url') + '/upload/',                  upload, ['post', 'upload', 10000], 3084); // 3 MB
+	F.route(CONFIG('manager-url') + '/upload/base64/',           upload_base64, ['post', 10000], 2048); // 2 MB
 	F.route(CONFIG('manager-url') + '/logoff/',                  redirect_logoff);
 
 	// FILES
@@ -36,7 +36,8 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/products/{id}/',       json_products_read);
 	F.route(CONFIG('manager-url') + '/api/products/',            json_products_remove, ['delete']);
 	F.route(CONFIG('manager-url') + '/api/products/clear/',      json_products_clear);
-	F.route(CONFIG('manager-url') + '/api/products/import/',     json_products_import, ['upload'], 1024);
+	F.route(CONFIG('manager-url') + '/api/products/import/',     json_products_import, ['upload', 1000 * 60 * 5], 1024);
+	F.route(CONFIG('manager-url') + '/api/products/export/',     json_products_export, [10000]);
 	F.route(CONFIG('manager-url') + '/api/products/codelists/',  json_products_codelists);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   json_products_category_replace, ['post']);
 
@@ -95,8 +96,12 @@ function upload() {
 		var id = new ObjectID();
 
 		GridStore.writeFile(DB(), id, file.path, file.filename, null, function(err) {
+
+			if (err)
+				return next();
+
 			output.push(id.toString() + file.extension);
-			setTimeout(next, 100);
+			setTimeout(next, 200);
 		});
 
 	}, function() {
@@ -297,6 +302,14 @@ function json_products_import() {
 	}
 
 	GETSCHEMA('Product').workflow('import.' + file.type.substring(5), null, file.path, self.callback(), true);
+}
+
+// Exports products to XML
+function json_products_export() {
+	var self = this;
+	GETSCHEMA('Product').workflow('export.xml', null, null, function(err, response) {
+		self.content(response, 'text/xml', { 'Content-Disposition': 'attachment; filename=products.xml' });
+	}, true);
 }
 
 // Reads all product categories and manufacturers
