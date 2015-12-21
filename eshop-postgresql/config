@@ -1,8 +1,8 @@
 name                      : E-shop
-version                   : 3.1.0
+version                   : 4.0.0
 author                    : Peter Širka
 
-database                  : postgres://USER:PASSWORD@IP_OR_HOSTNAME/DATABASE_NAME
+database                               : postgres://testuser:123456@148.251.79.153/eshop_test
 
 // A relative URL address into the eshop management
 manager-url               : /$manager
