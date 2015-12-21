@@ -8,6 +8,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="true" data-empty-text="@(All products)" data-source-value="linker"></div>
+				<a href="javascript:products_export()" class="silver"><span class="fa fa-file-code-o mr5"></span>@(Export products to XML)</a>
 			</div>
 			<div class="col-md-6 m">
 				<div class="row">
@@ -182,7 +183,10 @@
 		component.click = function(index, row, button) {
 			switch ($(button).attr('name')) {
 				case 'edit':
+					loading(true);
 					$.components.GET('/api/products/' + row.id, null, function(response, err) {
+
+						loading(false, 500);
 
 						// Error prevention
 						if (response instanceof Array)
@@ -196,7 +200,9 @@
 				case 'remove':
 					if (!confirm('@(Do you want to remove) ' + row.name + '?'))
 						return;
+					loading(true);
 					$.components.DELETE(managerurl + '/api/products', { id: row.id }, function() {
+						loading(false, 500);
 						products_refresh(true);
 					});
 					break;
@@ -236,6 +242,7 @@
 
 	ON('#products.form', function(component) {
 		component.submit = function(hide) {
+			loading(true);
 			$.components.POST(managerurl + '/api/products/', products.form, function(response) {
 
 				// Error handling
@@ -248,6 +255,7 @@
 				if (products.form.$index === undefined || products.grid[products.form.$index].category !== products.form.category || products.grid[products.form.$index].manufacturer !== products.form.manufacturer)
 					setTimeout(products_refresh_codelists, 2000);
 
+				loading(false, 500);
 				products_refresh(true);
 				success();
 			});
@@ -335,4 +343,9 @@
 	function products_import() {
 		$('#products_file_cvsxml').click();
 	}
+
+	function products_export(argument) {
+		window.location.href = managerurl + '/api/products/export/';
+	}
+
 </script>

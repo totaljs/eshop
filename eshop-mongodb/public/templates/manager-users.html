@@ -121,6 +121,7 @@
 		component.click = function(index, row, button) {
 			switch ($(button).attr('name')) {
 				case 'edit':
+					loading(true);
 					$.components.GET(managerurl + '/api/users/' + row.id, null, function(response, err) {
 
 						// Error prevention
@@ -130,14 +131,17 @@
 						SET('users.form', $.extend({}, response), true);
 						SET('users.response', null);
 						SET('common.form', 'users');
+						loading(false, 500);
 					});
 					break;
 
 				case 'remove':
 					if (!confirm('@(Do you want to remove selected user?)'))
 						return;
+					loading(true);
 					$.components.DELETE(managerurl + '/api/users', { id: row.id }, function() {
 						users_refresh(true);
+						loading(false, 500);
 					});
 					break;
 			}
@@ -151,7 +155,7 @@
 	ON('#users.form', function(component) {
 		// Submits user form
 		component.submit = function(hide) {
-
+			loading(true);
 			$.components.PUT(managerurl + '/api/users/', users.form, function(response) {
 
 				// Error handling
@@ -162,6 +166,7 @@
 				hide();
 				users_refresh(true);
 				success();
+				loading(false, 500);
 			});
 		};
 	});

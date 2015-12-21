@@ -946,6 +946,9 @@ COMPONENT('fileupload', function() {
 			for (var i = 0, length = files.length; i < length; i++)
 				data.append('file' + i, files[i]);
 
+				if (typeof(window.loading) === 'function')
+					window.loading(true);
+
 			$.components.UPLOAD(url, data, function(response, err) {
 				self.change();
 				el.value = '';
@@ -964,6 +967,9 @@ COMPONENT('fileupload', function() {
 					self.set(response[0]);
 				else
 					self.push(response);
+
+				if (typeof(window.loading) === 'function')
+					window.loading(false, 500);
 			});
 		});
 	};

@@ -165,9 +165,11 @@
 			var files = e.target.files;
 			data.append('file0', files[0]);
 			this.value = '';
+			loading(true);
 			$.components.UPLOAD(managerurl + '/upload/', data, function(response, err) {
 				if (response && response.length)
 					cmseditor.instance.getTarget().attr('src', '/download/' + response[0]);
+				loading(false, 500);
 			});
 		});
 	}, 1000);

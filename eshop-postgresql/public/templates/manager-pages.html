@@ -246,7 +246,9 @@
 				case 'remove':
 					if (!confirm('@(Do you want to remove) ' + row.name + '?'))
 						return;
+					loading(true);
 					$.components.DELETE(managerurl + '/api/pages', { id: row.id }, function() {
+						loading(false, 500);
 						pages_refresh(true);
 					});
 					break;
@@ -277,6 +279,7 @@
 			pages.form.widgets = widgets.widgets;
 			pages.form.settings = widgets.settings;
 
+			loading(true);
 			$.components.POST(managerurl + '/api/pages/', pages.form, function(response) {
 
 				// Error handling
@@ -287,6 +290,7 @@
 				hide();
 				success();
 				pages_refresh(true);
+				loading(false, 500);
 
 				if (!pages.form.ispartial)
 					setTimeout(pages_refresh_sitemap, 2000);
@@ -409,8 +413,10 @@
 				case 'remove':
 					if (!confirm('@(Do you want to remove) ' + row.name + '?'))
 						return;
+					loading(true);
 					$.components.DELETE(managerurl + '/api/widgets', { id: row.id }, function() {
 						widgets_refresh();
+						loading(false, 500);
 					});
 					break;
 			}
@@ -420,6 +426,7 @@
 	ON('#widgets.form', function(component) {
 		// Submit order form
 		component.submit = function(hide) {
+			loading(true);
 			$.components.POST(managerurl + '/api/widgets/', widgets.form, function(response) {
 
 				// Error handling
@@ -433,6 +440,7 @@
 				hide();
 				success();
 				widgets_refresh();
+				loading(false, 500);
 			});
 		};
 	});
