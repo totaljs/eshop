@@ -682,6 +682,22 @@ Agent.prototype.__proto__ = Object.create(Events.EventEmitter.prototype, {
 // Debug mode (output to console)
 Agent.debug = false;
 
+Agent.prototype.priority = function() {
+	var self = this;
+	var length = self.command.length - 1;
+
+	if (!length)
+		return self;
+
+	var last = self.command[length];
+
+	for (var i = length; i > -1; i--)
+		self.command[i] = self.command[i - 1];
+
+	self.command[0] = last;
+	return self;
+};
+
 Agent.prototype.default = function(fn) {
 	fn.call(this.results, this.results);
 	return this;
