@@ -2,7 +2,7 @@ cms/databases/
 cms/tmp/
 eshop/databases/
 eshop/tmp/
-eshop-pg/tmp/
+eshop-postgresql/tmp/
 eshop-mongodb/tmp/
 *.pid
 node_modules/mongodb
