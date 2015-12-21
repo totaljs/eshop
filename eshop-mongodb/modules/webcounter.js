@@ -248,7 +248,6 @@ WebCounter.prototype.counter = function(req, res) {
 
 	if (!referer || (webcounter.hostname && referer.indexOf(webcounter.hostname) !== -1)) {
 		stats.direct++;
-		history.direct++;
 		return true;
 	}
 
