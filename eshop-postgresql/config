@@ -2,7 +2,9 @@ name                      : E-shop
 version                   : 4.0.0
 author                    : Peter Širka
 
-database                  : postgres://USERNAME:PASSWORD@HOSTNAME/database_name
+// IMPORTANT: PLEASE CREATE YOUR OWN DB on your server or on some PostgreSQL cloud.
+// DON'T CHANGE A DATA
+database                  : postgres://yiaebywx:XeA0zqmTxC4NtrMaAcM36xZpExuNesWR@pellefant.db.elephantsql.com:5432/yiaebywx
 
 // A relative URL address into the eshop management
 manager-url               : /$manager
