@@ -38,6 +38,19 @@ __CMS__:
 - added categorization for widgets
 - fixed height of CMS editor
 
+## Dependencies
+
+### MongoDB version
+
+- install `npm install mongobuilder`
+- install `npm install mongodb`
+
+### PostgreSQL version
+
+- install `npm install sqlagent`
+- install `npm install pg`
+- install `npm install pg-large-object`
+
 ## Do you need VPS hosting for your eshops?
 
 Sign up on <https://www.webhostingy.com/totaljs>
