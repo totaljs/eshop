@@ -26,6 +26,7 @@ F.on('controller', function(controller, name) {
 		protection[controller.req.ip]++;
 
 	controller.cancel();
+	controller.theme('');
 	controller.view('manager-login');
 });
 

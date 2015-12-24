@@ -26,7 +26,7 @@ function view_homepage() {
 		options.homepage = true;
 		GETSCHEMA('Product').query(options, function(err, response) {
 			// Finds homepage page
-			self.page('/', '~index', response, false, true);
+			self.page('/', 'index', response, false, true);
 		});
 	});
 }

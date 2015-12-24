@@ -600,7 +600,7 @@ F.eval(function() {
 				self.title(response.title);
 
 				if (!view)
-					view = '~/cms/' + response.template;
+					view = '/cms/' + response.template;
 
 				self.view(view, model);
 			});

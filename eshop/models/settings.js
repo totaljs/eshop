@@ -132,5 +132,4 @@ NEWSCHEMA('Settings').make(function(schema) {
 			callback(SUCCESS(true));
 		});
 	});
-
 });

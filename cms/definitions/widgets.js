@@ -31,7 +31,7 @@ GETSCHEMA('Widget').addTransform('d5467a1697', function(error, model, data, call
 		var model = {};
 		model.max = U.parseInt(data.settings, 5);
 		model.items = docs;
-		callback(F.view('~widgets/blogs', model));
+		callback(F.view('widgets/blogs', model));
 	});
 });
 
@@ -43,5 +43,5 @@ GETSCHEMA('Widget').addTransform('23cee236ba', function(error, model, data, call
 	// data.page
 	// data.controller
 
-	callback(F.view('~widgets/contactform'));
+	callback(F.view('widgets/contactform'));
 });

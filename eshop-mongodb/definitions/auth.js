@@ -26,7 +26,8 @@ F.on('controller', function(controller, name) {
 		protection[controller.req.ip]++;
 
 	controller.cancel();
-	controller.view('manager-login');
+	controller.theme('');
+	controller.view('~manager-login');
 });
 
 // Clears blocked IP addreses
