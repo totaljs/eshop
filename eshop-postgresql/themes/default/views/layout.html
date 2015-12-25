@@ -36,8 +36,13 @@
 					<a href="/"><img src="/img/logo.png" border="0" alt="Eshop" height="70" /></a>
 				</div>
 				<div class="col-sm-3 m ui-right header-padding">
-					<a href="/checkout/" class="checkoutbutton-label hidden-xs"><span class="fa fa-shopping-cart"></span>@(Your shopping cart)</a>
-					<a href="/checkout/" class="checkoutbutton xs-center" data-component="checkout" data-currency="@{config.custom.currency}">&nbsp;</a>
+					<hr class="visible-xs" />
+					<div class="checkoutbutton-container">
+						<a href="/checkout/" class="checkoutbutton xs-center" data-component="checkout" data-currency="@{config.custom.currency}">&nbsp;</a>
+						<a href="/checkout/" class="checkoutbutton-label"><span class="fa fa-shopping-cart"></span>@(Your shopping cart)</a>
+					</div>
+					<a href="javascript:void(0)" class="header-menu-button"><span class="fa fa-navicon"></span></a>
+					<div class="clearfix"></div>
 				</div>
 				<div class="col-sm-4 m header-padding">
 					<form action="/shop/" method="GET">
@@ -57,7 +62,7 @@
 				<div class="row">
 					@{foreach m in global.categories}
 						@{if m.count > 0 && m.level === 0}
-						<div class="col-xs-6 col-sm-4 col-md-4"><a href="/shop/@{m.linker}/">@{m.name}</a></div>
+						<div class="col-sm-4 col-md-4"><a href="/shop/@{m.linker}/">@{m.name}</a></div>
 						@{fi}
 					@{end}
 				</div>

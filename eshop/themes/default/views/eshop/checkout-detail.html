@@ -24,7 +24,7 @@
 			<div><a href="/contact/?orderid=@{model.id}#contactform">@(Do you want to <b>cancel this order</b>?)</a></div>
 			@{fi}
 			<br />
-			<table class="table table-bordered" border="0">
+			<table class="table table-bordered table-responsive" border="0">
 				<tbody>
 					<tr>
 						<td class="col-xs-4 active"># id</td>
@@ -72,7 +72,7 @@
 			@{fi}
 
 			<br />
-			<table class="table table-bordered" border="0">
+			<table class="table table-bordered table-responsive" border="0">
 				<tbody>
 					<tr>
 						<td class="col-xs-4 active">@(Customer)</td>
@@ -99,8 +99,8 @@
 			<br />
 			<div class="b"><span class="fa fa-navicon"></span> @(Ordered items) (@{model.count})</div>
 			<br />
-			<table class="table table-bordered" border="0">
-				<thead>
+			<table class="table table-bordered table-responsive" border="0">
+				<thead class="hidden-xs">
 					<tr class="b">
 						<th>@(Item name)</th>
 						<th class="ui-center col-xs-2 hidden-xs">@(Price)</th>
@@ -111,26 +111,28 @@
 				<tbody>
 					@{foreach m in model.products}
 						<tr>
-							<td>@{ m.name }</td>
+							<td class="b">@{ m.name }</td>
 							<td class="ui-center col-xs-2 hidden-xs">@{m.price.format(2)} @{!config.custom.currency_entity}</td>
-							<td class="ui-center col-xs-2 col-sm-1">@{m.count}x</td>
-							<td class="ui-center col-xs-3 col-sm-2">@{(m.price * m.count).format(2)} @{!config.custom.currency_entity}</td>
+							<td class="ui-center col-xs-2 col-sm-1"><span class="table-repsonsive-label mr5">@(Count:)</span>@{m.count}x</td>
+							<td class="ui-center col-xs-3 col-sm-2"><span class="table-repsonsive-label mr5">@(Together:)</span>@{(m.price * m.count).format(2)} @{!config.custom.currency_entity}</td>
 						</tr>
 					@{end}
-					<tr class="warning b">
-						<td>@(Summarize)</td>
+					<tr class="warning">
+						<td class="b">@(Summarize)</td>
 						<td class="ui-center col-xs-2 hidden-xs">&nbsp;</td>
-						<td class="ui-center col-xs-2 col-sm-1">@{model.count}x</td>
-						<td class="ui-center col-xs-3 col-sm-2">@{model.price.format(2)} @{!config.custom.currency_entity}</td>
+						<td class="ui-center col-xs-2 col-sm-1"><span class="table-repsonsive-label mr5">@(Count:)</span>@{model.count}x</td>
+						<td class="ui-center col-xs-3 col-sm-2"><span class="table-repsonsive-label mr5">@(Total price:)</span><b>@{model.price.format(2)} @{!config.custom.currency_entity}</b></td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 	</div>
 	<br />
-	<hr />
-	<br />
-	<br />
+	<div class="hidden-xs">
+		<hr />
+		<br />
+		<br />
+	</div>
 	<div class="row">
 		<div class="col-md-3"></div>
 		<div class="col-md-6">
@@ -138,7 +140,7 @@
 		</div>
 	</div>
 	<br />
-	<br />
+	<br class="hidden-xs" />
 </div>
 
 @{section script}

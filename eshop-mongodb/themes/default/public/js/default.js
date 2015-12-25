@@ -16,6 +16,10 @@ $(document).ready(function() {
 	if (path)
 		$('.categories').find('a[href="' + path + '"]').addClass('selected');
 
+	$(document).on('click', '.header-menu-button', function() {
+		$('.categories').toggleClass('categories-toggle');
+	});
+
 	var buy = $('.detail-buy').on('click', function() {
 		var el = $(this);
 		var price = parseFloat(el.attr('data-price'));
@@ -192,13 +196,10 @@ COMPONENT('checkout', function() {
 	self.refresh = function() {
 
 		var cart = CACHE('cart');
-		if (!cart || cart.length === 0) {
-			self.element.addClass('hidden-xs');
+		if (!cart || !cart.length) {
 			self.element.html('0.00 ' + currency);
 			return;
 		}
-
-		self.element.removeClass('hidden-xs');
 
 		var sum = 0;
 		var count = 0;
