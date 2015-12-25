@@ -23,40 +23,18 @@ __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREAT
 
 - install `npm install total.js`
 
-### MongoDB version
+### MongoDB version only
 
 - install `npm install mongobuilder`
 - install `npm install mongodb`
+- __note__: cloud database www.mongolab.com
 
-### PostgreSQL version
+### PostgreSQL version only
 
 - install `npm install sqlagent`
 - install `npm install pg`
 - install `npm install pg-large-object`
-
----
-
-## What's new?
-
-__Both__:
-
-- new window animations (CSS 3)
-- many fixes
-
-__Eshop__:
-
-- unlimited count of subcategories
-- product can contain its manufacturer
-- new PostgreSQL version
-
-__CMS__:
-
-- new widgets can be added between widgets
-- added search field (CMS EDITOR creates keywords from the content)
-- added keywords field
-- added Font-Awesome lists for CMS EDITOR
-- added categorization for widgets
-- fixed height of CMS editor
+- __note__: cloud database www.elephantsql.com
 
 ---
 
