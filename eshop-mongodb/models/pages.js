@@ -134,6 +134,8 @@ NEWSCHEMA('Page').make(function(schema) {
 		builder.where('id', id);
 		builder.where('isremoved', false);
 
+		builder.set('isremoved', true);
+
 		// Updates database file
 		builder.updateOne(DB('pages'), callback);
 
@@ -188,10 +190,12 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		builder.set(model);
 
-		if (isnew)
+		if (isnew) {
 			builder.insert(DB('pages'), cb);
-		else
+		} else {
+			builder.where('id', model.id);
 			builder.updateOne(DB('pages'), cb);
+		}
 
 	});
 
@@ -512,7 +516,7 @@ F.eval(function() {
 				self.title(response.title);
 
 				if (!view)
-					view = '~/cms/' + response.template;
+					view = 'cms/' + response.template;
 
 				self.view(view, model);
 			});

@@ -154,7 +154,7 @@ function json_files_clear() {
 		});
 	});
 
-	self.json(SUCCESS(true));
+	this.json(SUCCESS(true));
 }
 
 // ==========================================================================
@@ -414,7 +414,7 @@ function view_pages_preview() {
 	self.layout('layout-preview');
 	self.repository.preview = true;
 	self.repository.page = self.body;
-	self.view('cms/' + self.body.template);
+	self.view('~cms/' + self.body.template);
 }
 
 // Gets dependencies for Pages (templates and navigations)

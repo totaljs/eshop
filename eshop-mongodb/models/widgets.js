@@ -86,10 +86,12 @@ NEWSCHEMA('Widget').make(function(schema) {
 			callback(SUCCESS(true));
 		};
 
-		if (isnew)
+		if (isnew) {
 			builder.insert(DB('widgets'), cb);
-		else
+		} else {
+			builder.where('id', model.id);
 			builder.updateOne(DB('widgets'), cb);
+		}
 	});
 
 	// Clears widget database

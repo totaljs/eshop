@@ -7,6 +7,11 @@
 		<div class="col-md-2"></div>
 		<div class="col-md-8">
 			<div class="detail-category">@(Category:) <a href="/shop/@{model.linker_category}/">@{model.category}</a></div>
+
+			@{if model.manufacturer}
+			<div class="detail-category">@(Manufacturer:) <span class="blue">@{model.manufacturer}</span></div>
+			@{fi}
+
 			@{if model.reference}
 				<div class="detail-reference">@(Item) # <b>@{model.reference}</b></div>
 			@{fi}

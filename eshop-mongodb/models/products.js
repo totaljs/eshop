@@ -482,11 +482,14 @@ function refresh() {
 
 			// Prepares manufacturers
 			keys = Object.keys(db_manufacturers);
-			var manufacturers = new Array(keys.length);
+			var manufacturers = [];
+
 			for (var i = 0, length = keys.length; i < length; i++) {
 				var name = keys[i];
+				if (!name)
+					continue;
 				var item = db_manufacturers[name];
-				manufacturers[i] = { name: name, linker: item.linker, count: item.count };
+				manufacturers.push({ name: name, linker: item.linker, count: item.count });
 			}
 
 			F.global.categories = categories;
