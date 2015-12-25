@@ -2,6 +2,8 @@
 
 Please do not change the code, just create a new issues. I solve all problems as soon as possible. Do you want special upgrades? Contact me <petersirka@gmail.com>.
 
+__IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREATE YOUR OWN BACKUP AND RESTORE IT ON YOU SERVERS OR CLOUD.__
+
 - Current version: `v4.0.0`
 - [Documentation](http://docs.totaljs.com/eshop-cms/latest.html)
 
@@ -10,11 +12,29 @@ Please do not change the code, just create a new issues. I solve all problems as
 ## The source-code
 
 - `cms` NoSQL embedded version
-- `cms-templates` Different CMS templates (designs)
 - `eshop` NoSQL embedded version
 - `eshop-postgresql` PostgreSQL version
 - `eshop-mongodb` MongoDB version
-- `eshop-templates` Different eshop templates (designs)
+- `backup` contains backup of MongoDB and PostgreSQL database.
+
+---
+
+## Installation
+
+- install `npm install total.js`
+
+### MongoDB version
+
+- install `npm install mongobuilder`
+- install `npm install mongodb`
+
+### PostgreSQL version
+
+- install `npm install sqlagent`
+- install `npm install pg`
+- install `npm install pg-large-object`
+
+---
 
 ## What's new?
 
@@ -37,21 +57,6 @@ __CMS__:
 - added Font-Awesome lists for CMS EDITOR
 - added categorization for widgets
 - fixed height of CMS editor
-
----
-
-## Dependencies
-
-### MongoDB version
-
-- install `npm install mongobuilder`
-- install `npm install mongodb`
-
-### PostgreSQL version
-
-- install `npm install sqlagent`
-- install `npm install pg`
-- install `npm install pg-large-object`
 
 ---
 
