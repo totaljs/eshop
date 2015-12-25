@@ -15,7 +15,7 @@ __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREAT
 - `eshop` NoSQL embedded version
 - `eshop-postgresql` PostgreSQL version
 - `eshop-mongodb` MongoDB version
-- `backup` contains backup of MongoDB and PostgreSQL database.
+- `backup` contains backup of MongoDB and PostgreSQL database
 
 
 ---
