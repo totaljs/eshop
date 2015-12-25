@@ -17,6 +17,7 @@ __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREAT
 - `eshop-mongodb` MongoDB version
 - `backup` contains backup of MongoDB and PostgreSQL database.
 
+
 ---
 
 ## Installation
@@ -28,6 +29,7 @@ __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREAT
 - install `npm install mongobuilder`
 - install `npm install mongodb`
 - __note__: cloud database www.mongolab.com
+- __important__: binary files are too slow because I have a free billing plan and the servers are in USA
 
 ### PostgreSQL version only
 
@@ -35,6 +37,7 @@ __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREAT
 - install `npm install pg`
 - install `npm install pg-large-object`
 - __note__: cloud database www.elephantsql.com
+- __important__: binary files are too slow because I have a free billing plan and the servers are in USA
 
 ---
 
