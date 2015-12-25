@@ -206,10 +206,10 @@ NEWSCHEMA('Page').make(function(schema) {
 			if (count === 0)
 				DB('pages').insert(clean);
 
-			F.emit('pages.save', model);
-
 			// Returns response
 			callback(SUCCESS(true));
+
+			F.emit('pages.save', model);
 
 			// Refreshes internal informations e.g. sitemap
 			setTimeout(refresh, 1000);
@@ -528,7 +528,7 @@ F.eval(function() {
 				self.title(response.title);
 
 				if (!view)
-					view = '/cms/' + response.template;
+					view = '~/cms/' + response.template;
 
 				self.view(view, model);
 			});
