@@ -193,7 +193,7 @@ NEWSCHEMA('User').make(function(schema) {
 });
 
 // Rewrites framework authorization
-F.onAuthorization = function(req, res, flags, callback) {
+F.onAuthorize = function(req, res, flags, callback) {
 
 	var hash = req.cookie(COOKIE);
 
