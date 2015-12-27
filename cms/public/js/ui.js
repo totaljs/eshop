@@ -136,6 +136,9 @@ COMPONENT('dropdown', function() {
 				builder.push('<option value="' + item[kv] + '"' + (value == item[kv] ? ' selected="selected"' : '') + '>' + item[kt] + '</option>');
 		}
 
+		var disabled = arr.length === 0;
+		el.parent().toggleClass('ui-disabled', disabled);
+		el.prop('disabled', disabled);
 		el.html(builder.join(''));
 	};
 
