@@ -75,7 +75,7 @@ canvas { display: block; }
 .pages-editor-widget { border-bottom: 1px solid #F0F0F0; padding: 4px 5px; cursor: pointer; }
 .pages-editor-widget:hover { background-color: #F0F0F0; }
 
-.linkbutton { display: block; font-size: 12px; padding: 4px 0 5px; border-radius: 3px; text-decoration: none; background-color: #F0F0F0; border: 2px solid #E0E0E0; color: gray; font-size: 11px; text-align: center; margin-bottom: 15px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; transition: 0.5s all; }
+.linkbutton { display: block; font-size: 12px; padding: 6px 0; border-radius: 3px; text-decoration: none; background-color: #E9E9E9; border: 1px solid #E0E0E0; color: gray; font-size: 11px; text-align: center; margin-bottom: 15px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; transition: 0.5s all; }
 .linkbutton:hover { background-color: #E0E0E0; border-color: #D0D0D0; text-decoration: none; }
 .linkbutton .fa { margin-right: 7px; }
 .gridinfo { position: absolute; margin-top: -15px; font-size: 11px; }

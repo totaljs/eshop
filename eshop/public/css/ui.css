@@ -47,7 +47,7 @@ button { outline: 0; }
 .ui-form-buttons button[name="submit"] { width: 220px; margin-right: 15px; font-weight: bold; }
 .ui-form-buttons button[name="cancel"] { color: gray; }
 .ui-form-buttons div { position: relative; display: inline-block; vertical-align: middle; }
-.ui-form-buttons label { float: right; margin: 12px 0 0 0; font-size: 11px; color: #AAB2BD; }
+.ui-form-buttons label { float: right; margin: 12px 0 0 0; font-size: 11px; }
 
 .ui-dropdowncheckbox-container { display: block; text-align: left; position: relative; }
 .ui-dropdowncheckbox-container * { box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; }
@@ -84,7 +84,7 @@ button { outline: 0; }
 .ui-fileupload { border: 2px solid #E0E0E0; padding: 6px 8px; border-radius: 2px; position: relative; display: block; width: 100%; background-color: white; }
 .ui-fileupload input[type="text"] { border: 0; width: 100%; outline: 0; font: normal 14px Arial; color: black; }
 .ui-fileupload-input { position: absolute; width: 100%; height: 30px; border: 1px solid #E0E0E0; margin: -5px 0 0 -7px; opacity: 0; cursor: pointer; font-weight: bold; }
-.ui-fileupload-label { margin-bottom: 6px; font-size: 12px; color: gray; }
+.ui-fileupload-label { margin-bottom: 6px; font-size: 12px; }
 .ui-fileupload-label .fa { width: 13px; }
 .ui-fileupload-label-required:before { color: red; content: '***'; margin-right: 5px; }
 .ui-fileupload .fa-angle-down, .ui-fileupload .fa-folder { position: absolute; right: 10px; top: 8px; color: #D0D0D0; font-size: 16px; }
@@ -98,7 +98,7 @@ button { outline: 0; }
 .ui-crop ul li:first-child { border-left: 0; margin-left: 0; }
 .ui-crop ul li:hover { margin-top: 1px; background-color: #508AF0; }
 
-.ui-codemirror-label { margin-bottom: 5px; font-size: 12px; color: #656D78; text-align: left; }
+.ui-codemirror-label { margin-bottom: 5px; font-size: 12px; text-align: left; }
 .ui-codemirror-label .fa { width: 14px; }
 .ui-codemirror-label-required:before { color: red; content: '***'; margin-right: 5px; }
 .ui-codemirror-invalid .CodeMirror { background-color: #FFF3F3 !important; border: 1px solid #E1A1A1 !important; }
@@ -143,7 +143,7 @@ button { outline: 0; }
 .ui-textbox { border: 2px solid #E0E0E0; padding: 5px 2px 5px 5px; border-radius: 2px; position: relative; width: 100%; background-color: white; display: table; }
 .ui-textbox input { display: table-cell; border: 0; outline: 0; font: normal 14px Arial; color: black; width: 100%; background-color: white; padding: 0; }
 .ui-textbox div { width: 1%; position: relative; vertical-align: middle; display: table-cell; text-align: center; white-space: nowrap; text-overflow: clip; border-left: 1px solid #E0E0E0; width: 30px; color: silver; user-select: none; }
-.ui-textbox-label { margin-bottom: 5px; font-size: 12px; color: #656D78; text-align: left; }
+.ui-textbox-label { margin-bottom: 5px; font-size: 12px; text-align: left; }
 .ui-textbox-label .fa { width: 14px; }
 .ui-textbox-label-required:before { color: red; content: '***'; margin-right: 5px; }
 .ui-textbox-invalid { border-color: #E7B8B8 !important; background-color: #FFF3F3 !important; }
@@ -156,7 +156,7 @@ button { outline: 0; }
 .ui-textbox .fa-caret-up, .ui-textbox .fa-caret-down { display:block; line-height:9px; cursor: pointer; }
 .ui-textarea { border: 2px solid #E0E0E0; padding: 4px 5px; border-radius: 2px; position: relative; display: block; width: 100%; background-color: white; }
 .ui-textarea textarea { border: 0; width: 100%; outline: 0; font: normal 14px Arial; color: black; resize: none; min-height: 50px; background-color: white; padding: 0; }
-.ui-textarea-label { margin-bottom: 5px; font-size: 12px; color: gray; text-align: left; }
+.ui-textarea-label { margin-bottom: 5px; font-size: 12px; text-align: left; }
 .ui-textarea-label .fa { width: 14px; }
 .ui-textarea-label-required:before { color: red; content: '***'; margin-right: 5px; }
 .ui-textarea-invalid { border-color: #E7B8B8 !important; background-color: #FFF3F3 !important; }
@@ -184,7 +184,7 @@ button { outline: 0; }
 .ui-disabled { background-color: #F0F0F0; cursor: not-allowed; }
 .ui-disabled > div { background-color: #F0F0F0; }
 
-.ui-checkbox { margin-bottom: 5px; line-height: 16px; font-size: 12px; }
+.ui-checkbox { margin-bottom: 3px; line-height: 16px; font-size: 12px; }
 .ui-checkbox label { cursor: pointer; }
 .ui-checkbox label span { cursor: pointer; }
 .ui-checkbox input { vertical-align: middle; cursor: pointer; }
