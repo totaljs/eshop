@@ -49,10 +49,10 @@ button { outline: 0; }
 .ui-form-buttons div { position: relative; display: inline-block; vertical-align: middle; }
 .ui-form-buttons label { float: right; margin: 12px 0 0 0; font-size: 11px; color: #AAB2BD; }
 
-.ui-dropdowncheckbox-container { display: block; text-align: left; position: relative; font-size:14px; }
+.ui-dropdowncheckbox-container { display: block; text-align: left; position: relative; }
 .ui-dropdowncheckbox-container * { box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; }
-.ui-dropdowncheckbox { border: 1px solid #E0E0E0; padding: 0 10px; border-radius: 2px; outline: 0; overflow: hidden; width: 100%; background-color: white; height: 32px; cursor: pointer; }
-.ui-dropdowncheckbox div { padding: 4px 0 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: black; }
+.ui-dropdowncheckbox { border: 2px solid #E0E0E0; padding: 0 8px; border-radius: 2px; outline: 0; overflow: hidden; width: 100%; background-color: white; height: 34px; cursor: pointer; }
+.ui-dropdowncheckbox div { padding: 5px 0 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: black; }
 .ui-dropdowncheckbox .fa { float: right; width: 20px; text-align: right; margin: 8px 0 0 0; }
 .ui-dropdowncheckbox-label .fa { width: 14px; }
 .ui-dropdowncheckbox-label { margin-bottom: 5px; font-size: 12px; color: gray; }
@@ -61,14 +61,14 @@ button { outline: 0; }
 .ui-dropdowncheckbox-values label { cursor: pointer; vertical-align: middle; }
 .ui-dropdowncheckbox-values input { vertical-align: middle; }
 .ui-dropdowncheckbox-values span { margin-left: 5px; vertical-align: middle; }
-.ui-dropdowncheckbox-invalid { border-color: #FFE9E9 !important; background-color: #FFF3F3 !important; }
+.ui-dropdowncheckbox-invalid { border-color: #E7B8B8 !important; background-color: #FFF3F3 !important; }
 
 .ui-textboxtags * { box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; }
 .ui-textboxtags { border: 2px solid #E0E0E0; padding: 4px 5px; border-radius: 2px; position: relative; display: block; width: 100%; background-color: white; }
 .ui-textboxtags-label { margin-bottom: 5px; font-size: 12px; color: gray; text-align: left; }
 .ui-textboxtags-label .fa { width: 14px; }
 .ui-textboxtags-label-required:before { color: red; content: '***'; margin-right: 5px; }
-.ui-textboxtags-invalid { border-color: #FFE9E9 !important; background-color: #FFF3F3 !important; }
+.ui-textboxtags-invalid { border-color: #E7B8B8 !important; background-color: #FFF3F3 !important; }
 .ui-textboxtags-values { min-height: 60px; }
 .ui-textboxtags-values ul { position: relative; display: inline-block; margin: 0; padding: 0; }
 .ui-textboxtags-values li { padding: 4px 6px 4px 8px; line-height: 16px; vertical-align: middle; background-color: #F0F0F0; font-size: 12px; position: relative; display: inline-block; margin: 2px; border-radius: 3px; }
@@ -81,13 +81,13 @@ button { outline: 0; }
 .ui-pictures .fa-times:active { margin-top: -3px; }
 .ui-pictures .selected { border: 4px solid yellow; }
 
-.ui-fileupload { border: 2px solid #E0E0E0; padding: 3px 5px; border-radius: 2px; position: relative; display: block; width: 100%; background-color: white; }
+.ui-fileupload { border: 2px solid #E0E0E0; padding: 6px 8px; border-radius: 2px; position: relative; display: block; width: 100%; background-color: white; }
 .ui-fileupload input[type="text"] { border: 0; width: 100%; outline: 0; font: normal 14px Arial; color: black; }
 .ui-fileupload-input { position: absolute; width: 100%; height: 30px; border: 1px solid #E0E0E0; margin: -5px 0 0 -7px; opacity: 0; cursor: pointer; font-weight: bold; }
 .ui-fileupload-label { margin-bottom: 6px; font-size: 12px; color: gray; }
 .ui-fileupload-label .fa { width: 13px; }
 .ui-fileupload-label-required:before { color: red; content: '***'; margin-right: 5px; }
-.ui-fileupload .fa-angle-down, .ui-fileupload .fa-folder { position: absolute; right: 8px; top: 6px; color: color; }
+.ui-fileupload .fa-angle-down, .ui-fileupload .fa-folder { position: absolute; right: 10px; top: 8px; color: #D0D0D0; font-size: 16px; }
 
 .ui-crop { text-align: center; padding: 30px 0 60px; background-color: #F8F8F8; position: relative; width: 100%; }
 .ui-crop canvas { cursor: pointer; cursor: pointer; border: 1px solid #6298F3; margin: 0 auto; }
@@ -146,7 +146,7 @@ button { outline: 0; }
 .ui-textbox-label { margin-bottom: 5px; font-size: 12px; color: #656D78; text-align: left; }
 .ui-textbox-label .fa { width: 14px; }
 .ui-textbox-label-required:before { color: red; content: '***'; margin-right: 5px; }
-.ui-textbox-invalid { border-color: #FFE9E9 !important; background-color: #FFF3F3 !important; }
+.ui-textbox-invalid { border-color: #E7B8B8 !important; background-color: #FFF3F3 !important; }
 .ui-textbox-invalid input { background-color: #FFF3F3 !important; }
 .ui-textbox ul { margin: 20px 0 0 -5px; padding: 0; list-style-type: none; position: absolute; width: 100%; background-color: white; z-index: 5; border: 1px solid #E0E0E0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: none; }
 .ui-textbox li { display: block; padding: 5px 10px; border-top: 1px solid #E0E0E0; cursor: pointer; }
@@ -159,19 +159,19 @@ button { outline: 0; }
 .ui-textarea-label { margin-bottom: 5px; font-size: 12px; color: gray; text-align: left; }
 .ui-textarea-label .fa { width: 14px; }
 .ui-textarea-label-required:before { color: red; content: '***'; margin-right: 5px; }
-.ui-textarea-invalid { border-color: #FFE9E9 !important; background-color: #FFF3F3 !important; }
+.ui-textarea-invalid { border-color: #E7B8B8 !important; background-color: #FFF3F3 !important; }
 .ui-textarea-invalid textarea { background-color: #FFF3F3 !important; }
 .ui-textarea-code textarea { font-family: monospace; font-size: 14px; }
 
 .ui-dropdown-container * { box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; }
-.ui-dropdown-values { position: relative; display: block; height: 32px; text-align: left; }
-.ui-dropdown { border: 2px solid #E0E0E0; padding: 0 10px; border-radius: 2px; outline: 0; height: 32px; overflow: hidden; float: left; width: 100%; background-color: white; position: relative; }
-.ui-dropdown select { width: 120%; outline: 0; border: 0; height: 24px; background-color: white; font-size: 14px; float: left; cursor: pointer; padding: 0; margin: 2px 0 0 -3px; color: black; appearance: none; -moz-appearance: none; -webkit-appearance: none; }
+.ui-dropdown-values { position: relative; display: block; height: 34px; text-align: left; }
+.ui-dropdown { border: 2px solid #E0E0E0; padding: 0 10px; border-radius: 2px; outline: 0; height: 34px; overflow: hidden; float: left; width: 100%; background-color: white; position: relative; }
+.ui-dropdown select { width: 120%; outline: 0; border: 0; height: 26px; background-color: white; font-size: 14px; float: left; cursor: pointer; padding: 0; margin: 2px 0 0 -3px; color: black; appearance: none; -moz-appearance: none; -webkit-appearance: none; }
 .ui-dropdown .fa { position: absolute; right: 8px; top: 8px; }
 .ui-dropdown-label { margin-bottom: 5px; font-size: 12px; }
 .ui-dropdown-label .fa { width: 14px; }
 .ui-dropdown-label-required:before { color: red; content: '***'; margin-right: 5px; }
-.ui-dropdown-invalid { border-color: #FFE9E9 !important; background-color: #FFF3F3 !important; }
+.ui-dropdown-invalid { border-color: #E7B8B8 !important; background-color: #FFF3F3 !important; }
 .ui-dropdown-invalid select { background-color: #FFF3F3 !important; }
 .ui-dropdown select:disabled { background-color: #F0F0F0; cursor: not-allowed; color: gray; }
 
