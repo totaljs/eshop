@@ -35,7 +35,10 @@ function $cmseditor_load(type) {
 	// type === sourcecode --> content changed
 }
 
-function $cmseditor_save() {
+function $cmseditor_save(type) {
+	// type === undefined  --> save the content
+	// type === sourcecode --> get source-code
+
 	// changed the DOM
 	// DOM will be saved
 }

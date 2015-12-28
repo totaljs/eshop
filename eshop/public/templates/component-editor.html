@@ -204,10 +204,10 @@
 			}, true);
 		};
 
-		self.save = function(callback) {
+		self.save = function(callback, type) {
 			var w = self.getWindow();
 			if (w.$cmseditor_save)
-				w.$cmseditor_save();
+				w.$cmseditor_save(type);
 			setTimeout(callback, 500);
 		};
 
@@ -819,8 +819,12 @@
 		};
 
 		self.showSourceCode = function() {
-			SET('cmseditor.source', self.getSourceCode().replace(/\n[\s\t]+\n/g, '\n'), true);
-			SET('cmseditor.window', 'source');
+			loading(true);
+			self.save(function() {
+				SET('cmseditor.source', self.getSourceCode().replace(/\n[\s\t]+\n/g, '\n'), true);
+				SET('cmseditor.window', 'source');
+				loading(false);
+			}, 'sourcecode');
 		};
 	});
 
