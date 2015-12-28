@@ -208,8 +208,6 @@
 			var w = self.getWindow();
 			if (w.$cmseditor_save)
 				w.$cmseditor_save(type);
-			if (w.jQuery && w.jQuery.components)
-				w.jQuery.components.emit('cmseditor.save', type);
 			setTimeout(callback, 500);
 		};
 
@@ -227,6 +225,8 @@
 
 			frm.document.write(content.replace('</body>', offsetter + '</body>'));
 			frm.document.close();
+			frm.$cmseditor = true;
+
 			iframe.css({ height: 'auto' });
 
 			setTimeout(function() {
@@ -782,8 +782,6 @@
 				var w = self.getWindow();
 				if (w.$cmseditor_load)
 					w.$cmseditor_load(type);
-				if (w.jQuery && w.jQuery.components)
-					w.jQuery.components.emit('cmseditor.load', type);
 			}, 500);
 		};
 

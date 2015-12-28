@@ -225,6 +225,8 @@
 
 			frm.document.write(content.replace('</body>', offsetter + '</body>'));
 			frm.document.close();
+			frm.$cmseditor = true;
+
 			iframe.css({ height: 'auto' });
 
 			setTimeout(function() {
