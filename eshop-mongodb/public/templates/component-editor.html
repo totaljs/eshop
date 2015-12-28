@@ -204,6 +204,13 @@
 			}, true);
 		};
 
+		self.save = function(callback) {
+			var w = self.getWindow();
+			if (w.$cmseditor_save)
+				w.$cmseditor_save();
+			setTimeout(callback, 500);
+		};
+
 		self.write = function(content) {
 			var frm = iframe.get(0).contentWindow;
 
@@ -256,7 +263,11 @@
 		};
 
 		self.getDocument = function() {
-			return iframe.get(0).contentWindow.document;
+			return this.getWindow().document;
+		};
+
+		self.getWindow = function() {
+			return iframe.get(0).contentWindow;
 		};
 
 		self.getTarget = function() {
@@ -761,6 +772,15 @@
 			});
 
 			self.resize(10);
+			self.load();
+		};
+
+		self.load = function(type) {
+			setTimeout(function() {
+				var w = self.getWindow();
+				if (w.$cmseditor_load)
+					w.$cmseditor_load(type);
+			}, 500);
 		};
 
 		self.resize = function(force) {
@@ -1031,6 +1051,7 @@
 			editor.doFind('#CMS').html(cmseditor.source);
 			editor.resize();
 			editor.change(true);
+			editor.load('sourcecode');
 			hide();
 		};
 	});

@@ -269,31 +269,31 @@
 	ON('#pages.form', function(component) {
 		// Submit order form
 		component.submit = function(hide) {
-			var editor = FIND('#pages.editor');
-			var widgets = editor.getWidgets();
-
-			pages.form.pictures = editor.getPictures();
-			pages.form.perex = editor.getPerex();
-			pages.form.body = editor.getContent().replace(/\n[\s\t]+\n/g, '\n');
-			pages.form.search = editor.getKeywords();
-			pages.form.widgets = widgets.widgets;
-			pages.form.settings = widgets.settings;
-
 			loading(true);
-			$.components.POST(managerurl + '/api/pages/', pages.form, function(response) {
+			var editor = FIND('#pages.editor');
+			editor.save(function() {
+				var widgets = editor.getWidgets();
+				pages.form.pictures = editor.getPictures();
+				pages.form.perex = editor.getPerex();
+				pages.form.body = editor.getContent().replace(/\n[\s\t]+\n/g, '\n');
+				pages.form.search = editor.getKeywords();
+				pages.form.widgets = widgets.widgets;
+				pages.form.settings = widgets.settings;
+				$.components.POST(managerurl + '/api/pages/', pages.form, function(response) {
 
-				// Error handling
-				SET('pages.response', response);
-				if (response instanceof Array)
-					return;
+					// Error handling
+					SET('pages.response', response);
+					if (response instanceof Array)
+						return;
 
-				hide();
-				success();
-				pages_refresh(true);
-				loading(false, 500);
+					hide();
+					success();
+					pages_refresh(true);
+					loading(false, 500);
 
-				if (!pages.form.ispartial)
-					setTimeout(pages_refresh_sitemap, 2000);
+					if (!pages.form.ispartial)
+						setTimeout(pages_refresh_sitemap, 2000);
+				});
 			});
 		};
 	});
