@@ -208,6 +208,8 @@
 			var w = self.getWindow();
 			if (w.$cmseditor_save)
 				w.$cmseditor_save(type);
+			if (w.COM)
+				w.COM.emit('cmseditor.save', type);
 			setTimeout(callback, 500);
 		};
 
@@ -782,6 +784,8 @@
 				var w = self.getWindow();
 				if (w.$cmseditor_load)
 					w.$cmseditor_load(type);
+				if (w.COM)
+					w.COM.emit('cmseditor.load', type);
 			}, 500);
 		};
 
