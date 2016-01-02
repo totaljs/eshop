@@ -176,9 +176,9 @@ button { outline: 0; }
 .ui-dropdown select:disabled { background-color: #F0F0F0; cursor: not-allowed; color: gray; }
 
 .button { position: relative; display: inline-block; margin: 0; padding: 0; border: 2px solid #D0D0D0; border-radius: 4px; background-color: white; background: linear-gradient(white,#F0F0F0); padding: 20px 0; font: normal normal 14px Arial; vertical-align: middle; color: gray; width: 100%; }
-.button:hover { border: 1px solid silver; }
+.button:hover { border-color: silver; }
 .button:active { background: white; color: #A4A4A4; }
-.button:disabled { color: silver; border: 1px solid #E0E0E0; cursor: not-allowed; background: white; }
+.button:disabled { color: silver; border-color: #E0E0E0; cursor: not-allowed; background: white; }
 .button-small { padding: 13px 0; }
 
 .ui-disabled { background-color: #F0F0F0; cursor: not-allowed; }
