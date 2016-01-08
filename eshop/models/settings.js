@@ -73,7 +73,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 				break;
 			// Brasilian currency
 			case 'brl':
-				settings.currency_entity = 'R$';
+				settings.currency_entity = 'R&dollar;';
 				break;				
 			default:
 				settings.currency_entity = settings.currency;
