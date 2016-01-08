@@ -69,7 +69,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 				settings.currency_entity = 'Kč';
 				break;
 			case 'brl':
-				settings.currency_entity = 'R$';
+				settings.currency_entity = 'R&dollar';
 				break;				
 			default:
 				settings.currency_entity = settings.currency;
