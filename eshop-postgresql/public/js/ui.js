@@ -50,11 +50,7 @@ COMPONENT('validation', function() {
 	if (path.lastIndexOf('*') === -1)
 		path += '.*';
 
-	self.noValid();
-	self.noDirty();
-
-	self.setter = null;
-	self.getter = null;
+	self.readonly();
 
 	self.make = function() {
 		buttons = self.element.find('button');
@@ -336,9 +332,7 @@ COMPONENT('textarea', function() {
 COMPONENT('template', function() {
 	var self = this;
 
-	self.noDirty();
-	self.noValid();
-	self.getter = null;
+	self.readonly();
 
 	self.make = function(template) {
 
@@ -734,8 +728,7 @@ COMPONENT('form', function() {
 		self.set('');
 	};
 
-	self.noValid();
-	self.noDirty();
+	self.readonly();
 	self.submit = function(hide) { self.hide(); };
 	self.cancel = function(hide) { self.hide(); };
 
@@ -833,8 +826,7 @@ COMPONENT('pictures', function() {
 		self.element.addClass('ui-pictures');
 	};
 
-	self.noValid();
-	self.noDirty();
+	self.readonly();
 
 	self.setter = function(value) {
 
