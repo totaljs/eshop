@@ -71,6 +71,10 @@ NEWSCHEMA('Settings').make(function(schema) {
 			case 'czk':
 				settings.currency_entity = 'Kč';
 				break;
+			// Brasilian currency
+			case 'brl':
+				settings.currency_entity = 'R$';
+				break;				
 			default:
 				settings.currency_entity = settings.currency;
 				break;
