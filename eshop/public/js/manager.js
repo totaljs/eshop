@@ -114,7 +114,7 @@ function can(name) {
 Tangular.register('price', function(value, format) {
 	if (value === undefined)
 		value = 0;
-	return value.format(format) + ' ' + currency;
+	return currency.format(value.format(format));
 });
 
 Tangular.register('join', function(value) {

@@ -4,6 +4,7 @@
 - added themes
 - added export/import XML products
 - updated design
+- updated currencies
 
 ======================== v3.0.0
 

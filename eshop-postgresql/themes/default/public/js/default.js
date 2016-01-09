@@ -197,7 +197,7 @@ COMPONENT('checkout', function() {
 
 		var cart = CACHE('cart');
 		if (!cart || !cart.length) {
-			self.element.html('0.00 ' + currency);
+			self.element.html(currency.format('0.00'));
 			return;
 		}
 
@@ -209,7 +209,7 @@ COMPONENT('checkout', function() {
 			count += cart[i].count;
 		}
 
-		self.element.html(sum.format(2) + ' ' + currency);
+		self.element.html(currency.format(sum.format(2)));
 	};
 
 });

@@ -52,30 +52,6 @@ NEWSCHEMA('Settings').make(function(schema) {
 		if (settings.url.endsWith('/'))
 			settings.url = settings.url.substring(0, settings.url.length - 1);
 
-		switch (settings.currency.toLowerCase()) {
-			case 'eur':
-				settings.currency_entity = '&euro;';
-				break;
-			case 'usd':
-				settings.currency_entity = '&dollar;';
-				break;
-			case 'gbp':
-				settings.currency_entity = '&pound;';
-				break;
-			case 'jpy':
-				settings.currency_entity = '&yen;';
-				break;
-			case 'czk':
-				settings.currency_entity = 'Kč';
-				break;
-			case 'brl':
-				settings.currency_entity = 'R&dollar;';
-				break;				
-			default:
-				settings.currency_entity = settings.currency;
-				break;
-		}
-
 		var sql = DB();
 
 		sql.update('tbl_common').make(function(builder) {
@@ -138,6 +114,31 @@ NEWSCHEMA('Settings').make(function(schema) {
 			// Rewrites internal framework settings
 			F.config['mail.address.from'] = F.config.custom.emailsender;
 			F.config['mail.address.reply'] = F.config.custom.emailreply;
+
+			// Currency settings
+			switch (F.config.custom.currency.toLowerCase()) {
+				case 'eur':
+					F.config.custom.currency_entity = '&euro; {0}';
+					break;
+				case 'usd':
+					F.config.custom.currency_entity = '&dollar; {0}';
+					break;
+				case 'gbp':
+					F.config.custom.currency_entity = '{0} &pound;';
+					break;
+				case 'jpy':
+					F.config.custom.currency_entity = '&yen; {0}';
+					break;
+				case 'czk':
+					F.config.custom.currency_entity = '{0} Kč';
+					break;
+				case 'brl':
+					F.config.custom.currency_entity = 'R&dollar; {0}';
+					break;
+				default:
+					F.config.custom.currency_entity = '{0} ' + F.config.custom.currency;
+					break;
+			}
 
 			// Returns response
 			callback(SUCCESS(true));

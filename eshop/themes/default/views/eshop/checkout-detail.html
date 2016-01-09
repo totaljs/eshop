@@ -46,7 +46,7 @@
 					</tr>
 					<tr>
 						<td class="col-xs-4 active b">@(Total price)</td>
-						<td class="b">@{if model.ispaid}<span class="green">@(paid)</span>@{fi} @{model.price.format(2)} @{!config.custom.currency_entity}</td>
+						<td class="b">@{if model.ispaid}<span class="green">@(paid)</span>@{fi} @{currency(model.price)}</td>
 					</tr>
 					<tr>
 						<td class="col-xs-4 active">@(Items count)</td>
@@ -112,16 +112,16 @@
 					@{foreach m in model.products}
 						<tr>
 							<td class="b">@{ m.name }</td>
-							<td class="ui-center col-xs-2 hidden-xs">@{m.price.format(2)} @{!config.custom.currency_entity}</td>
+							<td class="ui-center col-xs-2 hidden-xs">@{currency(m.price)}</td>
 							<td class="ui-center col-xs-2 col-sm-1"><span class="table-repsonsive-label mr5">@(Count:)</span>@{m.count}x</td>
-							<td class="ui-center col-xs-3 col-sm-2"><span class="table-repsonsive-label mr5">@(Together:)</span>@{(m.price * m.count).format(2)} @{!config.custom.currency_entity}</td>
+							<td class="ui-center col-xs-3 col-sm-2"><span class="table-repsonsive-label mr5">@(Together:)</span>@{currency(m.price * m.count)}</td>
 						</tr>
 					@{end}
 					<tr class="warning">
 						<td class="b">@(Summarize)</td>
 						<td class="ui-center col-xs-2 hidden-xs">&nbsp;</td>
 						<td class="ui-center col-xs-2 col-sm-1"><span class="table-repsonsive-label mr5">@(Count:)</span>@{model.count}x</td>
-						<td class="ui-center col-xs-3 col-sm-2"><span class="table-repsonsive-label mr5">@(Total price:)</span><b>@{model.price.format(2)} @{!config.custom.currency_entity}</b></td>
+						<td class="ui-center col-xs-3 col-sm-2"><span class="table-repsonsive-label mr5">@(Total price:)</span><b>@{currency(model.price)}</b></td>
 					</tr>
 				</tbody>
 			</table>

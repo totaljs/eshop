@@ -1,5 +1,5 @@
 // Helper for pagination rendering
-// Eshop use this helper
+// Eshop uses this helper
 F.helpers.pagination = function(model) {
 	var builder = '';
 
@@ -26,4 +26,12 @@ F.helpers.sitemap_category = function(url, category) {
 	}
 
 	return builder;
+};
+
+// Helper for formatting number with currency
+// Eshop uses this helper
+F.helpers.currency = function(value, decimals) {
+	if (typeof(value) === 'string')
+		return F.config.custom.currency_entity.format(value);
+	return F.config.custom.currency_entity.format(value.format(decimals || 2));
 };
