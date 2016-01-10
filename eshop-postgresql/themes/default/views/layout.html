@@ -12,7 +12,7 @@
 	@{import('meta', 'head', 'default.css', 'default.js', 'favicon.ico')}
 </head>
 <body>
-	<a href="https://www.totaljs.com/eshop/" class="developer"><b>This eshop is example.</b> Click here for download the source-code.</a>
+	<a href="https://www.totaljs.com/eshop/" class="developer">@(<b>This eshop is example.</b> Click here for download the source-code.)</a>
 	<div data-component="cookie" class="hidden">@(This site uses cookies for visitor statistics. By continuing to browse the site you are agreeing to our use of cookies.) <a href="/privacy/">@(Privacy Policy)</a></div>
 	<div class="header-container">
 		<div class="container">
@@ -25,9 +25,9 @@
 					@{fi}
 					@{if user}
 						<a href="/account/" class="b">@{user.name}</a>
-						<a href="/account/logoff/" class="red">Sign out</a>
+						<a href="/account/logoff/" class="red">@(Sign out)</a>
 					@{else}
-						<a href="/account/" class="b">My Account</a>
+						<a href="/account/" class="b">@(My Account)</a>
 					@{fi}
 				</div>
 			</div>
