@@ -31,7 +31,7 @@ NEWSCHEMA('Contact').make(function(schema) {
 		MODULE('webcounter').increment('contactforms');
 
 		// Sends email
-		var mail = F.mail(F.config.custom.emailcontactform, 'Contact form # ' + model.id, '~mails/contact', model, model.language);
+		var mail = F.mail(F.config.custom.emailcontactform, 'Contact form # ' + model.id, '=?/mails/contact', model, model.language);
 		mail.reply(model.email, true);
 	});
 });

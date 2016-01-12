@@ -154,7 +154,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		MODULE('webcounter').increment('orders');
 
 		// Sends email
-		var mail = F.mail(model.email, 'Order # ' + model.id, '~mails/order', model);
+		var mail = F.mail(model.email, 'Order # ' + model.id, '=?/mails/order', model);
 		mail.bcc(F.config.custom.emailorderform);
 	});
 
@@ -208,7 +208,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			return;
 
 		// Sends email
-		var mail = F.mail(model.email, 'Order (update) # ' + model.id, '~mails/order-status', model);
+		var mail = F.mail(model.email, 'Order (update) # ' + model.id, '=?/mails/order-status', model);
 		mail.bcc(F.config.custom.emailorderform);
 	});
 
