@@ -26,10 +26,11 @@ COMPONENT('gallery', function() {
 
 	self.index = 0;
 	self.max = 0;
+	self.readonly();
 
 	// For all galleries
 	if (!window.$gallery_init) {
-		$(document.body).append('<div id="gallery-layer"><a herf="javascript:void(0)" class="gallery-close"><span class="fa fa-times"></span></a><div class="gallery-container"><div class="gallery-prev"><span class="fa fa-arrow-left"></span></div><div class="gallery-image"><img src="/img/empty.png" class="img-responsive" /><div class="gallery-alt"></div></div><div class="gallery-next"><span class="fa fa-arrow-right"></span></div></div></div>');
+		$(document.body).append('<div id="gallery-layer"><a herf="javascript:void(0)" class="gallery-close"><span class="fa fa-times"></span></a><div class="gallery-container"><div class="gallery-prev"><span class="fa fa-arrow-left"></span></div><div class="gallery-image"><img src="/img/empty.png" /><div class="gallery-alt"></div></div><div class="gallery-next"><span class="fa fa-arrow-right"></span></div></div></div>');
 		window.$gallery_init = true;
 
 		$(window).on('keydown', function(e) {
@@ -57,6 +58,12 @@ COMPONENT('gallery', function() {
 			}
 
 			window.$gallery.next();
+		});
+
+		$(window).on('resize', function() {
+			FIND('gallery', true).forEach(function(component) {
+				component.show(true);
+			});
 		});
 	}
 
@@ -105,12 +112,50 @@ COMPONENT('gallery', function() {
 		});
 	};
 
-	self.show = function() {
+	self.show = function(isResize) {
+
+		if (isResize) {
+			if (!visible)
+				return;
+		}
+
 		var img = self.find('.gallery[data-index="' + self.index + '"]').find('img');
-		layer.find('img').attr('src', img.attr('data-original'));
-		layer.find('.gallery-alt').html(img.attr('alt'));
+		var big = layer.find('img');
+
+		big.attr('src', img.attr('data-original'));
+
+		var mw = img.attr('data-width').parseInt();
+		var mh = img.attr('data-height').parseInt();
+		var $w = $(window);
+		var ww = (($w.width() / 100) * 70) >> 0;
+		var wh = (($w.height() / 100) * 90) >> 0;
+		var alt = img.attr('alt');
+		var w = 0;
+		var h = 0;
+		var ratio = mw > mh ? mw / mh : mh / mw;
+
+		if (mw > mh) {
+			w = mw;
+			h = w / ratio;
+		} else {
+			h = mh;
+			w = h / ratio;
+		}
+
+		if (w > ww) {
+			w = ww - 20;
+			h = w / (mw / mh);
+		} else if (h > wh) {
+			h = wh - 20;
+			w = h / (mh / mw);
+		}
+
+		big.attr({ width: w >> 0, height: h >> 0 });
+		layer.find('.gallery-alt').html(alt).toggleClass('hidden', alt ? false : true);
+
 		if (visible)
 			return;
+
 		layer.show();
 		visible = true;
 		window.$gallery = self;
