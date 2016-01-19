@@ -46,6 +46,16 @@
 							</tr>
 						</script>
 					</tbody>
+					<tfoot data-component="template" data-component-path="summarize" class="hidden-xs">
+						<script type="text/html">
+							<tr class="active">
+								<td>@(Summarize)</td>
+								<td class="col-xs-2"></td>
+								<td class="ui-right col-xs-2 col-sm-1">{{ count }}x</td>
+								<td class="ui-right col-xs-3 col-sm-2 b black">@{currency('{{ price | sum(2) }}')}<span class="fa fa-calculator hidden-xs"></span></td>
+							</tr>
+						</script>
+					</tfoot>
 				</table>
 			</div>
 		</div>
@@ -179,6 +189,7 @@
 		$.components.GET('/api/products/', { id: id.join(',') }, function(response) {
 
 			datasource = [];
+
 			for (var i = 0, length = response.items.length; i < length; i++) {
 				var item = response.items[i];
 				datasource.push({ id: item.id, name: item.name, price: item.price, linker: item.linker, linker_category: item.linker_category, pictures: item.pictures, reference: item.reference });
@@ -234,7 +245,16 @@
 			product.count = item.count;
 		}
 
+		var count = 0;
+		var price = 0;
+		for (var i = 0, length = datasource.length; i < length; i++) {
+			var product = datasource[i];
+			price += product.price * product.count;
+			count += product.count;
+		}
+
 		UPDATE('datasource');
+		SET('summarize', { count: count, price: price });
 	}
 
 	OPERATION('submit', function() {
