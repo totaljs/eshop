@@ -2,32 +2,44 @@
 
 Please do not change the code, just create a new issues. I solve all problems as soon as possible. Do you want special upgrades? Contact me <petersirka@gmail.com>.
 
-- Current version: `v3.0.0`
+__IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREATE YOUR OWN BACKUP AND RESTORE IT ON YOU SERVERS OR CLOUD.__
+
+- Current version: `v4.0.0`
 - [Documentation](http://docs.totaljs.com/eshop-cms/latest.html)
 
 ---
 
-## What's new?
+## The source-code
 
-__Both__:
+- `cms` NoSQL embedded version
+- `eshop` NoSQL embedded version
+- `eshop-postgresql` PostgreSQL version
+- `eshop-mongodb` MongoDB version
+- `backup` contains backup of MongoDB and PostgreSQL database
 
-- new window animations (CSS 3)
-- many fixes
 
-__Eshop__:
+---
 
-- unlimited count of subcategories
-- product can contain its manufacturer
-- new PostgreSQL version
+## Installation
 
-__CMS__:
+- install `npm install total.js`
 
-- new widgets can be added between widgets
-- added search field (CMS EDITOR creates keywords from the content)
-- added keywords field
-- added Font-Awesome lists for CMS EDITOR
-- added categorization for widgets
-- fixed height of CMS editor
+### MongoDB version only
+
+- install `npm install mongobuilder`
+- install `npm install mongodb`
+- __note__: cloud database www.mongolab.com
+- __important__: binary files are too slow because I have a free billing plan and the servers are in USA
+
+### PostgreSQL version only
+
+- install `npm install sqlagent`
+- install `npm install pg`
+- install `npm install pg-large-object`
+- __note__: cloud database www.elephantsql.com
+- __important__: binary files are too slow because I have a free billing plan and the servers are in USA
+
+---
 
 ## Do you need VPS hosting for your eshops?
 

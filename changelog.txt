@@ -1,4 +1,13 @@
-(BETA) ======================== v3.0.0
+======================== v4.0.0
+
+- added mongodb version
+- added themes
+- added export/import XML products
+- updated design
+- updated currencies
+- updated scripts
+
+======================== v3.0.0
 
 - added postgresql version
 - added animations

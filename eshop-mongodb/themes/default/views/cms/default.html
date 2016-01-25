@@ -1,0 +1,45 @@
+@{notranslate}
+@{nocompress html}
+
+<!-- ALL CMS CONTENT (FOR EDITOR) MUST BE WRAPPED IN <div id="CMS"> -->
+<div id="CMS">
+
+	@{if repository.preview}
+
+		@{if repository.page && repository.page.body}
+
+			<!-- RENDER UPDATED CONTENT -->
+			@{!repository.page.body}
+
+		@{else}
+
+			<!-- DEFAULT CONTENT FOR NEW PAGES FO THIS TEMPLATE -->
+			<div class="CMS_widgets"></div>
+
+		@{fi}
+
+	@{else}
+
+		<!-- RENDERING FOR VISITORS -->
+		<br />
+		<br />
+		<h1 style="margin-bottom:0">@{repository.page.title}</h1>
+		@{!repository.page.body}
+
+	@{fi}
+</div>
+
+<script>
+function $cmseditor_load(type) {
+	// type === undefined  --> load new content
+	// type === sourcecode --> content changed
+}
+
+function $cmseditor_save(type) {
+	// type === undefined  --> save the content
+	// type === sourcecode --> get source-code
+
+	// changed the DOM
+	// DOM will be saved
+}
+</script>

@@ -114,8 +114,6 @@ NEWSCHEMA('Order').make(function(schema) {
 
 			data.count = count;
 			data.items = docs;
-
-			// Gets page count
 			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
 
 			if (data.pages === 0)
@@ -167,7 +165,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		MODULE('webcounter').increment('orders');
 
 		// Sends email
-		var mail = F.mail(model.email, 'Order # ' + model.id, '~mails/order', model);
+		var mail = F.mail(model.email, 'Order # ' + model.id, '=?/mails/order', model);
 		mail.bcc(F.config.custom.emailorderform);
 	});
 
@@ -221,6 +219,9 @@ NEWSCHEMA('Order').make(function(schema) {
 
 		// Update order in database
 		DB('orders').update(updater, function() {
+
+			F.emit('orders.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});
@@ -229,7 +230,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			return;
 
 		// Sends email
-		var mail = F.mail(model.email, 'Order (update) # ' + model.id, '~mails/order-status', model);
+		var mail = F.mail(model.email, 'Order (update) # ' + model.id, '=?/mails/order-status', model);
 		mail.bcc(F.config.custom.emailorderform);
 	});
 

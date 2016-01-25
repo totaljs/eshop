@@ -1,0 +1,58 @@
+@{layout('')}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Manager v@{config.version}</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=10" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="robots" content="all,follow" />
+	@{head}
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
+	@{import('manager.css', 'favicon.ico')}
+</head>
+<body>
+	<div id="loading"></div>
+	<br />
+	<br />
+	<div class="container">
+		<div class="col-md-4"></div>
+		<div class="col-md-4 enter">
+			<h1>@{config.name} <b>v@{config.version}</b></h1>
+			<div data-component="textbox" data-component-path="user.name" class="m" data-maxlength="80" data-required="true" data-placeholder="@(Enter your login name)" data-autofocus="true">@(Login name)</div>
+			<div data-component="textbox" data-component-path="user.password" data-component-type="password" data-required="true" class="m" data-maxlength="30" data-placeholder="@(Enter your password)">@(Password)</div>
+			<div class="row">
+				<div data-component="error" data-component-path="user.error"></div>
+			</div>
+			<div data-component="validation" data-component-path="user">
+				<button class="button button-small b" data-component="click" data-component-path="doLogin" data-enter=".enter"><span class="fa fa-lock"></span> @(Sign in)</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	@{import('manager.js')}
+	<script>
+		var user = {};
+		if (document.cookie.indexOf('__manager') !== -1)
+			user.error = [{ error: '@(Incorrect username or password.)' }];
+
+		loading(false, 2000);
+
+		function doLogin() {
+			if (!$.components.valid('user.*'))
+				return;
+			var id = HASH(user.name + ':' + user.password);
+			var dt = new Date();
+			dt.setDate(dt.getDate() + 7);
+			document.cookie = '__manager=' + (id.toString()) + '; expires=' + dt.toUTCString() + '; path=/';
+			loading(true);
+			window.location.reload(true);
+		}
+	</script>
+
+</body>
+</html>

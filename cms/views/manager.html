@@ -9,11 +9,10 @@
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<meta name="robots" content="all,follow" />
-	@{head}
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/codemirror.min.css" />
-	@{import('manager.css', 'favicon.ico')}
+	@{import('head', 'manager.css', 'favicon.ico')}
 	<script>
 		var managerurl="@{!CONFIG('manager-url')}";
 		var currency='@{!config.custom.currency_entity}';
@@ -68,7 +67,7 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/mode/xml/xml.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/mode/css/css.min.js"></script>
 
-	@{js('manager.js')}
+	@{import('manager.js')}
 	@{place('manager-script')}
 	@{section('script')}
 

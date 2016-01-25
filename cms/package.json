@@ -4,8 +4,7 @@
   "version": "1.0.1",
   "main": "release.js",
   "dependencies": {
-    "paypal-express-checkout": "^1.0.3",
-    "total.js": "^1.9.1"
+    "total.js": "^1.9.4"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

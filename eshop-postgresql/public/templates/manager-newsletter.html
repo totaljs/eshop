@@ -1,0 +1,70 @@
+<div class="filter" style="padding-bottom:9px">
+	<div class="container">
+		<div class="caption"><span class="fa fa-envelope mr5"></span> @(Registered email addresses)</div>
+	</div>
+</div>
+<div class="container hidden-xs">
+	<br />
+	<div class="row">
+		<div class="col-md-4 col-sm-4 m">
+			<div class="b"><span class="fa fa-envelope mr5"></span> MailChimps</div>
+			<p class="silver">MailChimp is the best way to design, send, and share email newsletters.</p>
+			<span class="fa fa-link mr5"></span><a href="http://mailchimp.com" target="_blank">@(Visit website)</a>
+		</div>
+		<div class="col-md-4 col-sm-4 m">
+			<div class="b"><span class="fa fa-envelope mr5"></span> Sendy</div>
+			<p class="silver">A self hosted newsletter application that lets you send trackable emails.</p>
+			<span class="fa fa-link mr5"></span><a href="https://sendy.co" target="_blank">@(Visit website)</a>
+		</div>
+		<div class="col-md-4 col-sm-4 m">
+			<div class="b"><span class="fa fa-envelope mr5"></span> Sendloop</div>
+			<p class="silver">Create email marketing and beautiful HTML email campaigns easily.</p>
+			<span class="fa fa-link mr5"></span><a href="https://sendloop.com" target="_blank">@(Visit website)</a>
+		</div>
+	</div>
+</div>
+<hr class="hidden-xs" />
+<div class="container hidden" data-component="visible" data-component-path="newsletter.grid" data-if="value && value.length > 0">
+	<div class="ui-center" style="margin-top:10px">
+		<div class="fs11 silver">@(Read-only mode)</div>
+		<a href="javascript:void(0)" class="csvexport"><span class="fa fa-download mr5"></span>@(<b>Download CSV</b> with email addresses)</a>
+	</div>
+	<br />
+	<div data-component="grid" data-component-path="newsletter.grid" data-max="1000000" data-options-page="">
+		<script type="text/html">
+		<tr>
+			<td><span class="fa fa-envelope"></span> {{ email }}</td>
+			<td style="width:150px" class="silver hidden-xs">{{ ip }}</td>
+			<td style="width:120px" class="ui-center active">{{ datecreated }}</td>
+		</tr>
+		</script>
+	</div>
+	<br />
+</div>
+
+<script>
+
+	var newsletter = {};
+
+	function newsletter_refresh() {
+		$.components.GET(managerurl + '/api/newsletter/', null, function(response) {
+			var csv = response.split('\n');
+			var arr = [];
+			csv.reverse();
+
+			for (var i = 0, length = csv.length; i < length; i++) {
+				var line = csv[i].split(';');
+				if (!line[1])
+					continue;
+				arr.push({ email: line[0], ip: line[1], datecreated: line[3] });
+			}
+
+
+			SET('newsletter.grid', arr);
+		});
+	}
+
+	$('.csvexport').attr('href', managerurl + '/api/newsletter/csv/');
+	newsletter_refresh();
+
+</script>

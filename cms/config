@@ -1,5 +1,5 @@
 name                      : CMS
-version                   : 3.0.0
+version                   : 4.0.0
 author                    : Peter Širka
 
 // A relative URL address into the eshop management
@@ -23,3 +23,6 @@ mail.smtp                 : YOUR.SMTPSERVER.COM
 // Image convertor for resizing of pictures
 // Default image converter: im = ImageMagick, gm = GraphicsMagick
 default-image-converter   : gm
+
+// Default theme
+default-theme             : default

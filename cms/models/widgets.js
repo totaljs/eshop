@@ -107,6 +107,8 @@ NEWSCHEMA('Widget').make(function(schema) {
 			if (count === 0)
 				DB('widgets').insert(model);
 
+			F.emit('widgets.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});

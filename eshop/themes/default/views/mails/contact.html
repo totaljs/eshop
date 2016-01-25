@@ -1,0 +1,29 @@
+@{layout('~mails/layout')}
+
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Contact number)</div>
+	<div class="float:left">: @{model.id}</div>
+</div>
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Created)</div>
+	<div class="float:left">: @{model.datecreated.format('@(yyyy-MM-dd)')}</div>
+</div>
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Customer)</div>
+	<div class="float:left">: @{model.firstname} @{model.lastname}</div>
+</div>
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Email address)</div>
+	<div class="float:left">: @{model.email}</div>
+</div>
+@{if model.phone}
+<div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
+	<div style="float:left;width:150px">@(Phone number)</div>
+	<div class="float:left">: @{model.phone}</div>
+</div>
+@{fi}
+<br />
+<div style="background-color:#F0F0F0;padding:20px;border-radius:4px;margin-top:5px">
+	<div style="margin-bottom:10px"><b>@(Message:)</b></div>
+	<div>@{!model.message.encode().replace(/\n/g, '<br />')}</div>
+</div>

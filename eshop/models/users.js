@@ -63,8 +63,11 @@ NEWSCHEMA('User').make(function(schema) {
 			return model.$clean();
 		};
 
-		// Update order in database
+		// Update user in database
 		DB('users').update(updater, function() {
+
+			F.emit('users.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
 		});
@@ -143,8 +146,6 @@ NEWSCHEMA('User').make(function(schema) {
 
 			data.count = count;
 			data.items = docs;
-
-			// Gets page count
 			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
 
 			if (data.pages === 0)
@@ -206,7 +207,7 @@ NEWSCHEMA('User').make(function(schema) {
 });
 
 // Rewrites framework authorization
-F.onAuthorization = function(req, res, flags, callback) {
+F.onAuthorize = function(req, res, flags, callback) {
 
 	var hash = req.cookie(COOKIE);
 

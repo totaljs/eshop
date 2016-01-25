@@ -50,11 +50,7 @@ COMPONENT('validation', function() {
 	if (path.lastIndexOf('*') === -1)
 		path += '.*';
 
-	self.noValid();
-	self.noDirty();
-
-	self.setter = null;
-	self.getter = null;
+	self.readonly();
 
 	self.make = function() {
 		buttons = self.element.find('button');
@@ -136,6 +132,9 @@ COMPONENT('dropdown', function() {
 				builder.push('<option value="' + item[kv] + '"' + (value == item[kv] ? ' selected="selected"' : '') + '>' + item[kt] + '</option>');
 		}
 
+		var disabled = arr.length === 0;
+		el.parent().toggleClass('ui-disabled', disabled);
+		el.prop('disabled', disabled);
 		el.html(builder.join(''));
 	};
 
@@ -333,9 +332,7 @@ COMPONENT('textarea', function() {
 COMPONENT('template', function() {
 	var self = this;
 
-	self.noDirty();
-	self.noValid();
-	self.getter = null;
+	self.readonly();
 
 	self.make = function(template) {
 
@@ -731,8 +728,7 @@ COMPONENT('form', function() {
 		self.set('');
 	};
 
-	self.noValid();
-	self.noDirty();
+	self.readonly();
 	self.submit = function(hide) { self.hide(); };
 	self.cancel = function(hide) { self.hide(); };
 
@@ -830,8 +826,7 @@ COMPONENT('pictures', function() {
 		self.element.addClass('ui-pictures');
 	};
 
-	self.noValid();
-	self.noDirty();
+	self.readonly();
 
 	self.setter = function(value) {
 
@@ -946,6 +941,9 @@ COMPONENT('fileupload', function() {
 			for (var i = 0, length = files.length; i < length; i++)
 				data.append('file' + i, files[i]);
 
+				if (typeof(window.loading) === 'function')
+					window.loading(true);
+
 			$.components.UPLOAD(url, data, function(response, err) {
 				self.change();
 				el.value = '';
@@ -964,6 +962,9 @@ COMPONENT('fileupload', function() {
 					self.set(response[0]);
 				else
 					self.push(response);
+
+				if (typeof(window.loading) === 'function')
+					window.loading(false, 500);
 			});
 		});
 	};

@@ -4,8 +4,8 @@ exports.install = function() {
 
 	// COMMON
 	F.route(CONFIG('manager-url') + '/*', '~manager');
-	F.route(CONFIG('manager-url') + '/upload/',                  upload, ['post', 'upload'], 3084); // 3 MB
-	F.route(CONFIG('manager-url') + '/upload/base64/',           upload_base64, ['post'], 2048); // 2 MB
+	F.route(CONFIG('manager-url') + '/upload/',                  upload, ['post', 'upload', 10000], 3084); // 3 MB
+	F.route(CONFIG('manager-url') + '/upload/base64/',           upload_base64, ['post', 10000], 2048); // 2 MB
 	F.route(CONFIG('manager-url') + '/logoff/',                  redirect_logoff);
 
 	// FILES
@@ -72,7 +72,6 @@ exports.install = function() {
 function upload() {
 
 	var self = this;
-	var async = [];
 	var id = [];
 
 	self.files.wait(function(file, next) {
