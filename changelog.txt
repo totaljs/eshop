@@ -5,6 +5,7 @@
 - added export/import XML products
 - updated design
 - updated currencies
+- updated scripts
 
 ======================== v3.0.0
 
