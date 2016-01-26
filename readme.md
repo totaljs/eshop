@@ -43,7 +43,7 @@ __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREAT
 
 ## Do you need VPS hosting for your eshops?
 
-Sign up on <https://www.webhostingy.com/totaljs>
+Sign up on <https://www.webhostingy.com/en/totaljs>
 
 - you can provide more than 5 eshops
 - price around 15 EUR per month
