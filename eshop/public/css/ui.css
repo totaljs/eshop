@@ -204,3 +204,16 @@ label span { vertical-align: middle; }
 .ui-cookie { font-size: 11px; padding: 3px 20px 5px; border-bottom: 1px solid #F0F0F0; text-align: center; }
 .ui-cookie button { position: relative; display: inline-block; padding: 1px 5px; border-radius: 4px; font-size: 10px; background-color: black; color: white; border: 0; margin-left: 5px; cursor: pointer; outline: 0; }
 .ui-cookie button:hover { background-color: #303030; }
+
+.ui-message { background-color: rgba(255,255,255,0.9); position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 20; width: 100%; display: table; height: 100%; transition: 0.5s all; opacity: 0; }
+.ui-message > div { display: table-cell; vertical-align: middle; text-align: center; color: white; padding: 15px; }
+.ui-message .fa { position: absolute; margin: -75px 0 0 -35px; width: 70px; left: 50%; height: 70px; padding-top: 15px; border-radius: 100px; font-size: 30px; border-width: 5px; border-style: solid; text-align: center; }
+.ui-message-body { padding: 30px; position: relative; display: inline-block; border-radius: 4px; max-width: 600px; text-align: left; transform: scale(0.5); transition: 0.3s all; }
+.ui-message-warning { background-color: #DA4453; }
+.ui-message-warning .fa { background-color: #ED5565; border-color: #DA4453; }
+.ui-message-success { background-color: #8CC152; }
+.ui-message-success .fa { background-color: #A0D468; border-color: #8CC152; }
+.ui-message button { display: block; width: 240px; margin: 20px auto 0; cursor: pointer; outline: 0; background-color: #E0E0E0; border: 0; border-radius: 4px; color: gray; padding: 0 20px; height: 40px; font-weight: bold; }
+.ui-message button:hover { background-color: #E5E5E5; }
+.ui-message-visible { opacity: 1; }
+.ui-message-visible .ui-message-body { transform: scale(1); }

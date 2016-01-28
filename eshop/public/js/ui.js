@@ -41,6 +41,51 @@ COMPONENT('visible', function() {
 	};
 });
 
+COMPONENT('message', function() {
+	var self = this;
+	var is = false;
+
+	self.readonly();
+	self.singleton();
+
+	self.make = function() {
+		self.element.addClass('ui-message');
+		self.element.on('click', 'button', function() {
+			self.hide();
+		});
+	};
+
+	self.warning = function(message, icon) {
+		self.content('ui-message-warning', message, icon || 'fa-warning');
+	};
+
+	self.success = function(message, icon) {
+		self.content('ui-message-success', message, icon || 'fa-check-circle');
+	};
+
+	self.hide = function() {
+		self.element.removeClass('ui-message-visible');
+		setTimeout(function() {
+			self.element.addClass('hidden');
+		}, 1000);
+	};
+
+	self.content = function(cls, text, icon) {
+
+		if (!is)
+			self.element.html('<div><div class="ui-message-body"><span class="fa fa-warning"></span><div class="ui-center"></div></div><button>' + (self.attr('data-button') || 'Close') + '</button></div>');
+
+		self.element.find('.ui-message-body').removeClass().addClass('ui-message-body ' + cls);
+		self.element.find('.fa').removeClass().addClass('fa ' + icon);
+		self.element.find('.ui-center').html(text);
+
+		self.element.removeClass('hidden');
+		setTimeout(function() {
+			self.element.addClass('ui-message-visible');
+		}, 5);
+	};
+});
+
 COMPONENT('validation', function() {
 
 	var self = this;
