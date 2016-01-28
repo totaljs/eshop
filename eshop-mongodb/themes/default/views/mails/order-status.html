@@ -35,7 +35,7 @@
 @{fi}
 <div style="border-bottom:1px solid #E0E0E0;color:#AAB2BD;padding:5px 0 3px;height:20px">
 	<div style="float:left;width:150px">@(Total price)</div>
-	<div class="float:left">: @{model.price.format(2)} @{!config.custom.currency_entity}</div>
+	<div class="float:left">: @{currency(model.price)}</div>
 </div>
 <br />
 <div style="background-color:#F0F0F0;padding:20px;border-radius:4px;margin-top:5px">
@@ -46,7 +46,7 @@
 @{foreach m in model.products}
 <div style="border-bottom:1px solid #E0E0E0;padding:5px 0 3px;height:20px">
     <div style="float:left">@{m.name}</div>
-    <div style="float:right;text-align:right;width:100px">@{m.price.format(2)} @{!config.custom.currency_entity}</div>
+    <div style="float:right;text-align:right;width:100px">@{currency(m.price)}</div>
     <div style="float:right;text-align:right;width:60px;font-size:11px;color:#AAB2BD">@{m.count}x</div>
 </div>
 @{end}
