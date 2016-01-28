@@ -44,6 +44,8 @@
 		<hr />
 	@{end}
 	<br />
-	<h2>@(Related) @{model.category}</h2>
-	<div data-component="related" data-category="@{model.linker_category}" data-id="@{model.id}"></div>
+	<div class="hidden">
+		<h2>@(Related) @{model.category}</h2>
+		<div data-component="related" data-category="@{model.linker_category}" data-id="@{model.id}"></div>
+	</div>
 </div>
