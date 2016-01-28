@@ -1233,8 +1233,7 @@ COMPONENT('crop', function() {
 	var current = { x: 0, y: 0 };
 	var offset = { x: 0, y: 0 };
 
-	self.noValid();
-	self.getter = null;
+	self.readonly();
 
 	img.onload = function () {
 		can = true;
