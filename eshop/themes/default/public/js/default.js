@@ -43,9 +43,7 @@ $(document).ready(function() {
 		}, 1000);
 	}
 
-	setTimeout(function() {
-		$('#loading').fadeOut(300);
-	}, 800);
+	loading(false, 800);
 });
 
 COMPONENT('related', function() {
@@ -53,6 +51,9 @@ COMPONENT('related', function() {
 	self.readonly();
 	self.make = function() {
 		$.components.GET('/api/products/', { html: 1, category: self.attr('data-category'), max: 8, skip: self.attr('data-id') }, function(response) {
+			var parent = self.element.parent();
+			if (parent.hasClass('hidden') && response.indexOf('id="empty"') === -1)
+				parent.removeClass('hidden');
 			self.html(response);
 		});
 	};
@@ -95,7 +96,7 @@ COMPONENT('newsletter', function() {
 		button.on('click', function() {
 
 			var mail = input.val();
-			if (!mail.match(/^[a-z0-9A-Z_\.]+@[0-9a-zA-Z_]+?\.[a-zA-Z]{2,3}$/))
+			if (!mail.isEmail())
 				return;
 
 			$.components.POST('/api/newsletter/', { email: input.val() }, function(response) {
@@ -118,7 +119,7 @@ COMPONENT('newsletter', function() {
 COMPONENT('checkout', function() {
 
 	var self = this;
-	var expiration = ((1000 * 60) * 60) * 168;
+	var expiration = ((1000 * 60) * 60) * 168; // Valid for 7 days
 	var currency = self.attr('data-currency');
 
 	self.make = function() {
@@ -157,40 +158,56 @@ COMPONENT('checkout', function() {
 
 		CACHE('cart', cart, expiration);
 		self.refresh();
-		return count
+		return count;
 	};
 
 	self.update = function(id, count) {
+
+		// Possible return values:
+		// -1 = without change
+		// 0  = removed
+		// 1  = updated
+
 		var cart = CACHE('cart');
 		if (!cart)
-			return;
+			return -1;
 
+		var removed = false;
 		for (var i = 0, length = cart.length; i < length; i++) {
 			var item = cart[i];
 			if (item.id !== id)
 				continue;
 
 			if (count === item.count)
-				return;
+				return -1;
 
-			if (count <= 0)
+			if (count <= 0) {
 				cart.splice(i, 1);
-			else
+				removed = true;
+			} else
 				item.count = count;
+
 			break;
 		}
-
 		CACHE('cart', cart, expiration);
-		self.refresh();
+		self.refresh(removed ? 1 : 0);
+		return removed ? 1 : 0;
 	};
 
 	self.clear = function() {
 		CACHE('cart', [], expiration);
-		self.refresh();
+		self.refresh(1);
 	};
 
 	self.read = function() {
 		return CACHE('cart');
+	};
+
+	self.get = function(id) {
+		var cart = CACHE('cart');
+		if (!cart)
+			return;
+		return cart.findItem('id', id);
 	};
 
 	self.refresh = function() {
@@ -211,5 +228,23 @@ COMPONENT('checkout', function() {
 
 		self.element.html(currency.format(sum.format(2)));
 	};
-
 });
+
+function loading(visible, timeout) {
+	var el = $('#loading');
+
+	if (!visible && !el.length)
+		return;
+
+	if (!el.length) {
+		$(document.body).append('<div id="loading"></div>');
+		el = $('#loading');
+	}
+
+	setTimeout(function() {
+		if (visible)
+			el.fadeIn(500);
+		else
+			el.fadeOut(500);
+	}, timeout || 0);
+}

@@ -111,14 +111,14 @@
 				<tbody>
 					@{foreach m in model.products}
 						<tr>
-							<td>@{ m.name }</td>
+							<td class="b">@{ m.name }</td>
 							<td class="ui-center col-xs-2 hidden-xs">@{currency(m.price)}</td>
 							<td class="ui-center col-xs-2 col-sm-1"><span class="table-repsonsive-label mr5">@(Count:)</span>@{m.count}x</td>
 							<td class="ui-center col-xs-3 col-sm-2"><span class="table-repsonsive-label mr5">@(Together:)</span>@{currency(m.price * m.count)}</td>
 						</tr>
 					@{end}
 					<tr class="warning">
-						<td class="b">@(Summarize)</td>
+						<td class="b black">@(Summarize)</td>
 						<td class="ui-center col-xs-2 hidden-xs">&nbsp;</td>
 						<td class="ui-center col-xs-2 col-sm-1"><span class="table-repsonsive-label mr5">@(Count:)</span>@{model.count}x</td>
 						<td class="ui-center col-xs-3 col-sm-2"><span class="table-repsonsive-label mr5">@(Total price:)</span><b>@{currency(model.price)}</b></td>

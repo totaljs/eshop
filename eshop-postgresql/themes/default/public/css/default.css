@@ -170,7 +170,7 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	.checkoutlist { border: 0; }
 	.checkoutlist tr { display: block !important; margin-bottom: 10px; border-bottom: 2px solid #E0E0E0; }
 	.checkoutlist td { display: block !important; width: 100%; border: 0 !important; }
-	.checkoutlist td:first-child { font-size: 16px; font-weight: bold; }
+	.checkoutlist td:first-child { font-size: 16px; }
 	.checkoutlist td:last-child { margin-bottom: 5px; padding-top: 0; }
 	.checkoutlist td:nth-child(2) { display: none !important; }
 	.checkoutlist .active { background-color: white !important; }

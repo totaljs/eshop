@@ -39,10 +39,10 @@
 					<tbody data-component="repeater" data-component-path="datasource">
 						<script type="text/html">
 							<tr>
-								<td><a href="/product/{{ linker }}/">{{ name }}</a></td>
+								<td><a href="/product/{{ linker }}/" class="b">{{ name }}</a><div class="visible-xs fs11 mt10">One piece: @{currency('{{ price | format(2) }}')}</div></td>
 								<td class="ui-right col-xs-2">@{currency('{{ price | format(2) }}')}</td>
 								<td class="ui-right col-xs-2 col-sm-1 active"><input type="text" value="{{ count }}" data-id="{{ id }}" maxlength="2" /></td>
-								<td class="ui-right col-xs-3 col-sm-2 b warning"><span class="visible-xs checkoutlist-label">Together:</span>@{currency('{{ price | sum(2) }}')}<span class="fa fa-times-circle hidden-xs" data-id="{{ id }}"></span></td>
+								<td class="ui-right col-xs-3 col-sm-2 b warning"><span class="visible-xs checkoutlist-label">Together:</span><span class="checkoutlist-item-price" data-format="@{currency('{0}')}">@{currency('{{ price | sum(2) }}')}</span><span class="fa fa-times-circle hidden-xs" data-id="{{ id }}"></span></td>
 							</tr>
 						</script>
 					</tbody>
@@ -52,7 +52,7 @@
 								<td>@(Summarize)</td>
 								<td class="col-xs-2"></td>
 								<td class="ui-right col-xs-2 col-sm-1">{{ count }}x</td>
-								<td class="ui-right col-xs-3 col-sm-2 b black">@{currency('{{ price | sum(2) }}')}<span class="fa fa-calculator hidden-xs"></span></td>
+								<td class="ui-right col-xs-3 col-sm-2 b black">@{currency('{{ price | format(2) }}')}<span class="fa fa-calculator hidden-xs"></span></td>
 							</tr>
 						</script>
 					</tfoot>
@@ -147,12 +147,13 @@
 	<br />
 </div>
 
+<!-- Stores the current user data (JSON) -->
 @{json(user, 'userprofile')}
 
 @{section script}
 <script>
 
-	// Saves last location after an user click to oauth2
+	// Caches the last location (valid globally)
 	$('.social-oauth2').on('click', 'a', function() {
 		if (window.localStorage)
 			window.localStorage.setItem('oauth2', window.location.pathname);
@@ -162,6 +163,7 @@
 	var form = {};
 	var datasource;
 
+	// Reads delivery types from the eshop configuration
 	SET('common.deliverytypes', '@{config.custom.deliverytypes.join(",")}'.split(','));
 
 	form.email = '@';
@@ -169,7 +171,7 @@
 	form.isnewsletter = true;
 
 	var userprofile = JSON.parse($('#userprofile').html());
-	if (userprofile !== null) {
+	if (userprofile) {
 		var arr = userprofile.name.split(' ');
 		form.firstname = arr[0];
 		form.lastname = arr[1];
@@ -195,37 +197,38 @@
 				datasource.push({ id: item.id, name: item.name, price: item.price, linker: item.linker, linker_category: item.linker_category, pictures: item.pictures, reference: item.reference });
 			}
 
-			refresh();
+			refresh(true);
 		});
 
 		$('.checkoutlist').on('change', 'input', function(e) {
-			var count = parseInt(this.value);
+			var count = parseInt(this.value.match(/\d+/));
 			if (isNaN(count))
 				return;
+
 			var id = this.getAttribute('data-id');
-			FIND('checkout').update(id, count);
-			refresh();
+			var checkout = FIND('checkout');
+			var output = checkout.update(id, count);
+
+			if (!output) {
+				var el = $(this).closest('tr').find('.checkoutlist-item-price');
+				var item = checkout.get(id);
+				el.html(el.attr('data-format').format(Tangular.helpers.sum.call(item, item.price, 2)));
+			}
+
+			refresh(output === 1);
 		});
 
 		$('.checkoutlist').on('click', '.fa-times-circle', function(e) {
-			FIND('checkout').update($(this).attr('data-id'), 0);
-			refresh();
+			var output = FIND('checkout').update($(this).attr('data-id'), 0);
+			refresh(output === 1);
 		});
 	});
-
-	Array.prototype.find = function(id) {
-		for (var i = 0, length = this.length; i < length; i++) {
-			if (this[i].id === id)
-				return this[i];
-		}
-		return null;
-	};
 
 	Tangular.register('sum', function(value, format) {
 		return (value * this.count).format(format);
 	});
 
-	function refresh() {
+	function refresh(redraw) {
 		var cart = CACHE('cart');
 		var index = 0;
 		while (true) {
@@ -234,7 +237,7 @@
 			if (product === undefined)
 				break;
 
-			var item = cart.find(product.id);
+			var item = cart.findItem('id', product.id);
 
 			if (!item) {
 				index--;
@@ -253,13 +256,23 @@
 			count += product.count;
 		}
 
-		UPDATE('datasource');
+		if (redraw)
+			UPDATE('datasource');
 		SET('summarize', { count: count, price: price });
 	}
 
 	OPERATION('submit', function() {
+		if (BLOCKED('submit', 3000))
+			return;
+
 		form.products = datasource;
+
+		RESET('form.*');
+		loading(true);
+
 		$.components.POST('/api/checkout/create/', form, function(response) {
+			loading(false, 1000);
+
 			if (!response.success) {
 				SET('common.success', response);
 				return;
