@@ -1,6 +1,6 @@
 // Total.js translation file
 // Created: 2016-01-10 15:33
-// Spanish Translation (casual version) for E-Shop and CMS 
+// Spanish Translation (casual version) for E-Shop and CMS
 
 // eshop/resources, eshop-mongodb/resources, eshop-postgresql/resources, cms/resources
 error-404                        : Página no encontrada.
@@ -165,7 +165,7 @@ T1350742467      : Añadir nuevo widget
 T-1289976177     : Widgets
 T708251676       : Mostrar mas páginas
 T-1961636398     : Ver página
-T1537260712      : Datos de la página
+T-1465713771     : Datos de la página
 T1820265895      : Título de la página
 T-1133263968     : Dirección URL relativa de la página
 T2002811396      : Es un contenido parcial
@@ -188,7 +188,7 @@ T-712344368      : Afecta al orden de navegación.
 T-1548945544     : Lenguaje
 T2273433         : Icono
 T1355153608      : sin
-T-2146162541     : Datos del Widget
+T686232832       : Datos del Widget
 T1079515761      : Solo es una plantilla HTML
 T2076098         : Cuerpo
 T1076350031      : Crear contenido HTML personalizado
@@ -235,7 +235,7 @@ T750501482       : super admin
 T-212393027      : Se usará en los mensajes de email.
 
 // cms/public/templates/manager-settings.html, eshop/public/templates/manager-settings.html, eshop/public/templates/manager-users.html, eshop-mongodb/public/templates/manager-settings.html, eshop-mongodb/public/templates/manager-users.html, eshop-postgresql/public/templates/manager-settings.html, eshop-postgresql/public/templates/manager-users.html
-T-862005524      : Datos de usuario
+T-2010064935     : Datos de usuario
 
 // cms/public/templates/manager-system.html
 T-935636288      : Backuping
@@ -272,7 +272,7 @@ T1306456528      : Sin completar y no pagadas
 T-130849757      : Sin completar y pagadas
 T601036331       : Completadas
 T467946893       : Mostrar más órdenes
-T293542665       : Datos de la orden
+T-1603685770     : Datos de la orden
 T1127534884      : Estado de la orden
 T-243557845      : la orden ha sido procesada y cerrada
 T-1973412142     : Enviar un email al usuario sobre el estado de la orden
@@ -335,7 +335,7 @@ T-508022033      : Importar CSV o XML
 T-1880884982     : Reemplazar categoría
 T782283276       : Mostrar más productos
 T83253           : TOP
-T82711176        : Datos del producto
+T1120289141      : Datos del producto
 T1803110230      : Marcar como <b>producto top</b>
 T-697912365      : Categoría existente
 T-1861865283     : Añadir nueva categoría

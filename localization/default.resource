@@ -164,7 +164,7 @@ T1350742467      : Add new widget
 T-1289976177     : Widgets
 T708251676       : Show more pages
 T-1961636398     : show page
-T1537260712      : Page evidence
+T-1465713771     : Page form
 T1820265895      : Page title
 T-1133263968     : Page relative URL address
 T2002811396      : Is partial content
@@ -187,7 +187,7 @@ T-712344368      : Affects navigation ordering.
 T-1548945544     : Language
 T2273433         : Icon
 T1355153608      : without
-T-2146162541     : Widget evidence
+T686232832       : Widget form
 T1079515761      : Is only HTML template
 T2076098         : Body
 T1076350031      : Create custom HTML content
@@ -234,7 +234,7 @@ T750501482       : super admin
 T-212393027      : It's used in email messages.
 
 // cms/public/templates/manager-settings.html, eshop/public/templates/manager-settings.html, eshop/public/templates/manager-users.html, eshop-mongodb/public/templates/manager-settings.html, eshop-mongodb/public/templates/manager-users.html, eshop-postgresql/public/templates/manager-settings.html, eshop-postgresql/public/templates/manager-users.html
-T-862005524      : User evidence
+T-2010064935     : User form
 
 // cms/public/templates/manager-system.html
 T-935636288      : Backuping
@@ -271,7 +271,7 @@ T1306456528      : Uncompleted and not paid
 T-130849757      : Uncompleted and paid
 T601036331       : Completed
 T467946893       : Show more orders
-T293542665       : Order evidence
+T-1603685770     : Order form
 T1127534884      : Order status
 T-243557845      : Order is processed and closed
 T-1973412142     : Send email to user about the order status
@@ -334,7 +334,7 @@ T-508022033      : Import CSV or XML
 T-1880884982     : Replace category
 T782283276       : Show more products
 T83253           : TOP
-T82711176        : Product evidence
+T1120289141      : Product form
 T1803110230      : Mark as <b>top product</b>
 T-697912365      : Existing category
 T-1861865283     : Add new category

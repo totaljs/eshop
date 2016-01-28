@@ -20,13 +20,13 @@ T76453678        : Ordem
 T115155230       : Categoria
 
 // cms/views/manager-login.html, eshop/views/manager-login.html, eshop-mongodb/views/manager-login.html, eshop-postgresql/views/manager-login.html
-T-785010297      : Escreva seu nome de usuário. 
-T1758829696      : Escriva sua senha. 
+T-785010297      : Escreva seu nome de usuário.
+T1758829696      : Escriva sua senha.
 T-542111160      : Entrar
 T-873912411      : Nome de usuário ou senha incorretos.
 
 // cms/views/manager-login.html, eshop/views/manager-login.html, eshop-mongodb/views/manager-login.html, eshop-postgresql/views/manager-login.html, cms/public/templates/manager-settings.html, eshop/public/templates/manager-settings.html, eshop-mongodb/public/templates/manager-settings.html, eshop-postgresql/public/templates/manager-settings.html
-T187470082       : Nome de usuário 
+T187470082       : Nome de usuário
 
 // cms/views/manager-login.html, eshop/views/manager-login.html, eshop-mongodb/views/manager-login.html, eshop-postgresql/views/manager-login.html, eshop/public/templates/manager-settings.html, eshop-mongodb/public/templates/manager-settings.html, eshop-postgresql/public/templates/manager-settings.html
 T1281629883      : Senha
@@ -39,8 +39,8 @@ T76873636        : Páginas
 
 // cms/views/manager.html, eshop/views/manager.html, eshop-mongodb/views/manager.html, eshop-postgresql/views/manager.html
 T-1198923559     : Boletim
-T1354720503      : Dom. Seg. Ter. Quar. Quin. Sex. Sáb. 
-T-769884949      : Janeiro, fevereiro, março, abril, maio, junho, julho, agosto, setembro, outubro, novembro, dezembro 
+T1354720503      : Dom. Seg. Ter. Quar. Quin. Sex. Sáb.
+T-769884949      : Janeiro, fevereiro, março, abril, maio, junho, julho, agosto, setembro, outubro, novembro, dezembro
 T-830911952      : Escreva a data de hoje.
 
 // cms/views/manager.html, eshop/views/manager.html, eshop-mongodb/views/manager.html, eshop-postgresql/views/manager.html, cms/public/templates/component-editor.html, eshop/public/templates/component-editor.html, eshop-mongodb/public/templates/component-editor.html, eshop-postgresql/public/templates/component-editor.html
@@ -66,7 +66,7 @@ T1700030920      : Selecionar widget
 T-787153169      : Editor de imagens
 T-1677408326     : Descrição da imagem
 T-715295693      : Editor de link
-T710885571       : <b>Mudar o endereço da URL</b> e outras configurações para o link selecionado. 
+T710885571       : <b>Mudar o endereço da URL</b> e outras configurações para o link selecionado.
 T-1620699109     : Transferir arquivo
 T2061191035      : Janela atual ou janela
 T322196322       : Nova janela ou janela
@@ -83,7 +83,7 @@ T685681364       : Editor de Ícone
 T-1094498721     : Configurações de Widget
 T67674134        : Acrescentar configurações pessoais para o widget selecionado.A configuração afeta o comportamento do widget.
 T-290634085      : Editor de código fonte
-T963022717       : <b>SEM CONTEÚDO</b><br />Escolha a planilha para a edição de conteúdos. 
+T963022717       : <b>SEM CONTEÚDO</b><br />Escolha a planilha para a edição de conteúdos.
 T-45022646       : Mudar link
 T-1917255769     : Mudar atributos
 T-1089311509     : Duplicado
@@ -141,12 +141,12 @@ T859275632       : Contatos desde o formulário hoje
 T824097085       : Estadísticas anuais de contatos desde o formulário
 
 // cms/public/templates/manager-newsletter.html, eshop/public/templates/manager-newsletter.html, eshop-mongodb/public/templates/manager-newsletter.html, eshop-postgresql/public/templates/manager-newsletter.html
-T-1540404576     : Endereços de e-mail registrados 
+T-1540404576     : Endereços de e-mail registrados
 T-2058782144     : Modo Só-leitura
 T-315169681      : <b>Baixar CSV</b> com endereços de e-mail
 
 // cms/public/templates/manager-newsletter.html, cms/public/templates/manager-system.html, eshop/public/templates/manager-newsletter.html, eshop/public/templates/manager-system.html, eshop-mongodb/public/templates/manager-newsletter.html, eshop-mongodb/public/templates/manager-system.html, eshop-postgresql/public/templates/manager-newsletter.html, eshop-postgresql/public/templates/manager-system.html
-T-790724954      : Visitar web site 
+T-790724954      : Visitar web site
 
 // cms/public/templates/manager-pages.html, eshop/public/templates/manager-pages.html, eshop-mongodb/public/templates/manager-pages.html, eshop-postgresql/public/templates/manager-pages.html
 T-1767274566     : Buscar páginas ...
@@ -156,7 +156,7 @@ T1350742467      : Acrescentar novo widget
 T-1289976177     : Widgets
 T708251676       : Mostrar mais páginas
 T-1961636398     : Ver página
-T1537260712      : Provar página
+T-1465713771     : Provar página
 T1820265895      : Título da página
 T-1133263968     : Endereço URL relativo à página
 T2002811396      : É um conteúdo parcial
@@ -169,7 +169,7 @@ T-1026963764     : sublinhado
 T3321850         : link
 T1608611804      : Mostrar código fonte
 T-438835660      : Navegação
-T-355489880      : Aonde a página será mostrada? 
+T-355489880      : Aonde a página será mostrada?
 T-1911556918     : Pai
 T1230442517      : Afeta a sitemap e breadcrumb.
 T587793354       : Palavras clave
@@ -179,7 +179,7 @@ T-712344368      : Afeta a ordem de navegação.
 T-1548945544     : Linguajem
 T2273433         : Ícone
 T1355153608      : sem
-T-2146162541     : Dados do Widget
+T686232832       : Dados do Widget
 T1079515761      : Só é uma planilha de HTML
 T2076098         : Corpo
 T1076350031      : Criar conteúdo HTML personalizado
@@ -209,7 +209,7 @@ T317882171       : Planilhas registradas
 T-1191944431     : As planilhas devem ser criadas manualmente na pasta. <code>/views/cms/</code>.
 T680524897       : Navegações registradas
 T-300564914      : As navegações devem ser redirecionadas manualmente no desenho ou visita. Para redirecionar use: <code>F.global.navigation.NAME</code>
-T-2020943141     : Para criar outros acessos dentro da administração use o seguinte botão: 
+T-2020943141     : Para criar outros acessos dentro da administração use o seguinte botão:
 T406441582       : Acrescentar novo administrador
 T837562214       : GUARDAR CONFIGURAÇÕES
 T1804909970      : Senha de acesso
@@ -219,14 +219,14 @@ T1102578873      : boletim
 T1434631203      : configurações
 T-887328209      : sistema
 T79142557        : Roles
-T-1803213147     : Deixa o rol do usuário vazio para permitir que tenha acesso a todas as funcionalidades. 
+T-1803213147     : Deixa o rol do usuário vazio para permitir que tenha acesso a todas as funcionalidades.
 T750501482       : super admin
 
 // cms/public/templates/manager-settings.html
-T-212393027      : Será usado nos mensagens de e-mail. 
+T-212393027      : Será usado nos mensagens de e-mail.
 
 // cms/public/templates/manager-settings.html, eshop/public/templates/manager-settings.html, eshop/public/templates/manager-users.html, eshop-mongodb/public/templates/manager-settings.html, eshop-mongodb/public/templates/manager-users.html, eshop-postgresql/public/templates/manager-settings.html, eshop-postgresql/public/templates/manager-users.html
-T-862005524      : Dados do usuário
+T-2010064935     : Dados do usuário
 
 // cms/public/templates/manager-system.html
 T-935636288      : Backuping
@@ -245,7 +245,7 @@ T-843945539      : Apagar todos os widgets
 T930914565       : Apagar todos os arquivos
 T-469815374      : Apagar a lista do boletim
 T2118756794      : Apagar estadísticas de visitas
-T-1079581624     : Por favor, confirme a limpeza da base dados. 
+T-1079581624     : Por favor, confirme a limpeza da base dados.
 
 // eshop/public/templates/manager-dashboard.html, eshop-mongodb/public/templates/manager-dashboard.html, eshop-postgresql/public/templates/manager-dashboard.html
 T707200196       : Ordens de hoje
@@ -261,16 +261,16 @@ T1306456528      : Sem completar e não pagas
 T-130849757      : Sem completar e pagas
 T601036331       : Completadas
 T467946893       : Mostrar mais ordens
-T293542665       : Dados da ordem
+T-1603685770     : Dados da ordem
 T1127534884      : Estado da ordem
-T-243557845      : a ordem foi processada e fechada 
+T-243557845      : a ordem foi processada e fechada
 T-1973412142     : Enviar um e-mail ao usuário sobre o estado da ordem
 T219944208       : A ordem está paga
 T-1736303937     : Nota interna sé para você.
 T-1727678635     : Nota interna
 T-195873094      : Código do artigo
-T1632282194      : Acrescentar novo artigo. 
-T163412261       : Deseja eliminar a ordem selecionada? 
+T1632282194      : Acrescentar novo artigo.
+T163412261       : Deseja eliminar a ordem selecionada?
 
 // eshop/public/templates/manager-orders.html, eshop/public/templates/manager-products.html, eshop/public/templates/manager-users.html, eshop-mongodb/public/templates/manager-orders.html, eshop-mongodb/public/templates/manager-products.html, eshop-mongodb/public/templates/manager-users.html, eshop-postgresql/public/templates/manager-orders.html, eshop-postgresql/public/templates/manager-products.html, eshop-postgresql/public/templates/manager-users.html
 T1076792         : # id
@@ -324,7 +324,7 @@ T-508022033      : Importar CSV ou XML
 T-1880884982     : Substituir categoria
 T782283276       : Mostrar mais produtos
 T83253           : TOP
-T82711176        : Dados do produto
+T1120289141      : Dados do produto
 T1803110230      : Marcar como <b>produto top</b>
 T-697912365      : Categoria existente
 T-1861865283     : Acrescentar nova categoria
@@ -334,12 +334,12 @@ T-56677412       : Descrição
 T1201109677      : Código do produto personalizado
 T-665475243      : Imagens
 T-388315904      : Substituir categoria
-T1841300820      : Substitui a antiga categoria com a nova em todos os produtos da antiga categoria. 
+T1841300820      : Substitui a antiga categoria com a nova em todos os produtos da antiga categoria.
 T1383606571      : Novo nome
 T-1547836979     : Nova categoria
 
 // eshop/public/templates/manager-settings.html, eshop-mongodb/public/templates/manager-settings.html, eshop-postgresql/public/templates/manager-settings.html
-T1699803811      : Será usado em pagamentos e mensagens de e-mail. 
+T1699803811      : Será usado em pagamentos e mensagens de e-mail.
 T-1836318927     : E-mail para o formulário do pedido
 T-200915419      : Facebook key
 T1941653802      : Facebook secret
@@ -395,12 +395,12 @@ T1311276570      : Buscar produtos
 // eshop/themes/default/views/contact.html, eshop-mongodb/themes/default/views/contact.html, eshop-postgresql/themes/default/views/contact.html
 T-127956515      : Obrigado, o formulário de contato foi enviado corretamente.
 T-2117496884     : ENVIAR
-T694595342       : Preciso mais informação sobre o produto: 
+T694595342       : Preciso mais informação sobre o produto:
 T900191336       : Desejo cancelar o pedido #
 
 // eshop/themes/default/views/index.html, eshop-mongodb/themes/default/views/index.html, eshop-postgresql/themes/default/views/index.html
-T1656375912      : Obrigado, você foi incluído/a. 
-T-848688042      : Una-se a nossa lista de e-mails. 
+T1656375912      : Obrigado, você foi incluído/a.
+T-848688042      : Una-se a nossa lista de e-mails.
 
 // eshop/themes/default/views/index.html, eshop-mongodb/themes/default/views/index.html, eshop-postgresql/themes/default/views/index.html, eshop/themes/default/views/eshop/account.html, eshop/themes/default/views/eshop/checkout.html, eshop-mongodb/themes/default/views/eshop/account.html, eshop-mongodb/themes/default/views/eshop/checkout.html, eshop-postgresql/themes/default/views/eshop/account.html, eshop-postgresql/themes/default/views/eshop/checkout.html
 T-1001660743     : Buscar em todos os produtos
@@ -420,11 +420,11 @@ T-397449933      : Mensagem:
 T670819326       : Cliente
 
 // eshop/themes/default/views/eshop/account.html, eshop-mongodb/themes/default/views/eshop/account.html, eshop-postgresql/themes/default/views/eshop/account.html
-T1964327598      : Não há nenhum pedido. 
+T1964327598      : Não há nenhum pedido.
 
 // eshop/themes/default/views/eshop/checkout-detail.html, eshop-mongodb/themes/default/views/eshop/checkout-detail.html, eshop-postgresql/themes/default/views/eshop/checkout-detail.html
 T1649684595      : Muito obrigado por seu pedido <b>Seu pedido foi cri<do corretamente. </b>.
-T2035092654      : Muito obrigado por seu pagamento. Seu pedido será processado imediatamente. 
+T2035092654      : Muito obrigado por seu pagamento. Seu pedido será processado imediatamente.
 T1615842596      : ESTADO DO PEDIDO.
 T662464619       : Deseja <b>cancelar este pedido</b>?
 T3433164         : pago
@@ -449,16 +449,16 @@ T-290915896      : Pagar
 // eshop/themes/default/views/eshop/checkout.html, eshop-mongodb/themes/default/views/eshop/checkout.html, eshop-postgresql/themes/default/views/eshop/checkout.html
 T1748897631      : Seu carrinho de compra está fazio, <b>tente visitar esta página mais tarde</b>.
 T65298671        : Conta
-T1117399742      : <b>Registre-se</b> agora e siga o estado dos seus pedidosa fácilmente. Ë fácil, seguro e muito rápido. 
+T1117399742      : <b>Registre-se</b> agora e siga o estado dos seus pedidosa fácilmente. Ë fácil, seguro e muito rápido.
 T-1076755335     : Informação dos pedidos.
 T629865476       : Rua, CP, Cidade, País
 T2434066         : Nota
-T-2108344607     : Desejo receber o boletim. 
-T68140841        : Estou de acordo com os termos e condições. 
+T-2108344607     : Desejo receber o boletim.
+T68140841        : Estou de acordo com os termos e condições.
 T-1209506522     : ENVIAR PEDIDO
 
 // eshop/themes/default/views/eshop/partial-products.html, eshop-mongodb/themes/default/views/eshop/partial-products.html, eshop-postgresql/themes/default/views/eshop/partial-products.html
-T-1100665556     : Atualmente não dispomos de nenhum artigo com os critérios estabelecidos. 
+T-1100665556     : Atualmente não dispomos de nenhum artigo com os critérios estabelecidos.
 T103243652       : Tente visitar a página mais tarde
 
 // eshop/themes/default/views/eshop/partial-subcategories.html, eshop-mongodb/themes/default/views/eshop/partial-subcategories.html, eshop-postgresql/themes/default/views/eshop/partial-subcategories.html
@@ -472,7 +472,7 @@ T2122703262      : Resultados da busca
 T-725155108      : Categoria:
 T-121272727      : Fabricante:
 T2289459         : Artigo
-T993667495       : O produto <b>@{model.name}</b> está no seu carrinho de compra. 
+T993667495       : O produto <b>@{model.name}</b> está no seu carrinho de compra.
 T839301011       : Pedir agora
 T2082452         : Comprar:
 T1693729697      : Precisa de mais informação?
@@ -486,7 +486,7 @@ T888111124       : Envio
 T-1294166218     : Siga seu pedido
 
 // eshop/themes/default/views/mails/order-status.html, eshop-mongodb/themes/default/views/mails/order-status.html, eshop-postgresql/themes/default/views/mails/order-status.html
-T-2021121594     : O pedido foi atualizado. Por favor, revise o estado deste pedido. 
+T-2021121594     : O pedido foi atualizado. Por favor, revise o estado deste pedido.
 
 // eshop/themes/default/views/mails/order.html, eshop-mongodb/themes/default/views/mails/order.html, eshop-postgresql/themes/default/views/mails/order.html
-T1841011644      : Muito obrigado por seu pedido. Seu pedido foi criado corretamente Este e-mail é uma confirmação do seu pedido. 
+T1841011644      : Muito obrigado por seu pedido. Seu pedido foi criado corretamente Este e-mail é uma confirmação do seu pedido.

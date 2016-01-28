@@ -102,7 +102,7 @@ T1306456528      : Nedokončené a nezaplatené
 T-130849757      : Nedokončené a zaplatené
 T601036331       : Dokončené
 T467946893       : Zobraziť viac objednávok
-T293542665       : Evidencia objednávky
+T-1603685770     : Evidencia objednávky
 T1076792         : # id
 T-1601759544     : Vytvorené
 T2479852         : Zaplatené
@@ -162,7 +162,7 @@ T-1289976177     : Rozšírenia
 T708251676       : Zobraziť viac stránok
 T-1961636398     : ukázať stránku
 T618939037       : Všetky registrované rozšírenia ($)
-T1537260712      : Evidencia stránky
+T-1465713771     : Evidencia stránky
 T1820265895      : Titulok stránky
 T80818744        : Titulok
 T-1133263968     : Relatívna URL adresa
@@ -184,7 +184,7 @@ T-712344368      : Ovplyvňuje poradie v navigácii
 T-1548945544     : Jazyk
 T2273433         : Ikona
 T1355153608      : bez
-T-2146162541     : Evidencia rozšírenia
+T686232832       : Evidencia rozšírenia
 T1079515761      : Je len HTML šablóna
 T2076098         : Telo
 T1700030920      : Vybrať rozšírenie
@@ -228,7 +228,7 @@ T254826576       : Pridať tovar
 T-177830133      : Importovať CSV
 T782283276       : Zobraziť viac tovarov
 T83253           : TOP
-T82711176        : Evidencia tovaru
+T1120289141      : Evidencia tovaru
 T1803110230      : Označiť ako <b>top tovar</b>
 T-697912365      : Vybrať existujúcu kategóriu
 T-1861865283     : Pridať podkategóriu
@@ -262,7 +262,7 @@ T1522855907      : Povoliť <b>testovací mód pre PayPal</b>
 T-2020943141     : Pre vytvorenie iného prístupu do administrácie kliknite na nižšie uvedené tlačítko:
 T406441582       : Pridať nového administrátora
 T837562214       : ULOŽIŤ NASTAVENIE
-T-862005524      : Evidencia užívateľa
+T-2010064935     : Evidencia užívateľa
 T187470082       : Prihlasovacie meno
 T1804909970      : Prihlasovacie heslo
 T-1047860588     : dashboard
