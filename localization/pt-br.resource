@@ -38,6 +38,7 @@ T956107380       : Dashboard
 T76873636        : Páginas
 
 // cms/views/manager.html, eshop/views/manager.html, eshop-mongodb/views/manager.html, eshop-postgresql/views/manager.html
+T65203672        : Close
 T-1198923559     : Boletim
 T1354720503      : Dom. Seg. Ter. Quar. Quin. Sex. Sáb.
 T-769884949      : Janeiro, fevereiro, março, abril, maio, junho, julho, agosto, setembro, outubro, novembro, dezembro
@@ -102,6 +103,7 @@ T-1838205928     : ENVIAR
 
 // cms/public/templates/component-editor.html, eshop/public/templates/component-editor.html, eshop/public/templates/manager-products.html, eshop-mongodb/public/templates/component-editor.html, eshop-mongodb/public/templates/manager-products.html, eshop-postgresql/public/templates/component-editor.html, eshop-postgresql/public/templates/manager-products.html
 T-336101236      : Buscar no dispositivo
+T-348727262      : The uploaded file is too large.
 
 // cms/public/templates/component-editor.html, cms/public/templates/manager-pages.html, eshop/public/templates/component-editor.html, eshop/public/templates/manager-pages.html, eshop-mongodb/public/templates/component-editor.html, eshop-mongodb/public/templates/manager-pages.html, eshop-postgresql/public/templates/component-editor.html, eshop-postgresql/public/templates/manager-pages.html
 T80818744        : Título
