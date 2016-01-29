@@ -44,14 +44,24 @@ COMPONENT('visible', function() {
 COMPONENT('message', function() {
 	var self = this;
 	var is = false;
+	var visible = false;
+	var timer;
 
 	self.readonly();
 	self.singleton();
 
 	self.make = function() {
-		self.element.addClass('ui-message');
+		self.element.addClass('ui-message hidden');
+
 		self.element.on('click', 'button', function() {
 			self.hide();
+		});
+
+		$(window).on('keyup', function(e) {
+			if (!visible)
+				return;
+			if (e.keyCode === 27)
+				self.hide();
 		});
 	};
 
@@ -65,7 +75,10 @@ COMPONENT('message', function() {
 
 	self.hide = function() {
 		self.element.removeClass('ui-message-visible');
-		setTimeout(function() {
+		if (timer)
+			clearTimeout(timer);
+		timer = setTimeout(function() {
+			visible = false;
 			self.element.addClass('hidden');
 		}, 1000);
 	};
@@ -75,10 +88,13 @@ COMPONENT('message', function() {
 		if (!is)
 			self.element.html('<div><div class="ui-message-body"><span class="fa fa-warning"></span><div class="ui-center"></div></div><button>' + (self.attr('data-button') || 'Close') + '</button></div>');
 
+		if (timer)
+			clearTimeout(timer);
+
+		visible = true;
 		self.element.find('.ui-message-body').removeClass().addClass('ui-message-body ' + cls);
 		self.element.find('.fa').removeClass().addClass('fa ' + icon);
 		self.element.find('.ui-center').html(text);
-
 		self.element.removeClass('hidden');
 		setTimeout(function() {
 			self.element.addClass('ui-message-visible');
@@ -990,6 +1006,21 @@ COMPONENT('fileupload', function() {
 					window.loading(true);
 
 			$.components.UPLOAD(url, data, function(response, err) {
+
+				if (err) {
+
+					if (typeof(window.loading) === 'function')
+						window.loading(false, 500);
+
+					var message = FIND('message');
+					if (message)
+						message.warning(self.attr('data-error-large'));
+					else
+						alert(self.attr('data-error-large'));
+
+					return;
+				}
+
 				self.change();
 				el.value = '';
 
@@ -1278,7 +1309,8 @@ COMPONENT('crop', function() {
 	var current = { x: 0, y: 0 };
 	var offset = { x: 0, y: 0 };
 
-	self.readonly();
+	self.noValid();
+	self.getter = null;
 
 	img.onload = function () {
 		can = true;

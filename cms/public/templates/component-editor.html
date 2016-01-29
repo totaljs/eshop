@@ -42,7 +42,7 @@
 			<div class="col-md-12">
 				<div class="silver"><span class="fa fa-link"></span> @(<b>Change the target URL address</b> and other settings for the selected link.)</div>
 				<hr />
-				<div data-component="fileupload" data-component-path="cmseditor.link.file" data-placeholder="@(Browse device)" data-icon="fa-file" class="m" data-singlefile="true">@(Upload file)</div>
+				<div data-component="fileupload" data-component-path="cmseditor.link.file" data-placeholder="@(Browse device)" data-error-large="@(The uploaded file is too large.)" data-icon="fa-file" class="m" data-singlefile="true">@(Upload file)</div>
 				<div data-component="textbox" data-component-path="cmseditor.link.href" data-required="true" class="m" data-icon="fa-globe">@(URL address)</div>
 				<div data-component="dropdown" data-component-path="cmseditor.link.target" data-required="true" data-options="@(Current tab or window)|_self;@(New tab or window)|_blank" class="m">@(Target)</div>
 				<div data-component="textbox" data-component-path="cmseditor.link.title" data-icon="fa-info-circle">@(Title)</div>
@@ -140,7 +140,7 @@
 	</div>
 </div>
 
-<input type="file" class="hidden" id="cmseditor_inlineupload" accept="image/*" />
+<input type="file" class="hidden" id="cmseditor_inlineupload" accept="image/*" data-error-large="@(The uploaded file is too large.)" />
 
 <script>
 
@@ -163,10 +163,22 @@
 		$('#cmseditor_inlineupload').on('change', function(e) {
 			var data = new FormData();
 			var files = e.target.files;
+			var errmsg = $(this).attr('data-error-large');
 			data.append('file0', files[0]);
 			this.value = '';
 			loading(true);
 			$.components.UPLOAD(managerurl + '/upload/', data, function(response, err) {
+
+				if (err) {
+					loading(false);
+					var message = FIND('message');
+					if (message)
+						message.warning(errmsg);
+					else
+						alert(errmsg);
+					return;
+				}
+
 				if (response && response.length)
 					cmseditor.instance.getTarget().attr('src', '/download/' + response[0]);
 				loading(false, 500);
@@ -904,7 +916,18 @@
 			var data = cropper.output();
 			loading(true);
 
-			$.components.POST(managerurl + '/upload/base64/', { file: data }, function(response) {
+			$.components.POST(managerurl + '/upload/base64/', { file: data }, function(response, err) {
+
+				if (err) {
+					var errmsg = $('#cmseditor_inlineupload').attr('data-error-large');
+					var message = FIND('message');
+					if (message)
+						message.warning(errmsg);
+					else
+						alert(errmsg);
+					loading(false);
+					return;
+				}
 
 				if (response) {
 					setTimeout(function() {
