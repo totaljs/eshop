@@ -304,7 +304,6 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		CLEANUP(stream, function() {
 
-			var filename = F.path.temp(U.GUID(10) + '.jpg');
 			var Fs = require('fs');
 			var id;
 
@@ -328,11 +327,13 @@ NEWSCHEMA('Product').make(function(schema) {
 					U.download(picture.trim(), ['get', 'dnscache'], function(err, response) {
 						if (err)
 							return next();
+						var filename = F.path.temp(U.GUID(10) + '.jpg');
 						var writer = Fs.createWriteStream(filename);
 						response.pipe(writer);
 						CLEANUP(writer, function() {
 							var tmp = new ObjectID();
 							GridStore.writeFile(DB(), tmp, filename, U.getName(picture), null, function(err) {
+								Fs.unlink(filename, NOOP);
 								if (err)
 									return next();
 								id.push(tmp.toString());
@@ -343,7 +344,7 @@ NEWSCHEMA('Product').make(function(schema) {
 				}, function() {
 					product.pictures = id;
 					fn();
-				});
+				}, 3); // 3 threads
 
 			}, function() {
 

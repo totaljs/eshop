@@ -385,7 +385,7 @@ NEWSCHEMA('Product').make(function(schema) {
 				}, function() {
 					product.pictures = id;
 					fn();
-				});
+				}, 3); // 3 threads
 
 			}, function() {
 

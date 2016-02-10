@@ -321,7 +321,6 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		CLEANUP(stream, function() {
 
-			var filename = F.path.temp(U.GUID(10) + '.jpg');
 			var Fs = require('fs');
 			var id;
 
@@ -345,11 +344,14 @@ NEWSCHEMA('Product').make(function(schema) {
 					U.download(picture.trim(), ['get', 'dnscache'], function(err, response) {
 						if (err)
 							return next();
+						var filename = F.path.temp(U.GUID(10) + '.jpg');
 						var writer = Fs.createWriteStream(filename);
 						response.pipe(writer);
 						CLEANUP(writer, function() {
+							Fs.unlink(filename, NOOP);
 							Fs.readFile(filename, function(err, data) {
-								id.push(DB('files').binary.insert(U.getName(picture), 'image/jpeg', data));
+								if (!err)
+									id.push(DB('files').binary.insert(U.getName(picture), 'image/jpeg', data));
 								setTimeout(next, 200);
 							});
 						});
@@ -357,7 +359,7 @@ NEWSCHEMA('Product').make(function(schema) {
 				}, function() {
 					product.pictures = id;
 					fn();
-				});
+				}, 3); // 3 threads
 
 			}, function() {
 
