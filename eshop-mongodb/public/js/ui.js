@@ -778,8 +778,8 @@ COMPONENT('form', function() {
 	var self = this;
 	var autocenter;
 
-	if (!$cmanager.$$form) {
-		$cmanager.$$form = true;
+	if (!MAN.$$form) {
+		MAN.$$form = true;
 		$(document).on('click', '.ui-form-button-close', function() {
 			SET($.components.findById($(this).attr('data-id')).path, '');
 		});
