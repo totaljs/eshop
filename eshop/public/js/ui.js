@@ -86,7 +86,7 @@ COMPONENT('message', function() {
 	self.content = function(cls, text, icon) {
 
 		if (!is)
-			self.element.html('<div><div class="ui-message-body"><span class="fa fa-warning"></span><div class="ui-center"></div></div><button>' + (self.attr('data-button') || 'Close') + '</button></div>');
+			self.html('<div><div class="ui-message-body"><span class="fa fa-warning"></span><div class="ui-center"></div></div><button>' + (self.attr('data-button') || 'Close') + '</button></div>');
 
 		if (timer)
 			clearTimeout(timer);
@@ -233,7 +233,7 @@ COMPONENT('dropdown', function() {
 			var value = self.get(datasource);
 			if (NOTMODIFIED(self.id, value))
 				return;
-			if (value === undefined || value === null)
+			if (!value)
 				value = [];
 			self.render(value);
 		};
@@ -392,9 +392,7 @@ COMPONENT('textarea', function() {
 
 COMPONENT('template', function() {
 	var self = this;
-
 	self.readonly();
-
 	self.make = function(template) {
 
 		if (template) {
@@ -403,16 +401,22 @@ COMPONENT('template', function() {
 		}
 
 		var script = self.element.find('script');
+
+		if (!script.length) {
+			script = self.element;
+			self.element = self.element.parent();
+		}
+
 		self.template = Tangular.compile(script.html());
 		script.remove();
 	};
 
 	self.setter = function(value) {
-		if (value === null)
+		if (!value)
 			return self.element.addClass('hidden');
 		if (NOTMODIFIED(self.id, value))
 			return;
-		self.element.html(self.template(value)).removeClass('hidden');
+		self.html(self.template(value)).removeClass('hidden');
 	};
 });
 
@@ -422,22 +426,21 @@ COMPONENT('repeater', function() {
 	self.readonly();
 
 	self.make = function() {
-		var element = self.element.find('script');
+		var el = self.element.find('script');
 
-		if (!element.length) {
-			element = self.element;
+		if (!el.length) {
+			el = self.element;
 			self.element = self.element.parent();
 		}
 
-		var html = element.html();
-		element.remove();
-		self.template = Tangular.compile(html);
+		self.template = Tangular.compile(el.html());
+		el.remove();
 	};
 
 	self.setter = function(value) {
 
-		if (!value || value.length === 0) {
-			self.element.html('');
+		if (!value || !value.length) {
+			self.html('');
 			return;
 		}
 
@@ -448,7 +451,7 @@ COMPONENT('repeater', function() {
 			builder += self.template(item).replace(/\$index/g, i.toString()).replace(/\$/g, self.path + '[' + i + ']');
 		}
 
-		self.element.empty().append(builder);
+		self.html(builder);
 	};
 });
 
@@ -465,7 +468,7 @@ COMPONENT('error', function() {
 
 	self.setter = function(value) {
 
-		if (!(value instanceof Array) || value.length === 0) {
+		if (!(value instanceof Array) || !value.length) {
 			element.addClass('hidden');
 			return;
 		}
@@ -474,13 +477,16 @@ COMPONENT('error', function() {
 		for (var i = 0, length = value.length; i < length; i++)
 			builder.push('<li><span class="fa fa-times-circle"></span> ' + value[i].error + '</li>');
 
-		element.html(builder.join(''));
+		element.empty();
+		element.append(builder.join(''));
 		element.removeClass('hidden');
 	};
 });
 
 COMPONENT('cookie', function() {
 	var self = this;
+	self.readonly();
+	self.singleton();
 	self.make = function() {
 		var cookie = localStorage.getItem('cookie');
 		if (cookie) {
