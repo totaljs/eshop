@@ -101,19 +101,24 @@
 		<div class="dashboard-devices-stats"></div>
 	</div>
 </div>
-
 <br />
 <div class="container">
+	<br />
+	<ul class="tabmenu" data-component="tabmenu" data-component-path="dashboard.year" data-component-type="number">
+		<script type="text/html" data-component="repeater" data-component-path="dashboard.years">
+			<li data-value="{{}}">{{}}</li>
+		</script>
+	</ul>
 	<br />
 	<div class="row">
 		<div class="col-md-6 m">
 			<div class="ui-center b">@(Yearly stats of contact forms)</div>
-			<canvas id="dashboard-monthly-contactforms" height="200"></canvas>
+			<canvas id="dashboard-monthly-contactforms"></canvas>
 		</div>
 		<div class="col-md-1"></div>
 		<div class="col-md-5 m">
 			<div class="ui-center b">@(Yearly stats of views)</div>
-			<canvas id="dashboard-monthly-hits" height="200"></canvas>
+			<canvas id="dashboard-monthly-hits"></canvas>
 		</div>
 	</div>
 	<br />
@@ -134,7 +139,7 @@
 					<label><span class="fa fa-square" style="color:#FFCE54"></span><span>@(Visitors)</span></label>
 					<label><span class="fa fa-square" style="color:#FC6E51"></span><span>@(Unique Visitors)</span></label>
 				</div>
-				<canvas id="dashboard-monthly-visitors" height="350"></canvas>
+				<canvas id="dashboard-monthly-visitors"></canvas>
 			</div>
 		</div>
 		<br />
@@ -148,9 +153,11 @@
 	dashboard.data = {};
 	dashboard.online = {};
 	dashboard.cache = {};
+	// dashboard.years = [];
+	// dashboard.year;
 
 	function dashboard_refresh() {
-		$.components.GET(managerurl + '/api/dashboard/', null, function(response) {
+		$.components.AJAX('GET ' + managerurl + '/api/dashboard/', function(response) {
 
 			SET('dashboard.data', response);
 
@@ -168,25 +175,8 @@
 			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'));
 			dashboard.cache.online.Doughnut(data, { responsive: true });
 
-			var year = (new Date()).getFullYear();
-
-			data = {};
-			data.labels = window.$calendar.months_short;
-			data.datasets = [{ fillColor: '#FFCE54', data: dashboard_charts_bar_items(response.webcounter.stats, 'count', year) }, { fillColor: '#FC6E51', data: dashboard_charts_bar_items(response.webcounter.stats, 'unique', year) }];
-			dashboard.cache.visitors = new Chart($('#dashboard-monthly-visitors').get(0).getContext('2d'));
-			dashboard.cache.visitors.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false });
-
-			data = {};
-			data.labels = window.$calendar.months_short;
-			data.datasets = [{ fillColor: '#48CFAD', data: dashboard_charts_bar_items(response.webcounter.stats, 'contactforms', year) }];
-			dashboard.cache.orders = new Chart($('#dashboard-monthly-contactforms').get(0).getContext('2d'));
-			dashboard.cache.orders.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
-
-			data = {};
-			data.labels = window.$calendar.months_short;
-			data.datasets = [{ fillColor: '#AC92EC', data: dashboard_charts_bar_items(response.webcounter.stats, 'hits', year) }];
-			dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'));
-			dashboard.cache.hits.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
+			dashboard.year = (new Date()).getFullYear();
+			dashboard.years = [];
 
 			var stats_mobile = 0;
 			var stats_desktop = 0;
@@ -195,12 +185,65 @@
 				var stats = response.webcounter.stats[key];
 				stats_mobile += stats.mobile;
 				stats_desktop += stats.desktop;
+				var year = key.substring(key.indexOf('-') + 1).parseInt();
+				if (dashboard.years.indexOf(year) === -1)
+					dashboard.years.push(year);
 			});
+
+			dashboard.years.sort();
+			dashboard.years.reverse();
+
+			UPDATE('!dashboard.year', 500);
+			UPDATE('!dashboard.years');
 
 			setTimeout(function() {
 				$('.dashboard-devices-stats').animate({ width: (stats_desktop / ((stats_desktop + stats_mobile) / 100) >> 0) + '%' }, 1000);
 			}, 1500);
 		});
+	}
+
+	WATCH('dashboard.year', function(path, value) {
+		dashboard_yearstats(value);
+	});
+
+	function dashboard_yearstats(year) {
+		var el;
+		var data = {};
+
+		data.labels = window.$calendar.months_short;
+		data.datasets = [{ fillColor: '#FFCE54', data: dashboard_charts_bar_items(dashboard.data.webcounter.stats, 'count', year) }, { fillColor: '#FC6E51', data: dashboard_charts_bar_items(dashboard.data.webcounter.stats, 'unique', year) }];
+
+		if (dashboard.cache.visitors)
+			dashboard.cache.visitors.$chart.destroy();
+
+		el = $('#dashboard-monthly-visitors');
+		el.height(350);
+		dashboard.cache.visitors = new Chart(el.get(0).getContext('2d'));
+		dashboard.cache.visitors.$chart = dashboard.cache.visitors.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false });
+
+		data = {};
+		data.labels = window.$calendar.months_short;
+		data.datasets = [{ fillColor: '#48CFAD', data: dashboard_charts_bar_items(dashboard.data.webcounter.stats, 'contactforms', year) }];
+
+		if (dashboard.cache.orders)
+			dashboard.cache.orders.$chart.destroy();
+
+		el = $('#dashboard-monthly-contactforms');
+		el.height(200);
+		dashboard.cache.orders = new Chart(el.get(0).getContext('2d'));
+		dashboard.cache.orders.$chart = dashboard.cache.orders.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
+
+		data = {};
+		data.labels = window.$calendar.months_short;
+		data.datasets = [{ fillColor: '#AC92EC', data: dashboard_charts_bar_items(dashboard.data.webcounter.stats, 'hits', year) }];
+
+		if (dashboard.cache.hits)
+			dashboard.cache.hits.$chart.destroy();
+
+		el = $('#dashboard-monthly-hits');
+		el.height(200);
+		dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'));
+		dashboard.cache.hits.$chart = dashboard.cache.hits.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
 	}
 
 	// Helper method for generating pie chart
