@@ -423,6 +423,12 @@ COMPONENT('repeater', function() {
 
 	self.make = function() {
 		var element = self.element.find('script');
+
+		if (!element.length) {
+			element = self.element;
+			self.element = self.element.parent();
+		}
+
 		var html = element.html();
 		element.remove();
 		self.template = Tangular.compile(html);
@@ -1830,12 +1836,13 @@ COMPONENT('calendar', function() {
 
 COMPONENT('tabmenu', function() {
 	var self = this;
+	self.readonly();
 	self.make = function() {
 		self.element.on('click', 'li', function() {
 			var el = $(this);
 			if (el.hasClass('selected'))
 				return;
-			self.set(el.attr('data-value'));
+			self.set(self.parser(el.attr('data-value')));
 		});
 	};
 	self.setter = function(value) {
