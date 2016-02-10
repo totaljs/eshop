@@ -19,7 +19,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('navigations', '[String]');
 	schema.define('deliverytypes', '[String]');
 	schema.define('defaultorderstatus', String);
-	schema.define('users', '[SuperUser]', true);
+	schema.define('users', '[SuperUser]');
 
 	// PayPal account
 	schema.define('paypaluser', String);

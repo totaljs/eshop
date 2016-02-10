@@ -17,7 +17,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('url', String, true);
 	schema.define('templates', '[String]');
 	schema.define('navigations', '[String]');
-	schema.define('users', '[SuperUser]', true);
+	schema.define('users', '[SuperUser]');
 
 	// Saves settings into the file
 	schema.setSave(function(error, model, options, callback) {

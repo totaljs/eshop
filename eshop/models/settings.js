@@ -22,7 +22,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('navigations', '[String]');
 	schema.define('deliverytypes', '[String]');
 	schema.define('defaultorderstatus', String);
-	schema.define('users', '[SuperUser]', true);
+	schema.define('users', '[SuperUser]');
 
 	// PayPal account
 	schema.define('paypaluser', String);
@@ -58,6 +58,8 @@ NEWSCHEMA('Settings').make(function(schema) {
 		settings.datebackuped = new Date().format();
 		DB('settings_backup').insert(JSON.parse(JSON.stringify(settings)));
 		delete settings.datebackuped;
+
+		console.log(JSON.stringify(settings));
 
 		// Writes settings into the file
 		Fs.writeFile(filename, JSON.stringify(settings), function() {
