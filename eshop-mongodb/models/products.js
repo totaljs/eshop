@@ -283,7 +283,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		var count = 0;
 		var stream = require('fs').createReadStream(filename);
 
-		stream.on('data', U.streamer('</product>', function(value) {
+		stream.on('data', U.streamer('<product>', '</product>', function(value) {
 
 			var index = value.indexOf('<product>');
 			if (index === -1)
