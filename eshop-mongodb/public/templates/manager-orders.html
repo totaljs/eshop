@@ -337,7 +337,7 @@
 	}
 
 	Tangular.register('sum', function(value, format) {
-		return (value * this.count).format(format) + ' ' + currency;
+		return currency.format((value * this.count).format(format));
 	});
 
 </script>
