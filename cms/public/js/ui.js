@@ -1871,7 +1871,7 @@ Tangular.register('pluralize', function(value, zero, one, other, many) {
 	return value + ' ' + other;
 });
 
-$.components.$parser.push(function(path, value, type) {
+jC.parser(function(path, value, type) {
 
 	if (type === 'date') {
 		if (value instanceof Date)
@@ -1891,7 +1891,7 @@ $.components.$parser.push(function(path, value, type) {
 	return value;
 });
 
-$.components.$formatter.push(function(path, value, type) {
+jC.formatter(function(path, value, type) {
 
 	if (type === 'date') {
 		if (value instanceof Date)
