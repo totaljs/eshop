@@ -170,7 +170,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		for (var i = 0, length = model.products.length; i < length; i++) {
 			var item = model.products[i];
 			sql.insert('tbl_order_product').make(function(builder) {
-				builder.set('idorder', sql.expected('order', 'identity'));
+				builder.set('idorder', model.id);
 				builder.set('idproduct', item.id);
 				builder.set('price', item.price);
 				builder.set('name', item.name);
