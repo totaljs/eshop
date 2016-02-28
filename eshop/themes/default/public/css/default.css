@@ -4,8 +4,7 @@ $font    : 'Source Sans Pro';
 
 .CMS_hidden { display: none; }
 
-html { overflow: hidden; }
-html,body { height: 100%; }
+html { background-color: #F0F0F0; }
 body { background-color: #F0F0F0; padding: 0; color: gray; font-smoothing: antialiased; overflow-y: scroll; overflow-x: hidden; overflow-scrolling: touch; }
 form { padding: 0; margin: 0; }
 
