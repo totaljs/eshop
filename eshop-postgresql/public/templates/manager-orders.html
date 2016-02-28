@@ -175,6 +175,8 @@
 						if (response instanceof Array)
 							response = {};
 
+						orders.ispaid = response.ispaid;
+
 						SET('orders.form', $.extend({}, response), true);
 						SET('orders.response', null);
 						SET('common.form', 'orders');
@@ -220,6 +222,9 @@
 
 			orders.form.count = count;
 			orders.form.price = price;
+
+			if (!orders.ispaid && orders.form.ispaid)
+				orders.form.datepaid = new Date();
 
 			loading(true);
 
