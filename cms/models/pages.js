@@ -17,11 +17,12 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('keywords', 'String(200)');
 	schema.define('icon', 'String(20)');
 	schema.define('navigations', '[String]');
-	schema.define('widgets', '[String]'); // Widgets lists, contains Array of ID widget
-	schema.define('settings', '[String]'); // Widget settings (according to widgets array index)
+	schema.define('partial', '[String]');  		// Subpages
+	schema.define('widgets', '[String]');  		// Widgets lists, contains Array of ID widget
+	schema.define('settings', '[String]'); 		// Widget settings (according to widgets array index)
 	schema.define('tags', '[String]');
 	schema.define('search', 'String(1000)');
-	schema.define('pictures', '[String]') // URL addresses for first 5 pictures
+	schema.define('pictures', '[String]')  		// URL addresses for first 5 pictures
 	schema.define('name', 'String(50)');
 	schema.define('perex', 'String(500)');
 	schema.define('title', 'String(100)', true);
