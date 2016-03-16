@@ -47,7 +47,7 @@
 	var newsletter = {};
 
 	function newsletter_refresh() {
-		$.components.GET(managerurl + '/api/newsletter/', null, function(response) {
+		AJAX('GET {0}/api/newsletter/'.format(managerurl), function(response) {
 			var csv = response.split('\n');
 			var arr = [];
 			csv.reverse();
@@ -59,12 +59,11 @@
 				arr.push({ email: line[0], ip: line[1], datecreated: line[3] });
 			}
 
-
 			SET('newsletter.grid', arr);
 		});
 	}
 
-	$('.csvexport').attr('href', managerurl + '/api/newsletter/csv/');
+	$('.csvexport').attr('href', '{0}/api/newsletter/csv/'.format(managerurl));
 	newsletter_refresh();
 
 </script>

@@ -21,7 +21,7 @@ h2 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 8px 0; paddin
 h2 b { font-weight: 700; }
 
 #loading { background: rgba(255,255,255,0.9) url(../img/preloader.gif) no-repeat 50% 50%; position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 15; }
-#success { width: 100px; height: 90px; left: 0; top: 50%; margin-left: -10px; margin-top: -45px; background-color: #66B258; border-radius: 4px; font-size: 40px; line-height: 0; position: fixed; z-index: 20; color: white; text-align: center; padding-top: 20px; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: none; }
+#success { width: 100px; height: 90px; left: 0; top: 50%; margin-left: -10px; margin-top: -45px; background-color: #66B258; border-radius: 4px; font-size: 40px; line-height: 0; position: fixed; z-index: 500; color: white; text-align: center; padding-top: 20px; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: none; }
 
 .padding { padding: 20px; }
 .m { margin-bottom: 20px; }
@@ -35,6 +35,7 @@ h2 b { font-weight: 700; }
 .npb { padding-bottom: 0 !important; }
 
 .bg-smoke { background-color: #F8F8F8; }
+.bg-fade { background: white linear-gradient(white,#F8F8F8); }
 .b { font-weight: bold; }
 .silver { color: #AAB2BD; }
 .red { color: #D63B32; }

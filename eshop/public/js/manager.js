@@ -14,7 +14,10 @@ $(document).ready(function() {
 			el.hide();
 	});
 
-	loading(false, 1000);
+	FIND('loading', function() {
+		this.hide(500);
+	});
+
 	$(window).on('resize', resizer);
 	resizer();
 });
@@ -81,6 +84,9 @@ jRouting.on('location', function(url) {
 });
 
 function loading(v, timeout) {
+	// @TODO: remove
+	return;
+
 	setTimeout(function() {
 		$('#loading').toggle(v);
 	}, timeout || 0);
@@ -96,8 +102,8 @@ function resizer() {
 }
 
 function success() {
-	loading(false, 1000);
 	var el = $('#success');
+	FIND('loading').hide(500);
 	el.css({ top: '0%' }).fadeIn(100).animate({ top: '50%' }, 1000, 'easeOutBounce', function() {
 		setTimeout(function() {
 			el.fadeOut(300);

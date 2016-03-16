@@ -70,7 +70,7 @@
 function system_clear_products() {
 	if (!confirm('@(Please, confirm clearing of the database.)'))
 		return;
-	loading(true);
+	FIND('loading').show();
 	$.components.GET(managerurl + '/api/products/clear/', null, function() {
 		success();
 		if (window.products_refresh)
@@ -81,7 +81,7 @@ function system_clear_products() {
 function system_clear_orders() {
 	if (!confirm('@(Please, confirm clearing of the database.)'))
 		return;
-	loading(true);
+	FIND('loading').show();
 	$.components.GET(managerurl + '/api/orders/clear/', null, function() {
 		success();
 		if (window.orders_refresh)
@@ -92,7 +92,7 @@ function system_clear_orders() {
 function system_clear_users() {
 	if (!confirm('@(Please, confirm clearing of the database.)'))
 		return;
-	loading(true);
+	FIND('loading').show();
 	$.components.GET(managerurl + '/api/users/clear/', null, function() {
 		success();
 		if (window.users_refresh)
@@ -103,7 +103,7 @@ function system_clear_users() {
 function system_clear_pages() {
 	if (!confirm('@(Please, confirm clearing of the database.)'))
 		return;
-	loading(true);
+	FIND('loading').show();
 	$.components.GET(managerurl + '/api/pages/clear/', null, function() {
 		success();
 		if (window.pages_refresh)
@@ -114,7 +114,7 @@ function system_clear_pages() {
 function system_clear_widgets() {
 	if (!confirm('@(Please, confirm clearing of the database.)'))
 		return;
-	loading(true);
+	FIND('loading').show();
 	$.components.GET(managerurl + '/api/widgets/clear/', null, function() {
 		success();
 		if (window.widgets_refresh)
@@ -125,7 +125,7 @@ function system_clear_widgets() {
 function system_clear_files() {
 	if (!confirm('@(Please, confirm clearing of the database.)'))
 		return;
-	loading(true);
+	FIND('loading').show();
 	$.components.GET(managerurl + '/api/files/clear/', null, function() {
 		success();
 	});
@@ -134,7 +134,7 @@ function system_clear_files() {
 function system_clear_newsletter() {
 	if (!confirm('@(Please, confirm clearing of the database.)'))
 		return;
-	loading(true);
+	FIND('loading').show();
 	$.components.GET(managerurl + '/api/newsletter/clear/', null, function() {
 		success();
 		if (window.newsletter_refresh)
@@ -145,7 +145,7 @@ function system_clear_newsletter() {
 function system_clear_webcounter() {
 	if (!confirm('@(Please, confirm clearing of the database.)'))
 		return;
-	loading(true);
+	FIND('loading').show();
 	$.components.GET(managerurl + '/api/dashboard/clear/', null, function() {
 		success();
 		setTimeout(function() {
@@ -157,7 +157,7 @@ function system_clear_webcounter() {
 $('#system_restore_backup').on('change', function(e) {
 	e.preventDefault();
 	e.stopPropagation();
-	loading(true);
+	FIND('loading').show();
 	var el = this;
 	var data = new FormData();
 	data.append('file', this.files[0]);

@@ -119,10 +119,11 @@
 		users_refresh(true);
 
 		component.click = function(index, row, button) {
+			var loading = FIND('loading');
 			switch ($(button).attr('name')) {
 				case 'edit':
-					loading(true);
-					$.components.GET(managerurl + '/api/users/' + row.id, null, function(response, err) {
+					loading.show();
+					AJAX('GET {0}/api/users/{1}'.format(managerurl, row.id), function(response, err) {
 
 						// Error prevention
 						if (response instanceof Array)
@@ -131,17 +132,19 @@
 						SET('users.form', $.extend({}, response), true);
 						SET('users.response', null);
 						SET('common.form', 'users');
-						loading(false, 500);
+						loading.hide();
 					});
 					break;
 
 				case 'remove':
-					if (!confirm('@(Do you want to remove selected user?)'))
-						return;
-					loading(true);
-					$.components.DELETE(managerurl + '/api/users', { id: row.id }, function() {
-						users_refresh(true);
-						loading(false, 500);
+					FIND('confirm').confirm('@(Do you want to remove selected user?)', ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						loading.show();
+						AJAX('DELETE {0}/api/users'.format(managerurl), { id: row.id }, function() {
+							users_refresh(true);
+							loading.hide(500);
+						});
 					});
 					break;
 			}
@@ -155,8 +158,11 @@
 	ON('#users.form', function(component) {
 		// Submits user form
 		component.submit = function(hide) {
-			loading(true);
-			$.components.PUT(managerurl + '/api/users/', users.form, function(response) {
+			var loading = FIND('loading');
+			loading.show();
+			AJAX('PUT {0}/api/users/'.format(managerurl), users.form, function(response) {
+
+				loading.hide(500);
 
 				// Error handling
 				SET('users.response', response);
@@ -166,7 +172,6 @@
 				hide();
 				users_refresh(true);
 				success();
-				loading(false, 500);
 			});
 		};
 	});
@@ -179,7 +184,7 @@
 			users.grid = [];
 		}
 
-		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
+		AJAX('GET {0}/api/users/'.format(managerurl), users.filter, function(response) {
 			SET((reset ? '' : '+') + 'users.grid', response.items);
 			if (!reset)
 				return;

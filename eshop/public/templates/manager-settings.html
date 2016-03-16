@@ -232,8 +232,9 @@ function settings_refresh() {
 }
 
 function settings_save() {
-	loading(true);
-	$.components.PUT(managerurl + '/api/settings/', settings.form, function() {
+	var loading = FIND('loading');
+	loading.show();
+	AJAX('PUT {0}/api/settings/'.format(managerurl), settings.form, function() {
 
 		success(true);
 		RESET('settings.form.*');
@@ -241,8 +242,10 @@ function settings_save() {
 		if (window.pages_refresh_dependencies)
 			window.pages_refresh_dependencies();
 
-		if (settings.cache.currency === settings.form.currency)
+		if (settings.cache.currency === settings.form.currency) {
+			loading.hide(500);
 			return;
+		}
 
 		// Refresh settings
 		setTimeout(function() {
@@ -313,7 +316,7 @@ COMPONENT('oauth2callback', function() {
 	};
 
 	self.setter = function(value) {
-		self.find('input').val(value + '/oauth2/' + name + '/callback/');
+		self.find('input').val('{0}/oauth2/{1}/callback/'.format(value, name));
 	};
 });
 

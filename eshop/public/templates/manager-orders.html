@@ -166,10 +166,11 @@
 		orders_refresh(true);
 
 		component.click = function(index, row, button) {
+			var loading = FIND('loading');
 			switch ($(button).attr('name')) {
 				case 'edit':
-					loading(true);
-					$.components.GET(managerurl + '/api/orders/' + row.id, null, function(response, err) {
+					loading.show();
+					AJAX('GET {0}/api/orders/{1}/'.format(managerurl, row.id), function(response, err) {
 
 						// Error prevention
 						if (response instanceof Array)
@@ -180,22 +181,24 @@
 						SET('orders.form', $.extend({}, response), true);
 						SET('orders.response', null);
 						SET('common.form', 'orders');
-						loading(false, 500);
+						loading.hide(500);
 					});
 					break;
 
 				case 'remove':
-					if (!confirm('@(Do you want to remove selected order?)'))
-						return;
-					loading(true);
-					$.components.DELETE(managerurl + '/api/orders', { id: row.id }, function() {
+					FIND('confirm').confirm('@(Do you want to remove selected order?)', ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						loading.show();
+						AJAX('DELETE {0}/api/orders'.format(managerurl), { id: row.id }, function() {
 
-						loading(false, 500);
-						orders_refresh(true);
+							loading.hide();
+							orders_refresh(true);
 
-						// Refresh dashboard informations
-						if (window.dashboard_refresh)
-							window.dashboard_refresh();
+							// Refresh dashboard informations
+							if (window.dashboard_refresh)
+								window.dashboard_refresh();
+						});
 					});
 					break;
 			}
@@ -212,6 +215,7 @@
 
 			var price = 0;
 			var count = 0;
+			var loading = FIND('loading');
 
 			for (var i = 0, length = orders.form.products.length; i < length; i++) {
 				var product = orders.form.products[i];
@@ -226,9 +230,11 @@
 			if (!orders.ispaid && orders.form.ispaid)
 				orders.form.datepaid = new Date();
 
-			loading(true);
+			loading.show();
 
-			$.components.PUT(managerurl + '/api/orders/', orders.form, function(response) {
+			AJAX('PUT {0}/api/orders/'.format(managerurl), orders.form, function(response) {
+
+				loading.hide(500);
 
 				// Error handling
 				SET('orders.response', response);
@@ -238,7 +244,6 @@
 				hide();
 				orders_refresh(true);
 				success();
-				loading(false, 500);
 
 				// Refreshes dashboard informations
 				if (window.dashboard_refresh)
@@ -292,7 +297,7 @@
 			orders.grid = [];
 		}
 
-		$.components.GET(managerurl + '/api/orders/', orders.filter, function(response) {
+		AJAX('GET {0}/api/orders/'.format(managerurl), orders.filter, function(response) {
 			SET((reset ? '' : '+') + 'orders.grid', response.items);
 			if (!reset)
 				return;

@@ -414,9 +414,11 @@ COMPONENT('template', function() {
 	self.setter = function(value) {
 		if (!value)
 			return self.element.addClass('hidden');
-		if (NOTMODIFIED(self.id, value))
-			return;
-		self.html(self.template(value)).removeClass('hidden');
+		KEYPRESS(function() {
+			if (NOTMODIFIED(self.id, value))
+				return;
+			self.html(self.template(value)).removeClass('hidden');
+		}, 100);
 	};
 });
 
@@ -666,7 +668,8 @@ COMPONENT('page', function() {
 			return;
 		}
 
-		loading(true);
+		var loading = FIND('loading');
+		loading.show();
 		isProcessing = true;
 		INJECT(el.attr('data-template'), el, function() {
 			isProcessing = false;
@@ -679,7 +682,7 @@ COMPONENT('page', function() {
 
 			isProcessed = true;
 			el.toggleClass('hidden', !is);
-			loading(false, 1200);
+			loading.hide(1200);
 		});
 	};
 });
@@ -729,7 +732,7 @@ COMPONENT('grid', function() {
 		setTimeout(function() {
 			var max = self.attr('data-max');
 			if (max === 'auto')
-				self.max = (Math.floor(($(window).height() - (self.element.offset().top + 208)) / 26));
+				self.max = (Math.floor(($(window).height() - (self.element.offset().top + 108)) / 26));
 			else
 				self.max = parseInt(max);
 
@@ -1131,10 +1134,11 @@ COMPONENT('repeater-group', function() {
 COMPONENT('dropdowncheckbox', function() {
 
 	var self = this;
-	var isRequired = self.element.attr('data-required') === 'true';
+	var required = self.element.attr('data-required') === 'true';
 	var datasource = '';
 	var container;
 	var data = [];
+	var values;
 
 	if (!window.$dropdowncheckboxtemplate)
 		window.$dropdowncheckboxtemplate = Tangular.compile('<div><label><input type="checkbox" value="{{ index }}" /><span>{{ text }}</span></label></div>');
@@ -1142,7 +1146,7 @@ COMPONENT('dropdowncheckbox', function() {
 	var template = window.$dropdowncheckboxtemplate;
 
 	self.validate = function(value) {
-		return isRequired ? value && value.length > 0 : true;
+		return required ? value && value.length > 0 : true;
 	};
 
 	self.make = function() {
@@ -1167,15 +1171,21 @@ COMPONENT('dropdowncheckbox', function() {
 
 		if (content.length > 0) {
 			element.empty();
-			element.append('<div class="ui-dropdowncheckbox-label' + (isRequired ? ' ui-dropdowncheckbox-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div>');
+			element.append('<div class="ui-dropdowncheckbox-label' + (required ? ' ui-dropdowncheckbox-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div>');
 			element.append(html);
 		} else
 			element.append(html);
 
 		self.element.addClass('ui-dropdowncheckbox-container');
 		container = self.element.find('.ui-dropdowncheckbox-values');
+		values = self.element.find('.ui-dropdowncheckbox-selected');
 
 		self.element.on('click', '.ui-dropdowncheckbox', function(e) {
+
+			var el = $(this);
+			if (el.hasClass('ui-disabled'))
+				return;
+
 			container.toggleClass('hidden');
 
 			if (window.$dropdowncheckboxelement) {
@@ -1236,8 +1246,12 @@ COMPONENT('dropdowncheckbox', function() {
 		if (NOTMODIFIED(path, value))
 			return;
 
-		if (!value)
-			value = [];
+		var clsempty = 'ui-dropdowncheckbox-values-empty';
+
+		if (!value) {
+			container.addClass(clsempty).empty().html(self.attr('data-empty'));
+			return;
+		}
 
 		var kv = self.attr('data-source-value') || 'id';
 		var kt = self.attr('data-source-text') || 'name';
@@ -1245,54 +1259,67 @@ COMPONENT('dropdowncheckbox', function() {
 
 		data = [];
 		for (var i = 0, length = value.length; i < length; i++) {
-
-			var item;
-			if (typeof(value[i]) === 'string')
-				item = { value: value[i], text: value[i], index: i };
-			else
-				item = { value: value[i][kv], text: value[i][kt], index: i };
-
+			var isString = typeof(value[i]) === 'string';
+			var item = { value: isString ? value[i] : value[i][kv], text: isString ? value[i] : value[i][kt], index: i };
 			data.push(item);
 			builder += template(item);
 		}
 
-		container.empty().append(builder);
+		if (builder)
+			container.removeClass(clsempty).empty().append(builder);
+		else
+			container.addClass(clsempty).empty().html(self.attr('data-empty'));
+
 		self.setter(self.get());
 	}
 
 	self.setter = function(value) {
 
-		if (!value) {
-			self.element.find('.ui-dropdowncheckbox-selected').html('');
-			self.element.find('input').prop('checked', false);
+		if (NOTMODIFIED(self.id, value))
 			return;
-		}
 
 		var label = '';
-		for (var i = 0, length = value.length; i < length; i++) {
-			var selected = value[i];
-			var index = 0;
-			while (true) {
-				var item = data[index++];
-				if (item === undefined)
-					break;
-				if (item.value != selected)
-					continue;
-				label += (label ? ', ' : '') + item.text;
+		var empty = self.attr('data-placeholder');
+
+		if (value && value.length) {
+			for (var i = 0, length = value.length; i < length; i++) {
+				var selected = value[i];
+				var index = 0;
+				while (true) {
+					var item = data[index++];
+					if (item === undefined)
+						break;
+					if (item.value != selected)
+						continue;
+					label += (label ? ', ' : '') + item.text;
+				}
 			}
 		}
 
 		container.find('input').each(function() {
 			var index = parseInt(this.value);
-			var checked = data[index];
-			if (checked === undefined)
+			var checked = false;
+			if (!value || !value.length)
 				checked = false;
-			else
+			else if (data[index])
+				checked = data[index];
+			if (checked)
 				checked = value.indexOf(checked.value) !== -1;
 			this.checked = checked;
 		});
 
-		self.element.find('.ui-dropdowncheckbox-selected').html(label);
+		if (!label && value) {
+			// invalid data
+			// it updates model without notification
+			MAN.set(self.path, []);
+		}
+
+		if (!label && empty) {
+			values.html('<span>{0}</span>'.format(empty));
+			return;
+		}
+
+		values.html(label);
 	};
 
 	self.state = function(type) {
@@ -1311,6 +1338,10 @@ COMPONENT('dropdowncheckbox', function() {
 	});
 });
 
+/**
+ * Cropper
+ * @version 2.0.0
+ */
 COMPONENT('crop', function() {
 	var self = this;
 	var width, height, canvas, context;
@@ -1320,6 +1351,8 @@ COMPONENT('crop', function() {
 	var zoom = 100;
 	var current = { x: 0, y: 0 };
 	var offset = { x: 0, y: 0 };
+	var cache = { x: 0, y: 0, zoom: 0 };
+	var bgcolor = '';
 
 	self.noValid();
 	self.getter = null;
@@ -1328,9 +1361,25 @@ COMPONENT('crop', function() {
 		can = true;
 		zoom = 100;
 
+		var nw = (img.width / 2) >> 0;
+		var nh = (img.height / 2) >> 0;
+
+		if (img.width > width) {
+
+			var ratio;
+			var p;
+
+			p = (width / (img.width / 100)) >> 0;
+			zoom -= zoom - p;
+			nh = ((img.height * (p / 100)) / 2) >> 0;
+			nw = ((img.width * (p / 100)) / 2) >> 0;
+		}
+
 		 // centering
-		current.x = (width / 2) - (img.width / 2);
-		current.y = (height / 2) - (img.height / 2);
+		cache.x = current.x = (width / 2) - nw;
+		cache.y = current.y = (height / 2) - nh;
+		cache.zoom = zoom;
+
 		self.redraw();
 	};
 
@@ -1339,25 +1388,24 @@ COMPONENT('crop', function() {
 		height = h;
 		canvas.width = w;
 		canvas.height = h;
-		self.element.find('div').html(w + 'x' + h);
 	};
 
 	self.output = function(type) {
 		if (type)
 			return canvas.toDataURL(type);
-		if (isTransparent(context))
+		if (!bgcolor && isTransparent(context))
 			return canvas.toDataURL('image/png');
-		var w = canvas.width;
-		return canvas.toDataURL('image/jpeg', w > 800 ? 0.7 : w > 500 ? 0.8 : 0.9);
+		return canvas.toDataURL('image/jpeg');
 	};
 
 	self.make = function() {
 
+		bgcolor = self.attr('data-background');
 		width = parseInt(self.attr('data-width') || 0);
 		height = parseInt(self.attr('data-height') || 0);
 		self.element.addClass('ui-crop');
 		self.append('<input type="file" style="display:none" accept="image/*" /><ul><li data-type="upload"><span class="fa fa-folder"></span></li><li data-type="plus"><span class="fa fa-plus"></span></li><li data-type="refresh"><span class="fa fa-refresh"></span></li><li data-type="minus"><span class="fa fa-minus"></span></li></ul>');
-		self.append(Tangular.render('<canvas width="{{ width }}" height="{{ height }}"></canvas><div></div>', { width: width, height: height }));
+		self.append(Tangular.render('<canvas width="{{ width }}" height="{{ height }}"></canvas>', { width: width, height: height }));
 		canvas = self.find('canvas').get(0);
 		context = canvas.getContext('2d');
 
@@ -1367,8 +1415,9 @@ COMPONENT('crop', function() {
 			e.stopPropagation();
 
 			var count = parseInt();
+			var type = $(this).attr('data-type');
 
-			switch ($(this).attr('data-type')) {
+			switch (type) {
 				case 'upload':
 					self.find('input').trigger('click');
 					break;
@@ -1376,35 +1425,41 @@ COMPONENT('crop', function() {
 					zoom += 5;
 					if (zoom > 300)
 						zoom = 300;
+					current.x -= 5;
+					current.y -= 5;
 					self.redraw();
-					break;
+				break;
 				case 'minus':
 					zoom -= 5;
 					if (zoom < 5)
 						zoom = 5;
+					current.x += 5;
+					current.y += 5;
 					self.redraw();
 					break;
 				case 'refresh':
-					zoom = 100;
+					zoom = cache.zoom;
+					x = cache.x;
+					y = cache.y;
 					self.redraw();
 					break;
 			}
+
 		});
 
 		self.find('input').on('change', function() {
-			var input = this;
 			var file = this.files[0];
 			var reader = new FileReader();
 
 			reader.onload = function () {
 				img.src = reader.result;
-				input.value = '';
 				setTimeout(function() {
 					self.change();
 				}, 500);
 			};
 
 			reader.readAsDataURL(file);
+			this.value = '';
 		});
 
 		$(canvas).on('mousedown', function (e) {
@@ -1463,7 +1518,8 @@ COMPONENT('crop', function() {
 		self.element.on('mousemove mouseup', function (e) {
 
 			if (e.type === 'mouseup') {
-				if (is) self.change();
+				if (is)
+					self.change();
 				is = false;
 				return;
 			}
@@ -1491,6 +1547,11 @@ COMPONENT('crop', function() {
 
 		context.clearRect(0, 0, width, height);
 
+		if (bgcolor) {
+			context.fillStyle = bgcolor;
+			context.fillRect(0, 0, width, height)
+		}
+
 		if (can)
 			context.drawImage(img, current.x || 0, current.y || 0, w, h);
 	};
@@ -1503,7 +1564,7 @@ COMPONENT('crop', function() {
 			return;
 		}
 
-		img.src = value;
+		img.src = (self.attr('data-format') || '{0}').format(value);
 	};
 
 	function isTransparent(ctx) {
@@ -1857,6 +1918,128 @@ COMPONENT('tabmenu', function() {
 	};
 });
 
+/**
+ * Disable
+ * @version 1.0.0
+ */
+COMPONENT('disable', function() {
+	var self = this;
+	var condition = self.attr('data-if');
+	var selector = self.attr('data-selector') || 'input,texarea,select';
+
+	self.readonly();
+
+	self.setter = function(value) {
+		var is = true;
+
+		if (condition)
+			is = EVALUATE(self.path, condition);
+		else
+			is = value ? false : true;
+
+		self.find(selector).each(function() {
+			var el = $(this);
+			var tag = el.get(0).tagName;
+			if (tag === 'INPUT' || tag === 'SELECT') {
+				el.prop('disabled', is);
+				el.parent().parent().toggleClass('ui-disabled', is);
+				return;
+			}
+			el.toggleClass('ui-disabled', is);
+		});
+	};
+
+	self.state = function(type) {
+		self.update();
+	};
+});
+
+/**
+ * Confirm Message
+ * @version 1.0.0
+ */
+COMPONENT('confirm', function() {
+	var self = this;
+	var is = false;
+	var visible = false;
+	var timer;
+
+	self.readonly();
+	self.singleton();
+
+	self.make = function() {
+		self.element.addClass('ui-confirm hidden');
+		self.element.on('click', 'button', function() {
+			self.hide($(this).attr('data-index').parseInt());
+		});
+	};
+
+	self.confirm = function(message, buttons, fn) {
+		self.callback = fn;
+
+		var builder = [];
+
+		buttons.forEach(function(item, index) {
+			builder.push('<button data-index="{1}">{0}</button>'.format(item, index));
+		});
+
+		self.content('ui-confirm-warning', '<div class="ui-confirm-message">{0}</div>{1}'.format(message.replace(/\n/g, '<br />'), builder.join('')));
+	};
+
+	self.hide = function(index) {
+
+		if (self.callback)
+			self.callback(index);
+
+		self.element.removeClass('ui-confirm-visible');
+		if (timer)
+			clearTimeout(timer);
+		timer = setTimeout(function() {
+			visible = false;
+			self.element.addClass('hidden');
+		}, 1000);
+	};
+
+	self.content = function(cls, text) {
+
+		if (!is)
+			self.html('<div><div class="ui-confirm-body"></div></div>');
+
+		if (timer)
+			clearTimeout(timer);
+
+		visible = true;
+		self.element.find('.ui-confirm-body').empty().append(text);
+		self.element.removeClass('hidden');
+		setTimeout(function() {
+			self.element.addClass('ui-confirm-visible');
+		}, 5);
+	};
+});
+
+COMPONENT('loading', function() {
+	var self = this;
+	var pointer;
+
+	self.readonly();
+	self.singleton();
+
+	self.make = function() {
+		self.element.addClass('ui-loading');
+	};
+
+	self.show = function() {
+		clearTimeout(pointer);
+		self.element.toggleClass('hidden', false);
+	};
+
+	self.hide = function(timeout) {
+		clearTimeout(pointer);
+		pointer = setTimeout(function() {
+			self.element.toggleClass('hidden', true);
+		}, timeout || 1);
+	};
+});
 // ==========================================================
 // @{end}
 // ==========================================================
