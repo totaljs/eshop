@@ -1,15 +1,19 @@
 var PayPal = require('paypal-express-checkout');
 
 exports.install = function() {
+
+	// IMPORTANT:
+	// routing is linked with the "sitemap" file
+
 	// PRODUCTS
-	F.route('/shop/',                     view_products);
-	F.route('/shop/{category}/*',         view_products_category);
-	F.route('/product/{linker}/',         view_products_detail);
+	F.route('#products',   view_products);
+	F.route('#category',   view_products_category);
+	F.route('#detail',     view_products_detail);
 
 	// ORDERS
-	F.route('/checkout/');
-	F.route('/checkout/{linker}/',        view_checkout);
-	F.route('/checkout/{linker}/paypal/', process_payment_paypal);
+	F.route('#checkout');
+	F.route('#order',      view_checkout);
+	F.route('#payment',    process_payment_paypal);
 
 	// USER ACCOUNT
 	F.route('/account/',                  view_account, ['authorized']);
