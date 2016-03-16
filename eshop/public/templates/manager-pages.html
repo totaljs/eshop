@@ -88,26 +88,34 @@
 	<hr style="margin:0 0 8px" />
 	<div class="help ui-center" style="margin-bottom:8px;padding:0 20px"><b>@(Editor formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L). <a href="javascript:void(0)" data-component="click" data-component-path="pages_sourcecode" class="black"><span class="fa fa-code w18"></span>@(Show source-code)</a></div>
 	<div class="pages-editor" data-component="editor" data-component-path="pages.form.body" data-component-import="/templates/component-editor.html" data-component-id="pages.editor"></div>
-	<div class="padding npb">
+	<div class="padding npb bg-fade">
 		<br />
 		<div class="row">
-			<div class="col-md-3 m">
-				<div data-component="dropdowncheckbox" data-component-path="pages.form.navigations" data-source="pages.dependencies.navigations" data-icon="fa-bars">@(Navigation)</div>
-				<div class="help">@(Where will be the page shown?)</div>
+			<div class="col-md-6 m">
+				<div data-component="disable" data-component-path="pages.form.ispartial" data-if="value" data-selector=".ui-dropdowncheckbox">
+					<div data-component="dropdowncheckbox" data-component-path="pages.form.navigations" data-source="pages.dependencies.navigations" data-icon="fa-bars" data-empty="@(Doesn't contain any navigation.)">@(Navigation)</div>
+					<div class="help m">@(Where will be the page shown?)</div>
+					<div data-component="dropdowncheckbox" data-component-path="pages.form.partial" data-source="pages.partial" data-icon="fa-database" data-empty="@(Doesn't contain any partial pages.)">@(Nested partial pages)</div>
+				</div>
 			</div>
-			<div class="col-md-3 m">
-				<div data-component="dropdown" data-component-path="pages.form.parent" data-source="pages.sitemap" data-source-text="name" data-source-value="id" data-empty="true" data-icon="fa-sitemap">@(Parent)</div>
-				<div class="help">@(Affects sitemap and breadcrumb.)</div>
-			</div>
-			<div class="col-md-3 m">
-				<div data-component="textbox" data-component-path="pages.form.name" data-maxlenght="50">@(Name)</div>
-			</div>
-			<div class="col-md-3 m">
-				<div data-component="textbox" data-component-path="pages.form.keywords" data-maxlenght="80" data-icon="fa-tags">@(Keywords)</div>
+			<div class="col-md-6 m">
+				<div class="row">
+					<div class="col-md-12 m" data-component="disable" data-component-path="pages.form.ispartial" data-if="value">
+						<div data-component="dropdown" data-component-path="pages.form.parent" data-source="pages.sitemap" data-source-text="name" data-source-value="id" data-empty="true" data-icon="fa-sitemap">@(Parent)</div>
+						<div class="help">@(Affects sitemap and breadcrumb.)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="pages.form.name" data-maxlenght="50">@(Name)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-component="textbox" data-component-path="pages.form.keywords" data-maxlenght="80" data-icon="fa-tags">@(Keywords)</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	<hr style="margin:0 0 15px" />
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6 m">
@@ -225,10 +233,14 @@
 		pages_refresh_sitemap();
 
 		component.click = function(index, row, button) {
+
+			var loading = FIND('loading');
+
 			switch ($(button).attr('name')) {
 				case 'edit':
-					loading(true);
-					$.components.GET(managerurl + '/api/pages/' + row.id, null, function(response, err) {
+					loading.show();
+					AJAX('GET {0}/api/pages/{1}/'.format(managerurl, row.id), function(response, err) {
+
 						// Error prevention
 						if (response instanceof Array)
 							response = {};
@@ -240,16 +252,19 @@
 						FIND('#pages.editor').setTemplate(response.template);
 						SET('pages.form', $.extend({ $index: index }, response), true);
 						SET('common.form', 'pages');
-						loading(false, 500);
+						loading.hide(500);
 					});
 					break;
 				case 'remove':
-					if (!confirm('@(Do you want to remove) ' + row.name + '?'))
-						return;
-					loading(true);
-					$.components.DELETE(managerurl + '/api/pages', { id: row.id }, function() {
-						loading(false, 500);
-						pages_refresh(true);
+					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						loading.show(true);
+						AJAX('DELETE {0}/api/pages'.format(managerurl), { id: row.id }, function() {
+							loading.hide(500);
+							pages_refresh(true);
+							setTimeout(pages_refresh_sitemap, 2000);
+						});
 					});
 					break;
 			}
@@ -269,8 +284,10 @@
 	ON('#pages.form', function(component) {
 		// Submit order form
 		component.submit = function(hide) {
-			loading(true);
+			var loading = FIND('loading');
 			var editor = FIND('#pages.editor');
+
+			loading.show();
 			editor.save(function() {
 				var widgets = editor.getWidgets();
 				pages.form.pictures = editor.getPictures();
@@ -279,20 +296,26 @@
 				pages.form.search = editor.getKeywords();
 				pages.form.widgets = widgets.widgets;
 				pages.form.settings = widgets.settings;
-				$.components.POST(managerurl + '/api/pages/', pages.form, function(response) {
+
+				if (pages.form.ispartial) {
+					pages.form.navigations = null;
+					pages.form.partial = null;
+					pages.form.parent = '';
+				}
+
+				AJAX('POST {0}/api/pages/'.format(managerurl), pages.form, function(response) {
 
 					// Error handling
 					SET('pages.response', response);
+					loading.hide(500);
+
 					if (response instanceof Array)
 						return;
 
 					hide();
 					success();
 					pages_refresh(true);
-					loading(false, 500);
-
-					if (!pages.form.ispartial)
-						setTimeout(pages_refresh_sitemap, 2000);
+					setTimeout(pages_refresh_sitemap, 2000);
 				});
 			});
 		};
@@ -309,11 +332,12 @@
 	ON('#pages.html', function(component) {
 		component.submit = function(hide) {
 			hide();
-			loading(true);
+			var loading = FIND('loading');
+			loading.show();
 			setTimeout(function() {
 				SET('pages.form.template', pages.html.template);
 				SET('pages.form.body', pages.html.body, 10);
-				loading(false, 500);
+				loading.hide(500);
 			}, 500);
 		};
 	});
@@ -326,7 +350,7 @@
 			pages.grid = [];
 		}
 
-		$.components.GET(managerurl + '/api/pages/', pages.filter, function(response) {
+		AJAX('GET {0}/api/pages/'.format(managerurl), pages.filter, function(response) {
 
 			if (pages.filter.navigation) {
 				// Sorts pages by priority
@@ -347,25 +371,27 @@
 
 			pages.info.count = response.count;
 			pages.info.pages = response.pages;
+
 			UPDATE('pages.info');
 		});
 	}
 
 	function pages_refresh_sitemap() {
-		$.components.GET(managerurl + '/api/pages/sitemap/', null, function(response) {
+		AJAX('GET {0}/api/pages/sitemap/'.format(managerurl), function(response) {
 			// Converts object to Array
-			var keys = Object.keys(response);
+			var keys = Object.keys(response.sitemap);
 			keys.sort();
 			var sitemap = [];
 			for (var i = 0, length = keys.length; i < length; i++)
-				sitemap.push(response[keys[i]]);
+				sitemap.push(response.sitemap[keys[i]]);
 			SET('pages.sitemap', sitemap);
+			SET('pages.partial', response.partial);
 		});
 	}
 
 	// Refreshes templates and navigations
 	function pages_refresh_dependencies() {
-		$.components.GET(managerurl + '/api/pages/dependencies/', null, 'pages.dependencies');
+		AJAX('GET {0}/api/pages/dependencies/'.format(managerurl), 'pages.dependencies');
 	}
 
 	function pages_new() {
@@ -396,10 +422,11 @@
 	ON('#widgets.grid', function(component) {
 		widgets_refresh(true);
 		component.click = function(index, row, button) {
+			var loading = FIND('loading');
 			switch ($(button).attr('name')) {
 				case 'edit':
-					loading(true);
-					$.components.GET(managerurl + '/api/widgets/' + row.id, null, function(response, err) {
+					loading.show();
+					AJAX('GET {0}/api/widgets/{1}/'.format(managerurl, row.id), function(response, err) {
 						// Error prevention
 						if (response instanceof Array)
 							response = {};
@@ -407,16 +434,18 @@
 						SET('widgets.response', null);
 						SET('widgets.form', $.extend({ $index: index }, response), true);
 						SET('common.form', 'widgets');
-						loading(false, 500);
+						loading.hide();
 					});
 					break;
 				case 'remove':
-					if (!confirm('@(Do you want to remove) ' + row.name + '?'))
-						return;
-					loading(true);
-					$.components.DELETE(managerurl + '/api/widgets', { id: row.id }, function() {
-						widgets_refresh();
-						loading(false, 500);
+					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						loading.show();
+						AJAX('DELETE {0}/api/widgets/'.format(managerurl), { id: row.id }, function() {
+							widgets_refresh();
+							loading.hide(500);
+						});
 					});
 					break;
 			}
@@ -424,10 +453,13 @@
 	});
 
 	ON('#widgets.form', function(component) {
-		// Submit order form
+		// Submit widget form
 		component.submit = function(hide) {
-			loading(true);
-			$.components.POST(managerurl + '/api/widgets/', widgets.form, function(response) {
+			var loading = FIND('loading');
+			loading.show();
+			AJAX('POST {0}/api/widgets/'.format(managerurl), widgets.form, function(response) {
+
+				loading.hide(500);
 
 				// Error handling
 				SET('widgets.response', response);
@@ -440,14 +472,13 @@
 				hide();
 				success();
 				widgets_refresh();
-				loading(false, 500);
 			});
 		};
 	});
 
 	// Method refreshes grid
 	function widgets_refresh() {
-		$.components.GET(managerurl + '/api/widgets/', null, function(response) {
+		AJAX('GET {0}/api/widgets/'.format(managerurl), function(response) {
 			SET('widgets.grid', response);
 		});
 	}

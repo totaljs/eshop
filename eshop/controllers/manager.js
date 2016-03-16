@@ -460,7 +460,7 @@ function json_pages_clear() {
 }
 
 function json_pages_sitemap() {
-	this.json(F.global.sitemap);
+	this.json({ sitemap: F.global.sitemap, partial: F.global.partial });
 }
 
 // ==========================================================================
