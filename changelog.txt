@@ -1,3 +1,13 @@
+======================== v5.0.0 (BETA)
+
+- added pages can support partial pages
+- eshop routing (products, details, checkout) is linked with the sitemap
+- updated jComponent version
+- removed footer
+- improved UI components
+- improved code
+- works only with total.js 2.0
+
 ======================== v4.0.0
 
 - added mongodb version
