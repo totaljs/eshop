@@ -101,9 +101,12 @@ NEWSCHEMA('Post').make(function(schema) {
 		// options.language {String}
 		// options.category {String}
 
+		if (options.category)
+			options.category = options.category.slug();
+
 		// Filter for reading
 		var filter = function(doc) {
-			if (options.category && doc.category !== options.category)
+			if (options.category && doc.category_linker !== options.category)
 				return;
 			if (options.linker && doc.linker !== options.linker)
 				return;
