@@ -3,7 +3,7 @@
 html { overflow: hidden; }
 html,body { margin: 0; height: 100%; position: relative; }
 body { background-color: white; padding: 0; color: gray; font-smoothing: antialiased; overflow-y: scroll; overflow-x: hidden; overflow-scrolling: touch; }
-header { background-color: #E0E0E0; height: 40px; margin-bottom: 30px; }
+header { background-color: #E0E0E0; height: 40px; margin-bottom: 20px; }
 
 nav { font-size: 20px; position: relative; display: inline-block; font-smoothing: antialiased; width: 100%; }
 nav a { color: gray; border-right: 1px solid #D0D0D0; padding: 6px 0 0; position: relative; display: inline-block; min-width: 60px; text-align: center; height: 40px; }

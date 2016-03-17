@@ -48,7 +48,7 @@
 				{{ fi }}
 				<tr>
 					<td class="col-xs-5 active">@(Created)</td>
-					<td>{{ datecreated | format('yyyy-MM-dd') }}</td>
+					<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
 				</tr>
 				{{ if ispaid && datepaid }}
 				<tr>

@@ -105,31 +105,24 @@ COMPONENT('message', function() {
 COMPONENT('validation', function() {
 
 	var self = this;
-	var path = self.path;
-	var buttons;
-
-	if (path.lastIndexOf('*') === -1)
-		path += '.*';
+	var path;
+	var elements;
 
 	self.readonly();
 
 	self.make = function() {
-		buttons = self.element.find('button');
-		buttons.prop({ disabled: true });
+		elements = self.find(self.attr('data-selector') || 'button');
+		elements.prop({ disabled: true });
 		self.evaluate = self.attr('data-if');
-		self.watch(self.path, function() {
-			var disabled = $.components.disable(path);
-			if (!disabled && self.evaluate)
-				disabled = !EVALUATE(self.path, self.evaluate);
-			buttons.prop({ disabled: disabled });
-		}, true);
+		path = self.path.replace(/\.\*$/, '');
+		self.watch(self.path, self.state, true);
 	};
 
 	self.state = function() {
-		var disabled = $.components.disable(path);
+		var disabled = jC.disabled(path);
 		if (!disabled && self.evaluate)
 			disabled = !EVALUATE(self.path, self.evaluate);
-		buttons.prop({ disabled: disabled });
+		elements.prop({ disabled: disabled });
 	};
 });
 
@@ -508,6 +501,20 @@ COMPONENT('cookie', function() {
 // ==========================================================
 // @{BLOCK manager}
 // ==========================================================
+
+COMPONENT('expander', function() {
+	var self = this;
+	self.readonly();
+	self.make = function() {
+		self.element.addClass('ui-expander');
+		self.element.wrapInner('<div class="ui-expander-container"></div>');
+		self.append('<div class="ui-expander-fade"></div><div class="ui-expander-button"><span class="fa fa-angle-double-down"></span></div>');
+		self.element.on('click', '.ui-expander-button', function() {
+			self.element.toggleClass('ui-expander-expanded');
+			self.element.find('.ui-expander-button').find('.fa').toggleClass('fa-angle-double-down fa-angle-double-up');
+		});
+	};
+});
 
 COMPONENT('textboxtags', function() {
 
@@ -1096,7 +1103,7 @@ COMPONENT('repeater-group', function() {
 			var html = element.html();
 			element.remove();
 
-			if (index === 0) {
+			if (!index) {
 				self.template = Tangular.compile(html);
 				return;
 			}
@@ -1107,10 +1114,13 @@ COMPONENT('repeater-group', function() {
 
 	self.setter = function(value) {
 
-		if (!value || value.length === 0) {
-			self.element.html('');
+		if (!value || !value.length) {
+			self.element.empty();
 			return;
 		}
+
+		if (NOTMODIFIED(self.id, value))
+			return;
 
 		var length = value.length;
 		var groups = {};
@@ -1129,6 +1139,7 @@ COMPONENT('repeater-group', function() {
 		var index = 0;
 		var builder = '';
 		var keys = Object.keys(groups);
+
 		keys.sort();
 		keys.forEach(function(key) {
 			var arr = groups[key];
