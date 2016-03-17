@@ -9,6 +9,11 @@ exports.install = function() {
 	F.route('/api/checkout/create/',      json_orders_create, ['post', '*Order']);
 	F.route('/api/checkout/{id}/',        json_orders_read);
 
+	// USERS
+	F.route('/api/users/create/',         json_users, ['post', '*UserRegistration']);
+	F.route('/api/users/password/',       json_users, ['post', '*UserPassword']);
+	F.route('/api/users/login/',          json_users, ['post', '*UserLogin']);
+
 	// PRODUCTS
 	F.route('/api/products/',             json_products_query);
 	F.route('/api/products/{id}/',        json_products_read);
@@ -97,6 +102,20 @@ function json_orders_read(id) {
 	var options = {};
 	options.id = id;
 	GETSCHEMA('Order').get(options, self.callback());
+}
+
+// ==========================================================================
+// USERS
+// ==========================================================================
+
+function json_users() {
+	var self = this;
+	var options = {};
+
+	options.controller = self;
+	options.ip = self.ip;
+
+	self.body.$workflow('exec', options, self.callback());
 }
 
 // ==========================================================================

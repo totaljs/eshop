@@ -29,17 +29,26 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('idlive', 'String(30)');
 	schema.define('ip', 'String(80)');
 	schema.define('name', 'String(50)', true);
+	schema.define('firstname', 'String(50)');
+	schema.define('lastname', 'String(50)');
 	schema.define('email', 'String(200)');
 	schema.define('gender', 'String(20)');
 	schema.define('datecreated', Date);
+	schema.define('isblocked', Boolean);
 
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
 
 		// options.id {String}
+		// options.password {String} (SHA1)
+		// options.email {String}
 
 		var filter = function(doc) {
 			if (options.id && doc.id !== options.id)
+				return;
+			if (options.email && doc.email !== options.email)
+				return;
+			if (options.password && doc.password !== options.password)
 				return;
 			return doc;
 		};
@@ -182,6 +191,7 @@ NEWSCHEMA('User').make(function(schema) {
 				doc.email = options.profile.email;
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
+				doc.datecreated = doc.datecreated.format();
 				doc[id] = options.profile[id];
 				DB('users').insert(doc.$clean(), F.error());
 
@@ -205,6 +215,125 @@ NEWSCHEMA('User').make(function(schema) {
 		});
 	});
 });
+
+NEWSCHEMA('UserLogin').make(function(schema) {
+
+	schema.define('email', 'String(200)', true);
+	schema.define('password', 'String(30)', true);
+
+	schema.setPrepare(function(name, value) {
+		if (name === 'email')
+			return value.toLowerCase();
+		return value;
+	});
+
+	schema.addWorkflow('exec', function(error, model, options, callback) {
+
+		// options.controller
+
+		GETSCHEMA('User').get(model, function(err, response) {
+
+			if (err) {
+				error.push(err);
+				return callback();
+			}
+
+			if (response.isblocked) {
+				error.push('error-user-blocked');
+				return callback();
+			}
+
+			exports.login(options.controller.req, options.controller.res, response.id);
+			callback(SUCCESS(true));
+		});
+	});
+});
+
+NEWSCHEMA('UserPassword').make(function(schema) {
+	schema.define('email', 'String(200)', true);
+	schema.addWorkflow('exec', function(error, model, options, callback) {
+
+		// options.controller
+
+		GETSCHEMA('User').get(model, function(err, response) {
+
+			if (err) {
+				error.push(err);
+				return callback();
+			}
+
+			if (response.isblocked) {
+				error.push('error-user-blocked');
+				return callback();
+			}
+
+			response.hash = F.encrypt({ id: response.id, expire: new Date().add('2 days').getTime() });
+			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response);
+			callback(SUCCESS(true));
+		});
+	});
+});
+
+NEWSCHEMA('UserRegistration').make(function(schema) {
+	schema.define('name', 'String(50)', true);
+	schema.define('gender', 'String(20)');
+	schema.define('email', 'String(200)', true);
+	schema.define('password', 'String(20)', true);
+
+	schema.addWorkflow('exec', function(error, model, options, callback) {
+
+		// options.controller
+		// options.ip
+
+		GETSCHEMA('User').get(model, function(err, response) {
+
+			if (response) {
+				error.push('error-user-exists');
+				return callback();
+			}
+
+			var user = GETSCHEMA('User').create();
+			user.name = model.name;
+			user.email = model.email;
+			user.firstname = model.firstname;
+			user.lastname = model.lastname;
+			user.gender = model.gender;
+			user.password = model.password.hash('sha1');
+			user.ip = options.ip;
+			user.datecreated = user.datecreated.format();
+
+			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user);
+
+			if (F.config.custom.emailuserform)
+				mail.bcc(F.config.custom.emailuserform);
+
+			DB('users').insert(user.$clean(), F.error());
+			callback(SUCCESS(true));
+		});
+	});
+
+});
+
+// Cleans online users
+F.on('service', function(counter) {
+
+	if (counter % 10 !== 0)
+		return;
+
+	var users = Object.keys(online);
+	var ticks = new Date().getTime();
+
+	for (var i = 0, length = users.length; i < length; i++) {
+		var user = online[users[i]];
+		if (user.ticks >= ticks)
+			continue;
+		delete online[users[i]];
+	}
+});
+
+exports.usage = function() {
+	return { online: online };
+};
 
 // Rewrites framework authorization
 F.onAuthorize = function(req, res, flags, callback) {
@@ -250,26 +379,4 @@ F.onAuthorize = function(req, res, flags, callback) {
 		res.cookie(COOKIE, F.encrypt({ id: response.id, ip: req.ip }, CONFIG('secret'), true), '6 days');
 		callback(true);
 	});
-
-};
-
-// Cleans online users
-F.on('service', function(counter) {
-
-	if (counter % 10 !== 0)
-		return;
-
-	var users = Object.keys(online);
-	var ticks = new Date().getTime();
-
-	for (var i = 0, length = users.length; i < length; i++) {
-		var user = online[users[i]];
-		if (user.ticks >= ticks)
-			continue;
-		delete online[users[i]];
-	}
-});
-
-exports.usage = function() {
-	return { online: online };
 };

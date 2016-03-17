@@ -70,49 +70,78 @@ function oauth2_login_callback(type) {
 		var profile = {};
 		var options = {};
 		var id = 'id' + type;
+		var tmp;
 
 		profile.name = '';
 		profile.email = '';
 		profile.gender = null;
 		profile.ip = self.ip;
 
+		if (user.gender) {
+			user.gender = user.gender.toLowerCase();
+			profile.gender = user.gender === 'male' || user.gender === 'female' ? user.gender : '';
+		} else if (user.sex) {
+			user.sex = user.sex.toLowerCase();
+			profile.gender = user.sex === 'male' || user.sex === 'female' ? user.sex : '';
+		}
+
 		switch (type) {
 			case 'facebook':
 				profile[id] = user.id.toString();
 				profile.name = user.name;
 				profile.email = user.email;
-				profile.gender = user.gender === 'male';
+				profile.firstname = user.first_name;
+				profile.lastname = user.last_name;
 				break;
+
 			case 'google':
 				profile[id] = user.id.toString();
 				profile.name = user.displayName;
 				profile.email = user.emails[0].value;
-				profile.gender = user.gender;
+
+				if (user.name) {
+					profile.firstname = user.name.givenName;
+					profile.lastname = user.name.familyName;
+				}
+
 				break;
 			case 'instagram':
 				profile[id] = user.id.toString();
 				profile.name = user.full_name;
+				tmp = user.full_name.split(' ');
+				profile.firstname = tmp[0];
+				profile.lastname = tmp[1];
 				break;
 			case 'dropbox':
 				profile[id] = user.uid.toString();
 				profile.name = user.display_name;
 				profile.email = user.email;
+
+				if (user.name_details) {
+					profile.firstname = user.name_details.given_name;
+					profile.lastname = user.name_details.surname;
+				}
+
 				break;
 			case 'live':
 				profile[id] = user.id.toString();
 				profile.name = user.name;
 				profile.email = user.emails.preferred;
-				profile.gender = user.gender;
+				profile.firstname = user.first_name;
+				profile.lastname = user.last_name;
 				break;
 			case 'yandex':
 				profile[id] = user.id.toString();
 				profile.name = user.real_name;
 				profile.email = user.default_email;
-				profile.gender = user.sex;
+				profile.firstname = user.first_name;
+				profile.lastname = user.last_name;
 				break;
 			case 'linkedin':
 				profile[id] = user.id.toString();
 				profile.name = user.firstName + ' ' + user.lastName;
+				profile.firstname = user.firstName;
+				profile.lastname = user.lastName;
 				profile.email = user.emailAddress;
 				break;
 			case 'yahoo':
@@ -124,9 +153,17 @@ function oauth2_login_callback(type) {
 				user = user.response[0];
 				profile[id] = user.uid.toString().trim();
 				profile.name = user.first_name + ' ' + user.last_name;
+				profile.firstname = user.first_name;
+				profile.lastname = user.last_name;
 				if (user.email)
 					profile.email = user.email;
 				break;
+		}
+
+		if (!profile.name) {
+			var error = self.invalid();
+			error.push('error-user-data');
+			return;
 		}
 
 		options.type = type;

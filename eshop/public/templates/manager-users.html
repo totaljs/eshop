@@ -50,14 +50,24 @@
 
 	<div class="padding" style="padding-bottom:0">
 		<div class="row">
-			<div class="col-md-4 m">
-				<div data-component="textbox" data-component-path="users.form.name" data-required="true">@(Name)</div>
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="users.form.name" data-required="true" data-maxlength="50">@(Name)</div>
 			</div>
-			<div class="col-md-4 m">
-				<div data-component="textbox" data-component-path="users.form.email">@(Email)</div>
+			<div class="col-md-6 m">
+				<div data-component="dropdown" data-component-path="users.form.gender" data-options=";@(male)|male;@(female)|female">@(Gender)</div>
 			</div>
-			<div class="col-md-4 m">
-				<div data-component="textbox" data-component-path="users.form.gender">@(Gender)</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="users.form.firstname" data-maxlength="50">@(First name)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="users.form.lastname" data-maxlength="50">@(Last name)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="users.form.email" data-maxlength="200">@(Email)</div>
 			</div>
 		</div>
 	</div>
@@ -65,28 +75,28 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idfacebook">Facebook #</div>
+				<div data-component="textbox" data-component-path="users.form.idfacebook" data-maxlength="30">Facebook #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idgoogle">Google #</div>
+				<div data-component="textbox" data-component-path="users.form.idgoogle" data-maxlength="30">Google #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idlinkedin">LInkedIn #</div>
+				<div data-component="textbox" data-component-path="users.form.idlinkedin" data-maxlength="30">LInkedIn #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idlive">Windows Live #</div>
+				<div data-component="textbox" data-component-path="users.form.idlive" data-maxlength="30">Windows Live #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idyahoo">Yahoo #</div>
+				<div data-component="textbox" data-component-path="users.form.idyahoo" data-maxlength="30">Yahoo #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.iddropbox">Dropbox #</div>
+				<div data-component="textbox" data-component-path="users.form.iddropbox" data-maxlength="30">Dropbox #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idinstagram">Instagram #</div>
+				<div data-component="textbox" data-component-path="users.form.idinstagram" data-maxlength="30">Instagram #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idvk">VKontakte #</div>
+				<div data-component="textbox" data-component-path="users.form.idvk" data-maxlength="30">VKontakte #</div>
 			</div>
 		</div>
 	</div>
