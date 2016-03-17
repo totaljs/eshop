@@ -2,6 +2,7 @@
 
 - added pages can support partial pages
 - eshop routing (products, details, checkout) is linked with the sitemap
+- added built-in users
 - updated jComponent version
 - removed footer
 - improved UI components
