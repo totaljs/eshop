@@ -51,7 +51,7 @@ table td { vertical-align: middle !important;}
 .order-completed .fa-check-circle { color: #66B258; margin-right: 5px; }
 
 .fs11 { font-size: 11px !important; }
-.help { font-size: 11px; color: #AAB2BD; margin-top: 5px; }
+.help { font-size: 11px; color: #AAB2BD; margin-top: 5px; min-height: 20px; }
 .help code { font: normal normal 11px Arial; background-color: #F0F0F0; padding: 2px 5px; border-radius: 4px; }
 
 .legend { margin-bottom: 10px; }
