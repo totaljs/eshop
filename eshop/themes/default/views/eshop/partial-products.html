@@ -2,10 +2,10 @@
 	@{foreach m in model.items}
 	<div class="col-md-3 col-sm-4 product">
 		@{if m.istop}<img src="/img/top.png" class="product-top" alt="TOP" width="40" />@{fi}
-		<a href="/product/@{m.linker}/" class="product-picture"><img src="@{if !m.pictures || !m.pictures.length}/img/empty.png@{else}/images/small/@{m.pictures[0]}.jpg@{fi}" class="img-responsive" alt="@{m.name}" border="0" /></a>
-		<a href="/shop/@{m.linker_category}/" class="product-category">@{m.category}</a>
+		<a href="@{m.linker}" class="product-picture"><img src="@{if !m.pictures || !m.pictures.length}/img/empty.png@{else}/images/small/@{m.pictures[0]}.jpg@{fi}" class="img-responsive" alt="@{m.name}" border="0" /></a>
+		<a href="@{m.linker_category}" class="product-category">@{m.category}</a>
 		<div class="product-manufacturer">@{m.manufacturer}</div>
-		<a href="/product/@{m.linker}/" class="product-name">@{m.name}</a>
+		<a href="@{m.linker}" class="product-name">@{m.name}</a>
 		<div class="product-price">@{currency(m.price)}</div>
 	</div>
 	@{end}

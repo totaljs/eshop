@@ -53,5 +53,5 @@
 <br />
 <br />
 <div style="color:#AAB2BD;font-size:11px">@(Track your order):</div>
-<div><a href="@{config.custom.url}/checkout/@{model.id}/" style="color:#1DA9FC">@{config.custom.url}/checkout/@{model.id}/</a></div>
+<div><a href="@{config.custom.url}@{sitemap_url('checkout')}@{model.id}/" style="color:#1DA9FC">@{config.custom.url}@{sitemap_url('checkout')}@{model.id}/</a></div>
 <br />

@@ -47,6 +47,9 @@ NEWSCHEMA('Product').make(function(schema) {
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
 
+		var linker_detail = F.sitemap('detail', true);
+		var linker_category = F.sitemap('category', true);
+
 		var filter = function(doc) {
 
 			if (options.category && !doc.linker_category.startsWith(options.category))
@@ -59,6 +62,11 @@ NEWSCHEMA('Product').make(function(schema) {
 				return;
 			if (options.skip && doc.id === options.skip)
 				return;
+
+			if (linker_detail)
+				doc.linker = linker_detail.url.format(doc.linker);
+			if (linker_category)
+				doc.linker_category = linker_category.url.format(doc.linker_category);
 
 			// Cleans unnecessary properties.
 			delete doc.body;

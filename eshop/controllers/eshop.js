@@ -6,19 +6,19 @@ exports.install = function() {
 	// routing is linked with the "sitemap" file
 
 	// PRODUCTS
-	F.route('#products',   view_products);
-	F.route('#category',   view_products_category);
-	F.route('#detail',     view_products_detail);
+	F.route('#products',         view_products);
+	F.route('#category',         view_products_category);
+	F.route('#detail',           view_products_detail);
 
 	// ORDERS
 	F.route('#checkout');
-	F.route('#order',      view_checkout);
-	F.route('#payment',    process_payment_paypal);
+	F.route('#order',            view_checkout);
+	F.route('#payment',          process_payment_paypal);
 
 	// USER ACCOUNT
-	F.route('/account/',                  view_account, ['authorized']);
-	F.route('/account/logoff/',           redirect_account_logoff, ['authorized']);
-	F.route('/account/',                  'account-oauth2', ['unauthorized']);
+	F.route('#account',          view_account, ['authorized']);
+	F.route('/account/logoff/',  redirect_account_logoff, ['authorized']);
+	F.route('#account',          'account-oauth2', ['unauthorized']);
 };
 
 // ============================================

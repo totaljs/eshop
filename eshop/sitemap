@@ -1,11 +1,10 @@
 // ID : Title ---> URL --> [Parent]
 homepage                 : @(Homepage)               --> /
 contact                  : @(Contact)                --> /contact/                    --> homepage
-cart                     : @(Shopping cart)          --> /cart/                       --> homepage
 products                 : @(Shop)                   --> /shop/                       --> homepage
 checkout                 : @(Checkout)               --> /checkout/                   --> homepage
 order                    : @(Order)                  --> /checkout/{0}/               --> checkout
 payment                  : @(Checkout Payment)       --> /checkout/{0}/{1}/           --> checkout
 account                  : @(Account)                --> /account/                    --> homepage
 category                 : @(Category)               --> /shop/{0}/*                  --> products
-detail                   : @(Product)                --> /product/{1}/                --> category
+detail                   : @(Product)                --> /product/{0}/                --> category

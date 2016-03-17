@@ -1,7 +1,7 @@
 exports.install = function() {
 	// COMMON
 	F.route('/', view_homepage);
-	F.route('/contact/', view_contact);
+	F.route('#contact', view_contact);
 
 	// CMS rendering through the 404
 	F.route('#404', view_page);
