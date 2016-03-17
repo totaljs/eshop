@@ -523,4 +523,4 @@ function prepare_subcategories(name) {
 	return { linker: builder_link.join('/'), name: builder_text.join(' / ') };
 }
 
-setTimeout(refresh, 1000);
+F.on('settings', refresh);

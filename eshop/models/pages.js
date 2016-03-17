@@ -570,4 +570,4 @@ F.middleware('page', function(req, res, next, options, controller) {
 	});
 });
 
-setTimeout(refresh, 1000);
+F.on('settings', refresh);
