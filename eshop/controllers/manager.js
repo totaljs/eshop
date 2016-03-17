@@ -41,6 +41,14 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/products/codelists/',  json_products_codelists);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   json_products_category_replace, ['post']);
 
+	// POSTS
+	F.route(CONFIG('manager-url') + '/api/posts/',               json_posts_query);
+	F.route(CONFIG('manager-url') + '/api/posts/',               json_posts_save, ['post', '*Post']);
+	F.route(CONFIG('manager-url') + '/api/posts/{id}/',          json_posts_read);
+	F.route(CONFIG('manager-url') + '/api/posts/',               json_posts_remove, ['delete']);
+	F.route(CONFIG('manager-url') + '/api/posts/clear/',         json_posts_clear);
+	F.route(CONFIG('manager-url') + '/api/posts/codelists/',     json_posts_codelists);
+
 	// PAGES
 	F.route(CONFIG('manager-url') + '/api/pages/',               json_pages_query);
 	F.route(CONFIG('manager-url') + '/api/pages/',               json_pages_save, ['post', '*Page']);
@@ -324,6 +332,48 @@ function json_products_read(id) {
 	var options = {};
 	options.id = id;
 	GETSCHEMA('Product').get(options, self.callback());
+}
+
+// ==========================================================================
+// POSTS
+// ==========================================================================
+
+// Gets all posts
+function json_posts_query() {
+	var self = this;
+	GETSCHEMA('Post').query(self.query, self.callback());
+}
+
+// Saves (update or create) specific post
+function json_posts_save() {
+	var self = this;
+	self.body.$save(self.callback());
+}
+
+// Removes specific post
+function json_posts_remove() {
+	var self = this;
+	GETSCHEMA('Post').remove(self.body.id, self.callback());
+}
+
+// Clears all posts
+function json_posts_clear() {
+	var self = this;
+	GETSCHEMA('Post').workflow('clear', null, null, self.callback(), true);
+}
+
+// Reads all post categories and manufacturers
+function json_posts_codelists() {
+	var self = this;
+	self.json({ categories: F.global.posts, templates: F.config.custom.templates });
+}
+
+// Reads a specific post by ID
+function json_posts_read(id) {
+	var self = this;
+	var options = {};
+	options.id = id;
+	GETSCHEMA('Post').get(options, self.callback());
 }
 
 // ==========================================================================

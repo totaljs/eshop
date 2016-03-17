@@ -40,6 +40,12 @@ if (window.su) {
 		});
 	}
 
+	if (can('posts')) {
+		jRouting.route(managerurl + '/posts/', function() {
+			SET('common.page', 'posts');
+		});
+	}
+
 	if (can('products')) {
 		jRouting.route(managerurl + '/products/', function() {
 			SET('common.page', 'products');

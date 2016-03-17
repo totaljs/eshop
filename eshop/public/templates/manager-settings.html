@@ -1,6 +1,6 @@
-<div class="filter" style="padding-bottom:9px;margin-bottom:0">
+<div class="filter">
 	<div class="container">
-		<div class="caption"><span class="fa fa-cogs mr5"></span> @(Internal settings)</div>
+		<div class="caption" style="margin-bottom:10px"><span class="fa fa-cogs mr5"></span> @(Internal settings)</div>
 	</div>
 </div>
 <br />
@@ -29,75 +29,75 @@
 		</div>
 	</div>
 </div>
-
 <div class="container">
-	<br />
 	<hr />
 	<h2>OAuth 2.0</h2>
-	<div class="row">
-		<div class="col-md-3 col-sm-6 m">
-			<h3><span class="fa fa-facebook blue"></span> Facebook</h3>
-			<div class="fs11"><a href="https://developers.facebook.com/apps/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
-			<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">facebook</div>
-			<div data-component="textbox" data-component-path="settings.form.oauth2_facebook_key">@(Facebook key)</div>
-			<br />
-			<div data-component="textbox" data-component-path="settings.form.oauth2_facebook_secret">@(Facebook secret)</div>
-		</div>
-		<div class="col-md-3 col-sm-6 m">
-			<h3><span class="fa fa-google blue"></span> Google</h3>
-			<div class="fs11"><a href="https://console.developers.google.com/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
-			<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">google</div>
-			<div data-component="textbox" data-component-path="settings.form.oauth2_google_key">@(Google key)</div>
-			<br />
-			<div data-component="textbox" data-component-path="settings.form.oauth2_google_secret">@(Google secret)</div>
-		</div>
-		<div class="col-md-3 col-sm-6 m">
-			<h3><span class="fa fa-instagram blue"></span> Instagram</h3>
-			<div class="fs11"><a href="https://instagram.com/developer/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
-			<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">instagram</div>
-			<div data-component="textbox" data-component-path="settings.form.oauth2_instagram_key">@(Instagram key)</div>
-			<br />
-			<div data-component="textbox" data-component-path="settings.form.oauth2_instagram_secret">@(Instagram secret)</div>
-		</div>
-		<div class="col-md-3 col-sm-6 m">
-			<h3><span class="fa fa-yahoo blue"></span> Yahoo</h3>
-			<div class="fs11"><a href="https://developer.yahoo.com" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
-			<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">yahoo</div>
-			<div data-component="textbox" data-component-path="settings.form.oauth2_yahoo_key">@(Yahoo key)</div>
-			<br />
-			<div data-component="textbox" data-component-path="settings.form.oauth2_yahoo_secret">@(Yahoo secret)</div>
-		</div>
-		<div class="col-md-3 col-sm-6 m">
-			<h3><span class="fa fa-windows blue"></span> Windows Live</h3>
-			<div class="fs11"><a href="https://account.live.com/developers/applications/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
-			<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">live</div>
-			<div data-component="textbox" data-component-path="settings.form.oauth2_live_key">@(Windows Live key)</div>
-			<br />
-			<div data-component="textbox" data-component-path="settings.form.oauth2_live_secret">@(Windows Live secret)</div>
-		</div>
-		<div class="col-md-3 col-sm-6 m">
-			<h3><span class="fa fa-dropbox blue"></span> Dropbox</h3>
-			<div class="fs11"><a href="https://www.dropbox.com/developers/apps" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
-			<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">dropbox</div>
-			<div data-component="textbox" data-component-path="settings.form.oauth2_dropbox_key">@(Dropbox key)</div>
-			<br />
-			<div data-component="textbox" data-component-path="settings.form.oauth2_dropbox_secret">@(Dropbox secret)</div>
-		</div>
-		<div class="col-md-3 col-sm-6 m">
-			<h3><span class="fa fa-vk blue"></span> VKontakte</h3>
-			<div class="fs11"><a href="https://developer.yahoo.com" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
-			<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">vk</div>
-			<div data-component="textbox" data-component-path="settings.form.oauth2_vk_key">@(VKontakte key)</div>
-			<br />
-			<div data-component="textbox" data-component-path="settings.form.oauth2_vk_secret">@(VKontakte secret)</div>
-		</div>
-		<div class="col-md-3 col-sm-6 m">
-			<h3><span class="fa fa-linkedin blue"></span> LinkedIn</h3>
-			<div class="fs11"><a href="https://www.linkedin.com/secure/developer" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
-			<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">linkedin</div>
-			<div data-component="textbox" data-component-path="settings.form.oauth2_linkedin_key">@(LinkedIn key)</div>
-			<br />
-			<div data-component="textbox" data-component-path="settings.form.oauth2_linkedin_secret">@(LinkedIn secret)</div>
+	<div data-component="expander">
+		<div class="row">
+			<div class="col-md-3 col-sm-6 m">
+				<h3><span class="fa fa-facebook blue"></span> Facebook</h3>
+				<div class="fs11"><a href="https://developers.facebook.com/apps/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">facebook</div>
+				<div data-component="textbox" data-component-path="settings.form.oauth2_facebook_key">@(Facebook key)</div>
+				<br />
+				<div data-component="textbox" data-component-path="settings.form.oauth2_facebook_secret">@(Facebook secret)</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<h3><span class="fa fa-google blue"></span> Google</h3>
+				<div class="fs11"><a href="https://console.developers.google.com/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">google</div>
+				<div data-component="textbox" data-component-path="settings.form.oauth2_google_key">@(Google key)</div>
+				<br />
+				<div data-component="textbox" data-component-path="settings.form.oauth2_google_secret">@(Google secret)</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<h3><span class="fa fa-instagram blue"></span> Instagram</h3>
+				<div class="fs11"><a href="https://instagram.com/developer/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">instagram</div>
+				<div data-component="textbox" data-component-path="settings.form.oauth2_instagram_key">@(Instagram key)</div>
+				<br />
+				<div data-component="textbox" data-component-path="settings.form.oauth2_instagram_secret">@(Instagram secret)</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<h3><span class="fa fa-yahoo blue"></span> Yahoo</h3>
+				<div class="fs11"><a href="https://developer.yahoo.com" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">yahoo</div>
+				<div data-component="textbox" data-component-path="settings.form.oauth2_yahoo_key">@(Yahoo key)</div>
+				<br />
+				<div data-component="textbox" data-component-path="settings.form.oauth2_yahoo_secret">@(Yahoo secret)</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<h3><span class="fa fa-windows blue"></span> Windows Live</h3>
+				<div class="fs11"><a href="https://account.live.com/developers/applications/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">live</div>
+				<div data-component="textbox" data-component-path="settings.form.oauth2_live_key">@(Windows Live key)</div>
+				<br />
+				<div data-component="textbox" data-component-path="settings.form.oauth2_live_secret">@(Windows Live secret)</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<h3><span class="fa fa-dropbox blue"></span> Dropbox</h3>
+				<div class="fs11"><a href="https://www.dropbox.com/developers/apps" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">dropbox</div>
+				<div data-component="textbox" data-component-path="settings.form.oauth2_dropbox_key">@(Dropbox key)</div>
+				<br />
+				<div data-component="textbox" data-component-path="settings.form.oauth2_dropbox_secret">@(Dropbox secret)</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<h3><span class="fa fa-vk blue"></span> VKontakte</h3>
+				<div class="fs11"><a href="https://developer.yahoo.com" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">vk</div>
+				<div data-component="textbox" data-component-path="settings.form.oauth2_vk_key">@(VKontakte key)</div>
+				<br />
+				<div data-component="textbox" data-component-path="settings.form.oauth2_vk_secret">@(VKontakte secret)</div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<h3><span class="fa fa-linkedin blue"></span> LinkedIn</h3>
+				<div class="fs11"><a href="https://www.linkedin.com/secure/developer" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">linkedin</div>
+				<div data-component="textbox" data-component-path="settings.form.oauth2_linkedin_key">@(LinkedIn key)</div>
+				<br />
+				<div data-component="textbox" data-component-path="settings.form.oauth2_linkedin_secret">@(LinkedIn secret)</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -135,6 +135,10 @@
 			<div class="col-md-6 m">
 				<div data-component="textboxtags" data-component-path="settings.form.navigations">@(Registered navigations)</div>
 				<div class="help">@(Navigations must be rendered manually in the layout or view. For render use: <code>F.global.navigation.NAME</code>)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-component="textboxtags" data-component-path="settings.form.posts">@(Posts categories)</div>
+				<div class="help">@(Posts must be rendered manually in the layout or view. Categories: <code>F.global.posts</code>)</div>
 			</div>
 		</div>
 		<br />
@@ -207,7 +211,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="dropdowncheckbox" data-component-path="settings.formuser.roles" data-options="@(dashboard)|dashboard;@(orders)|orders;@(products)|products;@(pages)|pages;@(newsletter)|newsletter;@(users)|users;@(settings)|settings;@(system)|system">@(Roles)</div>
+				<div data-component="dropdowncheckbox" data-component-path="settings.formuser.roles" data-options="@(dashboard)|dashboard;@(orders)|orders;@(products)|products;@(pages)|pages;@(posts)|posts;@(newsletter)|newsletter;@(users)|users;@(settings)|settings;@(system)|system">@(Roles)</div>
 				<div class="help">@(If the user roles will be empty then the user will be access to all functionality.)</div>
 			</div>
 		</div>

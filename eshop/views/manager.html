@@ -9,7 +9,7 @@
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<meta name="robots" content="all,follow" />
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/codemirror.min.css" />
 	@{import('head', 'manager.css', 'favicon.ico')}
@@ -39,6 +39,7 @@
 				<a class="jrouting" href="@{CONFIG('manager-url')}/orders/" title="@(Orders)" data-role="orders"><span class="fa fa-shopping-cart"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/products/" title="@(Products)" data-role="products"><span class="fa fa-dropbox"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/pages/" title="@(Pages)" data-role="pages"><span class="fa fa-file-text"></span></a>
+				<a class="jrouting" href="@{CONFIG('manager-url')}/posts/" title="@(Posts)" data-role="posts"><span class="fa fa-hashtag"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/users/" title="@(Users)" data-role="users"><span class="fa fa-users"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/settings/" title="@(Settings)" data-role="settings"><span class="fa fa-cogs"></span></a>
@@ -55,6 +56,7 @@
 		<div data-component="page" data-component-path="common.page" data-if="products" data-template="/templates/manager-products.html" data-reload="products_reload"></div>
 		<div data-component="page" data-component-path="common.page" data-if="users" data-template="/templates/manager-users.html" data-reload="users_reload"></div>
 		<div data-component="page" data-component-path="common.page" data-if="pages" data-template="/templates/manager-pages.html" data-reload="pages_reload"></div>
+		<div data-component="page" data-component-path="common.page" data-if="posts" data-template="/templates/manager-posts.html" data-reload="posts_reload"></div>
 		<div data-component="page" data-component-path="common.page" data-if="newsletter" data-template="/templates/manager-newsletter.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="settings" data-template="/templates/manager-settings.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="system" data-template="/templates/manager-system.html"></div>
