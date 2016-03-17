@@ -16,8 +16,12 @@ $(document).ready(function() {
 	if (path)
 		$('.categories').find('a[href="' + path + '"]').addClass('selected');
 
-	$(document).on('click', '.header-menu-button', function() {
+	$(document).on('click', '.header-menu-button, .categories-button', function() {
 		$('.categories').toggleClass('categories-toggle');
+	});
+
+	$(document).on('click', '.categories-button', function() {
+		$('.categories').parent().toggleClass('categories-hide');
 	});
 
 	var buy = $('.detail-buy').on('click', function() {

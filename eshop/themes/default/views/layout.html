@@ -58,13 +58,20 @@
 
 	<div class="padding-container">
 		<div class="container">
-			<div class="categories">
-				<div class="row">
-					@{foreach m in global.categories}
-						@{if m.count > 0 && m.level === 0}
-						<div class="col-sm-4 col-md-4"><a href="/shop/@{m.linker}/">@{m.name}</a></div>
-						@{fi}
-					@{end}
+			@{if url !== '/'}
+			<div class="hidden-xs m">
+				<a href="javascript:void(0)" class="categories-button"><span class="fa fa-folder mr5"></span>@(Show categories)</a>
+			</div>
+			@{fi}
+			<div@{if url !== '/'} class="categories-hide"@{fi}>
+				<div class="categories">
+					<div class="row">
+						@{foreach m in global.categories}
+							@{if m.count > 0 && m.level === 0}
+							<div class="col-sm-4 col-md-4"><a href="/shop/@{m.linker}/">@{m.name}</a></div>
+							@{fi}
+						@{end}
+					</div>
 				</div>
 			</div>
 

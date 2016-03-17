@@ -37,6 +37,8 @@ header { padding: 40px 25px; }
 .categories span { margin-left: 5px; }
 .categories .selected { background-color: black !important; color: white; }
 .categories .fa { margin-right: 5px; }
+.categories-hide { display: none; }
+.categories-button { margin-bottom: 18px; color: black; font-weight: bold; font-family: $font; text-transform: uppercase; }
 
 .subcategories { padding: 0; margin-top: 10px; }
 .subcategories a { display: block; line-height: 16px; padding: 8px 0; background-color: #F0F0F0; text-align: center; color: gray; font-size: 14px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 15px; }
@@ -158,6 +160,7 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	.xs-center { text-align: center !important; }
 	.categories { display: none; }
 	.categories a { margin-bottom: 10px; }
+	.categories-hide { display: block; }
 	.header-padding { padding: 0; }
 	.header-links-container { display: none; }
 	h1, h2 { font-size: 25px; }
