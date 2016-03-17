@@ -33,7 +33,7 @@
 			<tbody>
 				<tr>
 					<td class="col-xs-4 active">@(# id)</td>
-					<td><a href="/checkout/{{ id }}/">{{ id }}</a></td>
+					<td>{{ id }}</td>
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(IP address)</td>
@@ -132,20 +132,8 @@
 			var loading = FIND('loading');
 			switch ($(button).attr('name')) {
 				case 'edit':
-					loading.show();
-					AJAX('GET {0}/api/users/{1}'.format(managerurl, row.id), function(response, err) {
-
-						// Error prevention
-						if (response instanceof Array)
-							response = {};
-
-						SET('users.form', $.extend({}, response), true);
-						SET('users.response', null);
-						SET('common.form', 'users');
-						loading.hide();
-					});
+					users_edit(row.id);
 					break;
-
 				case 'remove':
 					FIND('confirm').confirm('@(Do you want to remove selected user?)', ['@(OK)', '@(Cancel)'], function(index) {
 						if (index)
@@ -185,6 +173,25 @@
 			});
 		};
 	});
+
+	function users_edit(id) {
+		var loading = FIND('loading');
+		loading.show();
+		AJAX('GET {0}/api/users/{1}'.format(managerurl, id), function(response, err) {
+
+			loading.hide(500);
+
+			// Error prevention
+			if (response instanceof Array) {
+				FIND('message').warning(response[0].error);
+				return;
+			}
+
+			SET('users.form', $.extend({}, response), true);
+			SET('users.response', null);
+			SET('common.form', 'users');
+		});
+	}
 
 	// Method refreshes grid
 	function users_refresh(reset) {
@@ -233,5 +240,14 @@
 
 		return builder;
 	});
+
+	function users_reload() {
+		var hash = location.hash;
+		if (hash && hash.length > 1) {
+			setTimeout(function() {
+				users_edit(hash.substring(1));
+			}, 500);
+		}
+	}
 
 </script>

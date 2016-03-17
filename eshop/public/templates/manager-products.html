@@ -181,24 +181,10 @@
 		products_refresh(true);
 
 		component.click = function(index, row, button) {
-
 			var loading = FIND('loading');
-
 			switch ($(button).attr('name')) {
 				case 'edit':
-					loading.show();
-					AJAX('GET /api/products/{0}/'.format(row.id), function(response, err) {
-
-						loading.hide(500);
-
-						// Error prevention
-						if (response instanceof Array)
-							response = {};
-
-						SET('products.form', $.extend({ $index: index }, response), true);
-						SET('products.response', null);
-						SET('common.form', 'products');
-					});
+					products_edit(row.id);
 					break;
 				case 'remove':
 					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
@@ -304,6 +290,25 @@
 		};
 	});
 
+	function products_edit(id) {
+		var loading = FIND('loading');
+		loading.show();
+		AJAX('GET /api/products/{0}/'.format(id), function(response, err) {
+
+			loading.hide(500);
+
+			// Error prevention
+			if (response instanceof Array) {
+				FIND('message').warning(response[0].error);
+				return;
+			}
+
+			SET('products.form', $.extend({ $index: index }, response), true);
+			SET('products.response', null);
+			SET('common.form', 'products');
+		});
+	}
+
 	function products_new() {
 		SET('products.form', {}, true);
 		SET('products.response', null);
@@ -355,6 +360,15 @@
 
 	function products_export(argument) {
 		window.location.href = '{0}/api/products/export/'.format(managerurl);
+	}
+
+	function products_reload() {
+		var hash = location.hash;
+		if (hash && hash.length > 1) {
+			setTimeout(function() {
+				products_edit(hash.substring(1));
+			}, 500);
+		}
 	}
 
 </script>

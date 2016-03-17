@@ -649,6 +649,7 @@ COMPONENT('page', function() {
 	var self = this;
 	var isProcessed = false;
 	var isProcessing = false;
+	var reload = self.attr('data-reload');
 
 	self.hide = function() {
 		self.set('');
@@ -665,6 +666,10 @@ COMPONENT('page', function() {
 
 		if (isProcessed || !is) {
 			el.toggleClass('hidden', !is);
+
+			if (is && reload)
+				self.get(reload)();
+
 			return;
 		}
 
@@ -673,12 +678,16 @@ COMPONENT('page', function() {
 		isProcessing = true;
 		INJECT(el.attr('data-template'), el, function() {
 			isProcessing = false;
+
 			var init = el.attr('data-init');
 			if (init) {
 				var fn = GET(init || '');
 				if (typeof(fn) === 'function')
 					fn(self);
 			}
+
+			if (reload)
+				self.get(reload)();
 
 			isProcessed = true;
 			el.toggleClass('hidden', !is);
