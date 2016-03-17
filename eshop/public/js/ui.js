@@ -414,11 +414,11 @@ COMPONENT('template', function() {
 	self.setter = function(value) {
 		if (!value)
 			return self.element.addClass('hidden');
+		if (NOTMODIFIED(self.id, value))
+			return;
 		KEYPRESS(function() {
-			if (NOTMODIFIED(self.id, value))
-				return;
 			self.html(self.template(value)).removeClass('hidden');
-		}, 100);
+		}, 100, self.id);
 	};
 });
 
@@ -798,6 +798,15 @@ COMPONENT('form', function() {
 		$(document).on('click', '.ui-form-button-close', function() {
 			SET($.components.findById($(this).attr('data-id')).path, '');
 		});
+
+		$(window).on('resize', function() {
+			FIND('form', true).forEach(function(component) {
+				if (component.element.hasClass('hidden'))
+					return;
+				component.resize();
+			});
+		});
+
 	}
 
 	var hide = self.hide = function() {
@@ -807,6 +816,20 @@ COMPONENT('form', function() {
 	self.readonly();
 	self.submit = function(hide) { self.hide(); };
 	self.cancel = function(hide) { self.hide(); };
+
+	self.resize = function() {
+		if (!autocenter)
+			return;
+		var ui = self.find('.ui-form');
+		var fh = ui.innerHeight();
+		var wh = $(window).height();
+
+		var r = (wh / 2) - (fh / 2);
+		if (r > 30)
+			ui.css({ marginTop: (r - 15) + 'px' });
+		else
+			ui.css({ marginTop: '20px' });
+	};
 
 	self.make = function() {
 		var content = self.element.html();
@@ -864,19 +887,7 @@ COMPONENT('form', function() {
 			window.$calendar.hide();
 
 		if (!isHidden) {
-
-			if (autocenter) {
-				var ui = self.find('.ui-form');
-				var fh = ui.innerHeight();
-				var wh = $(window).height();
-
-				var r = (wh / 2) - (fh / 2);
-				if (r > 20)
-					ui.css({ marginTop: (r - 15) + 'px' });
-				else
-					ui.css({ marginTop: '20px' });
-			}
-
+			self.resize();
 			var el = self.element.find('input,select,textarea');
 			if (el.length > 0)
 				el.eq(0).focus();
