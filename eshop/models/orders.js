@@ -1,3 +1,11 @@
+// Supported operations:
+// "dashboard" gets stats
+
+// Supported workflows
+// "create" creates an order
+// "paid" sets ispaid
+// "clear" removes all orders
+
 NEWSCHEMA('OrderItem').make(function(schema) {
 
 	schema.define('id', 'String(10)', true);
