@@ -69,7 +69,7 @@ NEWSCHEMA('Post').make(function(schema) {
 				}
 			}
 
-			return { id: doc.id, category: doc.category, name: doc.name, language: doc.language, datecreated: doc.datecreated };
+			return { id: doc.id, category: doc.category, name: doc.name, language: doc.language, datecreated: doc.datecreated, linker: doc.linker, category_linker: doc.category_linker, pictures: doc.pictures, perex: doc.perex, tags: doc.tags };
 		};
 
 		// Sorting documents

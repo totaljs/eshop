@@ -1,5 +1,5 @@
 @{title('Clothes, Fashion Clothing')}
-@{sitemap('#homepage')}
+@{sitemap('homepage')}
 
 <!-- CMS -->
 @{if repository.page}
@@ -14,7 +14,7 @@
 		<a href="https://www.facebook.com/totaljs.web.framework" class="mr15">Facebook</a>
 		<a href="https://twitter.com/totalframework" class="mr15">Twitter</a>
 		<a href="https://plus.google.com/u/0/+partialjs/posts" class="mr15">Google+</a>
-		<a href="/contact/" class="b">@(Contact)</a>
+		<a href="@{sitemap_url('contact')}" class="b">@(Contact)</a>
 	</div>
 	<br />
 	<div class="row">
@@ -35,7 +35,7 @@
 	<div class="row">
 		<div class="col-md-3"></div>
 		<div class="col-md-6">
-			<a href="/shop/" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
+			<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
 		</div>
 	</div>
 	<br />

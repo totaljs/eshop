@@ -1,5 +1,5 @@
 @{title(user.name)}
-@{sitemap('#account')}
+@{sitemap('account')}
 
 <div id="loading"></div>
 <div class="padding">
@@ -21,7 +21,7 @@
 						<hr />
 						<br />
 						<br />
-						<a href="/shop/" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
+						<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
 						<br />
 						<br />
 					</div>

@@ -19,7 +19,26 @@ exports.install = function() {
 	F.route('#account',          view_account, ['authorized']);
 	F.route('/account/logoff/',  redirect_account_logoff, ['authorized']);
 	F.route('#account',          'account-oauth2', ['unauthorized']);
+
+	F.route('#blogs',            view_blogs, ['*Post']);
+	F.route('#blogsdetail',      view_blogs_detail, ['*Post']);
+
 };
+
+function view_blogs() {
+	var self = this;
+	var options = {};
+	options.category = 'Blogs';
+	self.$query(options, self.callback('blogs-all'));
+}
+
+function view_blogs_detail(linker) {
+	var self = this;
+	var options = {};
+	options.category = 'Blogs';
+	options.linker = linker;
+	self.$get(options, self.callback('blogs-detail'));
+}
 
 // ============================================
 // PRODUCTS
@@ -43,7 +62,7 @@ function view_products() {
 }
 
 // Gets products by category
-function view_products_category(category) {
+function view_products_category() {
 	var self = this;
 	var options = {};
 

@@ -1,4 +1,4 @@
-@{sitemap('#checkout')}
+@{sitemap('checkout')}
 
 <div id="loading"></div>
 <div class="padding">
@@ -16,7 +16,7 @@
 				<hr />
 				<br />
 				<br />
-				<a href="/shop/" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
+				<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
 				<br />
 				<br />
 			</div>
@@ -39,7 +39,7 @@
 					<tbody data-component="repeater" data-component-path="datasource">
 						<script type="text/html">
 							<tr>
-								<td><a href="/product/{{ linker }}/" class="b">{{ name }}</a><div class="visible-xs fs11 mt10">One piece: @{currency('{{ price | format(2) }}')}</div></td>
+								<td><a href="@{sitemap_url('detail')}{{ linker }}/" class="b">{{ name }}</a><div class="visible-xs fs11 mt10">One piece: @{currency('{{ price | format(2) }}')}</div></td>
 								<td class="ui-right col-xs-2">@{currency('{{ price | format(2) }}')}</td>
 								<td class="ui-right col-xs-2 col-sm-1 active"><input type="text" value="{{ count }}" data-id="{{ id }}" maxlength="2" /></td>
 								<td class="ui-right col-xs-3 col-sm-2 b warning"><span class="visible-xs checkoutlist-label">Together:</span><span class="checkoutlist-item-price" data-format="@{currency('{0}')}">@{currency('{{ price | sum(2) }}')}</span><span class="fa fa-times-circle hidden-xs" data-id="{{ id }}"></span></td>

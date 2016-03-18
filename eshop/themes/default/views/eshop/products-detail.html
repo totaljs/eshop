@@ -1,12 +1,14 @@
 @{title(model.name)}
-@{sitemap('#detail')}
+@{sitemap('detail')}
+@{sitemap_change('detail', 'url', url)}
+@{sitemap_change('detail', 'name', model.name)}
 
 <div class="padding">
 	<h1>@{title}</h1>
 	<div class="row">
 		<div class="col-md-2"></div>
 		<div class="col-md-8">
-			<div class="detail-category">@(Category:) <a href="/shop/@{model.linker_category}/">@{model.category}</a></div>
+			<div class="detail-category">@(Category:) <a href="@{sitemap_url('category')}@{model.linker_category}/">@{model.category}</a></div>
 
 			@{if model.manufacturer}
 			<div class="detail-category">@(Manufacturer:) <span class="blue">@{model.manufacturer}</span></div>

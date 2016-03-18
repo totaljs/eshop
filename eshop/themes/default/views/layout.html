@@ -83,15 +83,7 @@
 							@{if m.id === 'category'}
 								@{sitemap_category(m.url, repository.category)}
 							@{else}
-								<li>@{if !m.first}<span class="fa fa-caret-right"></span>@{fi}
-								@{if m.id === 'detail'}
-									<a href="@{url}">@{title}</a>
-								@{else if m.id === 'order'}
-									<a href="@{url}">@{title}</a>
-								@{else}
-									<a href="@{m.url}">@{m.name}</a>
-								@{fi}
-								</li>
+								<li>@{if !m.first}<span class="fa fa-caret-right"></span>@{fi}<a href="@{m.url}">@{m.name}</a></li>
 							@{fi}
 						@{end}
 					</ul>
