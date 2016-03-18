@@ -3,15 +3,6 @@ PING('GET /api/ping/');
 
 $(document).ready(function() {
 
-	if (window.localStorage) {
-		// Loads last location (only for oauth2)
-		var oauth2 = window.localStorage.getItem('oauth2');
-		if (oauth2) {
-			window.localStorage.setItem('oauth2', '');
-			window.location.href = oauth2;
-		}
-	}
-
 	var path = $('.breadcrumb a').eq(2).attr('href');
 	if (path)
 		$('.categories').find('a[href="' + path + '"]').addClass('selected');

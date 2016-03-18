@@ -91,6 +91,8 @@ p { margin: 0; }
 .red { color: #D63B32; }
 .npt { padding-top: 0; }
 .npb { padding-bottom: 0; }
+.nmt { margin-top: 0; }
+.nmb { margin-bottom: 0; }
 
 .links > div { margin: 0; border-left: 1px solid #F0F0F0; border-top: 1px solid #E0E0E0; border-bottom: 1px solid #E0E0E0; padding: 0; }
 .links > div:first-child { border-left: 0; }
@@ -131,15 +133,16 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .linkbutton:hover { border-color: silver; text-decoration: none; color: black; }
 .linkbutton .fa { margin-right: 5px; }
 .linkbutton img { vertical-align: middle; margin: 1px 10px 0 0; }
+.linkbutton-small { padding: 10px 0; font-size: 16px; }
 
 .orders > div { border: 1px solid #E0E0E0; border-top: 0; padding: 10px; }
 .orders > div:first-child { border-top: 1px solid #E0E0E0; }
 .orders > div:nth-child(odd) { background-color: #F8F8F8; }
 
-.social-oauth2 div { text-align: center; margin-bottom: 25px; }
-.social-oauth2 a { display: block; background-color: #F0F0F0; padding: 40px 0; border-radius: 4px; color: gray; }
-.social-oauth2 a span { font-size: 50px; text-decoration: none; }
-.social-oauth2 b { font-size: 12px; display: block; margin: 15px 0 0 0; font-weight: normal; }
+.social-oauth2 div { text-align: center; margin-top: 20px; }
+.social-oauth2 a { display: block; background-color: #F8F8F8; padding: 10px 0; border-radius: 4px; color: gray; }
+.social-oauth2 a span { font-size: 30px; text-decoration: none; }
+.social-oauth2 b { font-size: 11px; display: block; margin: 5px 0 0 0; font-weight: normal; }
 .social-oauth2 a:hover { text-decoration: none; background-color: #36CAFD; color: white; }
 .social-oauth2 a:active { box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
 
@@ -147,7 +150,9 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .bg-smoke { background-color: #F8F8F8; }
 
 .button { padding: 20px 0; width: 100%; font-size: 16px; }
-.silver { color: silver; }
+.button-small { padding: 10px 0; font-size: 14px; }
+
+.silver { color: #A0A0A0; }
 .black { color: black; }
 .green { color: #8CC152; }
 .blue { color: #377BB5; }

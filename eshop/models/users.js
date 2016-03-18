@@ -11,7 +11,7 @@ exports.logoff = function(req, res, user) {
 };
 
 exports.createSession = function(profile) {
-	online[profile.id] = { id: profile.id, name: profile.name, ticks: new Date().add('30 minutes').getTime() };
+	online[profile.id] = { id: profile.id, name: profile.name, email: profile.email, ticks: new Date().add('30 minutes').getTime() };
 	return online[profile.id];
 };
 
@@ -224,6 +224,8 @@ NEWSCHEMA('UserLogin').make(function(schema) {
 	schema.setPrepare(function(name, value) {
 		if (name === 'email')
 			return value.toLowerCase();
+		if (name === 'password')
+			return value.hash('sha1');
 		return value;
 	});
 
@@ -275,7 +277,8 @@ NEWSCHEMA('UserPassword').make(function(schema) {
 });
 
 NEWSCHEMA('UserRegistration').make(function(schema) {
-	schema.define('name', 'String(50)', true);
+	schema.define('firstname', 'String(50)', true);
+	schema.define('lastname', 'String(50)', true);
 	schema.define('gender', 'String(20)');
 	schema.define('email', 'String(200)', true);
 	schema.define('password', 'String(20)', true);
@@ -285,7 +288,10 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 		// options.controller
 		// options.ip
 
-		GETSCHEMA('User').get(model, function(err, response) {
+		var filter = {};
+		filter.email = model.email;
+
+		GETSCHEMA('User').get(filter, function(err, response) {
 
 			if (response) {
 				error.push('error-user-exists');
@@ -293,10 +299,10 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			}
 
 			var user = GETSCHEMA('User').create();
-			user.name = model.name;
 			user.email = model.email;
 			user.firstname = model.firstname;
 			user.lastname = model.lastname;
+			user.name = model.firstname + ' ' + model.lastname;
 			user.gender = model.gender;
 			user.password = model.password.hash('sha1');
 			user.ip = options.ip;
@@ -308,6 +314,11 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 				mail.bcc(F.config.custom.emailuserform);
 
 			DB('users').insert(user.$clean(), F.error());
+
+			// Login user
+			exports.login(options.controller.req, options.controller.res, user.id);
+
+			// Reponse
 			callback(SUCCESS(true));
 		});
 	});

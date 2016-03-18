@@ -18,7 +18,7 @@ exports.install = function() {
 	// USER ACCOUNT
 	F.route('#account',          view_account, ['authorized']);
 	F.route('/account/logoff/',  redirect_account_logoff, ['authorized']);
-	F.route('#account',          'account-oauth2', ['unauthorized']);
+	F.route('#account',          'account-unlogged', ['unauthorized']);
 
 	F.route('#blogs',            view_blogs, ['*Post']);
 	F.route('#blogsdetail',      view_blogs_detail, ['*Post']);

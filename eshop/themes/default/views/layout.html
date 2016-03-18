@@ -12,8 +12,11 @@
 	@{import('meta', 'head', 'default.css', 'default.js', 'favicon.ico')}
 </head>
 <body>
-	<a href="https://www.totaljs.com/eshop/" class="developer">@(<b>This eshop is example.</b> Click here for download the source-code.)</a>
+
+	<!-- <a href="https://www.totaljs.com/eshop/" class="developer">@(<b>This eshop is example.</b> Click here for download the source-code.)</a> -->
 	<div data-component="cookie" class="hidden">@(This site uses cookies for visitor statistics. By continuing to browse the site you are agreeing to our use of cookies.) <a href="/privacy/">@(Privacy Policy)</a></div>
+	<div data-component="message" data-button="@(Close)"></div>
+
 	<div class="header-container">
 		<div class="container">
 			<div class="header-links-container">
@@ -67,7 +70,7 @@
 				<div class="categories">
 					<div class="row">
 						@{foreach m in global.categories}
-							@{if m.count > 0 && m.level === 0}
+							@{if m.count > 0 && !m.level}
 							<div class="col-sm-4 col-md-4"><a href="/shop/@{m.linker}/">@{m.name}</a></div>
 							@{fi}
 						@{end}

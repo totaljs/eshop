@@ -1,0 +1,195 @@
+@{sitemap('account')}
+
+<div id="loading"></div>
+<div class="padding">
+	<br />
+	<h1 style="margin-bottom:0">@{title}</h1>
+	<br />
+	<br />
+
+	<div class="row">
+
+		<div class="col-md-4 col-md-offset-1">
+
+			<div class="padding" id="login" data-component="visible" data-component-path="common.password" data-if="!value">
+				<h3 class="nmt"><i class="fa fa-user mr5"></i>@(Sign in)</h3>
+				<div class="row">
+					<div class="col-md-12 m">
+						<div data-required="true" data-component="textbox" data-component-path="signin.email" data-component-type="email" data-component-value="'@'">@(E-mail address)</div>
+					</div>
+					<div class="col-md-12 m">
+						<div data-required="true" data-component="textbox" data-component-path="signin.password" data-component-type="password">@(Password)</div>
+					</div>
+				</div>
+				<a href="javascript:void(0)" data-component="click" data-component-path="#passwordrecovery">@(Forgot your password?)</a>
+				<div data-component="error" data-component-path="signin.response" style="margin-top:18px"></div>
+				<div class="row">
+					<div class="col-md-10">
+						<div data-component="validation" data-component-path="signin">
+							<button class="button button-small" disabled="disabled" data-component="click" data-component-path="#doLogin" data-enter="#login">@(SUBMIT)</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="padding hidden" id="password" data-component="visible" data-component-path="common.password" data-if="value">
+				<h3 class="nmt"><i class="fa fa-user mr5"></i>@(Password recovery)</h3>
+				<div class="row">
+					<div class="col-md-12 m">
+						<div data-required="true" data-component="textbox" data-component-path="passwordrecovery.email" data-component-type="email" data-component-value="'@'">@(E-mail address)</div>
+					</div>
+				</div>
+				<a href="javascript:void(0)" data-component="click" data-component-path="#passwordrecovery">@(I know my password)</a>
+				<div data-component="error" data-component-path="passwordrecovery.response" style="margin-top:18px"></div>
+				<div class="row">
+					<div class="col-md-10">
+						<div data-component="validation" data-component-path="passwordrecovery">
+							<button class="button button-small" disabled="disabled" data-component="click" data-component-path="#doPassword" data-enter="#password">@(SUBMIT)</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="col-md-6">
+			<div class="padding bg-smoke">
+
+				<h3 class="nmt"><i class="fa fa-lock mr5"></i>@(Create a new account)</h3>
+
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-required="true" data-component="textbox" data-component-path="signup.firstname" data-component-value="''">@(First name)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-required="true" data-component="textbox" data-component-path="signup.lastname" data-component-value="''">@(Last name)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-required="true" data-component="dropdown" data-component-path="signup.gender" data-options=";@(male)|male;@(female)|female">@(Gender)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-required="true" data-component="textbox" data-component-path="signup.email" data-component-type="email" data-component-value="'@'">@(E-mail address)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-required="true" data-component="textbox" data-component-path="signup.password" data-component-type="password" data-component-value="''">@(Password)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-required="true" data-component="textbox" data-component-path="signup.passwordreply" data-component-type="password" data-component-value="''">@(Password)</div>
+					</div>
+				</div>
+				<div data-component="checkbox" data-component-path="signup.isterms" class="b">@(I agree with terms and conditions)</div>
+				<div data-component="error" data-component-path="signup.response" style="margin-top:20px"></div>
+				<div class="row">
+					<div class="col-md-6">
+						<div data-component="validation" data-component-path="signup" data-if="value && value.isterms && value.password === value.passwordreply">
+							<button class="button button-small" disabled="disabled" data-component="click" data-component-path="#doCreate">@(SUBMIT)</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row social-oauth2">
+				@{if config.custom.oauth2_google_key && config.custom.oauth2_google_secret}
+				<div class="col-xs-3">
+					<a href="/oauth2/google/" rel="nofollow"><span class="fa fa-google-plus"></span><b>Google+</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_facebook_key && config.custom.oauth2_facebook_secret}
+				<div class="col-xs-3">
+					<a href="/oauth2/facebook/" rel="nofollow"><span class="fa fa-facebook"></span><b>Facebook</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_live_key && config.custom.oauth2_live_secret}
+				<div class="col-xs-3">
+					<a href="/oauth2/live/" rel="nofollow"><span class="fa fa-windows"></span><b>Windows</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_linkedin_key && config.custom.oauth2_linkedin_secret}
+				<div class="col-xs-3">
+					<a href="/oauth2/linkedin/" rel="nofollow"><span class="fa fa-linkedin"></span><b>LinkedIn</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_vk_key && config.custom.oauth2_vk_secret}
+				<div class="col-xs-3">
+					<a href="/oauth2/vk/" rel="nofollow"><span class="fa fa-vk"></span><b>VKontakte</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_yahoo_key && config.custom.oauth2_yahoo_secret}
+				<div class="col-xs-3">
+					<a href="/oauth2/yahoo/" rel="nofollow"><span class="fa fa-yahoo"></span><b>Yahoo</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_instagram_key && config.custom.oauth2_instagram_secret}
+				<div class="col-xs-3">
+					<a href="/oauth2/instagram/" rel="nofollow"><span class="fa fa-instagram"></span><b>Instagram</b></a>
+				</div>
+				@{fi}
+				@{if config.custom.oauth2_dropbox_key && config.custom.oauth2_dropbox_secret}
+				<div class="col-xs-3">
+					<a href="/oauth2/dropbox/" rel="nofollow"><span class="fa fa-dropbox"></span><b>Dropbox</b></a>
+				</div>
+				@{fi}
+			</div>
+		</div>
+	</div>
+	<br />
+	<br />
+</div>
+
+@{section script}
+<script>
+
+	var common = {};
+	common.password = false;
+
+	OPERATION('passwordrecovery', function() {
+		SET('common.password', !common.password);
+	});
+
+	OPERATION('doPassword', function() {
+		if (!jC.valid('passwordrecovery.*'))
+			return;
+		if (BLOCKED('password', 1000))
+			return;
+		RESET('passwordrecovery.*');
+		AJAX('POST /api/users/password/', passwordrecovery, function(response) {
+			SET('passwordrecovery.response', response);
+			if (!response.success)
+				return;
+			DEFAULT('passwordrecovery.*');
+			FIND('message').success('@(We sent you email with instructions for resetting of your password.)');
+		});
+	});
+
+
+	OPERATION('doLogin', function() {
+		if (!jC.valid('signin.*'))
+			return;
+		if (BLOCKED('login', 1000))
+			return;
+		RESET('signin.*');
+		AJAX('POST /api/users/login/', signin, function(response) {
+			SET('signin.response', response);
+			if (response.success)
+				location.reload(true);
+		});
+	});
+
+	OPERATION('doCreate', function() {
+		if (!jC.valid('signup.*'))
+			return;
+		if (BLOCKED('create', 1000))
+			return;
+		RESET('signup.*');
+		AJAX('POST /api/users/create/', signup, function(response) {
+			SET('signup.response', response);
+			if (response.success)
+				location.reload(true);
+		});
+	});
+
+</script>
+@{end}

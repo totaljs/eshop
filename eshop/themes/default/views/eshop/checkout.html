@@ -70,11 +70,14 @@
 				<div class="ui-center m silver"><span class="fa fa-lock fa-3x"></span></div>
 				<div class="row">
 					<div class="col-md-3"></div>
-					<div class="col-md-6 ui-center">@(<b>Sign up</b> now and watch states of your orders easily. It's easy, safe and very fast.)</div>
+					<div class="col-md-6 ui-center">
+						<div>@(<b>Sign up</b> now and watch states of your orders easily. It's easy, safe and very fast.)</div>
+						<br />
+						<a href="@{sitemap_url('account')}" class="linkbutton linkbutton-small">Create account</a>
+					</div>
 				</div>
 				<br />
 				<br />
-				@{view('partial-oauth2')}
 			</div>
 		</div>
 		<hr />
@@ -153,12 +156,6 @@
 @{section script}
 <script>
 
-	// Caches the last location (valid globally)
-	$('.social-oauth2').on('click', 'a', function() {
-		if (window.localStorage)
-			window.localStorage.setItem('oauth2', window.location.pathname);
-	});
-
 	var common = {};
 	var form = {};
 	var datasource;
@@ -175,6 +172,7 @@
 		var arr = userprofile.name.split(' ');
 		form.firstname = arr[0];
 		form.lastname = arr[1];
+		form.email = userprofile.email;
 	}
 
 	$.components.ready(function() {
