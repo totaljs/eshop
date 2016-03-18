@@ -249,6 +249,9 @@ function settings_save() {
 		if (window.pages_refresh_dependencies)
 			window.pages_refresh_dependencies();
 
+		if (window.posts_refresh_codelists)
+			window.posts_refresh_codelists();
+
 		if (settings.cache.currency === settings.form.currency) {
 			loading.hide(500);
 			return;
