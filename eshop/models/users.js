@@ -1,8 +1,10 @@
+const COOKIE = '__user';
+const SECRET = 'total2016eshop';
+
 var online = {};
-var COOKIE = '__user';
 
 exports.login = function(req, res, id) {
-	res.cookie(COOKIE, F.encrypt({ id: id, ip: req.ip }, CONFIG('secret'), true), '6 days');
+	res.cookie(COOKIE, F.encrypt({ id: id, ip: req.ip }, SECRET, true), '6 days');
 };
 
 exports.logoff = function(req, res, user) {
@@ -270,7 +272,7 @@ NEWSCHEMA('UserPassword').make(function(schema) {
 			}
 
 			response.hash = F.encrypt({ id: response.id, expire: new Date().add('2 days').getTime() });
-			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response);
+			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response, options.controller.language);
 			callback(SUCCESS(true));
 		});
 	});
@@ -308,7 +310,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.ip = options.ip;
 			user.datecreated = user.datecreated.format();
 
-			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user);
+			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language);
 
 			if (F.config.custom.emailuserform)
 				mail.bcc(F.config.custom.emailuserform);
@@ -346,28 +348,27 @@ exports.usage = function() {
 	return { online: online };
 };
 
+function removeCookie(res, callback) {
+	res.cookie(COOKIE, '', new Date().add('-1 day'));
+	callback(false);
+}
+
 // Rewrites framework authorization
 F.onAuthorize = function(req, res, flags, callback) {
 
 	var hash = req.cookie(COOKIE);
-
 	if (!hash || hash.length < 20) {
 		callback(false);
 		return;
 	}
 
-	var fn_clean_cookie = function() {
-		res.cookie(COOKIE, '', new Date().add('-1 day'));
-		callback(false);
-	};
-
-	var user = F.decrypt(hash, CONFIG('secret'), true);
+	var user = F.decrypt(hash, SECRET, true);
 
 	if (!user)
-		return fn_clean_cookie();
+		return removeCookie(res, callback);
 
 	if (user.ip !== req.ip) {
-		fn_clean_cookie();
+		removeCookie(res, callback);
 		return;
 	}
 
@@ -382,12 +383,13 @@ F.onAuthorize = function(req, res, flags, callback) {
 	GETSCHEMA('User').get(user, function(err, response) {
 
 		if (err || !response) {
+			removeCookie(res, callback);
 			callback(false);
 			return;
 		}
 
 		req.user = exports.createSession(response);
-		res.cookie(COOKIE, F.encrypt({ id: response.id, ip: req.ip }, CONFIG('secret'), true), '6 days');
+		res.cookie(COOKIE, F.encrypt({ id: response.id, ip: req.ip }, SECRET, true), '6 days');
 		callback(true);
 	});
 };

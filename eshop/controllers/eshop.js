@@ -18,7 +18,7 @@ exports.install = function() {
 	// USER ACCOUNT
 	F.route('#account',          view_account, ['authorized']);
 	F.route('/account/logoff/',  redirect_account_logoff, ['authorized']);
-	F.route('#account',          'account-unlogged', ['unauthorized']);
+	F.route('#account',          view_login, ['unauthorized']);
 
 	F.route('#blogs',            view_blogs, ['*Post']);
 	F.route('#blogsdetail',      view_blogs_detail, ['*Post']);
@@ -185,6 +185,22 @@ function process_payment_paypal(linker) {
 // ============================================
 // ACCOUNT
 // ============================================
+
+function view_login() {
+	var self = this;
+	var user;
+
+	if (self.query.hash)
+		user = F.decrypt(self.query.hash);
+
+	if (user && user.expire > Date.now()) {
+		MODEL('users').login(self.req, self.res, user.id);
+		self.redirect(self.sitemap_url('account') + '?password=1');
+		return;
+	}
+
+	self.view('account-unlogged');
+}
 
 function view_account() {
 	var self = this;
