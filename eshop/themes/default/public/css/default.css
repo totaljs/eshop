@@ -13,7 +13,7 @@ form { padding: 0; margin: 0; }
 
 .content { background-color: white; }
 
-.header-container { background-color: #E0E0E0; padding: 10px 20px; position: relative; }
+.header-container { background: #E0E0E0 linear-gradient(#F0F0F0,#E0E0E0); padding: 20px 20px 15px; position: relative; }
 .header-container hr { border-color: #D0D0D0; }
 .header-padding { margin-top: 20px; }
 .header-links-container { position: relative; }
