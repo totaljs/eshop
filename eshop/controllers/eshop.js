@@ -6,39 +6,24 @@ exports.install = function() {
 	// routing is linked with the "sitemap" file
 
 	// PRODUCTS
-	F.route('#products',         view_products);
-	F.route('#category',         view_products_category);
-	F.route('#detail',           view_products_detail);
+	F.route('#products',         view_products, ['*Product']);
+	F.route('#category',         view_products_category, ['*Product']);
+	F.route('#detail',           view_products_detail, ['*Product']);
 
 	// ORDERS
 	F.route('#checkout');
-	F.route('#order',            view_checkout);
-	F.route('#payment',          process_payment_paypal);
+	F.route('#order',            view_checkout, ['*Order']);
+	F.route('#payment',          process_payment_paypal, ['*Order']);
 
 	// USER ACCOUNT
-	F.route('#account',          view_account, ['authorized']);
+	F.route('#account',          view_account, ['authorized', '*Order']);
 	F.route('/account/logoff/',  redirect_account_logoff, ['authorized']);
 	F.route('#account',          view_login, ['unauthorized']);
 
+	// POSTS
 	F.route('#blogs',            view_blogs, ['*Post']);
 	F.route('#blogsdetail',      view_blogs_detail, ['*Post']);
-
 };
-
-function view_blogs() {
-	var self = this;
-	var options = {};
-	options.category = 'Blogs';
-	self.$query(options, self.callback('blogs-all'));
-}
-
-function view_blogs_detail(linker) {
-	var self = this;
-	var options = {};
-	options.category = 'Blogs';
-	options.linker = linker;
-	self.$get(options, self.callback('blogs-detail'));
-}
 
 // ============================================
 // PRODUCTS
@@ -57,7 +42,7 @@ function view_products() {
 
 	// Increases the performance (1 minute cache)
 	self.memorize('cache.' + options.page + (self.query.q ? self.query.q : ''), '1 minute', DEBUG || options.search !== undefined, function() {
-		GETSCHEMA('Product').query(options, self.callback('products-all'));
+		self.$query(options, self.callback('products-all'));
 	});
 }
 
@@ -79,7 +64,7 @@ function view_products_category() {
 
 	// Increases the performance (1 minute cache)
 	self.memorize('cache.' + options.category + '.' + options.page, '1 minute', DEBUG, function() {
-		GETSCHEMA('Product').query(options, function(err, data) {
+		self.$query(options, function(err, data) {
 
 			if (data.items.length === 0)
 				return self.throw404();
@@ -100,7 +85,7 @@ function view_products_detail(linker) {
 
 	// Increases the performance (1 minute cache)
 	self.memorize('cache.product.' + linker, '1 minute', DEBUG, function() {
-		GETSCHEMA('Product').get(options, function(err, data) {
+		self.$get(options, function(err, data) {
 
 			if (!data || err)
 				return self.throw404();
@@ -127,10 +112,9 @@ function view_products_detail(linker) {
 function view_checkout(linker) {
 	var self = this;
 	var options = {};
-
 	options.id = linker;
 
-	GETSCHEMA('Order').get(options, function(err, data) {
+	self.$get(options, function(err, data) {
 
 		if (err || !data)
 			return self.throw404();
@@ -176,9 +160,9 @@ function process_payment_paypal(linker) {
 		if (!success)
 			return self.view('checkout-error');
 
-		GETSCHEMA('Order').workflow('paid', null, linker, function() {
+		self.$workflow('paid', linker, function() {
 			self.redirect('../?success=1');
-		}, true);
+		});
 	});
 }
 
@@ -212,7 +196,7 @@ function view_account() {
 	options.max = 100;
 
 	// Reads all orders
-	GETSCHEMA('Order').query(options, self.callback('account'));
+	self.$query(options, self.callback('account'));
 }
 
 // Logoff
@@ -220,4 +204,23 @@ function redirect_account_logoff() {
 	var self = this;
 	MODEL('users').logoff(self.req, self.res, self.user);
 	self.redirect('/account/');
+}
+
+// ============================================
+// POSTS
+// ============================================
+
+function view_blogs() {
+	var self = this;
+	var options = {};
+	options.category = 'Blogs';
+	self.$query(options, self.callback('blogs-all'));
+}
+
+function view_blogs_detail(linker) {
+	var self = this;
+	var options = {};
+	options.category = 'Blogs';
+	options.linker = linker;
+	self.$get(options, self.callback('blogs-detail'));
 }
