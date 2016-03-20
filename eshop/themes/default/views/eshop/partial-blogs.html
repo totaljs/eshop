@@ -1,7 +1,7 @@
 <div class="row">
 	@{foreach m in model.items}
 	<div class="col-md-12">
-		<div class="b"><a href="@{m.linker}">@{m.name}</a></div>
+		<div class="b"><a href="@{sitemap_url('blogsdetail', m.linker)}">@{m.name}</a></div>
 		<div>@{m.datecreated.parseDate().format('yyyy-MM-dd')}</div>
 		<p>@{m.perex}</p>
 		<hr />
