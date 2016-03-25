@@ -17,12 +17,12 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('keywords', 'String(200)');
 	schema.define('icon', 'String(20)');
 	schema.define('navigations', '[String]');
-	schema.define('partial', '[String]');  		// Subpages
-	schema.define('widgets', '[String]');  		// Widgets lists, contains Array of ID widget
-	schema.define('settings', '[String]'); 		// Widget settings (according to widgets array index)
+	schema.define('partial', '[String]');       // A partial content
+	schema.define('widgets', '[String]');       // Widgets lists, contains Array of ID widget
+	schema.define('settings', '[String]');      // Widget settings (according to widgets array index)
 	schema.define('tags', '[String]');
 	schema.define('search', 'String(1000)');
-	schema.define('pictures', '[String]')  		// URL addresses for first 5 pictures
+	schema.define('pictures', '[String]')       // URL addresses for first 5 pictures
 	schema.define('name', 'String(50)');
 	schema.define('perex', 'String(500)');
 	schema.define('title', 'String(100)', true);
@@ -334,6 +334,24 @@ NEWSCHEMA('Page').make(function(schema) {
 							return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
 						});
 
+						if (response.partial && response.partial.length) {
+							schema.operation2('render-multiple', { id: response.partial }, function(err, partial) {
+
+								if (err) {
+									error.push(err);
+									return callback();
+								}
+
+								var arr = [];
+								var keys = Object.keys(partial);
+								for (var i = 0, length = keys.length; i < length; i++)
+									arr.push(partial[keys[i]]);
+								response.partial = arr;
+								callback(response);
+							});
+							return
+						}
+
 						callback(response);
 					});
 				}, true);
@@ -383,9 +401,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			}
 		}
 
-		pending.async(function() {
-			callback(output);
-		});
+		pending.async(() => callback(output));
 	});
 
 	// Loads breadcrumb according to URL
@@ -423,12 +439,15 @@ function refresh() {
 	var sitemap = {};
 	var helper = {};
 	var navigation = {};
+	var partial = [];
 
 	var prepare = function(doc) {
 
-		// Partial content is skipped
-		if (doc.ispartial)
+		// Partial content is skipped from the sitemap
+		if (doc.ispartial) {
+			partial.push({ id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, language: doc.language, icon: doc.icon, tags: doc.tags, priority: doc.priority });
 			return;
+		}
 
 		var key = (doc.language ? doc.language + ':' : '') + doc.url;
 
@@ -458,20 +477,34 @@ function refresh() {
 
 		// Sorts navigation according to priority
 		Object.keys(navigation).forEach(function(name) {
-			navigation[name].sort(function(a, b) {
-				if (a.priority > b.priority)
-					return -1;
-				return a.priority < b.priority ? 1 : 0;
-			});
+			navigation[name].sort((a, b) => a.priority > b.priority ? -1 : a.priority === b.priority ? 0 : 1);
 		});
+
+		partial.sort((a, b) => a.priority > b.priority ? -1 : a.priority === b.priority ? 0 : 1);
 
 		F.global.navigations = navigation;
 		F.global.sitemap = sitemap;
+		F.global.partial = partial;
 	});
 }
 
 // Creates Controller.prototype.page()
 F.eval(function() {
+
+	Controller.prototype.render = function(url, view, model, cache) {
+		var self = this;
+		var key = (self.language ? self.language + ':' : '') + url;
+		var page = F.global.sitemap[key];
+
+		if (!page) {
+			self.status = 404;
+			self.plain(U.httpStatus(404, true));
+			return self;
+		}
+		self.page(self.url);
+		return self;
+	};
+
 	Controller.prototype.page = function(url, view, model, cache, partial) {
 
 		var self = this;
@@ -552,4 +585,4 @@ F.middleware('page', function(req, res, next, options, controller) {
 	});
 });
 
-setTimeout(refresh, 1000);
+F.on('settings', refresh);

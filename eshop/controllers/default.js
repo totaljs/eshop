@@ -7,8 +7,9 @@ exports.install = function() {
 	F.route('#404', view_page);
 
 	// FILES
-	F.file('Images (small, large)', file_image);
-	F.file('Files', file_read);
+	F.file('/images/small/*.jpg', file_image);
+	F.file('/images/large/*.jpg', file_image);
+	F.file('/download/', file_read);
 };
 
 // ==========================================================================
@@ -43,7 +44,8 @@ function view_contact() {
 
 function view_page() {
 	var self = this;
-	self.page(self.url);
+	// models/pages.js --> Controller.prototype.render()
+	self.render(self.url);
 }
 
 // ==========================================================================
@@ -53,10 +55,7 @@ function view_page() {
 // Reads a specific file from database
 // For images (jpg, gif, png) supports percentual resizing according "?s=NUMBER" argument in query string e.g.: .jpg?s=50, .jpg?s=80 (for image galleries)
 // URL: /download/*.*
-function file_read(req, res, is) {
-
-	if (is)
-		return req.path[0] === 'download';
+function file_read(req, res) {
 
 	var id = req.path[1].replace('.' + req.extension, '');
 
@@ -72,7 +71,7 @@ function file_read(req, res, is) {
 
 				var writer = require('fs').createWriteStream(filename);
 				CLEANUP(writer, function() {
-					F.responseFile(req, res, filename);
+					res.file(filename);
 					next();
 				});
 				stream.pipe(writer);
@@ -105,7 +104,7 @@ function file_read(req, res, is) {
 			stream.on('end', function() {
 
 				// Image processing
-				F.responseImage(req, res, filename, function(image) {
+				res.image(filename, function(image) {
 					image.output(req.extension);
 					if (req.extension === 'jpg')
 						image.quality(85);
@@ -122,10 +121,7 @@ function file_read(req, res, is) {
 
 // Reads specific picture from database
 // URL: /images/small|large/*.jpg
-function file_image(req, res, is) {
-
-	if (is)
-		return req.path[0] === 'images' && (req.path[1] === 'small' || req.path[1] === 'large') && req.path[2] && req.extension === 'jpg';
+function file_image(req, res) {
 
 	// Below method checks if the file exists (processed) in temporary directory
 	// More information in total.js documentation
@@ -144,7 +140,7 @@ function file_image(req, res, is) {
 			stream.on('end', function() {
 
 				// Image processing
-				F.responseImage(req, res, filename, function(image) {
+				res.image(filename, function(image) {
 					image.output('jpg');
 					image.quality(90);
 

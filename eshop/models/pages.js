@@ -18,11 +18,11 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('icon', 'String(20)');
 	schema.define('navigations', '[String]');
 	schema.define('partial', '[String]');       // A partial content
-	schema.define('widgets', '[String]');  		// Widgets lists, contains Array of ID widget
-	schema.define('settings', '[String]'); 		// Widget settings (according to widgets array index)
+	schema.define('widgets', '[String]');       // Widgets lists, contains Array of ID widget
+	schema.define('settings', '[String]');      // Widget settings (according to widgets array index)
 	schema.define('tags', '[String]');
 	schema.define('search', 'String(1000)');
-	schema.define('pictures', '[String]')  		// URL addresses for first 5 pictures
+	schema.define('pictures', '[String]')       // URL addresses for first 5 pictures
 	schema.define('name', 'String(50)');
 	schema.define('perex', 'String(500)');
 	schema.define('title', 'String(100)', true);
@@ -490,6 +490,21 @@ function refresh() {
 
 // Creates Controller.prototype.page()
 F.eval(function() {
+
+	Controller.prototype.render = function(url, view, model, cache) {
+		var self = this;
+		var key = (self.language ? self.language + ':' : '') + url;
+		var page = F.global.sitemap[key];
+
+		if (!page) {
+			self.status = 404;
+			self.plain(U.httpStatus(404, true));
+			return self;
+		}
+		self.page(self.url);
+		return self;
+	};
+
 	Controller.prototype.page = function(url, view, model, cache, partial) {
 
 		var self = this;
