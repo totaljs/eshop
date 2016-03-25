@@ -1,7 +1,7 @@
 exports.install = function() {
 	// COMMON
 	F.route('/', view_homepage);
-	F.route('/contact/', view_contact);
+	F.route('#contact', view_contact);
 
 	// CMS rendering
 	F.route('/*', view_page);
@@ -26,7 +26,7 @@ function view_homepage() {
 		options.max = 12;
 		options.homepage = true;
 		GETSCHEMA('Product').query(options, function(err, response) {
-			// Finds homepage page
+			// Finds "homepage"
 			self.page('/', 'index', response, false, true);
 		});
 	});
@@ -35,7 +35,7 @@ function view_homepage() {
 // Contact with contact form
 function view_contact() {
 	var self = this;
-	self.page(self.url, 'contact');
+	self.render(self.url, 'contact');
 }
 
 // ==========================================================================
@@ -44,7 +44,8 @@ function view_contact() {
 
 function view_page() {
 	var self = this;
-	self.page(self.url);
+	// models/pages.js --> Controller.prototype.render()
+	self.render(self.url);
 }
 
 // ==========================================================================

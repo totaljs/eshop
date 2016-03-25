@@ -190,9 +190,12 @@ NEWSCHEMA('User').make(function(schema) {
 				// new user
 				doc = schema.create();
 				doc.name = options.profile.name;
+				doc.firstname = options.profile.firstname;
+				doc.lastname = options.profile.lastname;
 				doc.email = options.profile.email;
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
+				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).toSearch().max(80);
 				doc.datecreated = doc.datecreated.format();
 				doc[id] = options.profile[id];
 				DB('users').insert(doc.$clean(), F.error());
@@ -272,7 +275,7 @@ NEWSCHEMA('UserPassword').make(function(schema) {
 			}
 
 			response.hash = F.encrypt({ id: response.id, expire: new Date().add('2 days').getTime() });
-			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response, options.controller.language);
+			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response, options.controller.language || '');
 			callback(SUCCESS(true));
 		});
 	});
@@ -310,7 +313,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.ip = options.ip;
 			user.datecreated = user.datecreated.format();
 
-			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language);
+			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
 
 			if (F.config.custom.emailuserform)
 				mail.bcc(F.config.custom.emailuserform);
@@ -324,7 +327,6 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			callback(SUCCESS(true));
 		});
 	});
-
 });
 
 // Cleans online users

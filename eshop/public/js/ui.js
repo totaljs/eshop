@@ -1313,9 +1313,12 @@ COMPONENT('dropdowncheckbox', function() {
 		var empty = self.attr('data-placeholder');
 
 		if (value && value.length) {
+			var remove = [];
 			for (var i = 0, length = value.length; i < length; i++) {
 				var selected = value[i];
 				var index = 0;
+				var is = false;
+
 				while (true) {
 					var item = data[index++];
 					if (item === undefined)
@@ -1323,8 +1326,25 @@ COMPONENT('dropdowncheckbox', function() {
 					if (item.value != selected)
 						continue;
 					label += (label ? ', ' : '') + item.text;
+					is = true;
 				}
+
+				if (!is)
+					remove.push(selected);
 			}
+
+			var refresh = false;
+
+			while (true) {
+				var item = remove.shift();
+				if (item === undefined)
+					break;
+				value.splice(value.indexOf(item), 1);
+				refresh = true;
+			}
+
+			if (refresh)
+				MAN.set(self.path, value);
 		}
 
 		container.find('input').each(function() {

@@ -1,5 +1,5 @@
 @{title(user.name)}
-@{sitemap('#account')}
+@{sitemap('account')}
 
 <div id="loading"></div>
 <div class="padding">
@@ -21,7 +21,7 @@
 						<hr />
 						<br />
 						<br />
-						<a href="/shop/" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
+						<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
 						<br />
 						<br />
 					</div>
@@ -30,21 +30,21 @@
 
 			<div data-component="visible" data-component-path="datasource.items" data-if="value.length > 0" class="hidden">
 				<div class="row">
-					<h3>My orders:</h3>
+					<h3>@(My orders:)</h3>
 				</div>
 				<div data-component="repeater" data-component-path="datasource.items" class="orders">
 					<script type="text/html">
 						<div class="row">
 							<div class="col-sm-5">
-								<a href="/checkout/{{ id }}/">Order # {{ id }}</a>
+								<a href="@{sitemap_url('order', '{{ id }}')}">@(Order) # {{ id }}</a>
 								<div>{{ status }}</div>
 							</div>
 							<div class="col-sm-4 ui-right">
 								<div class="b">@{currency('{{ price }}')}</div>
-								<div>{{ count }} items</div>
+								<div>{{ count }} @(items)</div>
 							</div>
 							<div class="col-sm-3 ui-right">
-								<div class="b">{{ datecreated | format('yyyy-MM-dd') }}</div>
+								<div class="b">{{ datecreated | format('@(yyyy-MM-dd)') }}</div>
 								<div>{{ datecreated | format('HH:mm') }}</div>
 							</div>
 						</div>

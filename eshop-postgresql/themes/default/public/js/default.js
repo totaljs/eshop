@@ -3,21 +3,16 @@ PING('GET /api/ping/');
 
 $(document).ready(function() {
 
-	if (window.localStorage) {
-		// Loads last location (only for oauth2)
-		var oauth2 = window.localStorage.getItem('oauth2');
-		if (oauth2) {
-			window.localStorage.setItem('oauth2', '');
-			window.location.href = oauth2;
-		}
-	}
-
 	var path = $('.breadcrumb a').eq(2).attr('href');
 	if (path)
 		$('.categories').find('a[href="' + path + '"]').addClass('selected');
 
-	$(document).on('click', '.header-menu-button', function() {
+	$(document).on('click', '.header-menu-button, .categories-button', function() {
 		$('.categories').toggleClass('categories-toggle');
+	});
+
+	$(document).on('click', '.categories-button', function() {
+		$('.categories').parent().toggleClass('categories-hide');
 	});
 
 	var buy = $('.detail-buy').on('click', function() {
@@ -50,7 +45,7 @@ COMPONENT('related', function() {
 	var self = this;
 	self.readonly();
 	self.make = function() {
-		$.components.GET('/api/products/', { html: 1, category: self.attr('data-category'), max: 8, skip: self.attr('data-id') }, function(response) {
+		AJAX('GET /api/products/', { html: 1, category: self.attr('data-category'), max: 8, skip: self.attr('data-id') }, function(response) {
 			var parent = self.element.parent();
 			if (parent.hasClass('hidden') && response.indexOf('id="empty"') === -1)
 				parent.removeClass('hidden');
@@ -189,6 +184,7 @@ COMPONENT('checkout', function() {
 
 			break;
 		}
+
 		CACHE('cart', cart, expiration);
 		self.refresh(removed ? 1 : 0);
 		return removed ? 1 : 0;

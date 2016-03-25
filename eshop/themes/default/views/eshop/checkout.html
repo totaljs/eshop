@@ -175,7 +175,7 @@
 		form.email = userprofile.email;
 	}
 
-	$.components.ready(function() {
+	jC.ready(function() {
 
 		var cart = CACHE('cart');
 		if (!cart)
@@ -186,7 +186,7 @@
 		for (var i = 0, length = cart.length; i < length; i++)
 			id.push(cart[i].id);
 
-		$.components.GET('/api/products/', { id: id.join(',') }, function(response) {
+		AJAX('GET /api/products/', { id: id.join(',') }, function(response) {
 
 			datasource = [];
 
@@ -194,6 +194,9 @@
 				var item = response.items[i];
 				datasource.push({ id: item.id, name: item.name, price: item.price, linker: item.linker, linker_category: item.linker_category, pictures: item.pictures, reference: item.reference });
 			}
+
+			if (!datasource.length)
+				FIND('checkout').clear();
 
 			refresh(true);
 		});

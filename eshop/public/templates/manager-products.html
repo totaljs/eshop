@@ -184,7 +184,7 @@
 			var loading = FIND('loading');
 			switch ($(button).attr('name')) {
 				case 'edit':
-					products_edit(row.id);
+					products_edit(row.id, index);
 					break;
 				case 'remove':
 					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
@@ -290,7 +290,7 @@
 		};
 	});
 
-	function products_edit(id) {
+	function products_edit(id, index) {
 		var loading = FIND('loading');
 		loading.show();
 		AJAX('GET /api/products/{0}/'.format(id), function(response, err) {

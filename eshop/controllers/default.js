@@ -26,7 +26,7 @@ function view_homepage() {
 		options.max = 12;
 		options.homepage = true;
 		GETSCHEMA('Product').query(options, function(err, response) {
-			// Finds homepage page
+			// Finds "homepage"
 			self.page('/', 'index', response, false, true);
 		});
 	});
@@ -35,7 +35,7 @@ function view_homepage() {
 // Contact with contact form
 function view_contact() {
 	var self = this;
-	self.page(self.url, 'contact');
+	self.render(self.url, 'contact');
 }
 
 // ==========================================================================

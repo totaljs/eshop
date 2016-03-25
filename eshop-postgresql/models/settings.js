@@ -13,9 +13,11 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('emailcontactform', String, true);
 	schema.define('emailorderform', String, true);
 	schema.define('emailreply', String, true);
+	schema.define('emailuserform', String, true);
 	schema.define('emailsender', String, true);
 	schema.define('url', String, true);
 	schema.define('templates', '[String]');
+	schema.define('posts', '[String]');
 	schema.define('navigations', '[String]');
 	schema.define('deliverytypes', '[String]');
 	schema.define('defaultorderstatus', String);
@@ -139,6 +141,8 @@ NEWSCHEMA('Settings').make(function(schema) {
 					F.config.custom.currency_entity = '{0} ' + F.config.custom.currency;
 					break;
 			}
+
+			F.emit('settings', settings);
 
 			// Returns response
 			callback(SUCCESS(true));

@@ -99,7 +99,17 @@ NEWSCHEMA('Product').make(function(schema) {
 			data.items = response.items;
 			data.pages = Math.ceil(response.count / options.max);
 
-			if (data.pages === 0)
+			var linker_detail = F.sitemap('detail', true);
+			var linker_category = F.sitemap('category', true);
+
+			data.items.forEach(function(item) {
+				if (linker_detail)
+					item.linker = linker_detail.url.format(item.linker);
+				if (linker_category)
+					item.linker_category = linker_category.url.format(item.linker_category);
+			});
+
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
@@ -534,4 +544,4 @@ function prepare_subcategories(name) {
 	return { linker: builder_link.join('/'), name: builder_text.join(' / ') };
 }
 
-setTimeout(refresh, 1000);
+F.on('settings', refresh);

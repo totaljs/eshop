@@ -45,7 +45,7 @@ COMPONENT('related', function() {
 	var self = this;
 	self.readonly();
 	self.make = function() {
-		$.components.GET('/api/products/', { html: 1, category: self.attr('data-category'), max: 8, skip: self.attr('data-id') }, function(response) {
+		AJAX('GET /api/products/', { html: 1, category: self.attr('data-category'), max: 8, skip: self.attr('data-id') }, function(response) {
 			var parent = self.element.parent();
 			if (parent.hasClass('hidden') && response.indexOf('id="empty"') === -1)
 				parent.removeClass('hidden');
@@ -184,6 +184,7 @@ COMPONENT('checkout', function() {
 
 			break;
 		}
+
 		CACHE('cart', cart, expiration);
 		self.refresh(removed ? 1 : 0);
 		return removed ? 1 : 0;

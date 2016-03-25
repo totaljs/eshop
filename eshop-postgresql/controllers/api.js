@@ -7,12 +7,17 @@ exports.install = function() {
 
 	// ORDERS
 	F.route('/api/checkout/create/',      json_orders_create, ['post', '*Order']);
-	F.route('/api/checkout/{id}/',        json_orders_read);
+	F.route('/api/checkout/{id}/',        json_orders_read, ['*Order']);
+
+	// USERS
+	F.route('/api/users/create/',         json_users, ['post', '*UserRegistration']);
+	F.route('/api/users/password/',       json_users, ['post', '*UserPassword']);
+	F.route('/api/users/login/',          json_users, ['post', '*UserLogin']);
 
 	// PRODUCTS
-	F.route('/api/products/',             json_products_query);
-	F.route('/api/products/{id}/',        json_products_read);
-	F.route('/api/products/categories/',  json_products_categories);
+	F.route('/api/products/',             json_products_query, ['*Product']);
+	F.route('/api/products/{id}/',        json_products_read, ['*Product']);
+	F.route('/api/products/categories/',  json_products_categories, ['*Product']);
 
 	// NEWSLETTER
 	F.route('/api/newsletter/',           json_newsletter, ['post', '*Newsletter']);
@@ -50,15 +55,13 @@ function json_products_query() {
 
 	// Renders related products
 	if (self.query.html) {
-
 		// Disables layout
 		self.layout('');
-
-		GETSCHEMA('Product').query(self.query, self.callback('~eshop/partial-products'));
+		self.$query(self.query, self.callback('~eshop/partial-products'));
 		return;
 	}
 
-	GETSCHEMA('Product').query(self.query, self.callback());
+	self.$query(self.query, self.callback());
 }
 
 // Reads a specific product
@@ -66,7 +69,7 @@ function json_products_read(id) {
 	var self = this;
 	var options = {};
 	options.id = id;
-	GETSCHEMA('Product').get(options, self.callback());
+	self.$get(options, self.callback());
 }
 
 // Reads all product categories
@@ -87,6 +90,7 @@ function json_products_categories() {
 function json_orders_create() {
 	var self = this;
 	self.body.ip = self.ip;
+	self.body.language = self.language;
 	self.body.iduser = self.user ? self.user.id : '';
 	self.body.$workflow('create', self.callback());
 }
@@ -96,7 +100,21 @@ function json_orders_read(id) {
 	var self = this;
 	var options = {};
 	options.id = id;
-	GETSCHEMA('Order').get(options, self.callback());
+	self.$get(options, self.callback());
+}
+
+// ==========================================================================
+// USERS
+// ==========================================================================
+
+function json_users() {
+	var self = this;
+	var options = {};
+
+	options.controller = self;
+	options.ip = self.ip;
+
+	self.body.$workflow('exec', options, self.callback());
 }
 
 // ==========================================================================

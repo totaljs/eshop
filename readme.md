@@ -26,7 +26,7 @@ __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREAT
 
 ### MongoDB version only
 
-- install `npm install mongobuilder`
+- install `npm install sqlagent`
 - install `npm install mongodb`
 - __note__: cloud database www.mongolab.com
 - __important__: binary files are too slow because I have a free billing plan and the servers are in USA

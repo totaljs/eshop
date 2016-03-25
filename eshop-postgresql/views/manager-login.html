@@ -15,7 +15,7 @@
 	@{import('manager.css', 'favicon.ico')}
 </head>
 <body>
-	<div id="loading"></div>
+	<div data-component="loading" class="ui-loading"></div>
 	<br />
 	<br />
 	<div class="container">
@@ -40,7 +40,9 @@
 		if (document.cookie.indexOf('__manager') !== -1)
 			user.error = [{ error: '@(Incorrect username or password.)' }];
 
-		loading(false, 2000);
+		FIND('loading', function() {
+			this.hide(500);
+		});
 
 		function doLogin() {
 			if (!$.components.valid('user.*'))
@@ -49,7 +51,7 @@
 			var dt = new Date();
 			dt.setDate(dt.getDate() + 7);
 			document.cookie = '__manager=' + (id.toString()) + '; expires=' + dt.toUTCString() + '; path=/';
-			loading(true);
+			FIND('loading').show();
 			window.location.reload(true);
 		}
 	</script>

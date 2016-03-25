@@ -203,7 +203,7 @@ function view_account() {
 function redirect_account_logoff() {
 	var self = this;
 	MODEL('users').logoff(self.req, self.res, self.user);
-	self.redirect('/account/');
+	self.redirect(self.sitemap_url('account'));
 }
 
 // ============================================

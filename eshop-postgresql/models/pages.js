@@ -11,16 +11,17 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	schema.define('id', 'String(10)');
 	schema.define('parent', 'String(10)');
-	schema.define('template', 'String(30)', true);
+	schema.define('template', 'String(30)');
 	schema.define('language', 'String(3)');
 	schema.define('url', 'String(200)');
 	schema.define('keywords', 'String(200)');
 	schema.define('icon', 'String(20)');
 	schema.define('navigations', '[String]');
-	schema.define('widgets', '[String]'); // Widgets lists, contains Array of ID widget
-	schema.define('settings', '[String]'); // Widget settings (according to widgets array index)
+	schema.define('partial', '[String]');      // A partial content
+	schema.define('widgets', '[String]');      // Widgets lists, contains Array of ID widget
+	schema.define('settings', '[String]');     // Widget settings (according to widgets array index)
 	schema.define('tags', '[String]');
-	schema.define('pictures', '[String]') // URL addresses for first 5 pictures
+	schema.define('pictures', '[String]')      // URL addresses for first 5 pictures
 	schema.define('name', 'String(50)');
 	schema.define('perex', 'String(500)');
 	schema.define('search', 'String(2000)');
@@ -61,7 +62,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (options.search)
 			options.search = options.search.keywords(true, true).join(' ');
 
-		var sql = DB();
+		var sql = DB(error);
 		var filter = sql.$;
 
 		filter.where('isremoved', false);
@@ -97,10 +98,8 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		sql.exec(function(err, response) {
 
-			if (err) {
-				error.push(err);
+			if (err)
 				return callback();
-			}
 
 			var empty = [];
 
@@ -127,7 +126,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			data.items = response.items;
 			data.pages = Math.ceil(response.count / options.max);
 
-			if (data.pages === 0)
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
@@ -170,6 +169,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			var item = response.item;
 
 			item.pictures = item.pictures ? item.pictures.split(';').trim() : [];
+			item.partial = item.partial ? item.partial.split(';').trim() : [];
 			item.navigations = item.navigations ? item.navigations.split(';').trim() : [];
 			item.tags = item.tags ? item.tags.split(';').trim() : [];
 
@@ -232,6 +232,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		clean.pictures = clean.pictures.join(';');
 		clean.tags = clean.tags.join(';');
+		clean.partial = clean.partial.join(';');
 		clean.navigations = clean.navigations.join(';');
 
 		if (clean.search)
@@ -243,7 +244,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		// settings
 		// widgets
 
-		var sql = DB();
+		var sql = DB(error);
 
 		sql.save('item', 'tbl_page', isNew, function(builder, isNew) {
 			builder.set(clean);
@@ -268,13 +269,13 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		sql.exec(function(err) {
 
-			if (err)
-				error.push(err);
-
-			F.emit('pages.save', model);
-
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (!err)
+				return;
+
+			F.emit('pages.save', model);
 
 			// Refreshes internal information e.g. categories
 			setTimeout(refresh, 1000);
@@ -379,8 +380,7 @@ NEWSCHEMA('Page').make(function(schema) {
 						if (response.language)
 							response.body = F.translator(response.language, response.body);
 
-						// Minify
-						response.body = U.minifyHTML(response.body.replace(/<br>/g, '<br />'))
+						response.body = U.minifyHTML(response.body.replace(/<br>/g, '<br />'));
 
 						// cleaner
 						response.body = response.body.replace(/(\s)class\=\".*?\"/g, function(text) {
@@ -398,6 +398,24 @@ NEWSCHEMA('Page').make(function(schema) {
 
 							return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
 						});
+
+						if (response.partial && response.partial.length) {
+							schema.operation2('render-multiple', { id: response.partial }, function(err, partial) {
+
+								if (err) {
+									error.push(err);
+									return callback();
+								}
+
+								var arr = [];
+								var keys = Object.keys(partial);
+								for (var i = 0, length = keys.length; i < length; i++)
+									arr.push(partial[keys[i]]);
+								response.partial = arr;
+								callback(response);
+							});
+							return
+						}
 
 						callback(response);
 					});
@@ -489,6 +507,7 @@ function refresh() {
 	var sitemap = {};
 	var helper = {};
 	var navigation = {};
+	var partial = [];
 
 	var sql = DB();
 
@@ -501,6 +520,12 @@ function refresh() {
 
 		for (var i = 0, length = response.pages.length; i < length; i++) {
 			var page = response.pages[i];
+
+			// A partial content is skipped from the sitemap
+			if (page.ispartial) {
+				partial.push({ id: page.id, url: page.url, name: page.name, title: page.title, language: page.language, icon: page.icon, tags: page.tags, priority: page.priority });
+				continue;
+			}
 
 			// Prepares navigations
 			page.navigations = page.navigations ? page.navigations.split(';') : [];
@@ -536,13 +561,32 @@ function refresh() {
 			});
 		});
 
+		partial.sort((a, b) => a.priority > b.priority ? -1 : a.priority === b.priority ? 0 : 1);
+
 		F.global.navigations = navigation;
 		F.global.sitemap = sitemap;
+		F.global.partial = partial;
 	});
 }
 
 // Creates Controller.prototype.page()
 F.eval(function() {
+
+	Controller.prototype.render = function(url, view, model, cache) {
+		var self = this;
+		var key = (self.language ? self.language + ':' : '') + url;
+		var page = F.global.sitemap[key];
+
+		if (!page) {
+			self.status = 404;
+			self.plain(U.httpStatus(404, true));
+			return self;
+		}
+
+		self.page(self.url, view, model, cache);
+		return self;
+	};
+
 	Controller.prototype.page = function(url, view, model, cache, partial) {
 
 		var self = this;
@@ -623,4 +667,4 @@ F.middleware('page', function(req, res, next, options, controller) {
 	});
 });
 
-setTimeout(refresh, 1000);
+F.on('settings', refresh);

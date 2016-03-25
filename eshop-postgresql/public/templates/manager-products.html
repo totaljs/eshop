@@ -49,7 +49,7 @@
 					</tr>
 					<tr>
 						<td class="col-xs-5 active">@(Created)</td>
-						<td>{{ datecreated | format('yyyy-MM-dd') }}</td>
+						<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -181,29 +181,20 @@
 		products_refresh(true);
 
 		component.click = function(index, row, button) {
+			var loading = FIND('loading');
 			switch ($(button).attr('name')) {
 				case 'edit':
-					loading(true);
-					$.components.GET('/api/products/' + row.id, null, function(response, err) {
-
-						loading(false, 500);
-
-						// Error prevention
-						if (response instanceof Array)
-							response = {};
-
-						SET('products.form', $.extend({ $index: index }, response), true);
-						SET('products.response', null);
-						SET('common.form', 'products');
-					});
+					products_edit(row.id, index);
 					break;
 				case 'remove':
-					if (!confirm('@(Do you want to remove) ' + row.name + '?'))
-						return;
-					loading(true);
-					$.components.DELETE(managerurl + '/api/products', { id: row.id }, function() {
-						loading(false, 500);
-						products_refresh(true);
+					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						loading.show();
+						AJAX('DELETE {0}/api/products/'.format(managerurl), { id: row.id }, function() {
+							loading.hide(500);
+							products_refresh(true);
+						});
 					});
 					break;
 			}
@@ -218,13 +209,14 @@
 		$('#products_file_cvsxml').on('change', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
-			loading(true);
+			var loading = FIND('loading');
 			var el = this;
 			var data = new FormData();
 			data.append('file', this.files[0]);
-			$.components.UPLOAD(managerurl + '/api/products/import/', data, function(response, err) {
+			loading.show();
+			jC.UPLOAD('{0}/api/products/import/'.format(managerurl), data, function(response, err) {
 				el.value = '';
-				loading(false);
+				loading.hide(500);
 				if (!response.success)
 					return;
 				products_refresh(true);
@@ -242,8 +234,11 @@
 
 	ON('#products.form', function(component) {
 		component.submit = function(hide) {
-			loading(true);
-			$.components.POST(managerurl + '/api/products/', products.form, function(response) {
+			var loading = FIND('loading');
+			loading.show();
+			AJAX('POST {0}/api/products/'.format(managerurl), products.form, function(response) {
+
+				loading.hide(500);
 
 				// Error handling
 				SET('products.response', response);
@@ -255,7 +250,6 @@
 				if (products.form.$index === undefined || products.grid[products.form.$index].category !== products.form.category || products.grid[products.form.$index].manufacturer !== products.form.manufacturer)
 					setTimeout(products_refresh_codelists, 2000);
 
-				loading(false, 500);
 				products_refresh(true);
 				success();
 			});
@@ -266,9 +260,10 @@
 		component.submit = function(hide) {
 			RESET('products.category.*');
 			hide();
-			loading(true);
-			$.components.POST(managerurl + '/api/products/category/', products.category, function(response) {
-				loading(false);
+			var loading = FIND('loading');
+			loading.show();
+			AJAX('POST {0}/api/products/category/'.format(managerurl), products.category, function(response) {
+				loading.hide(500);
 				setTimeout(function() {
 					setTimeout(products_refresh_codelists, 2000);
 					products_refresh(true);
@@ -295,6 +290,25 @@
 		};
 	});
 
+	function products_edit(id, index) {
+		var loading = FIND('loading');
+		loading.show();
+		AJAX('GET /api/products/{0}/'.format(id), function(response, err) {
+
+			loading.hide(500);
+
+			// Error prevention
+			if (response instanceof Array) {
+				FIND('message').warning(response[0].error);
+				return;
+			}
+
+			SET('products.form', $.extend({ $index: index }, response), true);
+			SET('products.response', null);
+			SET('common.form', 'products');
+		});
+	}
+
 	function products_new() {
 		SET('products.form', {}, true);
 		SET('products.response', null);
@@ -308,7 +322,7 @@
 
 	// Method refreshes categories
 	function products_refresh_codelists() {
-		$.components.GET(managerurl + '/api/products/codelists/', null, function(response) {
+		AJAX('GET {0}/api/products/codelists/'.format(managerurl), function(response) {
 			response.categories.sort(function(a, b) {
 				return a.name.localeCompare(b.name);
 			});
@@ -325,7 +339,7 @@
 			products.grid = [];
 		}
 
-		$.components.GET(managerurl + '/api/products/', products.filter, function(response) {
+		AJAX('GET {0}/api/products/'.format(managerurl), products.filter, function(response) {
 			SET((reset ? '' : '+') + 'products.grid', response.items);
 			if (!reset)
 				return;
@@ -345,7 +359,16 @@
 	}
 
 	function products_export(argument) {
-		window.location.href = managerurl + '/api/products/export/';
+		window.location.href = '{0}/api/products/export/'.format(managerurl);
+	}
+
+	function products_reload() {
+		var hash = location.hash;
+		if (hash && hash.length > 1) {
+			setTimeout(function() {
+				products_edit(hash.substring(1));
+			}, 500);
+		}
 	}
 
 </script>

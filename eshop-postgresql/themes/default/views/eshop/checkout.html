@@ -1,4 +1,4 @@
-@{sitemap('#checkout')}
+@{sitemap('checkout')}
 
 <div id="loading"></div>
 <div class="padding">
@@ -16,7 +16,7 @@
 				<hr />
 				<br />
 				<br />
-				<a href="/shop/" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
+				<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
 				<br />
 				<br />
 			</div>
@@ -39,7 +39,7 @@
 					<tbody data-component="repeater" data-component-path="datasource">
 						<script type="text/html">
 							<tr>
-								<td><a href="/product/{{ linker }}/" class="b">{{ name }}</a><div class="visible-xs fs11 mt10">One piece: @{currency('{{ price | format(2) }}')}</div></td>
+								<td><a href="@{sitemap_url('detail')}{{ linker }}/" class="b">{{ name }}</a><div class="visible-xs fs11 mt10">One piece: @{currency('{{ price | format(2) }}')}</div></td>
 								<td class="ui-right col-xs-2">@{currency('{{ price | format(2) }}')}</td>
 								<td class="ui-right col-xs-2 col-sm-1 active"><input type="text" value="{{ count }}" data-id="{{ id }}" maxlength="2" /></td>
 								<td class="ui-right col-xs-3 col-sm-2 b warning"><span class="visible-xs checkoutlist-label">Together:</span><span class="checkoutlist-item-price" data-format="@{currency('{0}')}">@{currency('{{ price | sum(2) }}')}</span><span class="fa fa-times-circle hidden-xs" data-id="{{ id }}"></span></td>
@@ -70,11 +70,14 @@
 				<div class="ui-center m silver"><span class="fa fa-lock fa-3x"></span></div>
 				<div class="row">
 					<div class="col-md-3"></div>
-					<div class="col-md-6 ui-center">@(<b>Sign up</b> now and watch states of your orders easily. It's easy, safe and very fast.)</div>
+					<div class="col-md-6 ui-center">
+						<div>@(<b>Sign up</b> now and watch states of your orders easily. It's easy, safe and very fast.)</div>
+						<br />
+						<a href="@{sitemap_url('account')}" class="linkbutton linkbutton-small">Create account</a>
+					</div>
 				</div>
 				<br />
 				<br />
-				@{view('partial-oauth2')}
 			</div>
 		</div>
 		<hr />
@@ -153,12 +156,6 @@
 @{section script}
 <script>
 
-	// Caches the last location (valid globally)
-	$('.social-oauth2').on('click', 'a', function() {
-		if (window.localStorage)
-			window.localStorage.setItem('oauth2', window.location.pathname);
-	});
-
 	var common = {};
 	var form = {};
 	var datasource;
@@ -175,9 +172,10 @@
 		var arr = userprofile.name.split(' ');
 		form.firstname = arr[0];
 		form.lastname = arr[1];
+		form.email = userprofile.email;
 	}
 
-	$.components.ready(function() {
+	jC.ready(function() {
 
 		var cart = CACHE('cart');
 		if (!cart)
@@ -188,7 +186,7 @@
 		for (var i = 0, length = cart.length; i < length; i++)
 			id.push(cart[i].id);
 
-		$.components.GET('/api/products/', { id: id.join(',') }, function(response) {
+		AJAX('GET /api/products/', { id: id.join(',') }, function(response) {
 
 			datasource = [];
 
@@ -196,6 +194,9 @@
 				var item = response.items[i];
 				datasource.push({ id: item.id, name: item.name, price: item.price, linker: item.linker, linker_category: item.linker_category, pictures: item.pictures, reference: item.reference });
 			}
+
+			if (!datasource.length)
+				FIND('checkout').clear();
 
 			refresh(true);
 		});

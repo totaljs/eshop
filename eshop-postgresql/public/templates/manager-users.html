@@ -33,7 +33,7 @@
 			<tbody>
 				<tr>
 					<td class="col-xs-4 active">@(# id)</td>
-					<td><a href="/checkout/{{ id }}/">{{ id }}</a></td>
+					<td>{{ id }}</td>
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(IP address)</td>
@@ -41,7 +41,7 @@
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(Created)</td>
-					<td>{{ datecreated | format('yyyy-MM-dd') }}</td>
+					<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -50,14 +50,24 @@
 
 	<div class="padding" style="padding-bottom:0">
 		<div class="row">
-			<div class="col-md-4 m">
-				<div data-component="textbox" data-component-path="users.form.name" data-required="true">@(Name)</div>
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="users.form.name" data-required="true" data-maxlength="50">@(Name)</div>
 			</div>
-			<div class="col-md-4 m">
-				<div data-component="textbox" data-component-path="users.form.email">@(Email)</div>
+			<div class="col-md-6 m">
+				<div data-component="dropdown" data-component-path="users.form.gender" data-options=";@(male)|male;@(female)|female">@(Gender)</div>
 			</div>
-			<div class="col-md-4 m">
-				<div data-component="textbox" data-component-path="users.form.gender">@(Gender)</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="users.form.firstname" data-maxlength="50">@(First name)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="users.form.lastname" data-maxlength="50">@(Last name)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textbox" data-component-path="users.form.email" data-maxlength="200">@(Email)</div>
 			</div>
 		</div>
 	</div>
@@ -65,28 +75,28 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idfacebook">Facebook #</div>
+				<div data-component="textbox" data-component-path="users.form.idfacebook" data-maxlength="30">Facebook #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idgoogle">Google #</div>
+				<div data-component="textbox" data-component-path="users.form.idgoogle" data-maxlength="30">Google #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idlinkedin">LInkedIn #</div>
+				<div data-component="textbox" data-component-path="users.form.idlinkedin" data-maxlength="30">LinkedIn #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idlive">Windows Live #</div>
+				<div data-component="textbox" data-component-path="users.form.idlive" data-maxlength="30">Windows Live #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idyahoo">Yahoo #</div>
+				<div data-component="textbox" data-component-path="users.form.idyahoo" data-maxlength="30">Yahoo #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.iddropbox">Dropbox #</div>
+				<div data-component="textbox" data-component-path="users.form.iddropbox" data-maxlength="30">Dropbox #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idinstagram">Instagram #</div>
+				<div data-component="textbox" data-component-path="users.form.idinstagram" data-maxlength="30">Instagram #</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.form.idvk">VKontakte #</div>
+				<div data-component="textbox" data-component-path="users.form.idvk" data-maxlength="30">VKontakte #</div>
 			</div>
 		</div>
 	</div>
@@ -119,29 +129,20 @@
 		users_refresh(true);
 
 		component.click = function(index, row, button) {
+			var loading = FIND('loading');
 			switch ($(button).attr('name')) {
 				case 'edit':
-					loading(true);
-					$.components.GET(managerurl + '/api/users/' + row.id, null, function(response, err) {
-
-						// Error prevention
-						if (response instanceof Array)
-							response = {};
-
-						SET('users.form', $.extend({}, response), true);
-						SET('users.response', null);
-						SET('common.form', 'users');
-						loading(false, 500);
-					});
+					users_edit(row.id);
 					break;
-
 				case 'remove':
-					if (!confirm('@(Do you want to remove selected user?)'))
-						return;
-					loading(true);
-					$.components.DELETE(managerurl + '/api/users', { id: row.id }, function() {
-						users_refresh(true);
-						loading(false, 500);
+					FIND('confirm').confirm('@(Do you want to remove selected user?)', ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						loading.show();
+						AJAX('DELETE {0}/api/users'.format(managerurl), { id: row.id }, function() {
+							users_refresh(true);
+							loading.hide(500);
+						});
 					});
 					break;
 			}
@@ -155,8 +156,11 @@
 	ON('#users.form', function(component) {
 		// Submits user form
 		component.submit = function(hide) {
-			loading(true);
-			$.components.PUT(managerurl + '/api/users/', users.form, function(response) {
+			var loading = FIND('loading');
+			loading.show();
+			AJAX('PUT {0}/api/users/'.format(managerurl), users.form, function(response) {
+
+				loading.hide(500);
 
 				// Error handling
 				SET('users.response', response);
@@ -166,10 +170,28 @@
 				hide();
 				users_refresh(true);
 				success();
-				loading(false, 500);
 			});
 		};
 	});
+
+	function users_edit(id) {
+		var loading = FIND('loading');
+		loading.show();
+		AJAX('GET {0}/api/users/{1}'.format(managerurl, id), function(response, err) {
+
+			loading.hide(500);
+
+			// Error prevention
+			if (response instanceof Array) {
+				FIND('message').warning(response[0].error);
+				return;
+			}
+
+			SET('users.form', $.extend({}, response), true);
+			SET('users.response', null);
+			SET('common.form', 'users');
+		});
+	}
 
 	// Method refreshes grid
 	function users_refresh(reset) {
@@ -179,7 +201,7 @@
 			users.grid = [];
 		}
 
-		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
+		AJAX('GET {0}/api/users/'.format(managerurl), users.filter, function(response) {
 			SET((reset ? '' : '+') + 'users.grid', response.items);
 			if (!reset)
 				return;
@@ -218,5 +240,14 @@
 
 		return builder;
 	});
+
+	function users_reload() {
+		var hash = location.hash;
+		if (hash && hash.length > 1) {
+			setTimeout(function() {
+				users_edit(hash.substring(1));
+			}, 500);
+		}
+	}
 
 </script>

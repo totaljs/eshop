@@ -1,5 +1,5 @@
 // Reads custom settings
-GETSCHEMA('Settings').workflow('load', null, null, NOOP, true);
+GETSCHEMA('Settings').workflow2('load');
 
 // Disables analytic counter for administraion / manager
 MODULE('webcounter').instance.onValid = function(req) {
