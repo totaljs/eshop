@@ -2,7 +2,7 @@
 	@{foreach m in model.items}
 	<div class="col-md-12">
 		<div class="b"><a href="@{sitemap_url('blogsdetail', m.linker)}">@{m.name}</a></div>
-		<div>@{m.datecreated.parseDate().format('yyyy-MM-dd')}</div>
+		<div class="fs11">@{m.datecreated.parseDate().format('yyyy-MM-dd HH:mm')}</div>
 		<p>@{m.perex}</p>
 		<hr />
 	</div>
