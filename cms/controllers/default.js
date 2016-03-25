@@ -1,6 +1,6 @@
 exports.install = function() {
-	// CMS rendering through the 404
-	F.route('#404', view_page);
+	// CMS rendering
+	F.route('/*', view_page);
 
 	// FILES
 	F.file('/download/', file_read);
