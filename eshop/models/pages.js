@@ -11,7 +11,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	schema.define('id', 'String(10)');
 	schema.define('parent', 'String(10)');
-	schema.define('template', 'String(30)', true);
+	schema.define('template', 'String(30)');
 	schema.define('language', 'String(3)');
 	schema.define('url', 'String(200)');
 	schema.define('keywords', 'String(200)');
