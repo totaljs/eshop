@@ -1,0 +1,241 @@
+<div class="filter">
+	<div class="container">
+		<div class="caption"><span class="fa fa-hashtag mr5"></span> @(Posts)</div>
+		<div class="row">
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="posts.filter.search" data-placeholder="@(Search posts ...)" data-control-icon="fa-search"></div>
+				<div class="help" data-component="template" data-component-path="posts.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="dropdown" data-component-path="posts.filter.category" data-source="posts.categories" data-empty="true" data-empty-text="@(All posts)" data-source-value="name"></div>
+			</div>
+			<div class="col-md-6 m">
+				<div class="row">
+					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="posts_new"><span class="fa fa-plus-circle"></span>@(Add post)</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div data-component="grid" data-component-path="posts.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more posts)" data-component-id="posts.grid" data-autocenter="false">
+		<script type="text/html">
+		<tr>
+			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ name }}</td>
+			<td style="width:150px" class="silver fs11 hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
+			<td style="width:100px" class="silver ui-center hidden-xs">{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
+			<td style="width:80px" class="ui-right">
+				<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
+				<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+			</td>
+		</tr>
+		</script>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Post form)" data-component-path="common.form" data-if="value === 'posts'" data-width="1200px" data-component-id="posts.form">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-component="textbox" data-component-path="posts.form.name" data-required="true" data-placeholder="Post name">@(Name)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-component="dropdown" data-component-path="posts.form.template" data-source="posts.templates" data-empty="true" data-required="true">@(Template)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-component="dropdown" data-component-path="posts.form.category" data-source="posts.categories" data-empty="true" data-source-value="name" data-required="true">@(Category)</div>
+			</div>
+		</div>
+	</div>
+	<hr style="margin:0 0 8px" />
+	<div class="help ui-center" style="margin-bottom:8px;padding:0 20px"><b>@(Editor formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L). <a href="javascript:void(0)" data-component="click" data-component-path="posts_sourcecode" class="black"><span class="fa fa-code w18"></span>@(Show source-code)</a></div>
+	<div class="pages-editor" data-component="editor" data-component-path="posts.form.body" data-component-import="/templates/component-editor.html" data-component-id="posts.editor"></div>
+	<br />
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-component="textboxtags" data-component-path="posts.form.tags">@(Tags)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-component="textbox" data-component-path="posts.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag" data-placeholder="e.g. en">@(Language)</div>
+			</div>
+		</div>
+	</div>
+	<div data-component="error" data-component-path="posts.response"></div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="posts.form">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<script>
+
+	var posts = {};
+
+	posts.filter = {};
+	posts.filter.page = 1;
+
+	posts.grid = [];
+	posts.info = {};
+	posts.form = {};
+	posts.categories = [];
+	posts.templates = [];
+	posts.response = null;
+	posts.category = {};
+	posts.subcategory = {};
+	posts.subcategory.visible = false;
+
+	ON('#posts.grid', function(component) {
+
+		// Max items per page
+		posts.filter.max = component.max;
+		posts_refresh_codelists();
+		posts_refresh(true);
+
+		component.click = function(index, row, button) {
+			var loading = FIND('loading');
+			switch ($(button).attr('name')) {
+				case 'edit':
+					posts_edit(row.id);
+					break;
+				case 'remove':
+					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						loading.show();
+						AJAX('DELETE {0}/api/posts/'.format(managerurl), { id: row.id }, function() {
+							loading.hide(500);
+							posts_refresh(true);
+						});
+					});
+					break;
+			}
+		};
+
+		component.next = function(page) {
+			posts.filter.page = page;
+			posts_refresh();
+		};
+
+		WATCH('posts.form.template', function(path, value, type) {
+			FIND('#posts.editor').setTemplate(value);
+			if (type === 2)
+				SET('posts.form.body', '');
+		});
+	});
+
+	// Watch for changes in order filter
+	WATCH('posts.filter.*', function(path, value) {
+		if (NOTMODIFIED('posts.filter', posts.filter))
+			return;
+		posts_refresh(path !== 'posts.filter.page');
+	});
+
+	ON('#posts.form', function(component) {
+		component.submit = function(hide) {
+			var loading = FIND('loading');
+			loading.show();
+
+			var editor = FIND('#posts.editor');
+			posts.form.pictures = editor.getPictures();
+			posts.form.body = editor.getContent();
+			posts.form.pictures = editor.getPictures();
+			posts.form.perex = editor.getPerex();
+			posts.form.body = editor.getContent().replace(/\n[\s\t]+\n/g, '\n');
+			posts.form.search = editor.getKeywords();
+
+			AJAX('POST {0}/api/posts/'.format(managerurl), posts.form, function(response) {
+
+				loading.hide(500);
+
+				// Error handling
+				SET('posts.response', response);
+				if (response instanceof Array)
+					return;
+
+				hide();
+				posts_refresh(true);
+				success();
+			});
+		};
+	});
+
+	function posts_edit(id) {
+		var loading = FIND('loading');
+		loading.show();
+		AJAX('GET {0}/api/posts/{1}/'.format(managerurl, id), function(response, err) {
+
+			loading.hide(500);
+
+			// Error prevention
+			if (response instanceof Array) {
+				FIND('message').warning(response[0].error);
+				return;
+			}
+
+			SET('posts.form', $.extend({ $index: index }, response), true);
+			SET('posts.response', null);
+			SET('common.form', 'posts');
+
+			// /templates/component-editor.html:
+			cmseditor_widgets(false);
+		});
+	}
+
+	function posts_new() {
+		SET('posts.form', {}, true);
+		SET('posts.response', null);
+		SET('common.form', 'posts');
+
+		// /templates/component-editor.html:
+		cmseditor_widgets(false);
+	}
+
+	function posts_category() {
+		SET('posts.category', {}, true);
+		SET('common.form', 'posts.category');
+	}
+
+	// Method refreshes categories
+	function posts_refresh_codelists() {
+		AJAX('GET {0}/api/posts/codelists/'.format(managerurl), function(response) {
+			SET('posts.categories', response.categories);
+			SET('posts.templates', response.templates);
+		});
+	}
+
+	// Method refreshes grid
+	function posts_refresh(reset) {
+
+		if (reset) {
+			posts.filter.page = 1;
+			posts.grid = [];
+		}
+
+		AJAX('GET {0}/api/posts/'.format(managerurl), posts.filter, function(response) {
+			SET((reset ? '' : '+') + 'posts.grid', response.items);
+			if (!reset)
+				return;
+			posts.info.count = response.count;
+			posts.info.pages = response.pages;
+			UPDATE('posts.info');
+		});
+	}
+
+	function posts_sourcecode() {
+		FIND('#posts.editor').showSourceCode();
+	}
+
+	function posts_reload() {
+		var hash = location.hash;
+		if (hash && hash.length > 1) {
+			setTimeout(function() {
+				posts_edit(hash.substring(1));
+			}, 500);
+		}
+	}
+
+</script>

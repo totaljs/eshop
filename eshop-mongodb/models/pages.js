@@ -11,17 +11,18 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	schema.define('id', 'String(10)');
 	schema.define('parent', 'String(10)');
-	schema.define('template', 'String(30)', true);
+	schema.define('template', 'String(30)');
 	schema.define('language', 'String(3)');
 	schema.define('url', 'String(200)');
 	schema.define('keywords', 'String(200)');
 	schema.define('icon', 'String(20)');
 	schema.define('navigations', '[String]');
-	schema.define('widgets', '[String]'); // Widgets lists, contains Array of ID widget
-	schema.define('settings', '[String]'); // Widget settings (according to widgets array index)
+	schema.define('partial', '[String]');       // A partial content
+	schema.define('widgets', '[String]');       // Widgets lists, contains Array of ID widget
+	schema.define('settings', '[String]');      // Widget settings (according to widgets array index)
 	schema.define('tags', '[String]');
 	schema.define('search', 'String(1000)');
-	schema.define('pictures', '[String]') // URL addresses for first 5 pictures
+	schema.define('pictures', '[String]')       // URL addresses for first 5 pictures
 	schema.define('name', 'String(50)');
 	schema.define('perex', 'String(500)');
 	schema.define('title', 'String(100)', true);
@@ -54,39 +55,43 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (options.page < 0)
 			options.page = 0;
 
+		var nosql = DB(error);
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
-		var builder = new MongoBuilder();
 
-		builder.where('isremoved', false);
+		nosql.listing('pages', 'pages').make(function(builder) {
 
-		// Checks partial content
-		if (options.ispartial)
-			builder.where('ispartial', options.ispartial);
+			builder.where('isremoved', false);
 
-		// Checks language
-		if (options.language)
-			builder.where('language', options.language);
+			// Checks partial content
+			if (options.ispartial)
+				builder.where('ispartial', options.ispartial);
 
-		// Checks navigations
-		if (options.navigation)
-			builder.in('navigations', options.navigation);
+			// Checks language
+			if (options.language)
+				builder.where('language', options.language);
 
-		if (options.search) {
-			builder.in('search', options.search.keywords(true, true));
-		}
+			// Checks navigations
+			if (options.navigation)
+				builder.in('navigations', options.navigation);
 
-		builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
-		builder.sort('name');
-		builder.take(take);
-		builder.skip(skip);
-		builder.findCount(DB('pages'), function(err, docs, count) {
+			if (options.search) {
+				builder.in('search', options.search.keywords(true, true));
+			}
+
+			builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
+			builder.sort('name');
+			builder.take(take);
+			builder.skip(skip);
+		});
+
+		nosql.exec(function(err, response) {
 
 			var data = {};
 
-			data.count = count;
-			data.items = docs;
-			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
+			data.count = response.pages.count;
+			data.items = response.pages.items;
+			data.pages = Math.floor(data.count / options.max) + (data.count % options.max ? 1 : 0);
 
 			if (data.pages === 0)
 				data.pages = 1;
@@ -105,39 +110,38 @@ NEWSCHEMA('Page').make(function(schema) {
 		// options.id {String}
 		// options.language {String}
 
-		var builder = new MongoBuilder();
+		var nosql = DB(error);
 
-		builder.where('isremoved', false);
+		nosql.select('page', 'pages').make(function(builder) {
+			builder.first();
+			builder.where('isremoved', false);
 
-		if (options.url)
-			builder.where('url', options.url);
+			if (options.url)
+				builder.where('url', options.url);
 
-		if (options.id)
-			builder.where('id', options.id);
+			if (options.id)
+				builder.where('id', options.id);
 
-		if (options.language)
-			builder.where('language', options.language);
-
-		// Gets specific document
-		builder.findOne(DB('pages'), function(err, doc) {
-			if (doc)
-				return callback(doc);
-			error.push('error-404-page');
-			callback();
+			if (options.language)
+				builder.where('language', options.language);
 		});
+
+		nosql.validate('page', 'error-404-page');
+		nosql.exec(callback, 'page');
 	});
 
 	// Removes a specific page
 	schema.setRemove(function(error, id, callback) {
 
-		var builder = new MongoBuilder();
-		builder.where('id', id);
-		builder.where('isremoved', false);
+		var nosql = DB(error);
 
-		builder.set('isremoved', true);
+		nosql.update('pages').make(function(builder) {
+			builder.set('isremoved', true);
+			builder.where('id', id);
+			builder.first();
+		});
 
-		// Updates database file
-		builder.updateOne(DB('pages'), callback);
+		nosql.exec(SUCCESS(callback));
 
 		// Refreshes internal informations e.g. sitemap
 		setTimeout(refresh, 1000);
@@ -152,7 +156,6 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (!model.name)
 			model.name = model.title;
 
-		var count = 0;
 		var isnew = false;
 
 		if (!model.id) {
@@ -175,28 +178,22 @@ NEWSCHEMA('Page').make(function(schema) {
 		model.isremoved = false;
 
 		// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
-		var builder = new MongoBuilder();
+		var nosql = DB(error);
 
-		// Callback
-		var cb = function() {
+		nosql.save('page', 'pages', isnew, function(builder, isnew) {
+			builder.set(model);
+			if (isnew)
+				return;
+			builder.where('id', model.id);
+		});
 
+		nosql.exec(function(err, response) {
 			F.emit('pages.save', model);
-
 			// Returns response
 			callback(SUCCESS(true));
 			// Refreshes internal informations e.g. sitemap
 			setTimeout(refresh, 1000);
-		};
-
-		builder.set(model);
-
-		if (isnew) {
-			builder.insert(DB('pages'), cb);
-		} else {
-			builder.where('id', model.id);
-			builder.updateOne(DB('pages'), cb);
-		}
-
+		});
 	});
 
 	schema.addWorkflow('create-url', function(error, model, options, callback) {
@@ -316,6 +313,24 @@ NEWSCHEMA('Page').make(function(schema) {
 							return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
 						});
 
+						if (response.partial && response.partial.length) {
+							schema.operation2('render-multiple', { id: response.partial }, function(err, partial) {
+
+								if (err) {
+									error.push(err);
+									return callback();
+								}
+
+								var arr = [];
+								var keys = Object.keys(partial);
+								for (var i = 0, length = keys.length; i < length; i++)
+									arr.push(partial[keys[i]]);
+								response.partial = arr;
+								callback(response);
+							});
+							return
+						}
+
 						callback(response);
 					});
 				}, true);
@@ -389,13 +404,12 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	// Clears database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		var builder = new MongoBuilder();
-
-		builder.remove(DB('pages'), function() {
+		var nosql = DB(error);
+		nosql.remove('pages');
+		nosql.exec(function(err, response) {
 			setTimeout(refresh, 1000);
+			callback(SUCCESS(true));
 		});
-
-		callback(SUCCESS(true));
 	});
 
 });
@@ -406,15 +420,24 @@ function refresh() {
 	var sitemap = {};
 	var helper = {};
 	var navigation = {};
+	var partial = [];
 
-	var builder = new MongoBuilder();
-	builder.where('isremoved', false);
-	builder.where('ispartial', false);
-	builder.fields('id', 'language', 'url', 'name', 'title', 'parent', 'language', 'icon', 'tags', 'navigations');
+	var nosql = DB();
+
+	nosql.select('pages', 'pages').make(function(builder) {
+		builder.where('isremoved', false);
+		builder.fields('id', 'language', 'url', 'name', 'title', 'parent', 'language', 'icon', 'tags', 'navigations', 'priority', 'ispartial');
+	});
 
 	var prepare = function(doc) {
 
 		var key = (doc.language ? doc.language + ':' : '') + doc.url;
+
+		// A partial content is skipped from the sitemap
+		if (doc.ispartial) {
+			partial.push({ id: doc.id, url: doc.url, name: doc.name, title: doc.title, language: doc.language, icon: doc.icon, tags: doc.tags, priority: doc.priority });
+			return;
+		}
 
 		helper[doc.id] = key;
 		sitemap[key] = { id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, language: doc.language, icon: doc.icon, tags: doc.tags };
@@ -431,7 +454,12 @@ function refresh() {
 		}
 	};
 
-	builder.find(DB('pages'), function(err, docs) {
+	nosql.exec(function(err, response) {
+
+		if (err)
+			return F.error(err);
+
+		var docs = response.pages;
 
 		for (var i = 0, length = docs.length; i < length; i++)
 			prepare(docs[i]);
@@ -452,8 +480,11 @@ function refresh() {
 			});
 		});
 
+		partial.sort((a, b) => a.priority > b.priority ? -1 : a.priority === b.priority ? 0 : 1);
+
 		F.global.navigations = navigation;
 		F.global.sitemap = sitemap;
+		F.global.partial = partial;
 	});
 }
 
@@ -539,4 +570,4 @@ F.middleware('page', function(req, res, next, options, controller) {
 	});
 });
 
-F.on('database', refresh);
+F.on('settings', refresh);

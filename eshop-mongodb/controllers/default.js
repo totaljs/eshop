@@ -1,7 +1,7 @@
 exports.install = function() {
 	// COMMON
 	F.route('/', view_homepage);
-	F.route('/contact/', view_contact);
+	F.route('#contact', view_contact);
 
 	// CMS rendering
 	F.route('/*', view_page);
@@ -26,7 +26,7 @@ function view_homepage() {
 		options.max = 12;
 		options.homepage = true;
 		GETSCHEMA('Product').query(options, function(err, response) {
-			// Finds homepage page
+			// Finds "homepage"
 			self.page('/', 'index', response, false, true);
 		});
 	});
@@ -35,7 +35,7 @@ function view_homepage() {
 // Contact with contact form
 function view_contact() {
 	var self = this;
-	self.page(self.url, 'contact');
+	self.render(self.url, 'contact');
 }
 
 // ==========================================================================
@@ -44,7 +44,8 @@ function view_contact() {
 
 function view_page() {
 	var self = this;
-	self.page(self.url);
+	// models/pages.js --> Controller.prototype.render()
+	self.render(self.url);
 }
 
 // ==========================================================================
@@ -61,7 +62,8 @@ function file_read(req, res) {
 	if (!req.query.s || (req.extension !== 'jpg' && req.extension !== 'gif' && req.extension !== 'png')) {
 		// Reads specific file by ID
 		F.exists(req, res, function(next, filename) {
-			GridStore.readFile(DB(), ObjectID.parse(id), function(err, fs, close) {
+			DB().readFile(ObjectID.parse(id), function(err, fs, close) {
+
 				if (err) {
 					next();
 					return res.throw404();
@@ -87,7 +89,7 @@ function file_read(req, res) {
 	// More information in total.js documentation
 	F.exists(req, res, 10, function(next, filename) {
 		// Reads specific file by ID
-		GridStore.readFile(DB(), ObjectID.parse(id), function(err, fs, close) {
+		DB().readFile(ObjectID.parse(id), function(err, fs, close) {
 
 			if (err) {
 				next();
@@ -119,7 +121,7 @@ function file_image(req, res) {
 	// Below method checks if the file exists (processed) in temporary directory
 	// More information in total.js documentation
 	F.exists(req, res, 10, function(next, filename) {
-		GridStore.readFile(DB(), ObjectID.parse(req.path[2].replace('.jpg', '')), function(err, fs, close) {
+		DB().readFile(ObjectID.parse(req.path[2].replace('.jpg', '')), function(err, fs, close) {
 
 			if (err) {
 				next();

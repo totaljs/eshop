@@ -260,8 +260,7 @@ function json_dashboard_clear() {
 	var self = this;
 	var instance = MODULE('webcounter').instance;
 
-	F.fs.rm.database('webcounter.nosql');
-	F.fs.rm.database('webcounter.cache');
+	// @TODO: missing remove all stats
 
 	Object.keys(instance.stats).forEach(function(key) {
 		instance.stats[key] = 0;
@@ -635,15 +634,10 @@ function json_settings_save() {
 function file_backup_website() {
 	var self = this;
 	var filename = F.path.temp('website.backup');
-	var filter = function(path) {
-		return !path.startsWith('/tmp');
-	};
 
 	F.backup(filename, F.path.root(), function() {
-		self.file('~' + filename, 'website.backup', null, function() {
-			F.fs.rm.temp('website.backup');
-		});
-	}, filter);
+		self.file('~' + filename, 'website.backup', null, () => require('fs').unlink(filename, NOOP));
+	}, path => !path.startsWith('/tmp'));
 }
 
 // ==========================================================================

@@ -18,11 +18,13 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
-		var builder = new MongoBuilder();
-		builder.where('isremoved', false);
-		builder.fields('id', 'icon', 'name', 'category', 'istemplate');
-		builder.sort('name');
-		builder.find(DB('widgets'), callback);
+		var nosql = DB(error);
+		nosql.select('widgets').make(function(builder) {
+			builder.where('isremoved', false);
+			builder.fields('id', 'icon', 'name', 'category', 'istemplate');
+			builder.sort('name');
+		});
+		nosql.exec(callback, 'widgets');
 	});
 
 	// Gets a specific widget
@@ -31,30 +33,36 @@ NEWSCHEMA('Widget').make(function(schema) {
 		// options.url {String}
 		// options.id {String}
 
-		var builder = new MongoBuilder();
-		builder.where('isremoved', false);
+		var nosql = DB(error);
 
-		if (options.url)
-			builder.where('url', options.url);
+		nosql.select('widgets', 'widgets').make(function(builder) {
+			builder.where('isremoved', false);
 
-		if (options.id)
-			builder.where('id', options.id);
+			if (options.url)
+				builder.where('url', options.url);
 
-		builder.findOne(DB('widgets'), function(err, doc) {
-			if (doc)
-				return callback(doc);
-			error.push('error-404-widget');
-			callback();
+			if (options.id)
+				builder.where('id', options.id);
+
+			builder.first();
 		});
+
+		nosql.validate('widgets', 'error-404-widget');
+		nosql.exec(callback, 'widgets');
 	});
 
-	// Removes specific widget
+	// Removes a specific widget
 	schema.setRemove(function(error, id, callback) {
-		var builder = new MongoBuilder();
-		builder.where('id', id);
-		builder.where('isremoved', false);
-		builder.set('isremoved', true);
-		builder.updateOne(DB('widgets'), callback);
+		var nosql = DB(error);
+
+		nosql.update('widgets').make(function(builder) {
+			builder.set('isremoved', true);
+			builder.where('id', id);
+			builder.where('isremoved', false);
+			builder.first();
+		});
+
+		nosql.exec(SUCCESS(callback), -1);
 	});
 
 	// Saves the widget into the database
@@ -63,7 +71,6 @@ NEWSCHEMA('Widget').make(function(schema) {
 		// options.id {String}
 		// options.url {String}
 
-		var count = 0;
 		var isnew = false;
 
 		if (!model.id) {
@@ -75,30 +82,27 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 		model.isremoved = false;
 
-		var builder = new MongoBuilder();
-		builder.set(model);
+		var nosql = DB(error);
 
-		var cb = function(err, doc) {
+		nosql.save('widgets', 'widgets', isnew, function(builder) {
+			builder.set(model);
+			if (isnew)
+				return;
+			builder.where('id', model.id);
+		});
 
+		nosql.exec(function(err, response) {
 			F.emit('widgets.save', model);
-
 			// Returns response
 			callback(SUCCESS(true));
-		};
-
-		if (isnew) {
-			builder.insert(DB('widgets'), cb);
-		} else {
-			builder.where('id', model.id);
-			builder.updateOne(DB('widgets'), cb);
-		}
+		});
 	});
 
 	// Clears widget database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		var builder = new MongoBuilder();
-		builder.remove(DB('widgets'), F.error());
-		callback(SUCCESS(true));
+		var nosql = DB(error);
+		nosql.remove('widgets');
+		nosql.exec(SUCCESS(callback));
 	});
 
 	// Loads widgets for rendering
@@ -107,23 +111,17 @@ NEWSCHEMA('Widget').make(function(schema) {
 		// widgets - contains String Array of ID widgets
 
 		var output = {};
-		var builder = new MongoBuilder();
+		var nosql = DB(error);
 
-		builder.in('id', widgets);
-		builder.where('isremoved', false);
+		nosql.select('widgets').make(function(builder) {
+			builder.in('id', widgets);
+			builder.where('isremoved', false);
+		});
 
-		var filter = function(doc) {
-			if (doc.istemplate)
-				return;
-			if (widgets.indexOf(doc.id) !== -1)
-				output[doc.id] = doc;
-		};
-
-		builder.find(DB('widgets'), function(err, docs) {
+		nosql.exec(function(err, docs) {
 			for (var i = 0, length = docs.length; i < length; i++)
 				output[docs[i].id] = docs[i];
 			callback(output);
-		});
+		}, 0);
 	});
-
 });

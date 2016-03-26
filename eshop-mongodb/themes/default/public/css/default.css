@@ -13,7 +13,7 @@ form { padding: 0; margin: 0; }
 
 .content { background-color: white; }
 
-.header-container { background-color: #E0E0E0; padding: 10px 20px; position: relative; }
+.header-container { background: #E0E0E0 linear-gradient(#F0F0F0,#E0E0E0); padding: 20px 20px 15px; position: relative; }
 .header-container hr { border-color: #D0D0D0; }
 .header-padding { margin-top: 20px; }
 .header-links-container { position: relative; }
@@ -37,6 +37,8 @@ header { padding: 40px 25px; }
 .categories span { margin-left: 5px; }
 .categories .selected { background-color: black !important; color: white; }
 .categories .fa { margin-right: 5px; }
+.categories-hide { display: none; }
+.categories-button { margin-bottom: 18px; color: black; font-weight: bold; font-family: $font; text-transform: uppercase; }
 
 .subcategories { padding: 0; margin-top: 10px; }
 .subcategories a { display: block; line-height: 16px; padding: 8px 0; background-color: #F0F0F0; text-align: center; color: gray; font-size: 14px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 15px; }
@@ -60,7 +62,7 @@ header { padding: 40px 25px; }
 
 h1, h2 { font-weight: 200; font-family: $font; margin: 0 0 30px 0; padding: 0; color: #A4A4A4; text-align: center; font-size: 40px; }
 
-.product { border-bottom: 1px solid #F0F0F0; margin-bottom: 20px; padding-bottom: 20px; }
+.product { margin-bottom: 20px; padding-bottom: 20px; }
 .product-picture { text-align: center; display: block; padding: 10px 0; }
 .product-picture img { margin: 0 auto; }
 .product-name { text-align: center; font-size: 16px; font-family: $font; display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
@@ -89,6 +91,8 @@ p { margin: 0; }
 .red { color: #D63B32; }
 .npt { padding-top: 0; }
 .npb { padding-bottom: 0; }
+.nmt { margin-top: 0; }
+.nmb { margin-bottom: 0; }
 
 .links > div { margin: 0; border-left: 1px solid #F0F0F0; border-top: 1px solid #E0E0E0; border-bottom: 1px solid #E0E0E0; padding: 0; }
 .links > div:first-child { border-left: 0; }
@@ -129,15 +133,16 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .linkbutton:hover { border-color: silver; text-decoration: none; color: black; }
 .linkbutton .fa { margin-right: 5px; }
 .linkbutton img { vertical-align: middle; margin: 1px 10px 0 0; }
+.linkbutton-small { padding: 10px 0; font-size: 16px; }
 
 .orders > div { border: 1px solid #E0E0E0; border-top: 0; padding: 10px; }
 .orders > div:first-child { border-top: 1px solid #E0E0E0; }
 .orders > div:nth-child(odd) { background-color: #F8F8F8; }
 
-.social-oauth2 div { text-align: center; margin-bottom: 25px; }
-.social-oauth2 a { display: block; background-color: #F0F0F0; padding: 40px 0; border-radius: 4px; color: gray; }
-.social-oauth2 a span { font-size: 50px; text-decoration: none; }
-.social-oauth2 b { font-size: 12px; display: block; margin: 15px 0 0 0; font-weight: normal; }
+.social-oauth2 div { text-align: center; margin-top: 20px; }
+.social-oauth2 a { display: block; background-color: #F8F8F8; padding: 10px 0; border-radius: 4px; color: gray; }
+.social-oauth2 a span { font-size: 30px; text-decoration: none; }
+.social-oauth2 b { font-size: 11px; display: block; margin: 5px 0 0 0; font-weight: normal; }
 .social-oauth2 a:hover { text-decoration: none; background-color: #36CAFD; color: white; }
 .social-oauth2 a:active { box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
 
@@ -145,7 +150,9 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .bg-smoke { background-color: #F8F8F8; }
 
 .button { padding: 20px 0; width: 100%; font-size: 16px; }
-.silver { color: silver; }
+.button-small { padding: 10px 0; font-size: 14px; }
+
+.silver { color: #A0A0A0; }
 .black { color: black; }
 .green { color: #8CC152; }
 .blue { color: #377BB5; }
@@ -158,6 +165,7 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	.xs-center { text-align: center !important; }
 	.categories { display: none; }
 	.categories a { margin-bottom: 10px; }
+	.categories-hide { display: block; }
 	.header-padding { padding: 0; }
 	.header-links-container { display: none; }
 	h1, h2 { font-size: 25px; }
@@ -186,4 +194,5 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	.table-responsive .ui-center { text-align: left !important; }
 	.table-repsonsive-label { display: block; }
 	td.hidden-xs { display: none !important; }
+	.product { border-bottom: 1px solid #F0F0F0; }
 }

@@ -109,7 +109,7 @@ NEWSCHEMA('User').make(function(schema) {
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
 		var sql = DB(error);
-		sql.remove('tbl_page');
+		sql.remove('tbl_user');
 		sql.exec(function() {
 			callback(SUCCESS(true));
 		});
@@ -415,15 +415,15 @@ F.onAuthorize = function(req, res, flags, callback) {
 			return;
 		}
 
-		var nosql = DB();
+		var sql = DB();
 
-		nosql.update('tbl_user').make(function(builder) {
+		sql.update('tbl_user').make(function(builder) {
 			builder.inc('countlogin');
 			builder.set('datelogged', new Date());
 			builder.where('id', response.id);
 		});
 
-		nosql.exec(F.error());
+		sql.exec(F.error());
 
 		req.user = exports.createSession(response);
 		res.cookie(COOKIE, F.encrypt({ id: response.id, ip: req.ip }, SECRET, true), '6 days');

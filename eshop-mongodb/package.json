@@ -1,11 +1,11 @@
 {
   "name": "Eshop",
   "description": "Simple and powerful eshop solution written in total.js / node.js.",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "main": "release.js",
   "dependencies": {
     "paypal-express-checkout": "latest",
-    "mongobuilder": "latest",
+    "sqlagent": "latest",
     "mongodb": "latest",
     "total.js": "latest"
   },

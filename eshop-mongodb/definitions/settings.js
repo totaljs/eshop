@@ -1,6 +1,6 @@
 // Reads custom settings
 F.on('database', function() {
-	GETSCHEMA('Settings').workflow('load', null, null, NOOP, true);
+	GETSCHEMA('Settings').workflow2('load');
 });
 
 // Disables analytic counter for administraion / manager

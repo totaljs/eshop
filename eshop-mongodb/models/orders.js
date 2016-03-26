@@ -19,6 +19,7 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('lastname', 'String(40)', true);
 	schema.define('email', 'String(200)', true);
 	schema.define('phone', 'String(20)');
+	schema.define('language', 'String(3)');
 	schema.define('address', 'String(1000)', true);
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');
@@ -65,39 +66,41 @@ NEWSCHEMA('Order').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var type = U.parseInt(options.type);
 
-		var builder = new MongoBuilder();
+		var nosql = DB(error);
 
-		builder.where('isremoved', false);
+		nosql.listing('orders', 'orders').make(function(builder) {
+			builder.where('isremoved', false);
 
-		if (type === 1)
-			builder.where('iscompleted', false); // uncompleted
-		else if (type === 2)
-			builder.or().where('iscompleted', false).where('ispaid', false).end(); // uncompleted and not paid
-		else if (type === 3)
-			builder.or().where('iscompleted', false).where('ispaid', true).end(); // uncompleted and paid
-		else if (type === 4)
-			builder.where('iscompleted', true); // completed
+			if (type === 1)
+				builder.where('iscompleted', false); // uncompleted
+			else if (type === 2)
+				builder.or().where('iscompleted', false).where('ispaid', false).end(); // uncompleted and not paid
+			else if (type === 3)
+				builder.or().where('iscompleted', false).where('ispaid', true).end(); // uncompleted and paid
+			else if (type === 4)
+				builder.where('iscompleted', true); // completed
 
-		if (options.delivery)
-			builder.where('delivery', delivery); // by delivery
+			if (options.delivery)
+				builder.where('delivery', delivery); // by delivery
 
-		if (options.search)
-			builder.in('search', options.search.keywords(true, true));
+			if (options.search)
+				builder.in('search', options.search.keywords(true, true));
 
-		if (options.iduser)
-			builder.where('iduser', options.iduser);
+			if (options.iduser)
+				builder.where('iduser', options.iduser);
 
-		builder.sort('_id', true);
-		builder.take(take);
-		builder.skip(skip);
+			builder.sort('_id', true);
+			builder.take(take);
+			builder.skip(skip);
+		});
 
-		builder.findCount(DB('orders'), function(err, docs, count) {
+		nosql.exec(function(err, response) {
 
 			var data = {};
 
-			data.count = count;
-			data.items = docs;
-			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
+			data.count = response.orders.count;
+			data.items = response.orders.items;
+			data.pages = Math.floor(data.count / options.max) + (data.count % options.max ? 1 : 0);
 
 			if (data.pages === 0)
 				data.pages = 1;
@@ -106,7 +109,6 @@ NEWSCHEMA('Order').make(function(schema) {
 
 			// Returns data
 			callback(data);
-
 		});
 	});
 
@@ -140,12 +142,13 @@ NEWSCHEMA('Order').make(function(schema) {
 		delete model.isterms;
 		delete model.isemail;
 
-		var builder = new MongoBuilder();
+		var nosql = DB(error);
 
-		builder.set(model.$clean());
+		nosql.insert('orders').make(function(builder) {
+			builder.set(model.$clean());
+		});
 
-		// Inserts order into the database
-		builder.insert(DB('orders'), F.error());
+		nosql.exec(F.error());
 
 		// Returns response with order id
 		callback(SUCCESS(true, model.id));
@@ -154,22 +157,24 @@ NEWSCHEMA('Order').make(function(schema) {
 		MODULE('webcounter').increment('orders');
 
 		// Sends email
-		var mail = F.mail(model.email, 'Order # ' + model.id, '=?/mails/order', model);
+		var mail = F.mail(model.email, '@(Order #) ' + model.id, '=?/mails/order', model, model.language || '');
 		mail.bcc(F.config.custom.emailorderform);
 	});
 
 	// Gets a specific order
 	schema.setGet(function(error, model, options, callback) {
 		// options.id {String}
-		var builder = new MongoBuilder();
-		builder.where('id', options.id);
-		builder.where('isremoved', false);
-		builder.findOne(DB('orders'), function(err, doc) {
-			if (doc)
-				return callback(doc);
-			error.push('error-404-order');
-			callback();
+
+		var nosql = DB(error);
+
+		nosql.select('order', 'orders').make(function(builder) {
+			builder.where('id', options.id);
+			builder.where('isremoved', false);
+			builder.first();
 		});
+
+		nosql.validate('order', 'error-404-order')
+		nosql.exec(callback, 'order');
 	});
 
 	// Saves the order into the database
@@ -191,14 +196,18 @@ NEWSCHEMA('Order').make(function(schema) {
 		if (model.ispaid && !model.datepaid)
 			model.datepaid = new Date();
 
-		var builder = new MongoBuilder();
-		builder.set(model);
-		builder.where('id', model.id);
+		var nosql = DB(error);
 
-		// Update order in database
-		builder.updateOne(DB('orders'), function() {
+		nosql.update('order', 'orders').make(function(builder) {
+			builder.set(model.$clean());
+			builder.where('id', model.id);
+			builder.first();
+		});
 
-			F.emit('orders.save', model);
+		nosql.exec(function(err) {
+
+			if (!err)
+				F.emit('orders.save', model);
 
 			// Returns response
 			callback(SUCCESS(true));
@@ -208,24 +217,29 @@ NEWSCHEMA('Order').make(function(schema) {
 			return;
 
 		// Sends email
-		var mail = F.mail(model.email, 'Order (update) # ' + model.id, '=?/mails/order-status', model);
+		var mail = F.mail(model.email, '@(Order (update) #) ' + model.id, '=?/mails/order-status', model, model.language || '');
 		mail.bcc(F.config.custom.emailorderform);
 	});
 
 	// Removes order from DB
 	schema.setRemove(function(error, id, callback) {
-		var builder = new MongoBuilder();
-		builder.where('id', id);
-		builder.where('isremoved', false);
-		builder.set('isremoved', true);
-		builder.updateOne(DB('orders'), callback);
+		var nosql = DB(error);
+
+		nosql.update('orders').make(function(builder) {
+			builder.where('id', id);
+			builder.where('isremoved', false);
+			builder.set('isremoved', true);
+			builder.first();
+		});
+
+		nosql.exec(SUCCESS(callback), -1);
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		var builder = MongoBuilder();
-		builder.remove(DB('orders'), F.error());
-		callback(SUCCESS(true));
+		var nosql = DB(error);
+		nosql.remove('orders');
+		nosql.exec(SUCCESS(callback), -1);
 	});
 
 	// Gets some stats from orders for Dashboard
@@ -238,14 +252,31 @@ NEWSCHEMA('Order').make(function(schema) {
 		stats.pending = 0;
 		stats.pending_price = 0;
 
-		var builder = new MongoBuilder();
-		builder.where('isremoved', false);
-		builder.group('_id.iscompleted', 'sum.$sum.price');
-		builder.group('_id.iscompleted', 'count.$sum.1');
-		builder.aggregate(DB('orders'), function(err, res) {
+		var nosql = DB(error);
 
-			for (var i = 0, length = res.length; i < length; i++) {
-				var agg = res[i];
+		nosql.push('orders', 'orders', function(collection, callback) {
+
+			// groupping
+			var $group = {};
+			$group._id = {};
+			$group._id = '$iscompleted';
+			$group.sum = { $sum: '$price' };
+			$group.count = { $sum: 1 };
+
+			// filter
+			var $match = {};
+			$match.isremoved = false;
+
+			var pipeline = [];
+			pipeline.push({ $match: $match });
+			pipeline.push({ $group: $group });
+
+			collection.aggregate(pipeline, callback);
+		});
+
+		nosql.exec(function(err, response) {
+			for (var i = 0, length = response.orders.length; i < length; i++) {
+				var agg = response.orders[i];
 				if (agg._id) {
 					stats.completed = agg.count;
 					stats.completed_price = agg.sum;
@@ -261,13 +292,18 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Sets the payment status to paid
 	schema.addWorkflow('paid', function(error, model, id, callback) {
-		var builder = new MongoBuilder();
-		builder.where('id', id);
-		builder.where('isremoved', false);
-		builder.where('ispaid', false);
-		builder.set('ispaid', true);
-		builder.set('datepaid', new Date());
-		builder.updateOne(DB('orders'), callback);
+		var nosql = DB(error);
+
+		nosql.udpate('orders').make(function(builder) {
+			builder.where('id', id);
+			builder.where('isremoved', false);
+			builder.where('ispaid', false);
+			builder.set('ispaid', true);
+			builder.set('datepaid', new Date());
+			builder.first();
+		});
+
+		nosql.exec(SUCCESS(callback), -1);
 	});
 
 });

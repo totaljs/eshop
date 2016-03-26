@@ -1,5 +1,6 @@
 @{title('@(Order) # ' + model.id)}
-@{sitemap('#order')}
+@{sitemap('order')}
+@{sitemap_change('order', 'url', url)}
 
 @{if query.success === '1' && !model.ispaid}
 	<div class="message-success"><span class="fa fa-check-circle"></span> @(Many thanks for the order. <b>Your order has been created successfully.</b>.)</div>
@@ -21,7 +22,7 @@
 			</div>
 			<hr />
 			@{if !model.iscompleted}
-			<div><a href="/contact/?orderid=@{model.id}#contactform">@(Do you want to <b>cancel this order</b>?)</a></div>
+			<div><a href="@{sitemap_url('contact')}?orderid=@{model.id}#contactform">@(Do you want to <b>cancel this order</b>?)</a></div>
 			@{fi}
 			<br />
 			<table class="table table-bordered table-responsive" border="0">
@@ -136,7 +137,7 @@
 	<div class="row">
 		<div class="col-md-3"></div>
 		<div class="col-md-6">
-			<a href="/shop/" class="linkbutton"><span class="fa fa-shopping-cart"></span> @(Buy other products)</a>
+			<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-shopping-cart"></span> @(Buy other products)</a>
 		</div>
 	</div>
 	<br />

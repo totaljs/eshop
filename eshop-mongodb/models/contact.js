@@ -17,21 +17,17 @@ NEWSCHEMA('Contact').make(function(schema) {
 		model.id = U.GUID(10);
 		model.datecreated = new Date();
 
-		var builder = new MongoBuilder();
-
-		builder.set(model);
-		builder.insert(DB('contactforms'));
+		var nosql = DB(error);
+		nosql.insert('contactforms').set(model);
+		nosql.exec(SUCCESS(callback), -1);
 
 		F.emit('contact.save', model);
-
-		// Returns response
-		callback(SUCCESS(true));
 
 		// Writes stats
 		MODULE('webcounter').increment('contactforms');
 
 		// Sends email
-		var mail = F.mail(F.config.custom.emailcontactform, 'Contact form # ' + model.id, '=?/mails/contact', model, model.language);
+		var mail = F.mail(F.config.custom.emailcontactform, '@(Contact form #) ' + model.id, '=?/mails/contact', model, model.language || '');
 		mail.reply(model.email, true);
 	});
 });

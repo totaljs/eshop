@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>EMAIL</title>
-    <meta charset="utf-8" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="viewport" content="width=660, initial-scale=1" />
+	<title>EMAIL</title>
+	<meta charset="utf-8" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="format-detection" content="date=no" />
+	<meta name="format-detection" content="address=no" />
+	<meta name="format-detection" content="email=no" />
+	<style type="text/css">
+		* { font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; margin:0; padding:0; }
+		body { -webkit-font-smoothing: antialiased; -webkit-text-size-adjust:none; height: 100%; background-color: white; }
+	</style>
 </head>
 <body style="background-color:#F0F0F0;padding:20px;font-family:Arial;font-size:14px;margin:0">
-    <br />
-    <div style="margin:0 auto;max-width:600px;text-align:center"><a href="@{config.custom.url}"><img src="@{config.custom.url}/img/logo.png" alt="Eshop" border="0" /></a></div>
-    <br />
-    <div style="margin:0 auto;max-width:580px;padding:30px;background-color:white;border-radius:4px;color:#656D78;line-height:18px">
-        @{body}
-    </div>
-    <div style="text-align:center;font-size:11px;margin:15px 0 0;color:#505050">&copy; 2015 @{config.name}</div>
+	<table align="center" style="margin:0 auto;max-width:600px">
+		<tr>
+			<td>
+				<div style="margin:10px 0 30px"><a href="@{config.custom.url}"><img src="@{config.custom.url}/img/logo.png" alt="@{config.name}" border="0" /></a></div>
+				<div style="padding:30px;background-color:white;border-radius:4px;color:gray;line-height:18px">
+					@{body}
+				</div>
+				<div style="text-align:center;font-size:11px;margin:15px 0 0;color:gray">&copy; 2015-2016 @{config.name}</div>
+			</td>
+		</tr>
+	</table>
 </body>
 </html>

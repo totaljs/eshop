@@ -165,8 +165,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (model.datecreated)
 			model.datecreated = model.datecreated.format();
 
-		if (model.search)
-			model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).toSearch();
+		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).toSearch();
 
 		// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
 		var clean = model.$clean();

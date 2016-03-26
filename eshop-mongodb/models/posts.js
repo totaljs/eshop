@@ -42,43 +42,38 @@ NEWSCHEMA('Post').make(function(schema) {
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
 
-		var sql = DB(error);
-		var filter = sql.$;
+		var nosql = DB(error);
 
-		filter.where('isremoved', false);
+		nosql.listing('posts', 'posts').make(function(builder) {
 
-		// Prepares searching
-		if (typeof(options.search) === 'string')
-			filter.like('search', options.search, '*');
+			builder.where('isremoved', false);
 
-		// Checks language
-		if (options.language)
-			filter.where('language', options.language);
+			// Prepares searching
+			if (typeof(options.search) === 'string')
+				builder.like('search', options.search, '*');
 
-		if (options.category)
-			filter.where('category_linker', options.category.slug());
+			// Checks language
+			if (options.language)
+				builder.where('language', options.language);
 
-		sql.select('items', 'tbl_post').make(function(builder) {
-			builder.replace(filter);
+			if (options.category)
+				builder.where('category_linker', options.category.slug());
+
 			builder.fields('id', 'name', 'category', 'language', 'datecreated', 'linker', 'category_linker', 'pictures', 'perex', 'tags');
-			builder.sort('datecreated', true);
+			builder.sort('_id', true);
 			builder.skip(skip);
 			builder.take(take);
 		});
 
-		sql.count('count', 'tbl_post', 'id').make(function(builder) {
-			builder.replace(filter);
-		});
-
-		sql.exec(function(err, response) {
+		nosql.exec(function(err, response) {
 
 			if (err)
 				return callback();
 
 			var data = {};
-			data.count = response.count;
-			data.items = response.items;
-			data.pages = Math.ceil(response.count / options.max);
+			data.count = response.posts.count;
+			data.items = response.posts.items;
+			data.pages = Math.ceil(data.count / options.max);
 
 			if (!data.pages)
 				data.pages = 1;
@@ -99,9 +94,9 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (options.category)
 			options.category = options.category.slug();
 
-		var sql = DB(error);
+		var noql = DB(error);
 
-		sql.select('post', 'tbl_post').make(function(builder) {
+		noql.select('post', 'posts').make(function(builder) {
 			builder.where('isremoved', false);
 			if (options.category)
 				builder.where('category_linker', options.category);
@@ -114,9 +109,9 @@ NEWSCHEMA('Post').make(function(schema) {
 			builder.first();
 		});
 
-		sql.validate('post', 'error-404-post');
+		noql.validate('post', 'error-404-post');
 
-		sql.exec(function(err, response) {
+		noql.exec(function(err, response) {
 			if (err)
 				return callback();
 			callback(response.post);
@@ -126,15 +121,15 @@ NEWSCHEMA('Post').make(function(schema) {
 	// Removes a specific blog
 	schema.setRemove(function(error, id, callback) {
 
-		var sql = DB(error);
+		var noql = DB(error);
 
-		sql.update('tbl_post').make(function(builder) {
+		noql.update('posts').make(function(builder) {
 			builder.set('isremoved', true);
 			builder.where('isremoved', false);
 			builder.where('id', id);
 		});
 
-		sql.exec(SUCCESS(callback), -1);
+		noql.exec(SUCCESS(callback), -1);
 
 		// Refreshes internal informations e.g. sitemap
 		setTimeout(refresh, 1000);
@@ -154,6 +149,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		}
 
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
+		model.isremoved = false;
 
 		var category = F.global.posts.find('name', model.category);
 		if (category)
@@ -161,18 +157,15 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ');
 
-		model.tags = model.tags.join(';');
-		model.pictures = model.pictures.join(';');
+		var nosql = DB(error);
 
-		var sql = DB(error);
-
-		sql.save('tbl_post', newbie, function(builder) {
+		nosql.save('posts', newbie, function(builder) {
 			builder.set(model);
 			if (!newbie)
 				builder.set('dateupdated', new Date());
 		});
 
-		sql.exec(function(err, response) {
+		nosql.exec(function(err, response) {
 
 			// Returns response
 			callback(SUCCESS(true));
@@ -189,9 +182,9 @@ NEWSCHEMA('Post').make(function(schema) {
 
 	// Clears database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		var sql = DB(error);
-		sql.remove('tbl_post');
-		sql.exec(function(err) {
+		var nosql = DB(error);
+		nosql.remove('posts');
+		nosql.exec(function(err) {
 			callback();
 			if (err)
 				setTimeout(refresh, 1000);
@@ -210,19 +203,33 @@ function refresh() {
 		});
 	}
 
-	var sql = DB();
+	var nosql = DB();
 
-	sql.query('SELECT category, COUNT(id) as count FROM tbl_post').make(function(builder) {
-		builder.group('category');
-		builder.where('isremoved', false);
+	nosql.push('posts', 'posts', function(collection, callback) {
+
+		// groupping
+		var $group = {};
+		$group._id = {};
+		$group._id = '$category';
+		$group.count = { $sum: 1 };
+
+		// filter
+		var $match = {};
+		$match.isremoved = false;
+
+		var pipeline = [];
+		pipeline.push({ $match: $match });
+		pipeline.push({ $group: $group });
+
+		collection.aggregate(pipeline, callback);
 	});
 
-	sql.exec(function(err, response) {
+	nosql.exec(function(err, response) {
 
 		var output = [];
 
-		response[0].forEach(function(item) {
-			var category = categories[item.category];
+		response.posts.forEach(function(item) {
+			var category = categories[item._id];
 			if (category)
 				category.count += item.count;
 		});

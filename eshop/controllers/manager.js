@@ -614,15 +614,9 @@ function json_settings_save() {
 function file_backup_website() {
 	var self = this;
 	var filename = F.path.temp('website.backup');
-	var filter = function(path) {
-		return !path.startsWith('/tmp');
-	};
-
 	F.backup(filename, F.path.root(), function() {
-		self.file('~' + filename, 'website.backup', null, function() {
-			F.fs.rm.temp('website.backup');
-		});
-	}, filter);
+		self.file('~' + filename, 'website.backup', null, () => require('fs').unlink(filename, NOOP));
+	}, path => !path.startsWith('/tmp'));
 }
 
 // Backup databases
@@ -630,9 +624,7 @@ function file_backup_database() {
 	var self = this;
 	var filename = F.path.temp('databases.backup');
 	F.backup(filename, F.path.databases(), function() {
-		self.file('~' + filename, 'databases.backup', null, function() {
-			F.fs.rm.temp('databases.backup');
-		});
+		self.file('~' + filename, 'databases.backup', null, () => require('fs').unlink(filename, NOOP));
 	});
 }
 

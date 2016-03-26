@@ -20,6 +20,7 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('email', 'String(200)', true);
 	schema.define('phone', 'String(20)');
 	schema.define('address', 'String(1000)', true);
+	schema.define('language', 'String(3)');
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');
 	schema.define('ip', 'String(80)');
@@ -188,7 +189,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			MODULE('webcounter').increment('orders');
 
 			// Sends email
-			var mail = F.mail(model.email, 'Order # ' + model.id, '=?/mails/order', model);
+			var mail = F.mail(model.email, '@(Order #) ' + model.id, '=?/mails/order', model, model.language || '');
 			mail.bcc(F.config.custom.emailorderform);
 		});
 	});
@@ -275,7 +276,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			return;
 
 		// Sends email
-		var mail = F.mail(model.email, 'Order (update) # ' + model.id, '=?/mails/order-status', model);
+		var mail = F.mail(model.email, '@(Order (update) #) ' + model.id, '=?/mails/order-status', model, model.language || '');
 		mail.bcc(F.config.custom.emailorderform);
 	});
 

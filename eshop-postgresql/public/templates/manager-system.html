@@ -8,8 +8,21 @@
 	<br />
 	<table class="table table-bordered">
 		<tr>
+			<td><span class="fa fa-cloud-download mr5"></span> @(Backup databases + settings)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_backup_database">@(Backup now)</a></td>
+		</tr>
+		<tr>
 			<td><span class="fa fa-cloud-download mr5"></span> @(Backup full website)</td>
 			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_backup_website">@(Backup now)</a></td>
+		</tr>
+	</table>
+	<br />
+	<div class="b">@(Restoring)</div>
+	<br />
+	<table class="table table-bordered">
+		<tr>
+			<td><span class="fa fa-refresh mr5"></span> @(Restore databases + settings)</td>
+			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_restore_database">@(Restore now)</a></td>
 		</tr>
 	</table>
 	<br />

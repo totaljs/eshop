@@ -7,7 +7,7 @@ var COOKIE = '__webcounter';
 var REG_ROBOT = /search|agent|bot|crawler/i;
 var TIMEOUT_VISITORS = 1200; // 20 MINUTES
 
-require('mongobuilder');
+require('sqlagent');
 
 function WebCounter() {
 	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0, robots: 0 };
@@ -281,11 +281,28 @@ WebCounter.prototype.save = function() {
 	var self = this;
 	var id = (F.id === null ? '0' : F.id.toString()) + '-cache';
 	self.stats.pages = self.stats.hits && self.stats.count ? (self.stats.hits / self.stats.count).floor(2) : 0;
-	var builder = new MongoBuilder();
-	builder.set(self.stats);
-	builder.set('_id', id);
-	builder.save(DB('stats'));
-	delete self.stats.pages;
+
+	var nosql = DB();
+
+	nosql.update('update', 'stats').make(function(builder) {
+		builder.set(self.stats);
+		builder.where('_id', id);
+		builder.first();
+	});
+
+	nosql.ifnot('update', function() {
+		nosql.insert('stats').make(function(builder) {
+			builder.replace(nosql.builder('update'), true);
+			builder.set('_id', id);
+		});
+	});
+
+	nosql.exec(function(err) {
+		if (err)
+			F.error(err);
+		delete self.stats.pages;
+	});
+
 	return self;
 };
 
@@ -296,13 +313,21 @@ WebCounter.prototype.save = function() {
 WebCounter.prototype.load = function() {
 	var self = this;
 	var id = (F.id === null ? '0' : F.id.toString()) + '-cache';
-	var builder = new MongoBuilder();
-	builder.where('_id', id);
-	builder.findOne(DB('stats'), function(err, data) {
-		F.error(err);
-		if (data)
-			self.stats = data;
+
+	var nosql = DB();
+
+	nosql.select('stats', 'stats').make(function(builder) {
+		builder.where('_id', id);
+		builder.first();
 	});
+
+	nosql.exec(function(err, response) {
+		if (err)
+			F.error(err);
+		if (response.stats)
+			self.stats = response.stats;
+	});
+
 	return self;
 };
 
@@ -312,17 +337,23 @@ WebCounter.prototype.load = function() {
  */
 WebCounter.prototype.append = function() {
 	var self = this;
-	var builder = new MongoBuilder();
 	var id = (self.stats.year + '' + self.stats.month.padLeft(2) + '' + self.stats.day.padLeft(2)).parseInt();
-	builder.inc(self.stats);
-	builder.where('_id', id);
-	builder.updateOne(DB('stats'), function(err, response) {
-		F.error(err);
-		if (response)
-			return;
-		builder.set('_id', id);
-		builder.insert(DB('stats'), F.error());
+	var nosql = DB();
+
+	nosql.update('update', 'stats').make(function(builder) {
+		builder.inc(self.stats);
+		builder.where('_id', id);
+		builder.first();
 	});
+
+	nosql.ifnot('update', function(error, response) {
+		nosql.insert('stats').make(function(builder) {
+			builder.replace(nosql.builder('update'), true);
+			builder.set('_id', id);
+		});
+	});
+
+	nosql.exec(F.error());
 	return self;
 };
 
@@ -388,11 +419,18 @@ WebCounter.prototype.yearly = function(callback) {
  */
 WebCounter.prototype.statistics = function(callback) {
 	var self = this;
-	var builder = new MongoBuilder();
-	builder.where('_id', '>', 0);
-	builder.find(DB('stats'), function(err, response) {
-		callback(response);
+	var nosql = DB();
+
+	nosql.select('stats').make(function(builder) {
+		builder.where('_id', '>', 0);
 	});
+
+	nosql.exec(function(err, response) {
+		if (err)
+			F.error(err);
+		callback(response[0]);
+	});
+
 	return self;
 };
 

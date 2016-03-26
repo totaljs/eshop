@@ -1,8 +1,10 @@
+const COOKIE = '__user';
+const SECRET = 'total2016eshop';
+
 var online = {};
-var COOKIE = '__user';
 
 exports.login = function(req, res, id) {
-	res.cookie(COOKIE, F.encrypt({ id: id, ip: req.ip }, CONFIG('secret'), true), '6 days');
+	res.cookie(COOKIE, F.encrypt({ id: id, ip: req.ip }, SECRET, true), '6 days');
 };
 
 exports.logoff = function(req, res, user) {
@@ -11,7 +13,7 @@ exports.logoff = function(req, res, user) {
 };
 
 exports.createSession = function(profile) {
-	online[profile.id] = { id: profile.id, name: profile.name, ticks: new Date().add('30 minutes').getTime() };
+	online[profile.id] = { id: profile.id, name: profile.name, email: profile.email, ticks: new Date().add('30 minutes').getTime() };
 	return online[profile.id];
 };
 
@@ -28,59 +30,86 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('idyahoo', 'String(30)');
 	schema.define('idlive', 'String(30)');
 	schema.define('ip', 'String(80)');
+	schema.define('search', 'String(80)');
+	schema.define('firstname', 'String(50)');
+	schema.define('lastname', 'String(50)');
 	schema.define('name', 'String(50)', true);
 	schema.define('email', 'String(200)');
 	schema.define('gender', 'String(20)');
-	schema.define('isblocked', Boolean);
 	schema.define('datecreated', Date);
+	schema.define('isblocked', Boolean);
 
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
+
 		// options.id {String}
-		var builder = new MongoBuilder();
-		builder.where('id', options.id);
-		builder.where('isremoved', false);
-		builder.findOne(DB('users'), function(err, doc) {
-			if (doc)
-				return callback(doc);
-			error.push('error-404-user');
-			callback(doc);
+
+		var nosql = DB(error);
+
+		nosql.select('item', 'users').make(function(builder) {
+			builder.where('isremoved', false);
+
+			if (options.email)
+				builder.where('email', options.email);
+			if (options.password)
+				builder.where('password', options.password);
+			if (options.id)
+				builder.where('id', options.id);
+
+			builder.first();
 		});
+
+		nosql.validate('item', 'error-404-user');
+		nosql.exec(callback, 'item');
 	});
 
 	schema.setSave(function(error, model, options, callback) {
 
-		model.dateupdated = new Date();
-		model.search = (model.name + ' ' + model.email).keywords(true, true);
+		var nosql = DB(error);
+		var newbie = model.id ? false : true;
 
-		var builder = new MongoBuilder();
-		builder.where('id', model.id);
-		builder.set('isremoved', false);
-		builder.set(model);
+		if (!model.id)
+			model.id = U.GUID(10);
 
-		builder.updateOne(DB('users'), function() {
+		model.search = (model.name + ' ' + (model.email || '')).toSearch().max(80);
+		model.isremoved = false;
+
+		nosql.save('item', 'users', newbie, function(builder, newbie) {
+			builder.set(model);
+			if (newbie)
+				return;
+			builder.rem('id');
+			builder.rem('datecreated');
+			builder.where('id', model.id);
+		});
+
+		nosql.exec(function() {
 
 			F.emit('users.save', model);
 
 			// Returns response
-			callback(SUCCESS(true));
+			callback(SUCCESS(true, model.id));
 		});
 	});
 
 	// Removes user from DB
 	schema.setRemove(function(error, id, callback) {
-		var builder = new MongoBuilder();
-		builder.where('id', id);
-		builder.where('isremoved', false);
-		builder.set('isremoved', true);
-		builder.removeOne(DB('users'), callback);
+
+		var nosql = DB(error);
+
+		nosql.update('item', 'users').make(function(builder) {
+			builder.where('id', id);
+			builder.set('isremoved', true);
+		});
+
+		sql.exec(SUCCESS(callback), -1);
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		var builder = new MongoBuilder();
-		builder.remove(DB('users'), F.error());
-		callback(SUCCESS(true));
+		var nosql = DB(error);
+		nosql.remove('users');
+		nosql.exec(SUCCESS(callback), -1);
 	});
 
 	// Sets default values
@@ -108,29 +137,37 @@ NEWSCHEMA('User').make(function(schema) {
 
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
-		var builder = new MongoBuilder();
 
-		builder.where('isremoved', false);
+		var nosql = DB(error);
 
-		if (options.search)
-			builder.in('search', options.search.keywords(true, true));
+		nosql.listing('users', 'users').make(function(builder) {
 
-		builder.sort('_id', true);
-		builder.findCount(DB('users'), function(err, docs, count) {
+			builder.where('isremoved', false);
+
+			if (options.search)
+				builder.like('search', options.search.toSearch(), '*');
+
+			builder.sort('datecreated', true);
+			builder.skip(skip);
+			builder.take(take);
+		});
+
+		nosql.exec(function(err, response) {
+
+			if (err)
+				return callback();
+
 			var data = {};
-
-			data.count = count;
-			data.items = docs;
-			data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
+			data.count = response.users.count;
+			data.items = response.users.items;
+			data.pages = Math.ceil(data.count / options.max);
 
 			if (data.pages === 0)
 				data.pages = 1;
 
 			data.page = options.page + 1;
-
-			// Returns data
 			callback(data);
-		}, skip, take);
+		});
 	});
 
 	schema.addWorkflow('login', function(error, model, options, callback) {
@@ -140,109 +177,176 @@ NEWSCHEMA('User').make(function(schema) {
 		// options.type
 
 		var id = 'id' + options.type;
-		var builder = new MongoBuilder();
+		var nosql = DB(error);
 
-		builder.where('isremoved', false);
+		nosql.select('user', 'users').make(function(builder) {
+			builder.where('isremoved', false);
 
-		var or = builder.or();
-		or.where(id, options.profile[id]);
-		or.where('email', options.profile.email);
-		or.end();
+			builder.scope(function() {
+				builder.where(id, options.profile[id]);
+				if (!options.profile.email)
+					return;
+				builder.or();
+				builder.where('email', options.profile.email);
+			});
 
-		builder.findOne(DB('users'), function(err, doc) {
+			builder.first();
+		});
 
-			if (!doc) {
+		nosql.prepare(function(error, response, resume) {
 
-				// new user
-				doc = schema.create();
-				doc.name = options.profile.name;
-				doc.email = options.profile.email;
-				doc.gender = options.profile.gender;
-				doc.ip = options.profile.ip;
-				doc.isremoved = false;
-				doc.search = (doc.name + ' ' + doc.email).keywords(true, true);
-				doc[id] = options.profile[id];
+			if (response.user) {
+				if (response.user[id] !== options.profile[id]) {
+					nosql.update('users').make(function(builder) {
+						builder.set(id, options.profile[id]);
+						builder.where('id', response.user.id);
+					});
+				}
+			} else {
+				response.user = schema.create();
+				response.user.name = options.profile.name;
+				response.user.email = options.profile.email;
+				response.user.gender = options.profile.gender;
+				response.user.firstname = options.profile.firstname;
+				response.user.lastname = options.profile.lastname;
+				response.user.ip = options.profile.ip;
+				response.user.search = (options.profile.name + ' ' + (options.profile.email || '')).toSearch().max(80);
+				response.user[id] = options.profile[id];
 
-				builder = new MongoBuilder();
-				builder.set(doc);
-				builder.insert(DB('users'), F.error());
+				// Inserts new user
+				nosql.insert('users').set(response.user);
 
 				// Writes stats
 				MODULE('webcounter').increment('users');
-
-			} else {
-				if (doc[id] !== options.profile[id]) {
-					var builder = new MongoBuilder();
-					builder.where('id', doc.id);
-					builder.set(id, options.profile[id]);
-					builder.updateOne(DB('users'), F.error());
-				}
 			}
 
-			if (doc.isblocked) {
-				error.push('error-user-blocked');
-				return callback();
+			resume();
+		});
+
+		nosql.exec(function(err, response) {
+
+			if (response.user) {
+				exports.login(options.controller.req, options.controller.res, response.user.id);
+				options.controller.req.user = exports.createSession(response.user);
 			}
 
-			exports.login(options.controller.req, options.controller.res, doc.id);
-			options.controller.req.user = exports.createSession(doc);
-
-			callback(doc);
+			callback(response.user);
 		});
 	});
 });
 
-// Rewrites framework authorization
-F.onAuthorize = function(req, res, flags, callback) {
+NEWSCHEMA('UserLogin').make(function(schema) {
 
-	var hash = req.cookie(COOKIE);
+	schema.define('email', 'String(200)', true);
+	schema.define('password', 'String(30)', true);
 
-	if (!hash || hash.length < 20) {
-		callback(false);
-		return;
-	}
-
-	var fn_clean_cookie = function() {
-		res.cookie(COOKIE, '', new Date().add('-1 day'));
-		callback(false);
-	};
-
-	var user = F.decrypt(hash, CONFIG('secret'), true);
-
-	if (!user)
-		return fn_clean_cookie();
-
-	if (user.ip !== req.ip) {
-		fn_clean_cookie();
-		return;
-	}
-
-	var session = online[user.id];
-	if (session) {
-		req.user = session;
-		session.ticks = new Date().add('30 minutes').getTime();
-		callback(true);
-		return;
-	}
-
-	GETSCHEMA('User').get(user, function(err, response) {
-
-		if (err || !response) {
-			callback(false);
-			return;
-		}
-
-		if (response.isblocked) {
-			callback(false);
-			return;
-		}
-
-		req.user = exports.createSession(response);
-		res.cookie(COOKIE, F.encrypt({ id: response.id, ip: req.ip }, CONFIG('secret'), true), '6 days');
-		callback(true);
+	schema.setPrepare(function(name, value) {
+		if (name === 'email')
+			return value.toLowerCase();
+		if (name === 'password')
+			return value.hash('sha1');
+		return value;
 	});
 
-};
+	schema.addWorkflow('exec', function(error, model, options, callback) {
+
+		// options.controller
+
+		GETSCHEMA('User').get(model, function(err, response) {
+
+			if (err) {
+				error.push(err);
+				return callback();
+			}
+
+			if (response.isblocked) {
+				error.push('error-user-blocked');
+				return callback();
+			}
+
+			exports.login(options.controller.req, options.controller.res, response.id);
+			callback(SUCCESS(true));
+		});
+	});
+});
+
+NEWSCHEMA('UserPassword').make(function(schema) {
+	schema.define('email', 'String(200)', true);
+	schema.addWorkflow('exec', function(error, model, options, callback) {
+
+		// options.controller
+
+		GETSCHEMA('User').get(model, function(err, response) {
+
+			if (err) {
+				error.push(err);
+				return callback();
+			}
+
+			if (response.isblocked) {
+				error.push('error-user-blocked');
+				return callback();
+			}
+
+			response.hash = F.encrypt({ id: response.id, expire: new Date().add('2 days').getTime() });
+			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response, options.controller.language || '');
+			callback(SUCCESS(true));
+		});
+	});
+});
+
+NEWSCHEMA('UserRegistration').make(function(schema) {
+	schema.define('firstname', 'String(50)', true);
+	schema.define('lastname', 'String(50)', true);
+	schema.define('gender', 'String(20)');
+	schema.define('email', 'String(200)', true);
+	schema.define('password', 'String(20)', true);
+
+	schema.addWorkflow('exec', function(error, model, options, callback) {
+
+		// options.controller
+		// options.ip
+
+		var filter = {};
+		filter.email = model.email;
+
+		GETSCHEMA('User').get(filter, function(err, response) {
+
+			if (!err) {
+				error.push('error-user-exists');
+				return callback();
+			}
+
+			var user = GETSCHEMA('User').create();
+			user.id = '';
+			user.email = model.email;
+			user.firstname = model.firstname;
+			user.lastname = model.lastname;
+			user.name = model.firstname + ' ' + model.lastname;
+			user.gender = model.gender;
+			user.password = model.password.hash('sha1');
+			user.ip = options.ip;
+			user.datecreated = user.datecreated.format();
+
+			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
+
+			if (F.config.custom.emailuserform)
+				mail.bcc(F.config.custom.emailuserform);
+
+			user.$save(function(err, response) {
+				if (err)
+					return callback();
+
+				// Login user
+				exports.login(options.controller.req, options.controller.res, response.value.id);
+
+				// Response
+				callback(SUCCESS(true));
+			});
+
+		});
+	});
+});
 
 // Cleans online users
 F.on('service', function(counter) {
@@ -263,4 +367,60 @@ F.on('service', function(counter) {
 
 exports.usage = function() {
 	return { online: online };
+};
+
+function removeCookie(res, callback) {
+	res.cookie(COOKIE, '', new Date().add('-1 day'));
+	callback(false);
+}
+
+// Rewrites framework authorization
+F.onAuthorize = function(req, res, flags, callback) {
+
+	var hash = req.cookie(COOKIE);
+	if (!hash || hash.length < 20) {
+		callback(false);
+		return;
+	}
+
+	var user = F.decrypt(hash, SECRET, true);
+
+	if (!user)
+		return removeCookie(res, callback);
+
+	if (user.ip !== req.ip) {
+		removeCookie(res, callback);
+		return;
+	}
+
+	var session = online[user.id];
+	if (session) {
+		req.user = session;
+		session.ticks = new Date().add('30 minutes').getTime();
+		callback(true);
+		return;
+	}
+
+	GETSCHEMA('User').get(user, function(err, response) {
+
+		if (err || !response) {
+			removeCookie(res, callback);
+			callback(false);
+			return;
+		}
+
+		var nosql = DB();
+
+		nosql.update('users').make(function(builder) {
+			builder.inc('countlogin');
+			builder.set('datelogged', new Date());
+			builder.where('id', response.id);
+		});
+
+		nosql.exec(F.error());
+
+		req.user = exports.createSession(response);
+		res.cookie(COOKIE, F.encrypt({ id: response.id, ip: req.ip }, SECRET, true), '6 days');
+		callback(true);
+	});
 };

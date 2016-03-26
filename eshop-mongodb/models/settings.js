@@ -14,10 +14,12 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('emailorderform', String, true);
 	schema.define('emailreply', String, true);
 	schema.define('emailsender', String, true);
+	schema.define('emailuserform', String, true);
 	schema.define('url', String, true);
 	schema.define('templates', '[String]');
 	schema.define('navigations', '[String]');
 	schema.define('deliverytypes', '[String]');
+	schema.define('posts', '[String]');
 	schema.define('defaultorderstatus', String);
 	schema.define('users', '[SuperUser]');
 
@@ -52,39 +54,58 @@ NEWSCHEMA('Settings').make(function(schema) {
 		if (settings.url.endsWith('/'))
 			settings.url = settings.url.substring(0, settings.url.length - 1);
 
-		var builder = new MongoBuilder();
-		builder.set(settings);
-		builder.set('_id', 'settings');
-		builder.save(DB('common'), function() {
+		var nosql = DB(error);
 
-			F.emit('settings.save', settings);
+		nosql.update('update', 'common').make(function(builder) {
+			builder.set(settings);
+			builder.where('_id', 'settings');
+			builder.first();
+		});
+
+		nosql.ifnot('update', function(error, response) {
+			nosql.insert('common').make(function(builder) {
+				builder.replace(nosql.builder('update'), true);
+				builder.set('_id', 'settings');
+			});
+		});
+
+		nosql.exec(function(err, response) {
 
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (!err)
+				F.emit('settings.save', settings);
 		});
 	});
 
 	// Gets settings
 	schema.setGet(function(error, model, options, callback) {
 
-		var builder = new MongoBuilder();
-		builder.where('_id', 'settings');
-		builder.findOne(DB('common'), function(err, doc) {
+		var nosql = DB(error);
 
-			if (!doc) {
-				model.currency = 'EUR';
-				model.currency_entity = '&euro;';
-				callback();
+		nosql.select('common', 'common').make(function(builder) {
+			builder.where('_id', 'settings');
+			builder.first();
+		});
+
+		nosql.exec(function(err, doc) {
+
+			if (doc) {
+				callback(doc.common);
 				return;
 			}
 
-			callback(doc);
+			model.currency = 'EUR';
+			model.currency_entity = '&euro;';
+			callback();
 		});
 	});
 
 	// Loads settings + rewrites framework configuration
 	schema.addWorkflow('load', function(error, model, options, callback) {
 		schema.get(null, function(err, settings) {
+
 
 			F.config.custom = settings;
 
@@ -134,6 +155,8 @@ NEWSCHEMA('Settings').make(function(schema) {
 					F.config.custom.currency_entity = '{0} ' + F.config.custom.currency;
 					break;
 			}
+
+			F.emit('settings', settings);
 
 			// Returns response
 			callback(SUCCESS(true));
