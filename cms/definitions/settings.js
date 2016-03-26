@@ -9,3 +9,4 @@ MODULE('webcounter').instance.onValid = function(req) {
 // Global static variables (default values)
 F.global.sitemap = [];
 F.global.navigations = [];
+F.global.posts = [];

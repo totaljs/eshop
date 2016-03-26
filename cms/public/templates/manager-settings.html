@@ -1,35 +1,31 @@
-<div class="filter" style="padding-bottom:9px;margin-bottom:0">
+<div class="filter">
 	<div class="container">
-		<div class="caption"><span class="fa fa-cogs mr5"></span> @(Internal settings)</div>
+		<div class="caption" style="margin-bottom:10px"><span class="fa fa-cogs mr5"></span> @(Internal settings)</div>
 	</div>
 </div>
 <br />
 <div class="container">
 	<div class="row">
-		<div class="col-md-4 col-sm-4 m">
+		<div class="col-md-3 col-sm-3 m">
 			<div data-component="textbox" data-component-path="settings.form.url" data-required="true">@(URL address)</div>
-			<div class="help">@(It's used in email messages.)</div>
+			<div class="help">@(It's used in payments and email messages.)</div>
 		</div>
-		<div class="col-md-4 col-sm-4 m">
+		<div class="col-md-3 col-sm-3 m">
 			<div data-component="textbox" data-component-path="settings.form.emailcontactform" data-required="true" data-component-type="email">@(Email for contact form)</div>
 		</div>
-		<div class="col-md-4 col-sm-4 m">
+		<div class="col-md-3 col-sm-3 m">
 			<div data-component="textbox" data-component-path="settings.form.emailreply" data-required="true" data-component-type="email">@(Email for answers)</div>
 		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-4 col-sm-4 m">
+		<div class="col-md-3 col-sm-3 m">
 			<div data-component="textbox" data-component-path="settings.form.emailsender" data-required="true" data-component-type="email">@(Email for sending)</div>
 		</div>
 	</div>
 </div>
-
 <br />
-
 <div class="hidden" data-component="visible" data-component-path="user" data-if="su.sa === true">
 	<hr style="margin-top:0" />
 	<div class="container">
-		<h2 class="nmb">@(Developer's CMS settings)</h2>
+		<h2>@(Developer's CMS settings)</h2>
 		<br />
 		<div class="row">
 			<div class="col-md-6 m">
@@ -40,11 +36,14 @@
 				<div data-component="textboxtags" data-component-path="settings.form.navigations">@(Registered navigations)</div>
 				<div class="help">@(Navigations must be rendered manually in the layout or view. For render use: <code>F.global.navigation.NAME</code>)</div>
 			</div>
+			<div class="col-md-6 m">
+				<div data-component="textboxtags" data-component-path="settings.form.posts">@(Posts categories)</div>
+				<div class="help">@(Posts must be rendered manually in the layout or view. Categories: <code>F.global.posts</code>)</div>
+			</div>
 		</div>
 	</div>
 </div>
 <hr />
-
 <div class="container">
 	<div class="help" style="margin-top:10px">@(For creating another access into the administration click on to below button:)</div>
 	<div class="mt5"><a href="javascript:void(0)" data-component="click" data-component-path="settings_users_add"><span class="fa fa-user mr5"></span>@(Add new administrator)</a></div>
@@ -61,9 +60,10 @@
 		</tr>
 		</script>
 	</div>
+	<hr />
 	<br />
 	<div class="row">
-		<div class="col-md-4 m">
+		<div class="col-md-4 m col-md-offset-4">
 			<div data-component="validation" data-component-path="settings.form">
 				<button class="button b" data-component="click" data-component-path="settings_save">@(SAVE SETTINGS)</button>
 			</div>
@@ -86,7 +86,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="dropdowncheckbox" data-component-path="settings.formuser.roles" data-options="@(dashboard)|dashboard;@(pages)|pages;@(newsletter)|newsletter;@(settings)|settings;@(system)|system">@(Roles)</div>
+				<div data-component="dropdowncheckbox" data-component-path="settings.formuser.roles" data-options="@(dashboard)|dashboard;@(orders)|orders;@(products)|products;@(pages)|pages;@(posts)|posts;@(newsletter)|newsletter;@(users)|users;@(settings)|settings;@(system)|system">@(Roles)</div>
 				<div class="help">@(If the user roles will be empty then the user will be access to all functionality.)</div>
 			</div>
 		</div>
@@ -102,22 +102,40 @@
 <script>
 var settings = {};
 settings.form = {};
+settings.cache = {};
 
 function settings_refresh() {
 	$.components.GET(managerurl + '/api/settings/', null, function(response) {
 		SET('settings.form', response);
+
+		// If the user changes a currency then we must reload the website.
+		settings.cache.currency = response.currency;
 	});
 }
 
 function settings_save() {
-	loading(true);
-	$.components.PUT(managerurl + '/api/settings/', settings.form, function() {
+	var loading = FIND('loading');
+	loading.show();
+	AJAX('PUT {0}/api/settings/'.format(managerurl), settings.form, function() {
 
 		success(true);
 		RESET('settings.form.*');
 
 		if (window.pages_refresh_dependencies)
 			window.pages_refresh_dependencies();
+
+		if (window.posts_refresh_codelists)
+			window.posts_refresh_codelists();
+
+		if (settings.cache.currency === settings.form.currency) {
+			loading.hide(500);
+			return;
+		}
+
+		// Refresh settings
+		setTimeout(function() {
+			window.location.reload();
+		}, 3000);
 	});
 }
 
@@ -169,6 +187,21 @@ ON('#settings.formuser', function(component) {
 		UPDATE('settings.form.users');
 		CHANGE('settings.form.*', true);
 		hide();
+	};
+});
+
+COMPONENT('oauth2callback', function() {
+	var self = this;
+	var name;
+
+	self.make = function() {
+		name = self.html();
+		self.element.addClass('oauth2callback');
+		self.element.html('<div>@(Authorize Callback URL)</div><input type="text" readonly="readonly" />')
+	};
+
+	self.setter = function(value) {
+		self.find('input').val('{0}/oauth2/{1}/callback/'.format(value, name));
 	};
 });
 

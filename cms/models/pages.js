@@ -11,7 +11,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	schema.define('id', 'String(10)');
 	schema.define('parent', 'String(10)');
-	schema.define('template', 'String(30)', true);
+	schema.define('template', 'String(30)');
 	schema.define('language', 'String(3)');
 	schema.define('url', 'String(200)');
 	schema.define('keywords', 'String(200)');
@@ -204,7 +204,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		DB('pages').update(updater, function() {
 
 			// Creates record if not exists
-			if (count === 0)
+			if (!count)
 				DB('pages').insert(clean);
 
 			// Returns response
@@ -443,9 +443,9 @@ function refresh() {
 
 	var prepare = function(doc) {
 
-		// Partial content is skipped from the sitemap
+		// A partial content is skipped from the sitemap
 		if (doc.ispartial) {
-			partial.push({ id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, language: doc.language, icon: doc.icon, tags: doc.tags, priority: doc.priority });
+			partial.push({ id: doc.id, url: doc.url, name: doc.name, title: doc.title, language: doc.language, icon: doc.icon, tags: doc.tags, priority: doc.priority });
 			return;
 		}
 
@@ -501,7 +501,7 @@ F.eval(function() {
 			self.plain(U.httpStatus(404, true));
 			return self;
 		}
-		self.page(self.url);
+		self.page(self.url, view, model, cache);
 		return self;
 	};
 
@@ -562,7 +562,7 @@ F.eval(function() {
 				self.title(response.title);
 
 				if (!view)
-					view = '~/cms/' + response.template;
+					view = 'cms/' + response.template;
 
 				self.view(view, model);
 			});

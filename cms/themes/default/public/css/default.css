@@ -76,3 +76,8 @@ footer { text-align: center; font-size: 12px; padding: 50px 0; color: gray; bord
 .gallery-info { font-size: 11px; margin-top: 10px; text-align: center; }
 .gallery-info > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
 .gallery-info .fa { margin-right: 3px; }
+
+.pagination { padding: 15px 0 5px; text-align: center; }
+.pagination nav { margin: 10px 0 15px; }
+.pagination nav a { position: relative; display: inline-block; width: 30px; padding: 5px 0; text-align: center; font-size: 16px; border-radius: 3px; }
+.pagination nav .selected { background-color: #F0F0F0; color: silver; }

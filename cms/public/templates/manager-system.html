@@ -1,29 +1,7 @@
-<div class="filter" style="padding-bottom:9px;margin-bottom:0">
+<div class="filter">
 	<div class="container">
-		<div class="caption"><span class="fa fa-cogs mr5"></span> @(System)</div>
+		<div class="caption" style="margin-bottom:10px"><span class="fa fa-cogs mr5"></span> @(System)</div>
 	</div>
-</div>
-<br />
-<div class="container hidden-xs">
-	<div class="row">
-		<div class="col-md-4 col-sm-4 m">
-			<div class="b"><span class="fa fa-dashboard mr5"></span> MonitorGuru</div>
-			<p class="silver">Simple and powerful website monitoring. Monitor your website availability 24/7.</p>
-			<span class="fa fa-link mr5"></span><a href="https://monitorguru.com" target="_blank">@(Visit website)</a>
-		</div>
-		<div class="col-md-4 col-sm-4 m">
-			<div class="b"><span class="fa fa-check-circle mr5"></span> Todomator</div>
-			<p class="silver">Task manager system with time tracking. All your tasks under control.</p>
-			<span class="fa fa-link mr5"></span><a href="https://www.todomator.com" target="_blank">@(Visit website)</a>
-		</div>
-		<div class="col-md-4 col-sm-4 m">
-			<div class="b"><span class="fa fa-map mr5"></span> GPS Localization</div>
-			<p class="silver">Real-time GPS Localization on the map. Track your family, friends or colleagues.</p>
-			<span class="fa fa-link mr5"></span><a href="http://www.gpslocalization.com" target="_blank">@(Visit website)</a>
-		</div>
-	</div>
-	<hr />
-	<br />
 </div>
 <div class="container">
 	<div class="b">@(Backuping)</div>
@@ -76,9 +54,6 @@
 	<br />
 </div>
 
-<!-- HELPERS -->
-<input type="file" id="system_restore_backup" class="hidden" />
-
 <script>
 // Backup databases
 function system_backup_database() {
@@ -104,67 +79,77 @@ function system_backup_website() {
 }
 
 function system_clear_pages() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/pages/clear/', null, function() {
-		success();
-		if (window.pages_refresh)
-			window.pages_refresh(true);
+	FIND('confirm').confirm('@(Please, confirm clearing of the database.)', ['Clear', 'Cancel'], function(index) {
+		if (index)
+			return;
+		FIND('loading').show();
+		AJAX('GET {0}/api/pages/clear/'.format(managerurl), function() {
+			success();
+			if (window.pages_refresh)
+				window.pages_refresh(true);
+		});
 	});
 }
 
 function system_clear_widgets() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/widgets/clear/', null, function() {
-		success();
-		if (window.widgets_refresh)
-			window.widgets_refresh();
+	FIND('confirm').confirm('@(Please, confirm clearing of the database.)', ['Clear', 'Cancel'], function(index) {
+		if (index)
+			return;
+		FIND('loading').show();
+		AJAX('GET {0}/api/widgets/clear/'.format(managerurl), function() {
+			success();
+			if (window.widgets_refresh)
+				window.widgets_refresh();
+		});
 	});
 }
 
 function system_clear_files() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/files/clear/', null, function() {
-		success();
+	FIND('confirm').confirm('@(Please, confirm clearing of the database.)', ['Clear', 'Cancel'], function(index) {
+		if (index)
+			return;
+		FIND('loading').show();
+		AJAX('GET {0}/api/files/clear/'.format(managerurl), function() {
+			success();
+		});
 	});
 }
 
 function system_clear_newsletter() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/newsletter/clear/', null, function() {
-		success();
-		if (window.newsletter_refresh)
-			window.newsletter_refresh(true);
+	FIND('confirm').confirm('@(Please, confirm clearing of the database.)', ['Clear', 'Cancel'], function(index) {
+		if (index)
+			return;
+		FIND('loading').show();
+		AJAX('GET {0}/api/newsletter/clear/'.format(managerurl), function() {
+			success();
+			if (window.newsletter_refresh)
+				window.newsletter_refresh(true);
+		});
 	});
 }
 
 function system_clear_webcounter() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/dashboard/clear/', null, function() {
-		success();
-		setTimeout(function() {
-			window.location.reload(true);
-		}, 1500);
+	FIND('confirm').confirm('@(Please, confirm clearing of the database.)', ['Clear', 'Cancel'], function(index) {
+		if (index)
+			return;
+		FIND('loading').show();
+		AJAX('{0}/api/dashboard/clear/'.format(managerurl), function() {
+			success();
+			setTimeout(function() {
+				window.location.reload(true);
+			}, 1500);
+		});
 	});
 }
 
 $('#system_restore_backup').on('change', function(e) {
 	e.preventDefault();
 	e.stopPropagation();
-	loading(true);
+	FIND('loading').show();
 	var el = this;
 	var data = new FormData();
 	data.append('file', this.files[0]);
-	$.components.UPLOAD(managerurl + '/api/restore/database/', data, function(response, err) {
+	UPLOAD(managerurl + '/api/restore/database/', data, function(response, err) {
 		el.value = '';
 		success(true);
 		setTimeout(function() {

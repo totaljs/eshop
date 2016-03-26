@@ -16,8 +16,8 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('emailsender', String, true);
 	schema.define('url', String, true);
 	schema.define('templates', '[String]');
+	schema.define('posts', '[String]');
 	schema.define('navigations', '[String]');
-	schema.define('users', '[SuperUser]');
 
 	// Saves settings into the file
 	schema.setSave(function(error, model, options, callback) {

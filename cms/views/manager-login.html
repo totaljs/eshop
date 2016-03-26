@@ -10,12 +10,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<meta name="robots" content="all,follow" />
 	@{head}
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
 	@{import('manager.css', 'favicon.ico')}
 </head>
 <body>
-	<div id="loading"></div>
+	<div data-component="loading" class="ui-loading"></div>
 	<br />
 	<br />
 	<div class="container">
@@ -33,14 +33,18 @@
 		</div>
 	</div>
 
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
 	@{import('manager.js')}
+
 	<script>
 		var user = {};
 		if (document.cookie.indexOf('__manager') !== -1)
 			user.error = [{ error: '@(Incorrect username or password.)' }];
 
-		loading(false, 2000);
+		FIND('loading', function() {
+			this.hide(500);
+		});
 
 		function doLogin() {
 			if (!$.components.valid('user.*'))
@@ -49,7 +53,7 @@
 			var dt = new Date();
 			dt.setDate(dt.getDate() + 7);
 			document.cookie = '__manager=' + (id.toString()) + '; expires=' + dt.toUTCString() + '; path=/';
-			loading(true);
+			FIND('loading').show();
 			window.location.reload(true);
 		}
 	</script>

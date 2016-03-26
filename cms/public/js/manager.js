@@ -14,7 +14,10 @@ $(document).ready(function() {
 			el.hide();
 	});
 
-	loading(false, 1000);
+	FIND('loading', function() {
+		this.hide(500);
+	});
+
 	$(window).on('resize', resizer);
 	resizer();
 });
@@ -31,6 +34,24 @@ if (window.su) {
 		jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
 	});
 
+	if (can('orders')) {
+		jRouting.route(managerurl + '/orders/', function() {
+			SET('common.page', 'orders');
+		});
+	}
+
+	if (can('posts')) {
+		jRouting.route(managerurl + '/posts/', function() {
+			SET('common.page', 'posts');
+		});
+	}
+
+	if (can('products')) {
+		jRouting.route(managerurl + '/products/', function() {
+			SET('common.page', 'products');
+		});
+	}
+
 	if (can('newsletter')) {
 		jRouting.route(managerurl + '/newsletter/', function() {
 			SET('common.page', 'newsletter');
@@ -40,6 +61,12 @@ if (window.su) {
 	if (can('settings')) {
 		jRouting.route(managerurl + '/settings/', function() {
 			SET('common.page', 'settings');
+		});
+	}
+
+	if (can('users')) {
+		jRouting.route(managerurl + '/users/', function() {
+			SET('common.page', 'users');
 		});
 	}
 
@@ -54,15 +81,18 @@ if (window.su) {
 			SET('common.page', 'system');
 		});
 	}
-
-	jRouting.on('location', function(url) {
-		var nav = $('nav');
-		nav.find('.selected').removeClass('selected');
-		nav.find('a[href="' + url + '"]').addClass('selected');
-	});
 }
 
+jRouting.on('location', function(url) {
+	var nav = $('nav');
+	nav.find('.selected').removeClass('selected');
+	nav.find('a[href="' + url + '"]').addClass('selected');
+});
+
 function loading(v, timeout) {
+	// @TODO: remove
+	return;
+
 	setTimeout(function() {
 		$('#loading').toggle(v);
 	}, timeout || 0);
@@ -78,8 +108,8 @@ function resizer() {
 }
 
 function success() {
-	loading(false, 1000);
 	var el = $('#success');
+	FIND('loading').hide(500);
 	el.css({ top: '0%' }).fadeIn(100).animate({ top: '50%' }, 1000, 'easeOutBounce', function() {
 		setTimeout(function() {
 			el.fadeOut(300);
@@ -96,7 +126,7 @@ function can(name) {
 Tangular.register('price', function(value, format) {
 	if (value === undefined)
 		value = 0;
-	return value.format(format) + ' ' + currency;
+	return currency.format(value.format(format));
 });
 
 Tangular.register('join', function(value) {

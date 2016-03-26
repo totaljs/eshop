@@ -2,6 +2,10 @@ exports.install = function() {
 	// CMS rendering
 	F.route('/*', view_page);
 
+	// POSTS
+	F.route('#blogs',            view_blogs, ['*Post']);
+	F.route('#blogsdetail',      view_blogs_detail, ['*Post']);
+
 	// FILES
 	F.file('/download/', file_read);
 };
@@ -87,4 +91,31 @@ function file_read(req, res) {
 			});
 		});
 	});
+}
+
+// ============================================
+// POSTS
+// ============================================
+
+function view_blogs() {
+	var self = this;
+	var options = {};
+
+	options.category = 'Blogs';
+
+	if (self.query.q)
+		options.search = self.query.q;
+
+	if (self.query.page)
+		options.page = self.query.page;
+
+	self.$query(options, self.callback('blogs-all'));
+}
+
+function view_blogs_detail(linker) {
+	var self = this;
+	var options = {};
+	options.category = 'Blogs';
+	options.linker = linker;
+	self.$get(options, self.callback('blogs-detail'));
 }

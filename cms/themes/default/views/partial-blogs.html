@@ -1,0 +1,25 @@
+<div class="row">
+	@{foreach m in model.items}
+	<div class="col-md-10 col-md-offset-1">
+		<div class="b"><a href="@{sitemap_url('blogsdetail', m.linker)}">@{m.name}</a></div>
+		<div class="fs11">@{m.datecreated.parseDate().format('yyyy-MM-dd HH:mm')}</div>
+		<p>@{m.perex}</p>
+		<hr />
+	</div>
+	@{end}
+</div>
+
+@{if !model.count}
+	<div class="row" style="margin-top:30px;margin-bottom:100px" id="empty">
+		<div class="col-md-3"></div>
+		<div class="col-md-6 m ui-center">
+			<div><span class="fa fa-search fa-5x"></span></div>
+			<br />
+			<br />
+			<div>
+				@(Currently we don't have any items sufficient for search criteria.)<br />
+				<b>@(Try to visit our page later)</b>.
+			</div>
+		</div>
+	</div>
+@{fi}
