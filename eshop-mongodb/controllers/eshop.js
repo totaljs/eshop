@@ -215,6 +215,13 @@ function view_blogs() {
 	var self = this;
 	var options = {};
 	options.category = 'Blogs';
+
+	if (self.query.q)
+		options.search = self.query.q;
+
+	if (self.query.page)
+		options.page = self.query.page;
+
 	self.$query(options, self.callback('blogs-all'));
 }
 

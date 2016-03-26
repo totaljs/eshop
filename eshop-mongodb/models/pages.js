@@ -490,6 +490,21 @@ function refresh() {
 
 // Creates Controller.prototype.page()
 F.eval(function() {
+
+	Controller.prototype.render = function(url, view, model, cache) {
+		var self = this;
+		var key = (self.language ? self.language + ':' : '') + url;
+		var page = F.global.sitemap[key];
+
+		if (!page) {
+			self.status = 404;
+			self.plain(U.httpStatus(404, true));
+			return self;
+		}
+		self.page(self.url, view, model, cache);
+		return self;
+	};
+
 	Controller.prototype.page = function(url, view, model, cache, partial) {
 
 		var self = this;

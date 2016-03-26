@@ -61,8 +61,6 @@ NEWSCHEMA('Settings').make(function(schema) {
 		DB('settings_backup').insert(JSON.parse(JSON.stringify(settings)));
 		delete settings.datebackuped;
 
-		console.log(JSON.stringify(settings));
-
 		// Writes settings into the file
 		Fs.writeFile(filename, JSON.stringify(settings), function() {
 

@@ -12,3 +12,4 @@ MODULE('webcounter').instance.onValid = function(req) {
 F.global.sitemap = [];
 F.global.navigations = [];
 F.global.categories = [];
+F.global.posts = [];

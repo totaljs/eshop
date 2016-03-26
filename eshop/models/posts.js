@@ -73,7 +73,11 @@ NEWSCHEMA('Post').make(function(schema) {
 		};
 
 		// Sorting documents
-		var sorting = (a, b) => a.name.removeDiacritics().localeCompare(b.name.removeDiacritics());
+		var sorting = function(a, b) {
+			if (new Date(a.datecreated) > new Date(b.datecreated))
+				return -1;
+			return 1;
+		};
 
 		DB('posts').sort(filter, sorting, function(err, docs, count) {
 
