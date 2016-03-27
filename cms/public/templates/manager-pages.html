@@ -7,7 +7,7 @@
 				<div class="help" data-component="template" data-component-path="pages.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="dropdown" data-component-path="pages.filter.navigation" data-source="pages.dependencies.navigations" data-empty="true" data-empty-text="@(All pages)"></div>
+				<div data-component="dropdown" data-component-path="pages.filter.navigation" data-source="pages.dependencies.navigations" data-empty="@(All pages)"></div>
 			</div>
 			<div class="col-md-6 m">
 				<div class="row">
@@ -79,7 +79,7 @@
 				<div data-component="checkbox" data-component-path="pages.form.ispartial" class="fs11 green mt5">@(Is partial content)</div>
 			</div>
 			<div class="col-md-4 m">
-				<div data-component="dropdown" data-component-path="pages.form.template" data-source="pages.dependencies.templates" data-empty="true">@(Template)</div>
+				<div data-component="dropdown" data-component-path="pages.form.template" data-source="pages.dependencies.templates" data-empty="">@(Template)</div>
 				<div class="mt5 fs11" style="float:left"><a href="javascript:void(0)" data-component="click" data-component-path="pages_new_content"><span class="fa fa-code mr5"></span>@(Create custom content)</a></div>
 				<div class="cl"></div>
 			</div>
@@ -101,7 +101,7 @@
 			<div class="col-md-6 m">
 				<div class="row">
 					<div class="col-md-12 m" data-component="disable" data-component-path="pages.form.ispartial" data-if="value">
-						<div data-component="dropdown" data-component-path="pages.form.parent" data-source="pages.sitemap" data-source-text="name" data-source-value="id" data-empty="true" data-icon="fa-sitemap">@(Parent)</div>
+						<div data-component="dropdown" data-component-path="pages.form.parent" data-source="pages.sitemap" data-source-text="name" data-source-value="id" data-empty="" data-icon="fa-sitemap">@(Parent)</div>
 						<div class="help">@(Affects sitemap and breadcrumb.)</div>
 					</div>
 				</div>
@@ -190,7 +190,7 @@
 			<div class="col-md-12">
 				<div class="silver">@(The form loads template from the server <u>without default content</u> and creates a new content according to <b>HTML</b> editor. The existing content will be replaced.)</div>
 				<hr />
-				<div data-component="dropdown" data-component-path="pages.html.template" data-source="pages.dependencies.templates" class="m" data-empty="true" data-required="true">@(Template)</div>
+				<div data-component="dropdown" data-component-path="pages.html.template" data-source="pages.dependencies.templates" class="m" data-empty="" data-required="true">@(Template)</div>
 				<div data-component="codemirror" data-component-path="pages.html.body" data-icon="fa-code" data-height="300px" data-required="true" class="ui-textarea-code">@(HTML)</div>
 			</div>
 		</div>

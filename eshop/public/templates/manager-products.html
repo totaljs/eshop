@@ -7,7 +7,7 @@
 				<div class="help" data-component="template" data-component-path="products.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="true" data-empty-text="@(All products)" data-source-value="linker"></div>
+				<div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="@(All products)" data-source-value="linker"></div>
 				<a href="javascript:products_export()" class="silver"><span class="fa fa-file-code-o mr5"></span>@(Export products to XML)</a>
 			</div>
 			<div class="col-md-6 m">
@@ -69,7 +69,7 @@
 	<div class="padding bg-smoke">
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-component="dropdown" data-component-path="products.form.category" data-source="products.categories" data-empty="true" data-source-value="name">@(Existing category)</div>
+				<div data-component="dropdown" data-component-path="products.form.category" data-source="products.categories" data-empty="" data-source-value="name">@(Existing category)</div>
 			</div>
 			<div class="col-md-6 m">
 				<div data-component="textbox" data-component-path="products.form.category" data-required="true">@(Category)</div>
@@ -78,7 +78,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-component="dropdown" data-component-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="true" data-source-value="name">@(Existing manufacturer)</div>
+				<div data-component="dropdown" data-component-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="" data-source-value="name">@(Existing manufacturer)</div>
 			</div>
 			<div class="col-md-6 m">
 				<div data-component="textbox" data-component-path="products.form.manufacturer">@(Manufacturer)</div>
@@ -124,7 +124,7 @@
 			<div class="col-md-12">
 				<div class="silver">@(Replace old category with new category name in all products which have old category.)</div>
 				<hr />
-				<div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="true" data-source-value="name" class="m">@(Existing category)</div>
+				<div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="" data-source-value="name" class="m">@(Existing category)</div>
 				<div data-component="textbox" data-component-path="products.category.category_new" data-required="true" class="m">@(New name)</div>
 			</div>
 		</div>
