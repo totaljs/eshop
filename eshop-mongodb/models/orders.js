@@ -206,11 +206,13 @@ NEWSCHEMA('Order').make(function(schema) {
 
 		nosql.exec(function(err) {
 
-			if (!err)
-				F.emit('orders.save', model);
-
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (err)
+				return;
+
+			F.emit('orders.save', model);
 		});
 
 		if (!isemail)
@@ -275,6 +277,12 @@ NEWSCHEMA('Order').make(function(schema) {
 		});
 
 		nosql.exec(function(err, response) {
+
+			if (err) {
+				callback(stats);
+				return;
+			}
+
 			for (var i = 0, length = response.orders.length; i < length; i++) {
 				var agg = response.orders[i];
 				if (agg._id) {

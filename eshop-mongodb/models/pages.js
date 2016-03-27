@@ -188,9 +188,15 @@ NEWSCHEMA('Page').make(function(schema) {
 		});
 
 		nosql.exec(function(err, response) {
-			F.emit('pages.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (err)
+				return;
+
+			F.emit('pages.save', model);
+
 			// Refreshes internal informations e.g. sitemap
 			setTimeout(refresh, 1000);
 		});

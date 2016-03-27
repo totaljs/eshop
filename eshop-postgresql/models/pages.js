@@ -272,7 +272,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			// Returns response
 			callback(SUCCESS(true));
 
-			if (!err)
+			if (err)
 				return;
 
 			F.emit('pages.save', model);
@@ -490,7 +490,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	// Clears database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		var sql = DB();
+		var sql = DB(error);
 		sql.remove('tbl_page');
 		sql.exec(function() {
 			// Refreshes internal information e.g. sitemap

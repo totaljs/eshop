@@ -181,9 +181,13 @@ NEWSCHEMA('Order').make(function(schema) {
 			});
 		}
 
-		sql.exec(function() {
+		sql.exec(function(err) {
+
 			// Returns response with order id
 			callback(SUCCESS(true, model.id));
+
+			if (err)
+				return;
 
 			// Writes stats
 			MODULE('webcounter').increment('orders');

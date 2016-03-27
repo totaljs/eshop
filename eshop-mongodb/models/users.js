@@ -84,11 +84,13 @@ NEWSCHEMA('User').make(function(schema) {
 		});
 
 		nosql.exec(function() {
-
-			F.emit('users.save', model);
-
 			// Returns response
 			callback(SUCCESS(true, model.id));
+
+			if (err)
+				return;
+
+			F.emit('users.save', model);
 		});
 	});
 

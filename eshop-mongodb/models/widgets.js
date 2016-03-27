@@ -92,9 +92,11 @@ NEWSCHEMA('Widget').make(function(schema) {
 		});
 
 		nosql.exec(function(err, response) {
-			F.emit('widgets.save', model);
 			// Returns response
 			callback(SUCCESS(true));
+			if (err)
+				return;
+			F.emit('widgets.save', model);
 		});
 	});
 

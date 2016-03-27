@@ -131,9 +131,15 @@ NEWSCHEMA('Product').make(function(schema) {
 		});
 
 		nosql.exec(function(err, response) {
-			F.emit('products.save', model);
+
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (err)
+				return;
+
+			F.emit('products.save', model);
+
 			// Refreshes internal information e.g. categories
 			setTimeout(refresh, 1000);
 		});
