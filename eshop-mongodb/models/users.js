@@ -84,7 +84,8 @@ NEWSCHEMA('User').make(function(schema) {
 			builder.where('id', model.id);
 		});
 
-		nosql.exec(function() {
+		nosql.exec(function(err) {
+
 			// Returns response
 			callback(SUCCESS(true, model.id));
 

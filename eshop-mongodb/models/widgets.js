@@ -24,7 +24,8 @@ NEWSCHEMA('Widget').make(function(schema) {
 			builder.fields('id', 'icon', 'name', 'category', 'istemplate');
 			builder.sort('name');
 		});
-		nosql.exec(callback, 'widgets');
+
+		nosql.exec(callback, 0);
 	});
 
 	// Gets a specific widget
