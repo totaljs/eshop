@@ -1,6 +1,6 @@
 NEWSCHEMA('Widget').make(function(schema) {
 
-	schema.define('id', 'String(10)');
+	schema.define('id', 'String(20)');
 	schema.define('name', 'String(50)', true);
 	schema.define('category', 'String(50)');
 	schema.define('body', String);
@@ -85,7 +85,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 		var count = 0;
 
 		if (!model.id)
-			model.id = U.GUID(10);
+			model.id = UID();
 
 		if (model.datecreated)
 			model.datecreated = model.datecreated.format();

@@ -1,6 +1,6 @@
 NEWSCHEMA('Contact').make(function(schema) {
 
-	schema.define('id', 'String(10)');
+	schema.define('id', 'String(20)');
 	schema.define('firstname', 'String(40)', true);
 	schema.define('lastname', 'String(40)', true);
 	schema.define('email', 'String(200)', true);
@@ -14,7 +14,7 @@ NEWSCHEMA('Contact').make(function(schema) {
 	schema.setSave(function(error, model, options, callback) {
 
 		// Default values
-		model.id = U.GUID(10);
+		model.id = UID();
 		model.datecreated = new Date();
 
 		var nosql = DB(error);

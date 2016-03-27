@@ -1,6 +1,6 @@
 NEWSCHEMA('Product').make(function(schema) {
 
-	schema.define('id', 'String(10)');
+	schema.define('id', 'String(20)');
 	schema.define('pictures', '[String]');
 	schema.define('reference', 'String(20)');
 	schema.define('category', 'String(300)', true);
@@ -107,7 +107,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		var count = 0;
 
 		if (!model.id)
-			model.id = U.GUID(10);
+			model.id = UID();
 
 		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
 		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';

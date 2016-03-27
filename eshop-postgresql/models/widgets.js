@@ -1,6 +1,6 @@
 NEWSCHEMA('Widget').make(function(schema) {
 
-	schema.define('id', 'String(10)');
+	schema.define('id', 'String(20)');
 	schema.define('name', 'String(50)', true);
 	schema.define('category', 'String(50)');
 	schema.define('body', String);
@@ -77,12 +77,13 @@ NEWSCHEMA('Widget').make(function(schema) {
 		var sql = DB();
 
 		if (!model.id)
-			model.id = U.GUID(10);
+			model.id = UID();
 
 		sql.save('item', 'tbl_widget', isNew, function(builder, isNew) {
 			builder.set(model);
 			if (isNew)
 				return;
+			builder.set('dateupdated', new Date());
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', model.id);

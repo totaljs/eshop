@@ -1,6 +1,6 @@
 NEWSCHEMA('OrderItem').make(function(schema) {
 
-	schema.define('id', 'String(10)', true);
+	schema.define('id', 'String(20)', true);
 	schema.define('price', Number, true);
 	schema.define('name', 'String(50)', true);
 	schema.define('reference', 'String(20)');
@@ -11,8 +11,8 @@ NEWSCHEMA('OrderItem').make(function(schema) {
 
 NEWSCHEMA('Order').make(function(schema) {
 
-	schema.define('id', 'String(10)');
-	schema.define('iduser', 'String(10)');
+	schema.define('id', 'String(20)');
+	schema.define('iduser', 'String(20)');
 	schema.define('status', 'String(100)');
 	schema.define('delivery', 'String(30)', true);
 	schema.define('firstname', 'String(40)', true);
@@ -142,7 +142,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			count += product.count;
 		}
 
-		model.id = U.GUID(8);
+		model.id = UID();
 		model.price = price;
 		model.count = count;
 		model.search = (model.firstname + ' ' + model.lastname + ' ' + model.email).toSearch().max(80);
@@ -249,6 +249,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.rem('products');
+			builder.set('dateupdated', new Date());
 			builder.where('id', model.id);
 		});
 
@@ -269,11 +270,13 @@ NEWSCHEMA('Order').make(function(schema) {
 		}
 
 		sql.exec(function(err) {
-
-			F.emit('orders.save', model);
-
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (err)
+				return;
+
+			F.emit('orders.save', model);
 		});
 
 		if (!isemail)

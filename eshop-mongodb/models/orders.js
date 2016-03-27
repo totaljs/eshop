@@ -1,6 +1,6 @@
 NEWSCHEMA('OrderItem').make(function(schema) {
 
-	schema.define('id', 'String(10)', true);
+	schema.define('id', 'String(20)', true);
 	schema.define('price', Number, true);
 	schema.define('name', 'String(50)', true);
 	schema.define('reference', 'String(20)');
@@ -11,8 +11,8 @@ NEWSCHEMA('OrderItem').make(function(schema) {
 
 NEWSCHEMA('Order').make(function(schema) {
 
-	schema.define('id', 'String(10)');
-	schema.define('iduser', 'String(10)');
+	schema.define('id', 'String(20)');
+	schema.define('iduser', 'String(20)');
 	schema.define('status', 'String(100)');
 	schema.define('delivery', 'String(30)', true);
 	schema.define('firstname', 'String(40)', true);
@@ -124,7 +124,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			count += product.count;
 		}
 
-		model.id = U.GUID(8);
+		model.id = UID();
 		model.price = price;
 		model.count = count;
 		model.isremoved = false;
@@ -200,6 +200,9 @@ NEWSCHEMA('Order').make(function(schema) {
 
 		nosql.update('order', 'orders').make(function(builder) {
 			builder.set(model.$clean());
+			builder.rem('id');
+			builder.rem('datecreated');
+			builder.set('dateupdated', new Date());
 			builder.where('id', model.id);
 			builder.first();
 		});

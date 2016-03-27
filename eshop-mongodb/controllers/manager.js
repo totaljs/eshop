@@ -36,7 +36,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/products/{id}/',       json_products_read, ['*Product']);
 	F.route(CONFIG('manager-url') + '/api/products/',            json_products_remove, ['delete', '*Product']);
 	F.route(CONFIG('manager-url') + '/api/products/clear/',      json_products_clear, ['*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/import/',     json_products_import, ['upload', '*Product', 1000 * 60 * 5], 1024);
+	F.route(CONFIG('manager-url') + '/api/products/import/',     json_products_import, ['upload', 1000 * 60 * 5], 1024);
 	F.route(CONFIG('manager-url') + '/api/products/export/',     json_products_export, ['*Product', 10000]);
 	F.route(CONFIG('manager-url') + '/api/products/codelists/',  json_products_codelists);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   json_products_category_replace, ['post', '*Product']);
@@ -304,7 +304,7 @@ function json_products_import() {
 		return;
 	}
 
-	self.$workflow('import.' + file.type.substring(5), file.path, self.callback());
+	GETSCHEMA('Product').workflow2('import.' + file.type.substring(5), file.path, self.callback());
 }
 
 // Exports products to XML
@@ -455,48 +455,6 @@ function json_users_read(id) {
 function json_users_clear() {
 	var self = this;
 	self.$workflow('clear', self.callback());
-}
-
-// ==========================================================================
-// POSTS
-// ==========================================================================
-
-// Gets all posts
-function json_posts_query() {
-	var self = this;
-	self.$query(self.query, self.callback());
-}
-
-// Saves (update or create) specific post
-function json_posts_save() {
-	var self = this;
-	self.body.$save(self.callback());
-}
-
-// Removes specific post
-function json_posts_remove() {
-	var self = this;
-	self.$remove(self.body.id, self.callback());
-}
-
-// Clears all posts
-function json_posts_clear() {
-	var self = this;
-	self.$workflow('clear', self.callback());
-}
-
-// Reads all post categories and manufacturers
-function json_posts_codelists() {
-	var self = this;
-	self.json({ categories: F.global.posts, templates: F.config.custom.templates });
-}
-
-// Reads a specific post by ID
-function json_posts_read(id) {
-	var self = this;
-	var options = {};
-	options.id = id;
-	self.$get(options, self.callback());
 }
 
 // ==========================================================================

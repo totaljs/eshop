@@ -1,6 +1,6 @@
 NEWSCHEMA('Product').make(function(schema) {
 
-	schema.define('id', 'String(10)');
+	schema.define('id', 'String(20)');
 	schema.define('pictures', '[String]');
 	schema.define('reference', 'String(20)');
 	schema.define('category', 'String(300)', true);
@@ -105,7 +105,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		var dt = new Date();
 
 		if (!model.id) {
-			model.id = U.GUID(10);
+			model.id = UID();
 			model.datecreated = dt;
 			isnew = true;
 		} else
@@ -126,6 +126,9 @@ NEWSCHEMA('Product').make(function(schema) {
 			builder.set(model);
 			if (isnew)
 				return;
+			builder.set('dateupdated', new Date());
+			builder.rem('id');
+			builder.rem('datecreated');
 			builder.where('id', model.id);
 			builder.first();
 		});

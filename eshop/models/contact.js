@@ -1,6 +1,6 @@
 NEWSCHEMA('Contact').make(function(schema) {
 
-	schema.define('id', 'String(10)');
+	schema.define('id', 'String(20)');
 	schema.define('firstname', 'String(40)', true);
 	schema.define('lastname', 'String(40)', true);
 	schema.define('email', 'String(200)', true);
@@ -14,7 +14,7 @@ NEWSCHEMA('Contact').make(function(schema) {
 	schema.setDefault(function(name) {
 		switch (name) {
 			case 'id':
-				return U.GUID(10);
+				return UID();
 			case 'datecreated':
 				return new Date();
 		}

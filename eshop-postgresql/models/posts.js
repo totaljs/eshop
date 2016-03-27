@@ -1,6 +1,6 @@
 NEWSCHEMA('Post').make(function(schema) {
 
-	schema.define('id', 'String(10)');
+	schema.define('id', 'String(20)');
 	schema.define('category', 'String(50)');
 	schema.define('template', 'String(30)', true);
 	schema.define('language', 'String(3)');
@@ -150,7 +150,7 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		if (!model.id) {
 			newbie = true;
-			model.id = U.GUID(10);
+			model.id = UID();
 		}
 
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
@@ -168,8 +168,12 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		sql.save('tbl_post', newbie, function(builder) {
 			builder.set(model);
-			if (!newbie)
-				builder.set('dateupdated', new Date());
+			if (newbie)
+				return;
+			builder.rem('datecreated');
+			builder.rem('id');
+			builder.set('dateupdated', new Date());
+			builder.where('id', model.id);
 		});
 
 		sql.exec(function(err, response) {

@@ -9,8 +9,8 @@
 
 NEWSCHEMA('Page').make(function(schema) {
 
-	schema.define('id', 'String(10)');
-	schema.define('parent', 'String(10)');
+	schema.define('id', 'String(20)');
+	schema.define('parent', 'String(20)');
 	schema.define('template', 'String(30)');
 	schema.define('language', 'String(3)');
 	schema.define('url', 'String(200)');
@@ -159,7 +159,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		var isnew = false;
 
 		if (!model.id) {
-			model.id = U.GUID(10);
+			model.id = UID();
 			model.datecreated = new Date();
 			isnew = true;
 		} else
@@ -184,6 +184,9 @@ NEWSCHEMA('Page').make(function(schema) {
 			builder.set(model);
 			if (isnew)
 				return;
+			builder.rem('id');
+			builder.rem('datecreated');
+			builder.set('dateupdated', new Date());
 			builder.where('id', model.id);
 		});
 

@@ -1,9 +1,9 @@
 <div class="row">
 	@{foreach m in model.items}
 	<div class="col-md-10 col-md-offset-1">
-		<div class="b"><a href="@{sitemap_url('blogsdetail', m.linker)}">@{m.name}</a></div>
-		<div class="fs11">@{m.datecreated.parseDate().format('yyyy-MM-dd HH:mm')}</div>
-		<p>@{m.perex}</p>
+		<div class="b"><a href="@{sitemap_url('blogsdetail', m.linker)}" style="font-size:16px">@{m.name}</a></div>
+		<div class="fs11">@{m.datecreated.format('yyyy-MM-dd HH:mm')}</div>
+		<p style="margin-top:10px">@{m.perex}</p>
 		<hr />
 	</div>
 	@{end}

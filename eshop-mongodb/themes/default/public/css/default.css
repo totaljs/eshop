@@ -158,7 +158,7 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .blue { color: #377BB5; }
 
 #loading { background: rgba(255,255,255,0.9) url(../img/preloader.gif) no-repeat 50% 50%; position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 10; }
-.fs11 { font-size: 11px; }
+.fs11 { font-size: 11px; line-height: 14px; }
 .table-repsonsive-label { float: left; display: none; }
 
 @media(max-width: 767px) {

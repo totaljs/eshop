@@ -19,7 +19,7 @@ exports.createSession = function(profile) {
 
 NEWSCHEMA('User').make(function(schema) {
 
-	schema.define('id', 'String(10)');
+	schema.define('id', 'String(20)');
 	schema.define('idfacebook', 'String(30)');
 	schema.define('idgoogle', 'String(30)');
 	schema.define('idlinkedin', 'String(30)');
@@ -69,7 +69,7 @@ NEWSCHEMA('User').make(function(schema) {
 		var newbie = model.id ? false : true;
 
 		if (!model.id)
-			model.id = U.GUID(10);
+			model.id = UID();
 
 		model.search = (model.name + ' ' + (model.email || '')).toSearch().max(80);
 
@@ -77,6 +77,7 @@ NEWSCHEMA('User').make(function(schema) {
 			builder.set(model);
 			if (newbie)
 				return;
+			builder.set('dateupdated', new Date());
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', model.id);
@@ -120,8 +121,6 @@ NEWSCHEMA('User').make(function(schema) {
 	// Sets default values
 	schema.setDefault(function(name) {
 		switch (name) {
-			case 'id':
-				return U.GUID(10);
 			case 'datecreated':
 				return new Date();
 		}
@@ -212,6 +211,7 @@ NEWSCHEMA('User').make(function(schema) {
 				}
 			} else {
 				response.user = schema.create();
+				response.user.id = UID();
 				response.user.name = options.profile.name;
 				response.user.email = options.profile.email;
 				response.user.gender = options.profile.gender;

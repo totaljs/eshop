@@ -9,8 +9,8 @@
 
 NEWSCHEMA('Page').make(function(schema) {
 
-	schema.define('id', 'String(10)');
-	schema.define('parent', 'String(10)');
+	schema.define('id', 'String(20)');
+	schema.define('parent', 'String(20)');
 	schema.define('template', 'String(30)');
 	schema.define('language', 'String(3)');
 	schema.define('url', 'String(200)');
@@ -218,7 +218,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		var isNew = model.id ? false : true;
 
 		if (!model.id)
-			model.id = U.GUID(10);
+			model.id = UID();
 
 		// Sanitizes URL
 		if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
@@ -250,6 +250,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			builder.set(clean);
 			if (isNew)
 				return;
+			builder.set('dateupdated', new Date());
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', clean.id);

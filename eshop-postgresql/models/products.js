@@ -1,6 +1,6 @@
 NEWSCHEMA('Product').make(function(schema) {
 
-	schema.define('id', 'String(10)');
+	schema.define('id', 'String(20)');
 	schema.define('pictures', '[String]');
 	schema.define('reference', 'String(20)');
 	schema.define('category', 'String(300)', true);
@@ -138,12 +138,13 @@ NEWSCHEMA('Product').make(function(schema) {
 		clean.pictures = clean.pictures.join(',');
 
 		if (isNew)
-			model.id = clean.id = U.GUID(10);
+			model.id = clean.id = UID();
 
 		sql.save('item', 'tbl_product', isNew, function(builder, isNew) {
 			builder.set(clean);
 			if (isNew)
 				return;
+			builder.set('dateupdated', new Date());
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', clean.id);
@@ -151,10 +152,13 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		sql.exec(function(err) {
 
-			F.emit('products.save', model);
-
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (err)
+				return;
+
+			F.emit('products.save', model);
 
 			// Refreshes internal information e.g. categories
 			setTimeout(refresh, 1000);
