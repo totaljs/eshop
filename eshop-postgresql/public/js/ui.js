@@ -129,101 +129,124 @@ COMPONENT('validation', function() {
 COMPONENT('checkbox', function() {
 
 	var self = this;
-	var isRequired = self.element.attr('data-required') === 'true';
+	var required = self.attr('data-required') === 'true';
+	var input;
 
 	self.validate = function(value) {
 		var is = false;
-		var t = typeof(value);
+		var type = typeof(value);
 
-		if (t === 'undefined' || t === 'object')
+		if (input.prop('disabled'))
+			return true;
+
+		if (type === 'undefined' || type === 'object')
 			value = '';
 		else
 			value = value.toString();
 
-		is = isRequired ? value === 'true' || value === 'on' : true;
-		return is;
+		return value === 'true' || value === 'on';
 	};
 
+	if (!required)
+		self.noValid();
+
 	self.make = function() {
-		var element = self.element;
-		var html = '<label><input type="checkbox" data-component-bind="" /> <span' + (isRequired ? ' class="ui-checkbox-label-required"' : '') + '>' + element.html() + '</span></label>';
-		element.addClass('ui-checkbox');
-		element.html(html);
+		self.element.addClass('ui-checkbox');
+		self.html('<label><input type="checkbox" data-component-bind="" /><span{1}>{0}</span></label>'.format(self.html(), required ? ' class="ui-checkbox-label-required"' : ''));
+		input = self.find('input');
 	};
 });
 
 COMPONENT('dropdown', function() {
 
 	var self = this;
-	var isRequired = self.attr('data-required') === 'true';
+	var required = self.attr('data-required') === 'true';
+	var select;
+	var container;
 
 	self.validate = function(value) {
 
-		if (value === null || value === undefined || typeof(value) === 'object')
+		var type = typeof(value);
+
+		if (select.prop('disabled'))
+			return true;
+
+		if (type === 'undefined' || type === 'object')
 			value = '';
 		else
 			value = value.toString();
 
-		return isRequired ? self.type === 'number' ? value > 0 : value.length > 0 : true;
+		if (window.$calendar)
+			window.$calendar.hide();
+
+		if (self.type === 'currency' || self.type === 'number')
+			return value > 0;
+
+		return value.length > 0;
 	};
+
+	if (!required)
+		self.noValid();
 
 	self.render = function(arr) {
 
 		var builder = [];
 		var value = self.get();
-		var el = self.find('select').empty();
-		var kt = self.attr('data-source-text') || 'name';
-		var kv = self.attr('data-source-value') || 'id';
+		var template = '<option value="{0}"{1}>{2}</option>';
+		var propText = self.attr('data-source-text') || 'name';
+		var propValue = self.attr('data-source-value') || 'id';
+		var emptyText = self.attr('data-empty');
 
-		if (self.attr('data-empty') === 'true')
-			builder.push('<option value="">' + (self.attr('data-empty-text') || '') + '</option>');
+		if (emptyText !== undefined)
+			builder.push('<option value="">{0}</option>'.format(emptyText));
 
 		for (var i = 0, length = arr.length; i < length; i++) {
 			var item = arr[i];
-			if (typeof(item) === 'string')
-				builder.push('<option value="' + item + '"' + (value == item ? ' selected="selected"' : '') + '>' + item + '</option>');
+			if (item.length)
+				builder.push(template.format(item, value === item ? ' selected="selected"' : '', item));
 			else
-				builder.push('<option value="' + item[kv] + '"' + (value == item[kv] ? ' selected="selected"' : '') + '>' + item[kt] + '</option>');
+				builder.push(template.format(item[propValue], value === item[propValue] ? ' selected="selected"' : '', item[propText]));
 		}
 
+		select.html(builder.join(''));
+
 		var disabled = arr.length === 0;
-		el.parent().toggleClass('ui-disabled', disabled);
-		el.prop('disabled', disabled);
-		el.html(builder.join(''));
+		select.parent().toggleClass('ui-disabled', disabled);
+		select.prop('disabled', disabled);
 	};
 
 	self.make = function() {
 
 		var options = [];
-		var element = self.element;
-		var arr = (element.attr('data-options') || '').split(';');
 
-		for (var i = 0, length = arr.length; i < length; i++) {
-			var item = arr[i].split('|');
-			options.push('<option value="' + (item[1] === undefined ? item[0] : item[1]) + '">' + item[0] + '</option>');
-		}
+		(self.attr('data-options') || '').split(';').forEach(function(item) {
+			item = item.split('|');
+			options.push('<option value="{0}">{1}</option>'.format(item[1] === undefined ? item[0] : item[1], item[0]));
+		});
 
 		self.element.addClass('ui-dropdown-container');
 
-		var content = element.html();
-		var icon = element.attr('data-icon');
-		var html = '<div class="ui-dropdown"><span class="fa fa-sort"></span><select data-component-bind="">' + options.join('') + '</select></div>';
+		var label = self.html();
+		var html = '<div class="ui-dropdown"><span class="fa fa-sort"></span><select data-component-bind="">{0}</select></div>'.format(options.join(''));
+		var builder = [];
 
-		if (content.length > 0) {
-			element.empty();
-			element.append('<div class="ui-dropdown-label' + (isRequired ? ' ui-dropdown-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div>');
-			element.append('<div class="ui-dropdown-values">' + html + '</div>');
-		} else {
-			element.addClass('ui-dropdown-values');
-			element.append(html);
-		}
+		if (label.length) {
+			var icon = self.attr('data-icon');
+			builder.push('<div class="ui-dropdown-label{0}">{1}{2}:</div>'.format(required ? ' ui-dropdown-label-required' : '', icon ? '<span class="fa {0}"></span> '.format(icon) : '', label));
+			builder.push('<div class="ui-dropdown-values">{0}</div>'.format(html));
+			self.html(builder.join(''));
+		} else
+			self.html(html).addClass('ui-dropdown-values');
 
-		var datasource = element.attr('data-source');
-		if (!datasource)
+		select = self.find('select');
+		container = self.find('.ui-dropdown');
+
+		var ds = self.attr('data-source');
+		if (!ds)
 			return;
 
 		var prerender = function(path) {
-			var value = self.get(datasource);
+			var value = self.get(self.attr('data-source'));
 			if (NOTMODIFIED(self.id, value))
 				return;
 			if (!value)
@@ -231,64 +254,87 @@ COMPONENT('dropdown', function() {
 			self.render(value);
 		};
 
-		self.watch(datasource, prerender, true);
+		self.watch(ds, prerender, true);
 	};
 
-	self.state = function(type) {
-		self.find('.ui-dropdown').toggleClass('ui-dropdown-invalid', self.isInvalid());
+	self.state = function(type, who) {
+		if (!type)
+			return;
+		var invalid = self.isInvalid();
+		if (invalid === self.$oldstate)
+			return;
+		self.$oldstate = invalid;
+		container.toggleClass('ui-dropdown-invalid', self.isInvalid());
 	};
 });
 
 COMPONENT('textbox', function() {
 
 	var self = this;
-	var isRequired = self.attr('data-required') === 'true';
+	var required = self.attr('data-required') === 'true';
+	var input;
+	var container;
 
 	self.validate = function(value) {
 
 		var is = false;
-		var t = typeof(value);
+		var type = typeof(value);
 
-		if (self.find('input').prop('disabled'))
+		if (input.prop('disabled'))
 			return true;
 
-		if (t === 'undefined' || t === 'object')
+		if (type === 'undefined' || type === 'object')
 			value = '';
 		else
 			value = value.toString();
 
 		if (window.$calendar)
 			window.$calendar.hide();
-		is = isRequired ? self.type === 'email' ? value.isEmail() : self.type === 'currency' ? value > 0 : value.length > 0 : true;
-		return is;
+
+		if (self.type === 'email')
+			return value.isEmail();
+		if (self.type === 'currency')
+			return value > 0;
+		return value.length > 0;
 	};
+
+	if (!required)
+		self.noValid();
 
 	self.make = function() {
 
 		var attrs = [];
+		var builder = [];
+		var tmp;
 
-		function attr(name) {
-			var a = self.element.attr(name);
-			if (!a)
-				return;
-			attrs.push(name.substring(name.indexOf('-') + 1) + '="' + a + '"');
-		}
+		attrs.attr('type', self.type === 'password' ? self.type : 'text');
+		attrs.attr('placeholder', self.attr('data-placeholder'));
+		attrs.attr('maxlength', self.attr('data-maxlength'));
+		attrs.attr('data-component-keypress', self.attr('data-component-keypress'));
+		attrs.attr('data-component-keypress-delay', self.attr('data-component-keypress-delay'));
+		attrs.attr('data-component-bind', '');
 
-		attr('data-placeholder');
-		attr('data-maxlength');
+		tmp = self.attr('data-align');
+		if (tmp)
+			attrs.attr('class', 'ui-' + tmp);
+
+		if (self.attr('data-autofocus') === 'true')
+			attrs.attr('autofocus');
 
 		var content = self.html();
 		var icon = self.attr('data-icon');
-		var align = self.attr('data-align');
-		var cicon = self.attr('data-control-icon');
-		var delay = self.attr('data-component-keypress-delay');
-		var keypress = self.attr('data-component-keypress');
+		var icon2 = self.attr('data-control-icon');
 		var increment = self.attr('data-increment') === 'true';
 
-		if (self.type === 'date' && !cicon)
-			cicon = 'fa-calendar';
+		if (!icon2 && self.type === 'date')
+			icon2 = 'fa-calendar';
 
-		var html = '<input' + (keypress ? ' data-component-keypress="' + keypress + '"' : '') + (delay ? ' data-component-keypress-delay="' + delay + '"' : '') + ' type="' + (self.type === 'password' ? 'password' : 'text') + '" data-component-bind=""' + (attrs.length ? ' ' + attrs.join('') : '') + (align ? ' class="ui-' + align + '"' : '')  + (self.attr('data-autofocus') === 'true' ? ' autofocus="autofocus"' : '') + ' />' + (cicon ? '<div><span class="fa ' + cicon + '"></span></div>' : increment ? '<div><span class="fa fa-caret-up"></span><span class="fa fa-caret-down"></span></div>' : '');
+		builder.push('<input {0} />'.format(attrs.join(' ')));
+
+		if (icon2)
+			builder.push('<div><span class="fa {0}"></span></div>'.format(icon2));
+		else if (increment)
+			builder.push('<div><span class="fa fa-caret-up"></span><span class="fa fa-caret-down"></span></div>');
 
 		if (increment) {
 			self.element.on('click', '.fa-caret-up,.fa-caret-down', function(e) {
@@ -313,19 +359,38 @@ COMPONENT('textbox', function() {
 			});
 		}
 
-		if (content.length === 0) {
+		if (!content.length) {
 			self.element.addClass('ui-textbox ui-textbox-container');
-			self.element.append(html);
+			self.html(builder.join(''));
+			input = self.find('input');
+			container = self.find('.ui-textbox');
 			return;
 		}
 
-		self.element.empty();
+		var html = builder.join('');
+		builder = [];
+		builder.push('<div class="ui-textbox-label{0}">'.format(required ? ' ui-textbox-label-required' : ''));
+
+		if (icon)
+			builder.push('<span class="fa {0}"></span> '.format(icon));
+
+		builder.push(content);
+		builder.push(':</div><div class="ui-textbox">{0}</div>'.format(html));
+
+		self.html(builder.join(''));
 		self.element.addClass('ui-textbox-container');
-		self.element.append('<div class="ui-textbox-label' + (isRequired ? ' ui-textbox-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div><div class="ui-textbox">' + html + '</div>');
+		input = self.find('input');
+		container = self.find('.ui-textbox');
 	};
 
-	self.state = function(type) {
-		self.find('.ui-textbox').toggleClass('ui-textbox-invalid', self.isInvalid());
+	self.state = function(type, who) {
+		if (!type)
+			return;
+		var invalid = self.isInvalid();
+		if (invalid === self.$oldstate)
+			return;
+		self.$oldstate = invalid;
+		container.toggleClass('ui-textbox-invalid', self.isInvalid());
 	};
 });
 
@@ -405,10 +470,10 @@ COMPONENT('template', function() {
 	};
 
 	self.setter = function(value) {
-		if (!value)
-			return self.element.addClass('hidden');
 		if (NOTMODIFIED(self.id, value))
 			return;
+		if (!value)
+			return self.element.addClass('hidden');
 		KEYPRESS(function() {
 			self.html(self.template(value)).removeClass('hidden');
 		}, 100, self.id);
@@ -418,35 +483,42 @@ COMPONENT('template', function() {
 COMPONENT('repeater', function() {
 
 	var self = this;
+	var recompile = false;
+
 	self.readonly();
 
 	self.make = function() {
-		var el = self.element.find('script');
+		var element = self.element.find('script');
 
-		if (!el.length) {
-			el = self.element;
+		if (!element.length) {
+			element = self.element;
 			self.element = self.element.parent();
 		}
 
-		self.template = Tangular.compile(el.html());
-		el.remove();
+		var html = element.html();
+		element.remove();
+		self.template = Tangular.compile(html);
+		recompile = html.indexOf('data-component="') !== -1;
 	};
 
 	self.setter = function(value) {
 
 		if (!value || !value.length) {
-			self.html('');
+			self.empty();
 			return;
 		}
 
-		var builder = '';
+		var builder = [];
 		for (var i = 0, length = value.length; i < length; i++) {
 			var item = value[i];
 			item.index = i;
-			builder += self.template(item).replace(/\$index/g, i.toString()).replace(/\$/g, self.path + '[' + i + ']');
+			builder.push(self.template(item).replace(/\$index/g, i.toString()).replace(/\$/g, self.path + '[' + i + ']'));
 		}
 
 		self.html(builder);
+
+		if (recompile)
+		   jC.compile();
 	};
 });
 
@@ -1389,10 +1461,6 @@ COMPONENT('dropdowncheckbox', function() {
 	});
 });
 
-/**
- * Cropper
- * @version 2.0.0
- */
 COMPONENT('crop', function() {
 	var self = this;
 	var width, height, canvas, context;
