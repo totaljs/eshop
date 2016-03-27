@@ -363,7 +363,7 @@ NEWSCHEMA('Product').make(function(schema) {
 						response.pipe(writer);
 						CLEANUP(writer, function() {
 							var tmp = new ObjectID();
-							db.writeFile(DB(), tmp, filename, U.getName(picture), null, function(err) {
+							db.writeFile(tmp, filename, U.getName(picture), null, function(err) {
 								Fs.unlink(filename, NOOP);
 								if (err)
 									return next();

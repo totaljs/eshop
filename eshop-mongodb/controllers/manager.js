@@ -143,7 +143,7 @@ function upload_base64() {
 			break;
 	}
 
-	GridStore.writeBuffer(DB(), id, data, output, null, function(err) {
+	DB().writeBuffer(id, data, output, null, function(err) {
 		self.json('/download/' + output);
 	});
 }
@@ -161,22 +161,18 @@ function redirect_logoff() {
 
 // Clears all uploaded files
 function json_files_clear() {
-	var async = [];
 	var self = this;
+	var nosql = DB();
 
-	async.push(function(next) {
-		DB('fs.chunks').drop(F.error());
-		next();
+	nosql.push('fs.chunks', function(collection, callback) {
+		collection.drop(callback);
 	});
 
-	async.push(function(next) {
-		DB('fs.files').drop(F.error());
-		next();
+	nosql.push('fs.files', function(collection, callback) {
+		collection.drop(callback);
 	});
 
-	async.async(function() {
-		self.json(SUCCESS(true));
-	});
+	nosql.exec(() => self.json(SUCCESS(true)));
 }
 
 // ==========================================================================
