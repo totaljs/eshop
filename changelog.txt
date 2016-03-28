@@ -9,6 +9,7 @@
 - improved UI components
 - improved code
 - works only with total.js 2.0
+- new NoSQL embedded database (compatibile with older database files)
 
 ======================== v4.0.0
 
