@@ -55,12 +55,16 @@ NEWSCHEMA('User').make(function(schema) {
 			return doc;
 		};
 
-		DB('users').one(filter, function(err, doc) {
-			if (doc)
-				return callback(doc);
-			error.push('error-404-user');
-			callback(doc);
-		});
+		var filter = DB('users').one();
+
+		if (options.id)
+			filter.where('id', options.id);
+		if (options.email)
+			filter.where('email', options.email);
+		if (options.password)
+			filter.where('password', options.password);
+
+		filter.callback(callback, 'error-404-user');
 	});
 
 	schema.setSave(function(error, model, options, callback) {
@@ -68,47 +72,32 @@ NEWSCHEMA('User').make(function(schema) {
 		if (model.datecreated)
 			model.datecreated = model.datecreated.format();
 
-		var updater = function(doc) {
-			if (doc.id !== model.id)
-				return doc;
-			return model.$clean();
-		};
-
-		// Update user in database
-		DB('users').update(updater, function() {
-
-			F.emit('users.save', model);
+		// Update the user in database
+		DB('users').update(model).where('id', model.id).callback(function(count) {
 
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (count)
+				F.emit('users.save', model);
 		});
 	});
 
 	// Removes user from DB
 	schema.setRemove(function(error, id, callback) {
-
-		// Filter for removing
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			return null;
-		};
-
 		// Updates database file
-		DB('users').update(updater, callback);
+		DB('users').remove().where('id', id).callback(callback);
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		DB('users').clear(NOOP);
+		DB('users').remove();
 		callback(SUCCESS(true));
 	});
 
 	// Sets default values
 	schema.setDefault(function(name) {
 		switch (name) {
-			case 'id':
-				return UID();
 			case 'datecreated':
 				return new Date();
 		}
@@ -130,29 +119,16 @@ NEWSCHEMA('User').make(function(schema) {
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
 
+		var filter = DB('users').find();
+
 		// Prepares searching
 		if (options.search)
-			options.search = options.search.toSearch();
+			filter.like('search', options.search.keywords(true, true));
 
-		// Filter for reading
-		var filter = function(doc) {
-			// Searchs in "title"
-			if (options.search) {
-				if (doc.name.toSearch().indexOf(options.search) === -1)
-					return;
-			}
-
-			return doc;
-		};
-
-		// Sorting documents
-		var sorting = function(a, b) {
-			if (new Date(a.datecreated) > new Date(b.datecreated))
-				return -1;
-			return 1;
-		};
-
-		DB('users').sort(filter, sorting, function(err, docs, count) {
+		filter.take(take);
+		filter.skip(skip);
+		filter.sort('datecreated');
+		filter.callback(function(err, docs, count) {
 			var data = {};
 
 			data.count = count;
@@ -166,7 +142,7 @@ NEWSCHEMA('User').make(function(schema) {
 
 			// Returns data
 			callback(data);
-		}, skip, take);
+		});
 	});
 
 	schema.addWorkflow('login', function(error, model, options, callback) {
@@ -189,13 +165,14 @@ NEWSCHEMA('User').make(function(schema) {
 
 				// new user
 				doc = schema.create();
+				doc.id = UID();
 				doc.name = options.profile.name;
 				doc.firstname = options.profile.firstname;
 				doc.lastname = options.profile.lastname;
 				doc.email = options.profile.email;
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
-				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).toSearch().max(80);
+				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ');
 				doc.datecreated = doc.datecreated.format();
 				doc[id] = options.profile[id];
 				DB('users').insert(doc.$clean(), F.error());
@@ -215,7 +192,6 @@ NEWSCHEMA('User').make(function(schema) {
 
 			exports.login(options.controller.req, options.controller.res, doc.id);
 			options.controller.req.user = exports.createSession(doc);
-
 			callback(doc);
 		});
 	});
@@ -304,6 +280,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			}
 
 			var user = GETSCHEMA('User').create();
+			user.id = UID();
 			user.email = model.email;
 			user.firstname = model.firstname;
 			user.lastname = model.lastname;
@@ -311,6 +288,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.gender = model.gender;
 			user.password = model.password.hash('sha1');
 			user.ip = options.ip;
+			user.search = (user.name + ' ' + (user.email || '')).keywords(true, true).join(' ');
 			user.datecreated = user.datecreated.format();
 
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
@@ -318,7 +296,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			if (F.config.custom.emailuserform)
 				mail.bcc(F.config.custom.emailuserform);
 
-			DB('users').insert(user.$clean(), F.error());
+			DB('users').insert(user, F.error());
 
 			// Login user
 			exports.login(options.controller.req, options.controller.res, user.id);

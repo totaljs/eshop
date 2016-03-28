@@ -59,46 +59,27 @@ NEWSCHEMA('Page').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 
 		// Prepares searching
-		if (typeof(options.search) === 'string')
-			options.search = options.search ? options.search.toSearch().split(' ') : [];
+		if (options.search)
+			options.search = options.search.keywords(true, true);
+
+		var filter = DB('pages').find();
+
+		if (options.ispartial)
+			filter.where('ispartial', options.ispartial);
+
+		if (options.language)
+			filter.where('language', options.language);
+
+		if (options.navigations)
+			filter.in('navigations', options.navigations);
 
 		if (options.search)
-			options.search_length = options.search.length;
+			filter.like('search', options.search);
 
-		// Filter for reading
-		var filter = function(doc) {
+		filter.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
+		filter.sort('datecreated', true);
 
-			// Checks partial content
-			if (options.ispartial && doc.ispartial !== options.ispartial)
-				return;
-
-			// Checks language
-			if (options.language && doc.language !== options.language)
-				return;
-
-			// Checks navigations
-			if (options.navigation && (!doc.navigations || doc.navigations.indexOf(options.navigation) === -1))
-				return;
-
-			// Searchs
-			if (options.search_length) {
-				if (!doc.search)
-					return;
-				for (var i = 0; i < options.search_length; i++) {
-					if (doc.search.indexOf(options.search[i]) === -1)
-						return;
-				}
-			}
-
-			return { id: doc.id, name: doc.name, parent: doc.parent, url: doc.url, navigations: doc.navigations, ispartial: doc.ispartial, priority: doc.priority, language: doc.language, icon: doc.icon };
-		};
-
-		// Sorting documents
-		var sorting = function(a, b) {
-			return a.name.removeDiacritics().localeCompare(b.name.removeDiacritics());
-		};
-
-		DB('pages').sort(filter, sorting, function(err, docs, count) {
+		filter.callback(function(err, docs, count) {
 
 			var data = {};
 
@@ -113,7 +94,8 @@ NEWSCHEMA('Page').make(function(schema) {
 
 			// Returns data
 			callback(data);
-		}, skip, take);
+
+		});
 	});
 
 	// Gets a specific page
@@ -132,30 +114,28 @@ NEWSCHEMA('Page').make(function(schema) {
 			return doc;
 		};
 
+		var filter = DB('pages').one();
+
+		if (options.url)
+			filter.where('url', options.url);
+
+		if (options.id)
+			filter.where('id', options.id);
+
+		if (options.language)
+			filter.where('language', options.language);
+
 		// Gets specific document
-		DB('pages').one(filter, function(err, doc) {
-
-			if (doc)
-				return callback(doc);
-
-			error.push('error-404-page');
-			callback();
+		filter.callback(function(err, doc) {
+			if (!doc)
+				error.push('error-404-page');
+			callback(doc);
 		});
 	});
 
 	// Removes a specific page
 	schema.setRemove(function(error, id, callback) {
-
-		// Filters for removing
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			return null;
-		};
-
-		// Updates database file
-		DB('pages').update(updater, callback);
-
+		DB('pages').remove().where('id', id).callback(callback);
 		// Refreshes internal informations e.g. sitemap
 		setTimeout(refresh, 1000);
 	});
@@ -169,10 +149,12 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (!model.name)
 			model.name = model.title;
 
-		var count = 0;
+		var newbie = false;
 
-		if (!model.id)
+		if (!model.id) {
 			model.id = UID();
+			newbie = true;
+		}
 
 		if (model.datecreated)
 			model.datecreated = model.datecreated.format();
@@ -187,34 +169,32 @@ NEWSCHEMA('Page').make(function(schema) {
 				model.url = '/' + model.url;
 		}
 
-		// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
-		var clean = model.$clean();
-
-		// Filter for updating
-		var updater = function(doc) {
-			if (doc.id !== clean.id)
-				return doc;
-			count++;
-			doc.datebackuped = new Date().format();
-			DB('pages_backup').insert(doc);
-			return clean;
-		};
-
-		// Updates database file
-		DB('pages').update(updater, function() {
-
-			// Creates record if not exists
-			if (!count)
-				DB('pages').insert(clean);
+		var fn = function(count) {
 
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (!count)
+				return;
+
+			// create a backup
+			if (!newbie) {
+				model.datebackuped = new Date();
+				DB('pages_backup').insert(model);
+			}
 
 			F.emit('pages.save', model);
 
 			// Refreshes internal informations e.g. sitemap
 			setTimeout(refresh, 1000);
-		});
+		};
+
+		if (newbie) {
+			DB('pages').insert(model).callback(fn);
+			return;
+		}
+
+		DB('pages').update(model).where('id', model.id).callback(fn);
 	});
 
 	schema.addWorkflow('create-url', function(error, model, options, callback) {
@@ -423,14 +403,9 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	// Clears database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-
-		DB('pages').clear(function() {
-			setTimeout(refresh, 1000);
-		});
-
+		DB('pages').remove().callback(() => setTimeout(refresh, 1000));
 		callback(SUCCESS(true));
 	});
-
 });
 
 // Refreshes internal informations (sitemap and navigations)
@@ -466,7 +441,7 @@ function refresh() {
 		}
 	};
 
-	DB('pages').all(prepare, function() {
+	DB('pages').find().prepare(prepare).callback(function() {
 
 		// Pairs parents by URL
 		Object.keys(sitemap).forEach(function(key) {
@@ -476,11 +451,8 @@ function refresh() {
 		});
 
 		// Sorts navigation according to priority
-		Object.keys(navigation).forEach(function(name) {
-			navigation[name].sort((a, b) => a.priority > b.priority ? -1 : a.priority === b.priority ? 0 : 1);
-		});
-
-		partial.sort((a, b) => a.priority > b.priority ? -1 : a.priority === b.priority ? 0 : 1);
+		Object.keys(navigation).forEach((name) => navigation[name].orderBy('priority', false));
+		partial.orderBy('priority', false);
 
 		F.global.navigations = navigation;
 		F.global.sitemap = sitemap;
@@ -570,19 +542,6 @@ F.eval(function() {
 
 		return self;
 	};
-});
-
-// Renders page and stores into the repository
-F.middleware('page', function(req, res, next, options, controller) {
-
-	if (!controller) {
-		res.throw404();
-		return;
-	}
-
-	controller.memorize('cache.' + controller.url, '1 minute', DEBUG, function() {
-		controller.page(controller.url);
-	});
 });
 
 F.on('settings', refresh);

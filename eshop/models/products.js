@@ -1,5 +1,4 @@
 NEWSCHEMA('Product').make(function(schema) {
-
 	schema.define('id', 'String(20)');
 	schema.define('pictures', '[String]');
 	schema.define('reference', 'String(20)');
@@ -39,55 +38,46 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		var search;
 		if (options.search)
-			search = options.search.toSearch();
+			search = options.search.keywords(true, true);
 
 		if (options.page < 0)
 			options.page = 0;
 
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
-
 		var linker_detail = F.sitemap('detail', true);
 		var linker_category = F.sitemap('category', true);
+		var filter = DB('products').find();
 
-		var filter = function(doc) {
+		if (options.category)
+			filter.like('linker_category', options.category, 'beg');
 
-			if (options.category && !doc.linker_category.startsWith(options.category))
-				return;
-			if (options.manufacturer && doc.manufacturer !== options.manufacturer)
-				return;
-			if (options.search && doc.name.toSearch().indexOf(search) === -1 && doc.id !== options.search && doc.reference !== options.search)
-				return;
-			if (options.id && options.id.indexOf(doc.id) === -1)
-				return;
-			if (options.skip && doc.id === options.skip)
-				return;
+		if (options.manufacturer)
+			filter.where('manufacturer', options.manufacturer);
 
-			if (linker_detail)
-				doc.linker = linker_detail.url.format(doc.linker);
-			if (linker_category)
-				doc.linker_category = linker_category.url.format(doc.linker_category);
+		if (search)
+			filter.like('search', search);
 
-			// Cleans unnecessary properties.
-			delete doc.body;
-			return doc;
-		};
+		if (options.id)
+			filter.where('id', options.id);
 
-		var sorting = function(a, b) {
+		if (options.skip)
+			filter.where('id', '<>', options.skip);
 
-			if (options.homepage) {
-				if (a.istop)
-					return -1;
-				if (b.istop)
-					return 1;
+		filter.sort('datecreated', true);
+		filter.skip(skip);
+		filter.take(take);
+		filter.callback(function(err, docs, count) {
+
+			for (var i = 0, length = docs.length; i < length; i++) {
+				var doc = docs[i];
+				if (linker_detail)
+					doc.linker = linker_detail.url.format(doc.linker);
+				if (linker_category)
+					doc.linker_category = linker_category.url.format(doc.linker_category);
+				delete doc.body;
 			}
 
-			if (new Date(a.datecreated) > new Date(b.datecreated))
-				return -1;
-			return 1;
-		};
-
-		DB('products').sort(filter, sorting, function(err, docs, count) {
 			var data = {};
 			data.count = count;
 			data.items = docs;
@@ -98,46 +88,34 @@ NEWSCHEMA('Product').make(function(schema) {
 
 			data.page = options.page + 1;
 			callback(data);
-		}, skip, take);
+		});
 	});
 
 	// Saves the product into the database
 	schema.setSave(function(error, model, options, callback) {
 
-		var count = 0;
+		var newbie = false;
+		var nosql = DB('products');
 
-		if (!model.id)
+		if (!model.id) {
+			newbie = true;
 			model.id = UID();
+		}
 
 		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
 		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
 
 		var category = prepare_subcategories(model.category);
+
 		model.category = category.name;
 		model.linker_category = category.linker;
 
 		if (model.datecreated)
 			model.datecreated = model.datecreated.format();
 
-		// Filter for updating
-		var updater = function(doc) {
+		model.search = (model.name + ' ' + (model.manufacturer || '') + ' ' + (model.reference || '')).keywords(true, true).join(' ');
 
-			if (doc.id !== model.id)
-				return doc;
-
-			count++;
-			doc.datebackuped = new Date().format();
-			DB('products_backup').insert(doc);
-			return model.$clean();
-		};
-
-		// Updates database file
-		DB('products').update(updater, function() {
-
-			// Creates record if not exists
-			if (count === 0)
-				DB('products').insert(model);
-
+		var fn = function() {
 			F.emit('products.save', model);
 
 			// Returns response
@@ -145,7 +123,15 @@ NEWSCHEMA('Product').make(function(schema) {
 
 			// Refreshes internal information e.g. categories
 			setTimeout(refresh, 1000);
-		});
+		};
+
+		if (newbie) {
+			nosql.insert(model).callback(fn);
+			return;
+		}
+
+		DB('products_backup').insert(model);
+		nosql.modify(model).where('id', model.id).callback(fn);
 	});
 
 	// Gets a specific product
@@ -154,45 +140,30 @@ NEWSCHEMA('Product').make(function(schema) {
 		// options.category {String}
 		// options.linker {String}
 		// options.id {String}
-
-		// Filter for reading
-		var filter = function(doc) {
-
-			if (options.category && doc.linker_category !== options.category)
-				return;
-
-			if (options.linker && doc.linker !== options.linker)
-				return;
-
-			if (options.id && doc.id !== options.id)
-				return;
-
-			return doc;
-		};
-
 		// Gets a specific document from DB
-		DB('products').one(filter, function(err, doc) {
+		var filter = DB('products').one();
 
-			if (doc)
-				return callback(doc);
+		if (options.category)
+			filter.where('linker_category', options.category);
 
-			error.push('error-404-product');
-			callback();
+		if (options.linker)
+			filter.where('linker', options.linker);
+
+		if (options.id)
+			filter.where('id', options.id);
+
+		filter.callback(function(err, doc) {
+			if (!doc)
+				error.push('error-404-product');
+			callback(doc);
 		});
 	});
 
 	// Removes product
 	schema.setRemove(function(error, id, callback) {
 
-		// Filter for removing
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			return null;
-		};
-
 		// Updates database file
-		DB('products').update(updater, callback);
+		DB('products').remove().where('id', id).callback(callback);
 
 		// Refreshes internal information e.g. categories
 		setTimeout(refresh, 1000);
@@ -200,12 +171,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 	// Clears product database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-
-		DB('products').clear(function() {
-			// Refreshes internal information e.g. categories
-			setTimeout(refresh, 1000);
-		});
-
+		DB('products').remove().callback(refresh);
 		callback(SUCCESS(true));
 	});
 
@@ -221,24 +187,18 @@ NEWSCHEMA('Product').make(function(schema) {
 		// options.category_old
 		// options.category_new
 
-		var is = false;
 		var category_old = prepare_subcategories(options.category_old);
 		var category_new = prepare_subcategories(options.category_new);
 
 		var update = function(doc) {
-
-			if (doc.category.startsWith(category_old.name)) {
-				doc.category = doc.category.replace(category_old.name, category_new.name);
-				doc.linker_category = doc.linker_category.replace(category_old.linker, category_new.linker);
-				is = true;
-			}
-
+			doc.category = doc.category.replace(category_old.name, category_new.name);
+			doc.linker_category = doc.linker_category.replace(category_old.linker, category_new.linker);
 			return doc;
 		};
 
-		DB('products').update(update, function() {
+		DB('products').update().like('category', category_old.name).callback(function(err, count) {
 			// Refreshes internal information e.g. categories
-			if (is)
+			if (count)
 				setTimeout(refresh, 1000);
 			callback(SUCCESS(true));
 		});
@@ -385,12 +345,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	});
 
 	schema.addWorkflow('export.xml', function(error, model, options, callback) {
-
-		var filter = function(doc) {
-			return doc;
-		}
-
-		DB('products').all(filter, function(err, docs, count) {
+		DB('products').find().callback(function(err, docs, count) {
 
 			var xml = [];
 
@@ -462,7 +417,7 @@ function refresh() {
 			db_manufacturers[doc.manufacturer].count++;
 	};
 
-	DB('products').all(prepare, function() {
+	DB('products').find().prepare(prepare).callback(function() {
 
 		// Prepares categories with their subcategories
 		var keys = Object.keys(db_categories);

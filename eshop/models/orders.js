@@ -41,7 +41,6 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('products', '[OrderItem]', true);
 	schema.define('isnewsletter', Boolean);
 	schema.define('ispaid', Boolean);
-	schema.define('isterms', Boolean);
 	schema.define('isemail', Boolean);
 
 	// Sets default values
@@ -78,47 +77,27 @@ NEWSCHEMA('Order').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var type = U.parseInt(options.type);
 
-		// Filtering documents
-		var filter = function(doc) {
+		var filter = DB('orders').find();
 
-			// Uncompleted
-			if (type === 1 && doc.iscompleted)
-				return;
+		if (type === 1)
+			filter.where('iscompleted', false); // Uncompleted
+		else if (type === 2)
+			filter.where('iscompleted', false).where('ispaid', false); // Uncompleted and not paid
+		else if (type === 3)
+			filter.where('iscompleted', false).where('ispaid', true); // Uncompleted and paid
+		else if (type === 4)
+			filter.where('iscompleted', true); // Uncompleted and paid
 
-			// Uncompleted and not paid
-			if (type === 2 && (doc.iscompleted || doc.ispaid))
-				return;
+		if (options.iduser)
+			filter.where('iduser', options.iduser);
 
-			// Uncompleted and paid
-			if (type === 3 && (doc.iscompleted || !doc.ispaid))
-				return;
+		if (options.search)
+			filter.like('search', options.search.keywords(true, true));
 
-			// Completed
-			if (type === 4 && !doc.iscompleted)
-				return;
-
-			// Delivery
-			if (options.delivery && doc.delivery !== delivery)
-				return;
-
-			// Search
-			if (options.search && (doc.id + ' ' + doc.firstname + ' ' + doc.lastname).toSearch().indexOf(options.search) === -1)
-				return;
-
-			if (options.iduser && options.iduser !== doc.iduser)
-				return;
-
-			return doc;
-		};
-
-		// Sorting documents
-		var sorting = function(a, b) {
-			if (new Date(a.datecreated) > new Date(b.datecreated))
-				return -1;
-			return 1;
-		};
-
-		DB('orders').sort(filter, sorting, function(err, docs, count) {
+		filter.skip(skip);
+		filter.take(take);
+		filter.sort('datecreated');
+		filter.callback(function(err, docs, count) {
 			var data = {};
 
 			data.count = count;
@@ -132,8 +111,7 @@ NEWSCHEMA('Order').make(function(schema) {
 
 			// Returns data
 			callback(data);
-
-		}, skip, take);
+		});
 	});
 
 	// Creates order
@@ -161,7 +139,6 @@ NEWSCHEMA('Order').make(function(schema) {
 
 		// Cleans unnecessary properties
 		delete model.isnewsletter;
-		delete model.isterms;
 		delete model.isemail;
 
 		// Inserts order into the database
@@ -180,21 +157,8 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Gets a specific order
 	schema.setGet(function(error, model, options, callback) {
-
 		// options.id {String}
-
-		var filter = function(doc) {
-			if (options.id && doc.id !== options.id)
-				return;
-			return doc;
-		};
-
-		DB('orders').one(filter, function(err, doc) {
-			if (doc)
-				return callback(doc);
-			error.push('error-404-order');
-			callback();
-		});
+		DB('orders').one().where('id', options.id).callback(callback, 'error-404-order');
 	});
 
 	// Saves the order into the database
@@ -204,7 +168,6 @@ NEWSCHEMA('Order').make(function(schema) {
 
 		// Cleans unnecessary properties
 		delete model.isnewsletter;
-		delete model.isterms;
 		delete model.isemail;
 
 		if (model.datecompleted)
@@ -218,21 +181,20 @@ NEWSCHEMA('Order').make(function(schema) {
 		if (model.ispaid && !model.datepaid)
 			model.datepaid = (new Date()).format();
 
-		var updater = function(doc) {
-			if (doc.id !== model.id)
-				return doc;
-			doc.datebackuped = new Date().format();
-			DB('orders_backup').insert(doc);
-			return model.$clean();
-		};
+		model.search = (model.id + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ');
 
 		// Update order in database
-		DB('orders').update(updater, function() {
-
-			F.emit('orders.save', model);
+		DB('orders').update(model).where('id', model.id).callback(function(err, count) {
 
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (!count)
+				return;
+
+			F.emit('orders.save', model);
+			model.datebackuped = new Date();
+			DB('orders_backup').insert(model);
 		});
 
 		if (!isemail)
@@ -245,21 +207,13 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Removes order from DB
 	schema.setRemove(function(error, id, callback) {
-
-		// Filter for removing
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			return null;
-		};
-
 		// Updates database file
-		DB('orders').update(updater, callback);
+		DB('orders').remove().where('id', id).callback(callback);
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		DB('orders').clear(NOOP);
+		DB('orders').remove();
 		callback(SUCCESS(true));
 	});
 
@@ -274,7 +228,6 @@ NEWSCHEMA('Order').make(function(schema) {
 		stats.pending_price = 0;
 
 		var prepare = function(doc) {
-
 			if (doc.iscompleted) {
 				stats.completed++;
 				stats.completed_price += doc.price;
@@ -282,31 +235,15 @@ NEWSCHEMA('Order').make(function(schema) {
 				stats.pending++;
 				stats.pending_price += doc.price;
 			}
-
-			// Saves memory
-			return 0;
 		};
 
-		DB('orders').all(prepare, function(err) {
-			// Returns stats for dashboard
-			callback(stats);
-		});
+		// Returns data for dashboard
+		DB('orders').find().prepare(prepare).callback(() => callback(stats));
 	});
 
 	// Sets the payment status to paid
 	schema.addWorkflow('paid', function(error, model, id, callback) {
-
-		// Filter for update
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			doc.ispaid = true;
-			doc.datepaid = (new Date()).format();
-			return doc;
-		};
-
-		// Updates database file
-		DB('orders').update(updater, callback);
+		DB('orders').modify({ ispaid: true, datepaid: new Date().format() }).where('id', id).callback(callback);
 	});
 
 });

@@ -18,19 +18,10 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
-
-		var filter = function(doc) {
-			return { id: doc.id, icon: doc.icon, name: doc.name, category: doc.category, istemplate: doc.istemplate };
-		};
-
-		DB('widgets').all(filter, function(err, docs, count) {
-
-			docs.sort(function(a, b) {
-				return a.name.removeDiacritics().localeCompare(b.name.removeDiacritics());
-			});
-
-			callback(docs);
-		});
+		var filter = DB('widgets').find();
+		filter.sort('name');
+		filter.fields('id', 'icon', 'name', 'category', 'istemplate');
+		filter.callback((err, docs) => callback(docs));
 	});
 
 	// Gets a specific widget
@@ -39,41 +30,22 @@ NEWSCHEMA('Widget').make(function(schema) {
 		// options.url {String}
 		// options.id {String}
 
-		// Filter for reading
-		var filter = function(doc) {
-
-			if (options.url && doc.url !== options.url)
-				return;
-
-			if (options.id && doc.id !== options.id)
-				return;
-
-			return doc;
-		};
-
 		// Gets a specific document
-		DB('widgets').one(filter, function(err, doc) {
+		var filter = DB('widgets').one();
 
-			if (doc)
-				return callback(doc);
+		if (options.url)
+			filter.where('url', options.url);
 
-			error.push('error-404-widget');
-			callback();
-		});
+		if (options.id)
+			filter.where('id', options.id);
+
+		filter.callback(callback, 'error-404-widget');
 	});
 
-	// Removes specific widget
+	// Removes a specific widget
 	schema.setRemove(function(error, id, callback) {
-
-		// Filter for removing
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			return null;
-		};
-
 		// Updates database file
-		DB('widgets').update(updater, callback);
+		DB('widgets').remove().where('id', id).callback(callback);
 	});
 
 	// Saves the widget into the database
@@ -82,61 +54,61 @@ NEWSCHEMA('Widget').make(function(schema) {
 		// options.id {String}
 		// options.url {String}
 
-		var count = 0;
+		var newbie = false;
 
-		if (!model.id)
+		if (!model.id) {
+			newbie = true;
 			model.id = UID();
+		}
 
 		if (model.datecreated)
 			model.datecreated = model.datecreated.format();
 
-		// Filter for updating
-		var updater = function(doc) {
-			if (doc.id !== model.id)
-				return doc;
-			count++;
-			doc.datebackuped = new Date().format();
-			DB('widgets_backup').insert(doc);
-			return model;
-		};
+		var fn = function(err, count) {
+			// Returns response
+			callback(SUCCESS(true));
 
-		// Updates database file
-		DB('widgets').update(updater, function() {
-
-			// Creates record if not exists
-			if (count === 0)
-				DB('widgets').insert(model);
+			if (!count)
+				return;
 
 			F.emit('widgets.save', model);
 
-			// Returns response
-			callback(SUCCESS(true));
-		});
+			if (newbie)
+				return;
+
+			model.datebackuped = new Date();
+			DB('widgets_backup').insert(model);
+		};
+
+		if (newbie) {
+			DB('widgets').insert(model).callback(fn);
+			return;
+		}
+
+		DB('widgets').update(model).where('id', model.id).callback(fn);
 	});
 
 	// Clears widget database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		DB('widgets').clear(NOOP);
+		DB('widgets').remove();
 		callback(SUCCESS(true));
 	});
 
 	// Loads widgets for rendering
 	schema.addWorkflow('load', function(error, model, widgets, callback) {
-
 		// widgets - contains String Array of ID widgets
-
 		var output = {};
 
-		var filter = function(doc) {
+		var filter = DB('widgets').find();
+
+		filter.filter(function(doc) {
 			if (doc.istemplate)
 				return;
 			if (widgets.indexOf(doc.id) !== -1)
 				output[doc.id] = doc;
-		};
-
-		DB('widgets').all(filter, function() {
-			callback(output);
 		});
+
+		filter.callback(() => callback(output));
 	});
 
 });
