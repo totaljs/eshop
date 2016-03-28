@@ -38,48 +38,27 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
-
-		// Prepares searching
-		if (typeof(options.search) === 'string')
-			options.search = options.search ? options.search.toSearch().split(' ') : [];
+		var filter = DB('posts').find();
 
 		if (options.search)
-			options.search_length = options.search.length;
+			options.search = options.search ? options.search.toSearch().split(' ') : [];
 
 		if (options.category)
 			options.category = options.category.slug();
 
-		// Filter for reading
-		var filter = function(doc) {
+		if (options.language)
+			filter.where('language', options.language);
 
-			if (options.category && doc.category_linker !== options.category)
-				return;
+		if (options.category)
+			filter.where('category_linker', options.category);
 
-			// Checks language
-			if (options.language && doc.language !== options.language)
-				return;
+		if (options.search)
+			filter.like('search', options.search.keywords(true, true));
 
-			// Searchs
-			if (options.search_length) {
-				if (!doc.search)
-					return;
-				for (var i = 0; i < options.search_length; i++) {
-					if (doc.search.indexOf(options.search[i]) === -1)
-						return;
-				}
-			}
+		filter.fields('id', 'category', 'name', 'language', 'datecreated', 'linker', 'category_linker', 'pictures', 'perex', 'tags');
+		filter.sort('datecreated');
 
-			return { id: doc.id, category: doc.category, name: doc.name, language: doc.language, datecreated: doc.datecreated, linker: doc.linker, category_linker: doc.category_linker, pictures: doc.pictures, perex: doc.perex, tags: doc.tags };
-		};
-
-		// Sorting documents
-		var sorting = function(a, b) {
-			if (new Date(a.datecreated) > new Date(b.datecreated))
-				return -1;
-			return 1;
-		};
-
-		DB('posts').sort(filter, sorting, function(err, docs, count) {
+		filter.callback(function(err, docs, count) {
 
 			var data = {};
 
@@ -94,10 +73,10 @@ NEWSCHEMA('Post').make(function(schema) {
 
 			// Returns data
 			callback(data);
-		}, skip, take);
+		});
 	});
 
-	// Gets a specific blog
+	// Gets a specific post
 	schema.setGet(function(error, model, options, callback) {
 
 		// options.linker {String}
@@ -108,57 +87,41 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (options.category)
 			options.category = options.category.slug();
 
-		// Filter for reading
-		var filter = function(doc) {
-			if (options.category && doc.category_linker !== options.category)
-				return;
-			if (options.linker && doc.linker !== options.linker)
-				return;
-			if (options.id && doc.id !== options.id)
-				return;
-			if (options.language && doc.language !== options.language)
-				return;
-			return doc;
-		};
+		var filter = DB('posts').one();
 
-		// Gets specific document
-		DB('posts').one(filter, function(err, doc) {
+		if (options.category)
+			filter.where('category_linker', options.category);
+		if (options.linker)
+			filter.where('linker', options.linker);
+		if (options.id)
+			filter.where('id', options.id);
+		if (options.language)
+			filter.where('language', options.language);
 
-			if (doc)
-				return callback(doc);
-
-			error.push('error-404-post');
-			callback();
-		});
+		filter.callback(callback, 'error-404-post');
 	});
 
-	// Removes a specific blog
+	// Removes a specific post
 	schema.setRemove(function(error, id, callback) {
-
-		// Filters for removing
-		var updater = function(doc) {
-			if (doc.id !== id)
-				return doc;
-			return null;
-		};
-
 		// Updates database file
-		DB('posts').update(updater, callback);
+		DB('posts').remove().where('id', id).callback(callback);
 
 		// Refreshes internal informations e.g. sitemap
 		setTimeout(refresh, 1000);
 	});
 
-	// Saves the blog into the database
+	// Saves the post into the database
 	schema.setSave(function(error, model, options, callback) {
 
 		// options.id {String}
 		// options.url {String}
 
-		var count = 0;
+		var newbie = false;
 
-		if (!model.id)
+		if (!model.id) {
 			model.id = UID();
+			newbie = true;
+		}
 
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
 
@@ -169,45 +132,38 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (model.datecreated)
 			model.datecreated = model.datecreated.format();
 
-		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).toSearch();
+		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true);
 
-		// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
-		var clean = model.$clean();
-
-		// Filter for updating
-		var updater = function(doc) {
-			if (doc.id !== clean.id)
-				return doc;
-			count++;
-			doc.datebackuped = new Date().format();
-			DB('posts_backup').insert(doc);
-			return clean;
-		};
-
-		// Updates database file
-		DB('posts').update(updater, function() {
-
-			// Creates record if not exists
-			if (count === 0)
-				DB('posts').insert(clean);
-
+		var fn = function(err, count) {
 			// Returns response
 			callback(SUCCESS(true));
+
+			if (!count)
+				return;
 
 			F.emit('posts.save', model);
 
 			// Refreshes internal informations e.g. sitemap
 			setTimeout(refresh, 1000);
-		});
+
+			if (newbie)
+				return;
+
+			model.datebackuped = new Date().format();
+			DB('posts_backup').insert(model);
+		};
+
+		if (newbie) {
+			DB('posts').insert(model).callback(fn);
+			return;
+		}
+
+		DB('posts').update(model).where('id', model.id).callback(fn);
 	});
 
 	// Clears database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-
-		DB('posts').clear(function() {
-			setTimeout(refresh, 1000);
-		});
-
+		DB('posts').remove().callback(() => setTimeout(refresh, 1000));
 		callback(SUCCESS(true));
 	});
 });
@@ -217,25 +173,17 @@ function refresh() {
 
 	var categories = {};
 
-	if (F.config.custom.posts) {
-		F.config.custom.posts.forEach(function(item) {
-			categories[item] = 0;
-		});
-	}
+	if (F.config.custom.posts)
+		F.config.custom.posts.forEach(item => categories[item] = 0);
 
 	var prepare = function(doc) {
 		if (categories[doc.category] !== undefined)
 			categories[doc.category] += 1;
 	};
 
-	DB('posts').all(prepare, function() {
-
+	DB('posts').find().prepare(prepare).callback(function() {
 		var output = [];
-
-		Object.keys(categories).forEach(function(key) {
-			output.push({ name: key, linker: key.slug(), count: categories[key] });
-		});
-
+		Object.keys(categories).forEach(key => output.push({ name: key, linker: key.slug(), count: categories[key] }));
 		F.global.posts = output;
 	});
 }
