@@ -59,7 +59,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			filter.like('search', search);
 
 		if (options.id)
-			filter.where('id', options.id);
+			filter.in('id', options.id);
 
 		if (options.skip)
 			filter.where('id', '<>', options.skip);
