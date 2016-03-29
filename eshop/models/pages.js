@@ -156,9 +156,6 @@ NEWSCHEMA('Page').make(function(schema) {
 			newbie = true;
 		}
 
-		if (model.datecreated)
-			model.datecreated = model.datecreated.format();
-
 		if (model.search)
 			model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).toSearch();
 

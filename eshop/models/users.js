@@ -68,10 +68,6 @@ NEWSCHEMA('User').make(function(schema) {
 	});
 
 	schema.setSave(function(error, model, options, callback) {
-
-		if (model.datecreated)
-			model.datecreated = model.datecreated.format();
-
 		// Update the user in database
 		DB('users').update(model).where('id', model.id).callback(function(count) {
 
@@ -173,7 +169,6 @@ NEWSCHEMA('User').make(function(schema) {
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
 				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ');
-				doc.datecreated = doc.datecreated.format();
 				doc[id] = options.profile[id];
 				DB('users').insert(doc.$clean(), F.error());
 
@@ -289,7 +284,6 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.password = model.password.hash('sha1');
 			user.ip = options.ip;
 			user.search = (user.name + ' ' + (user.email || '')).keywords(true, true).join(' ');
-			user.datecreated = user.datecreated.format();
 
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
 

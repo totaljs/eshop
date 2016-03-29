@@ -61,8 +61,6 @@ NEWSCHEMA('Widget').make(function(schema) {
 			model.id = UID();
 		}
 
-		if (model.datecreated)
-			model.datecreated = model.datecreated.format();
 
 		var fn = function(err, count) {
 			// Returns response

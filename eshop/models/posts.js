@@ -129,9 +129,6 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (category)
 			model.category_linker = category.linker;
 
-		if (model.datecreated)
-			model.datecreated = model.datecreated.format();
-
 		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true);
 
 		var fn = function(err, count) {
@@ -149,7 +146,7 @@ NEWSCHEMA('Post').make(function(schema) {
 			if (newbie)
 				return;
 
-			model.datebackuped = new Date().format();
+			model.datebackuped = new Date();
 			DB('posts_backup').insert(model);
 		};
 

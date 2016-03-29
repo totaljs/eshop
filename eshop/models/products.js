@@ -109,10 +109,6 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		model.category = category.name;
 		model.linker_category = category.linker;
-
-		if (model.datecreated)
-			model.datecreated = model.datecreated.format();
-
 		model.search = (model.name + ' ' + (model.manufacturer || '') + ' ' + (model.reference || '')).keywords(true, true).join(' ');
 
 		var fn = function() {
