@@ -31,6 +31,7 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');
 	schema.define('language', 'String(3)');
+	schema.define('reference', 'String(10)');
 	schema.define('ip', 'String(80)');
 	schema.define('iscompleted', Boolean);
 	schema.define('datecreated', Date);
@@ -170,18 +171,13 @@ NEWSCHEMA('Order').make(function(schema) {
 		delete model.isnewsletter;
 		delete model.isemail;
 
-		if (model.datecompleted)
-			model.datecompleted = model.datecompleted.format();
-		else if (model.iscompleted && !model.datecompleted)
-			model.datecompleted = (new Date()).format();
-
-		if (model.datecreated)
-			model.datecreated = model.datecreated.format();
+		if (model.iscompleted && !model.datecompleted)
+			model.datecompleted = new Date();
 
 		if (model.ispaid && !model.datepaid)
-			model.datepaid = (new Date()).format();
+			model.datepaid = new Date();
 
-		model.search = (model.id + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ');
+		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ');
 
 		// Update order in database
 		DB('orders').update(model).where('id', model.id).callback(function(err, count) {
@@ -243,7 +239,7 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Sets the payment status to paid
 	schema.addWorkflow('paid', function(error, model, id, callback) {
-		DB('orders').modify({ ispaid: true, datepaid: new Date().format() }).where('id', id).callback(callback);
+		DB('orders').modify({ ispaid: true, datepaid: new Date() }).where('id', id).callback(callback);
 	});
 
 });

@@ -21,6 +21,7 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('phone', 'String(20)');
 	schema.define('address', 'String(1000)', true);
 	schema.define('language', 'String(3)');
+	schema.define('reference', 'String(10)');
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');
 	schema.define('ip', 'String(80)');
@@ -145,7 +146,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.id = UID();
 		model.price = price;
 		model.count = count;
-		model.search = (model.firstname + ' ' + model.lastname + ' ' + model.email).toSearch().max(80);
+		model.search = (model.firstname + ' ' + (model.reference || '') + ' ' + model.lastname + ' ' + model.email).toSearch().max(80);
 
 		if (model.isnewsletter) {
 			var newsletter = GETSCHEMA('Newsletter').create();
