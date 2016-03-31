@@ -86,13 +86,17 @@
 	</div>
 	<div class="padding" style="padding-bottom:10px">
 		<div class="row">
-			<div class="col-md-12">
+			<div class="col-md-12 m">
 				<div data-component="textbox" data-component-path="orders.form.delivery" data-required="true" data-icon="fa fa-truck">@(Delivery type)</div>
+			</div>
+			<div class="col-md-3">
+				<div data-component="textbox" data-component-path="orders.form.reference" data-maxlength="10" data-align="center">@(Custom number)</div>
+				<div class="help">For pairing invoices or payments.</div>
 			</div>
 		</div>
 	</div>
 	<hr />
-	<div class="padding" style="padding-bottom:0">
+	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-6 m">
 				<div data-component="textbox" data-component-path="orders.form.firstname" data-required="true">@(First name)</div>

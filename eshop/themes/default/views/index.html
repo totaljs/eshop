@@ -18,8 +18,7 @@
 	</div>
 	<br />
 	<div class="row">
-		<div class="col-md-2"></div>
-		<div class="col-md-8">
+		<div class="col-md-8 col-md-offset-2">
 			<div class="newsletter" data-component="newsletter" data-success="@(Thanks, you have been added.)">
 				<div class="newsletter-button"><button><span class="fa fa-envelope"></span>@(SUBMIT)</button></div>
 				<div class="newsletter-input"><input type="text" placeholder="@(Join to our mailing list)" /></div>
@@ -31,8 +30,7 @@
 	<br />
 	@{view('eshop/partial-products', model)}
 	<div class="row">
-		<div class="col-md-3"></div>
-		<div class="col-md-6">
+		<div class="col-md-6 col-md-offset-3">
 			<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
 		</div>
 	</div>

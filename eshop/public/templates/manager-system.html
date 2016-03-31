@@ -184,7 +184,7 @@ function system_clear_webcounter() {
 		if (index)
 			return;
 		FIND('loading').show();
-		AJAX('{0}/api/dashboard/clear/'.format(managerurl), function() {
+		AJAX('GET {0}/api/dashboard/clear/'.format(managerurl), function() {
 			success();
 			setTimeout(function() {
 				window.location.reload(true);

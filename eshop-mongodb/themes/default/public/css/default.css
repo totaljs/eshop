@@ -168,6 +168,7 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	.categories-hide { display: block; }
 	.header-padding { padding: 0; }
 	.header-links-container { display: none; }
+	.links > div { border-bottom: 0; }
 	h1, h2 { font-size: 25px; }
 	.orders .col-sm-4 { border-bottom: 1px solid #E0E0E0; text-align: left !important; padding: 10px 0; }
 	.orders .col-sm-4:last-child { border-bottom: 0; }
@@ -196,3 +197,7 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	td.hidden-xs { display: none !important; }
 	.product { border-bottom: 1px solid #F0F0F0; }
 }
+
+.quicknavigation a { border-left: 1px solid #F0F0F0; padding: 5px 15px; font-size: 12px; }
+.quicknavigation a:first-child { border-left: 0; }
+.quicknavigation .fa { margin-right: 5px; }

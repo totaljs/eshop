@@ -94,7 +94,7 @@ COMPONENT('newsletter', function() {
 			if (!mail.isEmail())
 				return;
 
-			$.components.POST('/api/newsletter/', { email: input.val() }, function(response) {
+			AJAX('POST /api/newsletter/', { email: input.val() }, function(response) {
 
 				if (response.success) {
 					input.addClass('newsletter-success');

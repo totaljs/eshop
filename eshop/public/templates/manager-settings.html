@@ -123,7 +123,7 @@
 </div>
 <br />
 <div class="hidden" data-component="visible" data-component-path="user" data-if="su.sa === true">
-	<hr style="margin-top:0" />
+	<hr class="nmt" />
 	<div class="container">
 		<h2>@(Developer's CMS settings)</h2>
 		<br />
@@ -199,7 +199,7 @@
 </div>
 
 <div data-component="form" data-title="@(User form)" data-component-path="common.form" data-if="value === 'settings'" data-width="500px" data-component-id="settings.formuser">
-	<div class="padding" style="padding-bottom:0">
+	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12 m">
 				<div data-component="textbox" data-component-path="settings.formuser.login" data-required="true">@(Login name)</div>
@@ -231,7 +231,7 @@ settings.form = {};
 settings.cache = {};
 
 function settings_refresh() {
-	$.components.GET(managerurl + '/api/settings/', null, function(response) {
+	AJAX('GET {0}/api/settings/'.format(managerurl), function(response) {
 		SET('settings.form', response);
 
 		// If the user changes a currency then we must reload the website.

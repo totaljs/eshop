@@ -13,9 +13,8 @@
 <div class="padding">
 	<h1>@{title}</h1>
 	<div class="row">
-		<div class="col-md-2"></div>
-		<div class="col-md-8">
-			<hr style="margin-top:0" />
+		<div class="col-md-8 col-md-offset-2">
+			<hr class="nmt" />
 			<div class="ui-center">
 				<div style="font-size:11px" class="silver">@(ORDER STATUS)</div>
 				@{!model.status}
@@ -59,15 +58,13 @@
 			@{if !model.ispaid}
 			<br />
 			<div class="row">
-				<div class="col-md-3"></div>
-				<div class="col-md-6 ui-center blue m">
+				<div class="col-md-6 col-md-offset-3 ui-center blue m">
 					@(Pay bill now via) <span class="fa fa-paypal mr5"></span><b>PayPal</b>.
 					<div class="fs11 silver">@(You will be redirect to secured PayPal payment page.)</div>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-3"></div>
-				<div class="col-md-6"><a href="?pay=1" class="linkbutton pay"><img src="/img/paypal.png" border="0" alt="PayPal" width="42" height="25" /> @(Pay Bill Now)</a></div>
+				<div class="col-md-6 col-md-offset-3"><a href="?pay=1" class="linkbutton pay"><img src="/img/paypal.png" border="0" alt="PayPal" width="42" height="25" /> @(Pay Bill Now)</a></div>
 			</div>
 			<br />
 			@{fi}
@@ -135,8 +132,7 @@
 		<br />
 	</div>
 	<div class="row">
-		<div class="col-md-3"></div>
-		<div class="col-md-6">
+		<div class="col-md-6 col-md-offset-3">
 			<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-shopping-cart"></span> @(Buy other products)</a>
 		</div>
 	</div>

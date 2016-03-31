@@ -6,6 +6,7 @@ checkout                 : @(Checkout)               --> /checkout/             
 order                    : @(Order)                  --> /checkout/{0}/               --> checkout
 payment                  : @(Checkout Payment)       --> /checkout/{0}/{1}/           --> checkout
 account                  : @(Account)                --> /account/                    --> homepage
+settings                 : @(Account Settings)       --> /account/settings/           --> account
 category                 : @(Category)               --> /shop/*                      --> products
 detail                   : @(Product)                --> /product/{0}/                --> category
 blogs                    : @(Blogs)                  --> /blogs/                      --> homepage

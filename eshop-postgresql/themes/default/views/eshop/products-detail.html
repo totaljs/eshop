@@ -6,8 +6,7 @@
 <div class="padding">
 	<h1>@{title}</h1>
 	<div class="row">
-		<div class="col-md-2"></div>
-		<div class="col-md-8">
+		<div class="col-md-8 col-md-offset-2">
 			<div class="detail-category">@(Category:) <a href="@{sitemap_url('category')}@{model.linker_category}/">@{model.category}</a></div>
 
 			@{if model.manufacturer}

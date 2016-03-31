@@ -306,7 +306,7 @@
 	}, 5000);
 
 	function dashboard_refresh_online() {
-		$.components.GET(managerurl + '/api/dashboard/online/', null, function(response) {
+		AJAX('GET {0}/api/dashboard/online/'.format(managerurl), function(response) {
 			if (NOTMODIFIED('dashboard.online', response))
 				return;
 			SET('dashboard.online', response);
