@@ -149,13 +149,12 @@ NEWSCHEMA('User').make(function(schema) {
 
 		var id = 'id' + options.type;
 
-		var filter = function(doc) {
-			if (doc[id] === options.profile[id] || (doc.email && options.profile.email && doc.email === options.profile.email))
-				return doc;
-			return;
-		};
-
-		DB('users').one(filter, function(err, doc) {
+		DB('users').one().make(function(builder) {
+			builder.or();
+			builder.where(id, options.profile[id]);
+			builder.where('email', options.profile.email);
+			builder.end();
+		}).callback(function(err, doc) {
 
 			if (!doc) {
 
