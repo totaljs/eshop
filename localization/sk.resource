@@ -12,7 +12,6 @@ error-501                        : Funkcia nie je podporovaná.
 
 // eshop/sitemap, eshop-mongodb/sitemap, eshop-postgresql/sitemap
 T-420727794                      : Úvodná stránka
-T-908113224                      : Nákupný Košík
 T2576150                         : Obchod
 T1601548646                      : Objednávka
 T487334413                       : Účet
@@ -146,10 +145,6 @@ T2047248393                      : Priama
 T1956862964                      : Z reklamy
 T76517104                        : Ostatok
 
-// cms/public/templates/manager-dashboard.html
-T859275632                       : Kontaktné formuláre dnes
-T824097085                       : Ročná štatistika kontaktných formulárov
-
 // cms/public/templates/manager-newsletter.html, eshop/public/templates/manager-newsletter.html, eshop-mongodb/public/templates/manager-newsletter.html, eshop-postgresql/public/templates/manager-newsletter.html
 T-1540404576                     : Registrované emailové adresy
 T-2058782144                     : Povolené čítanie
@@ -231,9 +226,6 @@ T-887328209                      : systém
 T79142557                        : Prístupové práva
 T-1803213147                     : Užívateľ získa všetky práva pokiaľ mu nebudú vybrané práva manuálne.
 T750501482                       : super admin
-
-// cms/public/templates/manager-settings.html
-T-212393027                      : Použité v emailových správach
 
 // cms/public/templates/manager-settings.html, eshop/public/templates/manager-settings.html, eshop/public/templates/manager-users.html, eshop-mongodb/public/templates/manager-settings.html, eshop-mongodb/public/templates/manager-users.html, eshop-postgresql/public/templates/manager-settings.html, eshop-postgresql/public/templates/manager-users.html
 T-2010064935                     : Evidencia užívateľa
@@ -495,10 +487,6 @@ T2125970                         : Vážený
 T985652347                       : Číslo objednávky
 T-1808614382                     : Stav
 T888111124                       : Spôsob doručenia
-T-1294166218                     : Sledujte Vašu objednávku
-
-// eshop/themes/default/views/mails/order-status.html, eshop-mongodb/themes/default/views/mails/order-status.html, eshop-postgresql/themes/default/views/mails/order-status.html
-T-2021121594                     : objednávka bola aktualizovaná. Kliknutím na odkaz môžete vidieť aktuálny stav objendávky.
 
 // eshop/themes/default/views/mails/order.html, eshop-mongodb/themes/default/views/mails/order.html, eshop-postgresql/themes/default/views/mails/order.html
 T1841011644                      : Ďakujeme za Vašu objednávku. Objednávka bola úspešne vytvorená a tento email slúži ako potvrdenie.
