@@ -1,6 +1,6 @@
 exports.install = function() {
 	// Auto-localize static HTML templates
-	F.localize('All templates', '/templates/', true);
+	F.localize('/templates/*.html', ['compress']);
 
 	// COMMON
 	F.route(CONFIG('manager-url') + '/*', '~manager');
