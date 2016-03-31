@@ -91,6 +91,11 @@ NEWSCHEMA('Settings').make(function(schema) {
 
 		nosql.exec(function(err, doc) {
 
+			if (err) {
+				F.error(err);
+				return;
+			}
+
 			if (doc) {
 				callback(doc.common);
 				return;

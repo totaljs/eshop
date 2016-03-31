@@ -236,7 +236,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		clean.navigations = clean.navigations.join(';');
 
 		if (clean.search)
-			clean.search = ((clean.title || '') + ' ' + (clean.keywords || '') + ' ' + clean.search).keywords(true, true).join(' ');
+			clean.search = ((clean.title || '') + ' ' + (clean.keywords || '') + ' ' + clean.search).keywords(true, true).join(' ').max(2000);
 
 		delete clean.settings;
 		delete clean.widgets;

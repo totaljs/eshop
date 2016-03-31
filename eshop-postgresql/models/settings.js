@@ -82,6 +82,12 @@ NEWSCHEMA('Settings').make(function(schema) {
 		});
 
 		sql.exec(function(err, response) {
+
+			if (err) {
+				F.error(err);
+				return;
+			}
+
 			var settings = {};
 			if (response.settings.body)
 				settings = response.settings.body;

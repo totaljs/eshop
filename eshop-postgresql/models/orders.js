@@ -96,7 +96,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			filter.where('delivery', options.delivery);
 
 		if (options.search)
-			filter.like('search', options.search.toSearch(), '*');
+			filter.like('search', options.search.keywords(true, true).join(' '), '*');
 
 		if (options.iduser)
 			filter.where('iduser', options.iduser);
@@ -146,7 +146,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.id = UID();
 		model.price = price;
 		model.count = count;
-		model.search = (model.firstname + ' ' + (model.reference || '') + ' ' + model.lastname + ' ' + model.email).toSearch().max(80);
+		model.search = (model.firstname + ' ' + (model.reference || '') + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(80);
 
 		if (model.isnewsletter) {
 			var newsletter = GETSCHEMA('Newsletter').create();
@@ -236,7 +236,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		delete model.isterms;
 		delete model.isemail;
 
-		model.search = (model.firstname + ' ' + model.lastname + ' ' + model.email).toSearch().max(80);
+		model.search = ((model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(80);
 
 		if (model.datecompleted)
 			model.datecompleted = model.datecompleted;

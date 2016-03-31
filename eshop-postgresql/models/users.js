@@ -13,7 +13,7 @@ exports.logoff = function(req, res, user) {
 };
 
 exports.createSession = function(profile) {
-	online[profile.id] = { id: profile.id, name: profile.name, email: profile.email, ticks: new Date().add('30 minutes').getTime() };
+	online[profile.id] = { id: profile.id, name: profile.name, firstname: profile.firstname, lastname: profile.lastname, email: profile.email, ticks: new Date().add('30 minutes').getTime() };
 	return online[profile.id];
 };
 
@@ -71,7 +71,7 @@ NEWSCHEMA('User').make(function(schema) {
 		if (!model.id)
 			model.id = UID();
 
-		model.search = (model.name + ' ' + (model.email || '')).toSearch().max(80);
+		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(80);
 
 		sql.save('item', 'tbl_user', newbie, function(builder, newbie) {
 			builder.set(model);
@@ -148,7 +148,7 @@ NEWSCHEMA('User').make(function(schema) {
 		filter.where('isremoved', false);
 
 		if (options.search)
-			filter.like('search', options.search.toSearch(), '*');
+			filter.like('search', options.search.keywords(true, true).join(' '), '*');
 
 		sql.select('items', 'tbl_user').make(function(builder) {
 			builder.replace(filter);
@@ -240,6 +240,41 @@ NEWSCHEMA('User').make(function(schema) {
 
 			callback(response.user);
 		});
+	});
+});
+
+NEWSCHEMA('UserSettings').make(function(schema) {
+	schema.define('id', 'String(20)');
+	schema.define('firstname', 'String(50)', true);
+	schema.define('lastname', 'String(50)', true);
+	schema.define('email', 'String(200)', true);
+	schema.define('password', 'String(20)', true);
+
+	schema.setSave(function(error, model, options, callback) {
+
+		if (model.password.startsWith('*****'))
+			delete model.password;
+		else
+			model.password = model.password.hash('sha1');
+
+		model.name = model.firstname + ' ' + model.lastname;
+		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(80);
+
+		var user = options.controller.user;
+		user.name = model.name;
+		user.email = model.email;
+		user.firstname = model.firstname;
+		user.lastname = model.lastname;
+
+		var sql = DB(error);
+
+		sql.update('tbl_user').make(function(builder) {
+			builder.set(model);
+			builder.rem('id');
+			builder.where('id', model.id);
+		});
+
+		sql.exec(SUCCESS(callback), -1);
 	});
 });
 

@@ -13,7 +13,7 @@ exports.logoff = function(req, res, user) {
 };
 
 exports.createSession = function(profile) {
-	online[profile.id] = { id: profile.id, name: profile.name, email: profile.email, ticks: new Date().add('30 minutes').getTime() };
+	online[profile.id] = { id: profile.id, name: profile.name, firstname: profile.firstname, lastname: profile.lastname, email: profile.email, ticks: new Date().add('30 minutes').getTime() };
 	return online[profile.id];
 };
 
@@ -192,6 +192,34 @@ NEWSCHEMA('User').make(function(schema) {
 	});
 });
 
+NEWSCHEMA('UserSettings').make(function(schema) {
+	schema.define('id', 'String(20)');
+	schema.define('firstname', 'String(50)', true);
+	schema.define('lastname', 'String(50)', true);
+	schema.define('email', 'String(200)', true);
+	schema.define('password', 'String(20)', true);
+
+	schema.setSave(function(error, model, options, callback) {
+
+		if (model.password.startsWith('*****'))
+			delete model.password;
+		else
+			model.password = model.password.hash('sha1');
+
+		model.name = model.firstname + ' ' + model.lastname;
+		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ');
+
+		var user = options.controller.user;
+		user.name = model.name;
+		user.email = model.email;
+		user.firstname = model.firstname;
+		user.lastname = model.lastname;
+
+		// Update an user in database
+		DB('users').modify(model).where('id', model.id).callback(SUCCESS(callback));
+	});
+});
+
 NEWSCHEMA('UserLogin').make(function(schema) {
 
 	schema.define('email', 'String(200)', true);
@@ -269,7 +297,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 
 		GETSCHEMA('User').get(filter, function(err, response) {
 
-			if (response) {
+			if (!err) {
 				error.push('error-user-exists');
 				return callback();
 			}

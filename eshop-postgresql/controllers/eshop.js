@@ -17,6 +17,7 @@ exports.install = function() {
 
 	// USER ACCOUNT
 	F.route('#account',          view_account, ['authorized', '*Order']);
+	F.route('#settings',         'account-settings', ['authorized']);
 	F.route('/account/logoff/',  redirect_account_logoff, ['authorized']);
 	F.route('#account',          view_login, ['unauthorized']);
 

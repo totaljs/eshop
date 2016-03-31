@@ -188,7 +188,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		delete model.isterms;
 		delete model.isemail;
 
-		model.search = (model.id + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true);
+		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true);
 		model.isremoved = false;
 
 		if (model.iscompleted && !model.datecompleted)

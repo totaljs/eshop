@@ -159,7 +159,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (category)
 			model.category_linker = category.linker;
 
-		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ');
+		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ').max(1000);
 
 		model.tags = model.tags.join(';');
 		model.pictures = model.pictures.join(';');

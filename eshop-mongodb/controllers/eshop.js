@@ -17,6 +17,7 @@ exports.install = function() {
 
 	// USER ACCOUNT
 	F.route('#account',          view_account, ['authorized', '*Order']);
+	F.route('#settings',         'account-settings', ['authorized']);
 	F.route('/account/logoff/',  redirect_account_logoff, ['authorized']);
 	F.route('#account',          view_login, ['unauthorized']);
 
@@ -64,10 +65,9 @@ function view_products_category() {
 
 	// Increases the performance (1 minute cache)
 	self.memorize('cache.' + options.category + '.' + options.page, '1 minute', DEBUG, function() {
-
 		self.$query(options, function(err, data) {
 
-			if (!data.items.length)
+			if (data.items.length === 0)
 				return self.throw404();
 
 			self.repository.subcategories = F.global.categories.where('parent', options.category);

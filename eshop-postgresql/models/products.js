@@ -61,7 +61,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			filter.where('linker_manufacturer', options.manufacturer);
 
 		if (options.search)
-			filter.like('search', options.search.toSearch(), '*');
+			filter.like('search', options.search.keywords(true, true).join(' '), '*');
 		if (options.id)
 			filter.in('id', options.id);
 		if (options.skip)
@@ -121,9 +121,9 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.setSave(function(error, model, options, callback) {
 
 		// Default values
-		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
-		model.search = (model.name + ' ' + model.reference).toSearch();
-		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
+		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug().max(300);
+		model.search = (model.name + ' ' + model.reference).keywords(true, true).join(' ').max(80);
+		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug().max(50) : '';
 
 		var category = prepare_subcategories(model.category);
 

@@ -13,6 +13,7 @@ exports.install = function() {
 	F.route('/api/users/create/',         json_users, ['post', '*UserRegistration']);
 	F.route('/api/users/password/',       json_users, ['post', '*UserPassword']);
 	F.route('/api/users/login/',          json_users, ['post', '*UserLogin']);
+	F.route('/api/users/settings/',       json_users_settings, ['put', '*UserSettings', 'authorize']);
 
 	// PRODUCTS
 	F.route('/api/products/',             json_products_query, ['*Product']);
@@ -115,6 +116,14 @@ function json_users() {
 	options.ip = self.ip;
 
 	self.body.$workflow('exec', options, self.callback());
+}
+
+function json_users_settings() {
+	var self = this;
+	var options = {};
+	options.controller = self;
+	self.body.id = self.user.id;
+	self.body.$save(options, self.callback());
 }
 
 // ==========================================================================
