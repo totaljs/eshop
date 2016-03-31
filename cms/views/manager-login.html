@@ -18,10 +18,14 @@
 	<div data-component="loading" class="ui-loading"></div>
 	<br />
 	<br />
+	<div class="ui-center">
+		<i class="fa fa-lock fa-5x silver"></i>
+		<h1>@{config.name} <b>v@{config.version}</b></h1>
+	</div>
+	<br />
 	<div class="container">
 		<div class="col-md-4"></div>
 		<div class="col-md-4 enter">
-			<h1>@{config.name} <b>v@{config.version}</b></h1>
 			<div data-component="textbox" data-component-path="user.name" class="m" data-maxlength="80" data-required="true" data-placeholder="@(Enter your login name)" data-autofocus="true">@(Login name)</div>
 			<div data-component="textbox" data-component-path="user.password" data-component-type="password" data-required="true" class="m" data-maxlength="30" data-placeholder="@(Enter your password)">@(Password)</div>
 			<div class="row">
@@ -39,6 +43,7 @@
 
 	<script>
 		var user = {};
+
 		if (document.cookie.indexOf('__manager') !== -1)
 			user.error = [{ error: '@(Incorrect username or password.)' }];
 
