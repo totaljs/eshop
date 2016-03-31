@@ -1,12 +1,13 @@
 ======================== v5.0.0 (BETA)
 
-- added pages can support partial pages
+- pages can support partial pages
 - eshop routing (products, details, checkout) is linked with the sitemap
-- added built-in users
-- added posts
-- updated jComponent version
-- removed footer
+- built-in users
+- posts
+- updated jComponents and jComponent library
 - improved UI components
+- improved emails
+- improved performance
 - improved code
 - works only with total.js 2.0
 - new NoSQL embedded database (compatibile with older database files)

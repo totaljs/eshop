@@ -4,7 +4,7 @@ Please do not change the code, just create a new issues. I solve all problems as
 
 __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREATE YOUR OWN BACKUP AND RESTORE IT ON YOU SERVERS OR CLOUD.__
 
-- Current version: `v4.1.0`
+- New (beta) version: `v5.0.0`
 - [Documentation](http://docs.totaljs.com/eshop-cms/latest.html)
 
 ---
