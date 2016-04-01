@@ -1507,6 +1507,7 @@ COMPONENT('crop', function() {
 		height = h;
 		canvas.width = w;
 		canvas.height = h;
+		self.element.find('.ui-crop-size').empty().append('<i class="fa fa-image mr5"></i>{0}x{1}'.format(w, h));
 	};
 
 	self.output = function(type) {
