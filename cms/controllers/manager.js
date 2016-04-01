@@ -62,32 +62,22 @@ exports.install = function() {
 function upload() {
 
 	var self = this;
-	var output = [];
+	var id = [];
 
 	self.files.wait(function(file, next) {
+		file.read(function(err, data) {
 
-		// Store current file into the HDD
-		var index = file.filename.lastIndexOf('.');
+			// Store current file into the HDD
+			file.extension = U.getExtension(file.filename);
+			id.push(DB('files').binary.insert(file.filename, data) + file.extension);
 
-		if (index === -1)
-			file.extension = '.dat';
-		else
-			file.extension = file.filename.substring(index);
-
-		var id = new ObjectID();
-
-		GridStore.writeFile(DB(), id, file.path, file.filename, null, function(err) {
-
-			if (err)
-				return next();
-
-			output.push(id.toString() + file.extension);
-			setTimeout(next, 200);
+			// Next file
+			setTimeout(next, 100);
 		});
 
 	}, function() {
 		// Returns response
-		self.json(output);
+		self.json(id);
 	});
 }
 
@@ -102,25 +92,22 @@ function upload_base64() {
 
 	var type = self.body.file.base64ContentType();
 	var data = self.body.file.base64ToBuffer();
-
-	var id = new ObjectID();
-	var output = id.toString();
+	var ext;
 
 	switch (type) {
 		case 'image/png':
-			output += '.png';
+			ext = '.png';
 			break;
 		case 'image/jpeg':
-			output += '.jpg';
+			ext = '.jpg';
 			break;
 		case 'image/gif':
-			output += '.gif';
+			ext = '.gif';
 			break;
 	}
 
-	GridStore.writeBuffer(DB(), id, data, output, null, function(err) {
-		self.json('/download/' + output);
-	});
+	var id = DB('files').binary.insert('base64' + ext, data);
+	self.json('/download/' + id + ext);
 }
 
 // Logoff

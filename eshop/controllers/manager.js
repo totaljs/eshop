@@ -93,15 +93,10 @@ function upload() {
 
 	self.files.wait(function(file, next) {
 		file.read(function(err, data) {
+
 			// Store current file into the HDD
-			var index = file.filename.lastIndexOf('.');
-
-			if (index === -1)
-				file.extension = '.dat';
-			else
-				file.extension = file.filename.substring(index);
-
-			id.push(DB('files').binary.insert(file.filename, file.type, data) + file.extension);
+			file.extension = U.getExtension(file.filename);
+			id.push(DB('files').binary.insert(file.filename, data) + file.extension);
 
 			// Next file
 			setTimeout(next, 100);
@@ -124,21 +119,22 @@ function upload_base64() {
 
 	var type = self.body.file.base64ContentType();
 	var data = self.body.file.base64ToBuffer();
-	var id = DB('files').binary.insert('unknown', type, data);
+	var ext;
 
 	switch (type) {
 		case 'image/png':
-			id += '.png';
+			ext = '.png';
 			break;
 		case 'image/jpeg':
-			id += '.jpg';
+			ext = '.jpg';
 			break;
 		case 'image/gif':
-			id += '.gif';
+			ext = '.gif';
 			break;
 	}
 
-	self.json('/download/' + id);
+	var id = DB('files').binary.insert('base64' + ext, data);
+	self.json('/download/' + id + ext);
 }
 
 // Logoff
