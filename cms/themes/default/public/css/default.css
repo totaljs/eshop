@@ -62,7 +62,7 @@ footer { text-align: center; font-size: 12px; padding: 50px 0; color: gray; bord
 #gallery-layer { background-color: rgba(0,0,0,0.5); z-index: 5; left: 0; top: 0; position: fixed; bottom: 0; right: 0; overflow: hidden; display: none; width: 100%; height: 100%; }
 .gallery-close { position: absolute; right: 0; top: 0; font-size: 20px; color: white; cursor: pointer; background-color: black; width: 40px; padding: 5px 0; text-align: center; }
 .gallery-container { display: table; width: 100%; height: 100%; }
-.gallery-container img { width: 100%; border-radius: 4px; }
+.gallery-container img { max-width: 100%; border-radius: 4px; }
 .gallery-container > div { display: table-cell; height: 100%; vertical-align: middle; max-width: 100%; }
 .gallery-container .fa { background-color: black; padding: 40px 20px; cursor: pointer; font-size: 20px; user-select: none; color: white; }
 .gallery-next { display: table-cell; width: 15%; text-align: right; }
