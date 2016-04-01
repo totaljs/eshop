@@ -1523,8 +1523,7 @@ COMPONENT('crop', function() {
 		width = parseInt(self.attr('data-width') || 0);
 		height = parseInt(self.attr('data-height') || 0);
 		self.element.addClass('ui-crop');
-		self.append('<input type="file" style="display:none" accept="image/*" /><ul><li data-type="upload"><span class="fa fa-folder"></span></li><li data-type="plus"><span class="fa fa-plus"></span></li><li data-type="refresh"><span class="fa fa-refresh"></span></li><li data-type="minus"><span class="fa fa-minus"></span></li></ul>');
-		self.append(Tangular.render('<canvas width="{{ width }}" height="{{ height }}"></canvas>', { width: width, height: height }));
+		self.append(Tangular.render('<input type="file" style="display:none" accept="image/*" /><ul><li data-type="upload"><span class="fa fa-folder"></span></li><li data-type="plus"><span class="fa fa-plus"></span></li><li data-type="refresh"><span class="fa fa-refresh"></span></li><li data-type="minus"><span class="fa fa-minus"></span></li></ul><canvas width="{{ width }}" height="{{ height }}"></canvas><div class="ui-crop-size"><i class="fa fa-image mr5"></i>{{width}}x{{height}}</div>', { width: width, height: height }));
 		canvas = self.find('canvas').get(0);
 		context = canvas.getContext('2d');
 
