@@ -101,6 +101,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 				return;
 			}
 
+			model['manager-superadmin'] = 'admin:admin';
 			model.currency = 'EUR';
 			model.currency_entity = '&euro;';
 			callback();

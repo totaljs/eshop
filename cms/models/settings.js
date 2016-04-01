@@ -44,8 +44,14 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.setGet(function(error, model, options, callback) {
 		Fs.readFile(filename, function(err, data) {
 			var settings = {};
-			if (!err)
+
+			if (!err) {
 				settings = JSON.parse(data.toString('utf8'));
+				callback(settings);
+				return;
+			}
+
+			settings['manager-superadmin'] = 'admin:admin';
 			callback(settings);
 		});
 	});

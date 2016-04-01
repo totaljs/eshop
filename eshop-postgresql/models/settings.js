@@ -89,8 +89,15 @@ NEWSCHEMA('Settings').make(function(schema) {
 			}
 
 			var settings = {};
-			if (response.settings.body)
+
+			if (response.settings.body) {
 				settings = response.settings.body;
+				return callback(settings);
+			}
+
+			settings['manager-superadmin'] = 'admin:admin';
+			settings.currency = 'EUR';
+			settings.currency_entity = '&euro;';
 			callback(settings);
 		});
 	});
