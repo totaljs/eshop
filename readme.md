@@ -4,7 +4,7 @@ Please do not change the code, just create a new issues. I solve all problems as
 
 __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREATE YOUR OWN BACKUP AND RESTORE IT ON YOU SERVERS OR CLOUD.__
 
-- New (beta) version: `v5.0.0`
+- New (beta) version: `v5.0.0` (works only with total.js 2.0 beta)
 - [Documentation](http://docs.totaljs.com/eshop-cms/latest.html)
 
 ---
@@ -22,7 +22,7 @@ __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREAT
 
 ## Installation
 
-- install `npm install total.js`
+- install `npm install total.js@beta`
 
 ### MongoDB version only
 
