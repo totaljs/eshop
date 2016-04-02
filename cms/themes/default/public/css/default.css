@@ -13,7 +13,8 @@ header nav { float: right; margin: 5px 0 0 0; }
 header nav a { margin-left: 20px; color: gray; }
 header nav a:first-child { margin-left: 0; }
 header nav .fa { margin-right: 5px; }
-.mainmenu-button { border: 1px solid #F0F0F0; background-color: white; outline: 0; border-radius: 4px; font-size: 18px; width: 34px; position: absolute; right: 20px; top: 15px; display: none; }
+
+.mainmenu-button { border: 1px solid #F0F0F0; background-color: white; outline: 0; border-radius: 4px; font-size: 18px; width: 34px; height: 30px; position: absolute; right: 20px; display: none; text-align: center; color: silver; padding: 1px 0 0 0; text-decoration: none !important; }
 .mainmenu-visible { display: block; }
 
 h1 { font-family: $font; margin: 10px 0 30px; padding: 0; font-size: 34px; font-weight: 400; color: #656D78; text-align: center; }
