@@ -1,6 +1,12 @@
 // Online visitors counter
 PING('GET /api/ping/');
 
+$(document).ready(function() {
+	$(document).on('click', '.mainmenu-button', function() {
+		$(this).parent().find('nav').toggleClass('mainmenu-visible');
+	});
+});
+
 COMPONENT('emaildecode', function() {
 	var self = this;
 	self.readonly();

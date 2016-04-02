@@ -16,6 +16,7 @@
 	<header>
 		<div class="container">
 			<a href="/"><img src="/img/logo.png" alt="@{config.name}" border="0" height="30" /></a>
+			<button class="mainmenu-button"><i class="fa fa-navicon"></i></button>
 			<nav>
 				@{foreach m in global.navigations.mainmenu}
 					<a href="@{m.url}">@{if m.icon}<span class="fa fa-@{m.icon}"></span>@{fi}@{m.name}</a>
@@ -24,8 +25,8 @@
 		</div>
 	</header>
 	<div class="container">
-		<div class="row">
-			<nav class="breadcrumb hidden-xs col-md-12">
+		<div class="row hidden-xs">
+			<nav class="breadcrumb col-md-12">
 				<ul>
 					@{foreach m in sitemap()}
 						<li>@{if !m.first}<span class="fa fa-caret-right"></span>@{fi}<a href="@{m.url}">@{m.name}</a></li>
