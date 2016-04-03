@@ -39,7 +39,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/products/import/',     json_products_import, ['upload', 1000 * 60 * 5], 1024);
 	F.route(CONFIG('manager-url') + '/api/products/export/',     json_products_export, ['*Product', 10000]);
 	F.route(CONFIG('manager-url') + '/api/products/codelists/',  json_products_codelists);
-	F.route(CONFIG('manager-url') + '/api/products/category/',   json_products_category_replace, ['post', '*Product']);
+	F.route(CONFIG('manager-url') + '/api/products/category/',   json_products_category_replace, ['post']);
 
 	// POSTS
 	F.route(CONFIG('manager-url') + '/api/posts/',               json_posts_query, ['*Post']);
@@ -315,7 +315,7 @@ function json_products_codelists() {
 // Replaces old category with new
 function json_products_category_replace() {
 	var self = this;
-	self.$workflow('category', self.body, self.callback());
+	GETSCHEMA('Product').$workflow('category', self.body, self.callback());
 }
 
 // Reads a specific product by ID
