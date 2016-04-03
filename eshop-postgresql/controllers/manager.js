@@ -339,7 +339,7 @@ function json_products_codelists() {
 // Replaces old category with new
 function json_products_category_replace() {
 	var self = this;
-	GETSCHEMA('Product').$workflow('category', self.body, self.callback());
+	GETSCHEMA('Product').workflow2('category', self.body, self.callback());
 }
 
 // Reads a specific product by ID
