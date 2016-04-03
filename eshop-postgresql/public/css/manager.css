@@ -3,7 +3,7 @@
 html { overflow: hidden; }
 html,body { margin: 0; height: 100%; position: relative; }
 body { background-color: white; padding: 0; color: gray; font-smoothing: antialiased; overflow-y: scroll; overflow-x: hidden; overflow-scrolling: touch; }
-header { background-color: #E0E0E0; height: 40px; margin-bottom: 20px; }
+header { background-color: #E0E0E0; height: 40px; margin-bottom: 30px; }
 
 nav { font-size: 20px; position: relative; display: inline-block; font-smoothing: antialiased; width: 100%; }
 nav a { color: gray; border-right: 1px solid #D0D0D0; padding: 6px 0 0; position: relative; display: inline-block; min-width: 60px; text-align: center; height: 40px; }
@@ -21,7 +21,7 @@ h2 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 8px 0; paddin
 h2 b { font-weight: 700; }
 
 #loading { background: rgba(255,255,255,0.9) url(../img/preloader.gif) no-repeat 50% 50%; position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 15; }
-#success { width: 100px; height: 90px; left: 0; top: 50%; margin-left: -10px; margin-top: -45px; background-color: #66B258; border-radius: 4px; font-size: 40px; line-height: 0; position: fixed; z-index: 500; color: white; text-align: center; padding-top: 20px; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: none; }
+#success { width: 100px; height: 90px; left: 0; top: 50%; margin-left: -10px; margin-top: -45px; background-color: #66B258; border-radius: 4px; font-size: 40px; line-height: 0; position: fixed; z-index: 20; color: white; text-align: center; padding-top: 20px; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: none; }
 
 .padding { padding: 20px; }
 .m { margin-bottom: 20px; }
@@ -31,11 +31,11 @@ h2 b { font-weight: 700; }
 .mr5 { margin-right: 5px !important; }
 .mr15 { margin-right: 15px !important; }
 .nmb { margin-bottom: 0 !important; }
+.nmt { margin-top: 0 !important; }
 .npt { padding-top: 0 !important; }
 .npb { padding-bottom: 0 !important; }
 
 .bg-smoke { background-color: #F8F8F8; }
-.bg-fade { background: white linear-gradient(white,#F8F8F8); }
 .b { font-weight: bold; }
 .silver { color: #AAB2BD; }
 .red { color: #D63B32; }
@@ -51,7 +51,7 @@ table td { vertical-align: middle !important;}
 .order-completed .fa-check-circle { color: #66B258; margin-right: 5px; }
 
 .fs11 { font-size: 11px !important; }
-.help { font-size: 11px; color: #AAB2BD; margin-top: 5px; min-height: 20px; }
+.help { font-size: 11px; color: #AAB2BD; margin-top: 7px; line-height: 13px; }
 .help code { font: normal normal 11px Arial; background-color: #F0F0F0; padding: 2px 5px; border-radius: 4px; }
 
 .legend { margin-bottom: 10px; }
