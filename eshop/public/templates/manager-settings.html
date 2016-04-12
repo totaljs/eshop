@@ -300,6 +300,10 @@ ON('#settings.users', function(component) {
 // Users form
 ON('#settings.formuser', function(component) {
 	component.submit = function(hide) {
+
+		if (!settings.form.users)
+			settings.form.users = [];
+
 		var users = settings.form.users;
 		var is = false;
 
