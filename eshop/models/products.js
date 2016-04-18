@@ -366,7 +366,8 @@ NEWSCHEMA('Product').make(function(schema) {
 						tmp = '';
 
 						val.forEach(function(id) {
-							tmp += (tmp ? ',' : '') + F.config.custom.url + '/download/' + id + '.jpg';
+							if (id)
+								tmp += (tmp ? ',' : '') + F.config.custom.url + '/download/' + id + '.jpg';
 						});
 
 						val = tmp;
