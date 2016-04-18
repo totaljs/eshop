@@ -126,7 +126,7 @@
 				<div class="help">@(Affects navigation ordering.)</div>
 			</div>
 			<div class="col-md-2 m">
-				<div data-component="textbox" data-component-path="pages.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag" data-placeholder="e.g. en">@(Language)</div>
+				<div data-component="textbox" data-component-path="pages.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag" data-placeholder="@(e.g. en)">@(Language)</div>
 			</div>
 			<div class="col-md-2 m">
 				<div data-component="textbox" data-component-path="pages.form.icon" data-align="center" data-maxlength="20" data-placeholder="e.g. home" data-icon="fa-camera">@(Icon)</div>
@@ -144,7 +144,7 @@
 </div>
 
 <div data-component="form" data-title="@(Widget form)" data-component-path="common.form" data-if="value === 'widgets'" data-width="900px" data-component-id="widgets.form">
-	<div class="padding" style="padding-bottom:0">
+	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12">
 				<div data-component="textbox" data-component-path="widgets.form.name" data-required="true">@(Name)</div>
