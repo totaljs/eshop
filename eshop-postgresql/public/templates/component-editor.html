@@ -1,4 +1,4 @@
-<div data-component="form" data-title="@(Select wide)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="500px" data-top="true" data-component-id="cmseditor_widgets">
+<div data-component="form" data-title="@(Select widget)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="500px" data-top="true" data-component-id="cmseditor_widgets">
 	<div class="padding">
 		<div data-component="repeater-group" data-component-path="cmseditor.widgets2" data-group="category">
 			<script type="text/html">
@@ -209,10 +209,8 @@
 		};
 
 		self.init = function() {
-			if (!window.widgets) {
+			if (!window.widgets)
 				self.refreshWidgets();
-				return;
-			}
 			WATCH('widgets.grid', function(path, value, type) {
 				cmseditor.widgets = value; // cache
 				SET('cmseditor.widgets2', value);
