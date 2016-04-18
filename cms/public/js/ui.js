@@ -1697,14 +1697,14 @@ COMPONENT('crop', function() {
 COMPONENT('codemirror', function() {
 
 	var self = this;
-	var editor;
-	var isRequired = self.attr('data-required') === 'true';
+	var required = self.attr('data-required') === 'true';
 	var skipA = false;
 	var skipB = false;
+	var editor;
 	var timeout;
 
 	self.validate = function(value) {
-		return isRequired ? value && value.length > 0 : true;
+		return required ? value && value.length > 0 : true;
 	};
 
 	self.make = function() {
@@ -1714,7 +1714,7 @@ COMPONENT('codemirror', function() {
 		var content = self.element.html();
 
 		self.element.empty();
-		self.element.append('<div class="ui-codemirror-label' + (isRequired ? ' ui-codemirror-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div><div class="ui-codemirror"></div>');
+		self.element.append('<div class="ui-codemirror-label' + (required ? ' ui-codemirror-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div><div class="ui-codemirror"></div>');
 		var container = self.element.find('.ui-codemirror');
 
 		editor = CodeMirror(container.get(0), { lineNumbers: self.attr('data-linenumbers') === 'true', mode: self.attr('data-type') || 'htmlmixed', indentUnit: 4 });
@@ -1723,13 +1723,13 @@ COMPONENT('codemirror', function() {
 			editor.setSize('100%', height || '200px');
 
 		editor.on('change', function(a, b) {
-			clearTimeout(timeout);
 
-			if (skipB) {
+			if (skipB && b.origin !== 'paste') {
 				skipB = false;
 				return;
 			}
 
+			clearTimeout(timeout);
 			timeout = setTimeout(function() {
 				skipA = true;
 				self.reset(true);
