@@ -1,4 +1,4 @@
-<div data-component="form" data-title="@(Select widget)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="500px" data-top="true" data-component-id="cmseditor_widgets">
+<div data-component="form" data-title="@(Select wide)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="500px" data-top="true" data-component-id="cmseditor_widgets">
 	<div class="padding">
 		<div data-component="repeater-group" data-component-path="cmseditor.widgets2" data-group="category">
 			<script type="text/html">
@@ -58,7 +58,7 @@
 </div>
 
 <div data-component="form" data-title="@(Attributes editor)" data-component-path="cmseditor.window" data-if="value === 'attribute'" data-width="450px" data-top="true" data-component-id="cmseditor_attribute">
-	<div class="padding" style="padding-bottom:0">
+	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12">
 				<div data-component="textbox" data-component-path="cmseditor.attribute.title" class="m">@(Title)</div>
@@ -69,7 +69,7 @@
 	</div>
 	<div data-component="visible" data-component-path="cmseditor.attribute.isimage" data-if="value === true">
 		<hr />
-		<div class="padding" style="padding-top:0">
+		<div class="padding npt">
 			<div class="help m"><span class="fa fa-photo"></span> @(Image settings)</div>
 
 			<div class="row">
@@ -554,7 +554,7 @@
 
 				if (e.keyCode === 66) {
 					// bold
-					self.getDocument().document.execCommand('Bold', false, null);
+					self.getDocument().execCommand('Bold', false, null);
 					e.preventDefault();
 					e.stopPropagation();
 					return;
