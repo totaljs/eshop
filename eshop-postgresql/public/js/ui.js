@@ -1116,15 +1116,16 @@ COMPONENT('fileupload', function() {
 			for (var i = 0, length = files.length; i < length; i++)
 				data.append('file' + i, files[i]);
 
-				if (typeof(window.loading) === 'function')
-					window.loading(true);
+			var loading = FIND('loading');
+			if (loading)
+				loading.show();
 
 			$.components.UPLOAD(url, data, function(response, err) {
 
 				if (err) {
 
-					if (typeof(window.loading) === 'function')
-						window.loading(false, 500);
+					if (loading)
+						loading.hide(500);
 
 					var message = FIND('message');
 					if (message)
@@ -1153,8 +1154,8 @@ COMPONENT('fileupload', function() {
 				else
 					self.push(response);
 
-				if (typeof(window.loading) === 'function')
-					window.loading(false, 500);
+				if (loading)
+					loading.hide(500);
 			});
 		});
 	};

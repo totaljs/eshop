@@ -183,7 +183,7 @@
 
 				if (response && response.length)
 					cmseditor.instance.getTarget().attr('src', '/download/' + response[0]);
-				loading(false, 500);
+				loading.hide(500);
 			});
 		});
 	}, 1000);
