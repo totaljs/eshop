@@ -171,9 +171,6 @@ NEWSCHEMA('Page').make(function(schema) {
 			// Returns response
 			callback(SUCCESS(true));
 
-			if (!count)
-				return;
-
 			// create a backup
 			if (!newbie) {
 				model.datebackuped = new Date();
