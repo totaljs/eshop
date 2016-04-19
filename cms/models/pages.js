@@ -474,6 +474,22 @@ F.eval(function() {
 		return self;
 	};
 
+	Controller.prototype.partial = function(url, callback) {
+		var self = this;
+		var page = F.global.partial.find(n => n.url === url && n.language === (self.language || ''));
+
+		if (!page) {
+			callback(new ErrorBuilder().push('error-404-page'));
+			return;
+		}
+
+		var options = {};
+		options.id = page.id;
+
+		GETSCHEMA('Page').operation('render', options, callback);
+		return self;
+	};
+
 	Controller.prototype.page = function(url, view, model, cache, partial) {
 
 		var self = this;
