@@ -176,6 +176,7 @@
 				return;
 			}
 
+			FIND('#posts.editor').setTemplate(response.template);
 			SET('posts.form', $.extend({ $index: index }, response), true);
 			SET('posts.response', null);
 			SET('common.form', 'posts');
