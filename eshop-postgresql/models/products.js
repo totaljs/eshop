@@ -97,7 +97,8 @@ NEWSCHEMA('Product').make(function(schema) {
 			var data = {};
 			data.count = response.count;
 			data.items = response.items;
-			data.pages = Math.ceil(response.count / options.max);
+			data.limit = options.max;
+			data.pages = Math.ceil(data.count / options.max);
 
 			var linker_detail = F.sitemap('detail', true);
 			var linker_category = F.sitemap('category', true);

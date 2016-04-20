@@ -2,11 +2,7 @@
 // Eshop uses this helper
 F.helpers.pagination = function(model) {
 	var builder = '';
-
-	for (var i = 0; i < model.pages; i++) {
-		var page = i + 1;
-		builder += '<a href="?page=' + page + '"' + (model.page === page ? ' class="selected"' : '') + '>' + page + '</a>';
-	}
-
+	var pagination = new Pagination(model.count, model.page, model.limit);
+	pagination.render().forEach(n => builder += '<a href="?page=' + n.page + '"' + (n.selected ? ' class="selected"' : '') + '>' + n.page + '</a>');
 	return builder;
 };

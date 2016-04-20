@@ -162,6 +162,7 @@ NEWSCHEMA('User').make(function(schema) {
 			var data = {};
 			data.count = response.users.count;
 			data.items = response.users.items;
+			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
 			if (data.pages === 0)

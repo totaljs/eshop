@@ -91,7 +91,8 @@ NEWSCHEMA('Page').make(function(schema) {
 
 			data.count = response.pages.count;
 			data.items = response.pages.items;
-			data.pages = Math.floor(data.count / options.max) + (data.count % options.max ? 1 : 0);
+			data.limit = options.max;
+			data.pages = Math.ceil(data.count / options.max);
 
 			if (data.pages === 0)
 				data.pages = 1;

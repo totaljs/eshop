@@ -77,7 +77,8 @@ NEWSCHEMA('Product').make(function(schema) {
 			var data = {};
 			data.count = response.products.count;
 			data.items = response.products.items;
-			data.pages = Math.floor(data.count / options.max) + (data.count % options.max ? 1 : 0);
+			data.limit = options.max;
+			data.pages = Math.ceil(data.count / options.max);
 
 			var linker_detail = F.sitemap('detail', true);
 			var linker_category = F.sitemap('category', true);
