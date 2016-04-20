@@ -144,6 +144,9 @@ NEWSCHEMA('Product').make(function(schema) {
 			F.emit('products.save', model);
 
 			// Refreshes internal information e.g. categories
+			if (options && options.importing)
+				return;
+
 			setTimeout(refresh, 1000);
 		});
 	});
@@ -264,6 +267,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			var schema = GETSCHEMA('Product');
 			var isFirst = true;
 			var count = 0;
+			var options = { importing: true };
 
 			buffer.wait(function(line, next) {
 
@@ -293,7 +297,7 @@ NEWSCHEMA('Product').make(function(schema) {
 					if (err)
 						return next();
 					count++;
-					model.$save(next);
+					model.$save(options, next);
 				});
 			}, function() {
 
@@ -312,6 +316,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		var products = [];
 		var count = 0;
 		var stream = require('fs').createReadStream(filename);
+		var options = { importing: true };
 
 		stream.on('data', U.streamer('<product>', '</product>', function(value) {
 
@@ -345,7 +350,7 @@ NEWSCHEMA('Product').make(function(schema) {
 						if (err)
 							return next();
 						count++;
-						model.$save(next);
+						model.$save(options, next);
 					});
 				};
 
