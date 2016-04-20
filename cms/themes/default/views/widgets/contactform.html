@@ -2,40 +2,40 @@
 	<div class="col-md-2"></div>
 	<div class="col-md-8 m">
 
-		<div data-component="visible" data-component-path="common.success" data-if="value && value.success === true" class="hidden">
-			<div class="message-success"><span class="fa fa-check-circle"></span> Thanks, the contact form has been sent successfully.</div>
+		<div data-component="visible" data-component-path="form.success" data-if="value && value.success === true" class="hidden">
+			<div class="message-success"><span class="fa fa-check-circle"></span>@(Thanks, the contact form has been sent successfully.)</div>
 			<br />
 		</div>
 
-		<div data-component="visible" data-component-path="common.success" data-if="!value || !value.success">
+		<div data-component="visible" data-component-path="form.success" data-if="!value || !value.success">
 			<div class="row">
 				<div class="col-md-6 m">
-					<div data-component="textbox" data-component-path="form.firstname" data-required="true">First name</div>
+					<div data-component="textbox" data-component-path="form.firstname" data-required="true" data-component-value="''">@(First name)</div>
 				</div>
 				<div class="col-md-6 m">
-					<div data-component="textbox" data-component-path="form.lastname" data-required="true">Last name</div>
+					<div data-component="textbox" data-component-path="form.lastname" data-required="true" data-component-value="''">@(Last name)</div>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-6 m">
-					<div data-component="textbox" data-component-path="form.email" data-required="true" data-component-type="email">Email address</div>
+					<div data-component="textbox" data-component-path="form.email" data-required="true" data-component-type="email" data-component-value="'@'">@(Email address)</div>
 				</div>
 				<div class="col-md-6 m">
-					<div data-component="textbox" data-component-path="form.phone">Phone number</div>
+					<div data-component="textbox" data-component-path="form.phone" data-component-value="''">@(Phone number)</div>
 				</div>
 			</div>
 			<br />
 			<div class="row">
 				<div class="col-md-12 m">
-					<div data-component="textarea" data-component-path="form.message" data-required="true" data-height="100px">Message</div>
+					<div data-component="textarea" data-component-path="form.message" data-required="true" data-height="100px" data-component-value="''">@(Message)</div>
 				</div>
 			</div>
-			<div data-component="error" data-component-path="common.success"></div>
+			<div data-component="error" data-component-path="form.success"></div>
 			<br />
 			<div class="row">
 				<div class="col-md-6">
 					<div data-component="validation" data-component-path="form">
-						<button class="button" disabled="disabled" data-component="click" data-component-path="#submit">SUBMIT FORM</button>
+						<button class="button" disabled="disabled" data-component="click" data-component-path="#submit">@(SUBMIT FORM)</button>
 					</div>
 				</div>
 			</div>
@@ -44,12 +44,10 @@
 </div>
 
 <script>
-	var common = {};
 	var form = {};
-	form.email = '@';
 	OPERATION('submit', function() {
-		$.components.POST('/api/contact/', form, function(response) {
-			SET('common.success', response);
+		AJAX('POST /api/contact/', form, function(response) {
+			SET('form.success', response);
 		});
 	});
 </script>
