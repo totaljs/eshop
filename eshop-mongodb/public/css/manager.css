@@ -29,6 +29,7 @@ h2 b { font-weight: 700; }
 
 .mt5 { margin-top: 5px; }
 .mr5 { margin-right: 5px !important; }
+.ml5 { margin-left: 5px !important; }
 .mr15 { margin-right: 15px !important; }
 .nmb { margin-bottom: 0 !important; }
 .nmt { margin-top: 0 !important; }
