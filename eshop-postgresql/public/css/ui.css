@@ -127,7 +127,7 @@ button { outline: 0; }
 	.ui-textbox { padding: 5px 2px 4px 5px; }
 	.ui-textbox input { font-size: 11px; }
 	.ui-dropdowncheckbox-label { font-size: 11px; }
-	.ui-dropdowncheckbox { height: 26px; }
+	.ui-dropdowncheckbox { height: 28px; }
 	.ui-dropdowncheckbox-selected { font-size: 11px; }
 	.ui-dropdowncheckbox .fa { margin-top: 5px; font-size: 14px; }
 }
