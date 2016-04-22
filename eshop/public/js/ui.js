@@ -833,10 +833,19 @@ COMPONENT('grid', function() {
 		}
 
 		if (!output.length) {
-			page.html('&nbsp;');
-			output.push('<tr><td style="text-align:center;padding:50px 0;background-color:white"><div style="padding:40px 20px;border:2px solid #F0F0F0;max-width:500px;margin:0 auto;border-radius:4px">{0}</div></td></tr>'.format(self.attr('data-empty')));
-		} else
-			page.html(self.attr('data-page').replace(/\#/g, value.page));
+			var empty = self.attr('data-empty');
+			if (empty) {
+				page.html('&nbsp;');
+				output.push('<tr><td style="text-align:center;padding:50px 0;background-color:white"><div style="padding:40px 20px;border:2px solid #F0F0F0;max-width:500px;margin:0 auto;border-radius:4px">{0}</div></td></tr>'.format(empty));
+			} else
+				page.empty();
+		} else {
+			var format = self.attr('data-page');
+			if (format)
+				page.html(format.replace(/\#/g, value.page));
+			else
+				page.empty();
+		}
 
 		target.html(output);
 	};
