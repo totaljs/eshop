@@ -360,4 +360,9 @@
 		return currency.format((value * this.count).format(format));
 	});
 
+	SCHEDULE('#orders.grid', 'manually', '3 minutes', function() {
+		if (orders.filter.page === 1)
+			orders_refresh();
+	});
+
 </script>
