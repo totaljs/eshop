@@ -10,7 +10,7 @@
 	</div>
 </div>
 <div class="container">
-	<div data-component="grid" data-component-path="users.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more users)" data-component-id="users.grid">
+	<div data-component="grid" data-component-path="users.grid" data-pagination-path="users.filter.page" data-component-id="users.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contian any data.)">
 		<script type="text/html">
 		<tr>
 			<td><span class="mr5">{{ name }}</span> {{ id | oauth2 }}</td>
@@ -117,9 +117,8 @@
 	users.filter.page = 1;
 	users.filter.type = 0;
 
-	users.grid = [];
+	users.grid = {};
 	users.form = {};
-	users.info = {};
 	users.response;
 
 	ON('#users.grid', function(component) {
@@ -129,7 +128,6 @@
 		users_refresh(true);
 
 		component.click = function(index, row, button) {
-			var loading = FIND('loading');
 			switch ($(button).attr('name')) {
 				case 'edit':
 					users_edit(row.id);
@@ -138,26 +136,21 @@
 					FIND('confirm').confirm('@(Do you want to remove selected user?)', ['@(OK)', '@(Cancel)'], function(index) {
 						if (index)
 							return;
-						loading.show();
+						var loading = FIND('loading').show();
 						AJAX('DELETE {0}/api/users'.format(managerurl), { id: row.id }, function() {
-							users_refresh(true);
+							users_refresh();
 							loading.hide(500);
 						});
 					});
 					break;
 			}
 		};
-
-		component.next = function(page) {
-			SET('users.filter.page', page);
-		};
 	});
 
 	ON('#users.form', function(component) {
 		// Submits user form
 		component.submit = function(hide) {
-			var loading = FIND('loading');
-			loading.show();
+			var loading = FIND('loading').show();
 			AJAX('PUT {0}/api/users/'.format(managerurl), users.form, function(response) {
 
 				loading.hide(500);
@@ -168,15 +161,14 @@
 					return;
 
 				hide();
-				users_refresh(true);
+				users_refresh();
 				success();
 			});
 		};
 	});
 
 	function users_edit(id) {
-		var loading = FIND('loading');
-		loading.show();
+		var loading = FIND('loading').show();
 		AJAX('GET {0}/api/users/{1}'.format(managerurl, id), function(response, err) {
 
 			loading.hide(500);
@@ -195,20 +187,9 @@
 
 	// Method refreshes grid
 	function users_refresh(reset) {
-
-		if (reset) {
+		if (reset)
 			users.filter.page = 1;
-			users.grid = [];
-		}
-
-		AJAX('GET {0}/api/users/'.format(managerurl), users.filter, function(response) {
-			SET((reset ? '' : '+') + 'users.grid', response.items);
-			if (!reset)
-				return;
-			users.info.count = response.count;
-			users.info.pages = response.pages;
-			UPDATE('users.info');
-		});
+		AJAX('GET {0}/api/users/'.format(managerurl), users.filter, 'users.grid');
 	}
 
 	// Watchs changes in user filter

@@ -4,7 +4,7 @@
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
 				<div data-component="textbox" data-component-path="orders.filter.search" data-placeholder="@(Search orders ...)" data-control-icon="fa-search"></div>
-				<div class="help" data-component="template" data-component-path="orders.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+				<div class="help" data-component="template" data-component-path="orders.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(All orders)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>
@@ -13,7 +13,7 @@
 	</div>
 </div>
 <div class="container">
-	<div data-component="grid" data-component-path="orders.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more orders)" data-component-id="orders.grid">
+	<div data-component="grid" data-component-path="orders.grid" data-pagination-path="orders.filter.page" data-component-id="orders.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contian any data.)">
 		<script type="text/html">
 		<tr{{ if iscompleted }} class="order-completed"{{ fi }}>
 			<td style="width:150px" class="silver hidden-xs"><span class="fa fa-truck"></span> {{ delivery }}</td>
@@ -164,9 +164,8 @@
 	orders.filter.page = 1;
 	orders.filter.type = 0;
 
-	orders.grid = [];
+	orders.grid = {};
 	orders.form = {};
-	orders.info = {};
 	orders.response;
 
 	ON('#orders.grid', function(component) {
@@ -190,7 +189,7 @@
 						AJAX('DELETE {0}/api/orders'.format(managerurl), { id: row.id }, function() {
 
 							loading.hide();
-							orders_refresh(true);
+							orders_refresh();
 
 							// Refresh dashboard informations
 							if (window.dashboard_refresh)
@@ -199,10 +198,6 @@
 					});
 					break;
 			}
-		};
-
-		component.next = function(page) {
-			SET('orders.filter.page', page);
 		};
 	});
 
@@ -239,7 +234,7 @@
 					return;
 
 				hide();
-				orders_refresh(true);
+				orders_refresh();
 				success();
 
 				// Refreshes dashboard informations
@@ -308,20 +303,9 @@
 
 	// Method refreshes grid
 	function orders_refresh(reset) {
-
-		if (reset) {
+		if (reset)
 			orders.filter.page = 1;
-			orders.grid = [];
-		}
-
-		AJAX('GET {0}/api/orders/'.format(managerurl), orders.filter, function(response) {
-			SET((reset ? '' : '+') + 'orders.grid', response.items);
-			if (!reset)
-				return;
-			orders.info.count = response.count;
-			orders.info.pages = response.pages;
-			UPDATE('orders.info');
-		});
+		AJAX('GET {0}/api/orders/'.format(managerurl), orders.filter, 'orders.grid');
 	}
 
 	// Method appends a new item into the ordered items

@@ -17,15 +17,6 @@
 		</tr>
 	</table>
 	<br />
-	<div class="b">@(Restoring)</div>
-	<br />
-	<table class="table table-bordered">
-		<tr>
-			<td><span class="fa fa-refresh mr5"></span> @(Restore databases + settings)</td>
-			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_restore_database">@(Restore now)</a></td>
-		</tr>
-	</table>
-	<br />
 	<div class="b">@(Clearing)</div>
 	<br />
 	<table class="table table-bordered">
@@ -57,25 +48,14 @@
 <script>
 // Backup databases
 function system_backup_database() {
-	loading(true);
-	window.location.href = managerurl + '/api/backup/database/';
-	setTimeout(function() {
-		loading(false);
-	}, 5000);
-}
-
-// Restore databases
-function system_restore_database() {
-	$('#system_restore_backup').click();
+	FIND('loading').show().hide(5000);
+	location.href = managerurl + '/api/backup/database/';
 }
 
 // Backup website
 function system_backup_website() {
-	loading(true);
-	window.location.href = managerurl + '/api/backup/website/';
-	setTimeout(function() {
-		loading(false);
-	}, 5000);
+	FIND('loading').show().hide(5000);
+	location.href = managerurl + '/api/backup/website/';
 }
 
 function system_clear_pages() {
@@ -133,28 +113,12 @@ function system_clear_webcounter() {
 		if (index)
 			return;
 		FIND('loading').show();
-		AJAX('{0}/api/dashboard/clear/'.format(managerurl), function() {
+		AJAX('GET {0}/api/dashboard/clear/'.format(managerurl), function() {
 			success();
 			setTimeout(function() {
-				window.location.reload(true);
+				location.reload(true);
 			}, 1500);
 		});
 	});
 }
-
-$('#system_restore_backup').on('change', function(e) {
-	e.preventDefault();
-	e.stopPropagation();
-	FIND('loading').show();
-	var el = this;
-	var data = new FormData();
-	data.append('file', this.files[0]);
-	UPLOAD(managerurl + '/api/restore/database/', data, function(response, err) {
-		el.value = '';
-		success(true);
-		setTimeout(function() {
-			window.location.reload(true);
-		}, 1500);
-	});
-});
 </script>

@@ -24,13 +24,13 @@
 	</div>
 </div>
 <hr class="hidden-xs" />
-<div class="container hidden" data-component="visible" data-component-path="newsletter.grid" data-if="value && value.length > 0">
+<div class="container hidden" data-component="visible" data-component-path="newsletter.grid" data-if="value && value.items && value.items.length > 0">
 	<div class="ui-center" style="margin-top:10px">
 		<div class="fs11 silver">@(Read-only mode)</div>
 		<a href="javascript:void(0)" class="csvexport"><span class="fa fa-download mr5"></span>@(<b>Download CSV</b> with email addresses)</a>
 	</div>
 	<br />
-	<div data-component="grid" data-component-path="newsletter.grid" data-max="1000000" data-options-page="">
+	<div data-component="grid" data-component-path="newsletter.grid" data-max="10000" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contian any data.)">
 		<script type="text/html">
 		<tr>
 			<td><span class="fa fa-envelope"></span> {{ email }}</td>
@@ -45,6 +45,7 @@
 <script>
 
 	var newsletter = {};
+	newsletter.grid = {};
 
 	function newsletter_refresh() {
 		AJAX('GET {0}/api/newsletter/'.format(managerurl), function(response) {
@@ -59,7 +60,7 @@
 				arr.push({ email: line[0], ip: line[1], datecreated: line[3] });
 			}
 
-			SET('newsletter.grid', arr);
+			SET('newsletter.grid', { items: arr, page: 1, pages: 1, count: arr.length, limit: 10000 });
 		});
 	}
 

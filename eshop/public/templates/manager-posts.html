@@ -4,7 +4,7 @@
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
 				<div data-component="textbox" data-component-path="posts.filter.search" data-placeholder="@(Search posts ...)" data-control-icon="fa-search"></div>
-				<div class="help" data-component="template" data-component-path="posts.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+				<div class="help" data-component="template" data-component-path="posts.grid"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<div data-component="dropdown" data-component-path="posts.filter.category" data-source="posts.categories" data-empty="@(All posts)" data-source-value="name"></div>
@@ -19,7 +19,7 @@
 </div>
 
 <div class="container">
-	<div data-component="grid" data-component-path="posts.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more posts)" data-component-id="posts.grid" data-autocenter="false">
+	<div data-component="grid" data-component-path="posts.grid" data-pagination-path="posts.filter.page" data-component-id="posts.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contian any data.)">
 		<script type="text/html">
 		<tr>
 			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ name }}</td>
@@ -78,8 +78,7 @@
 	posts.filter = {};
 	posts.filter.page = 1;
 
-	posts.grid = [];
-	posts.info = {};
+	posts.grid = {};
 	posts.form = {};
 	posts.categories = [];
 	posts.templates = [];
@@ -96,7 +95,6 @@
 		posts_refresh(true);
 
 		component.click = function(index, row, button) {
-			var loading = FIND('loading');
 			switch ($(button).attr('name')) {
 				case 'edit':
 					posts_edit(row.id);
@@ -105,19 +103,14 @@
 					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
 						if (index)
 							return;
-						loading.show();
+						var loading = FIND('loading');
 						AJAX('DELETE {0}/api/posts/'.format(managerurl), { id: row.id }, function() {
 							loading.hide(500);
-							posts_refresh(true);
+							posts_refresh();
 						});
 					});
 					break;
 			}
-		};
-
-		component.next = function(page) {
-			posts.filter.page = page;
-			posts_refresh();
 		};
 
 		WATCH('posts.form.template', function(path, value, type) {
@@ -127,7 +120,7 @@
 		});
 	});
 
-	// Watch for changes in order filter
+	// Watch for changes in posts filter
 	WATCH('posts.filter.*', function(path, value) {
 		if (NOTMODIFIED('posts.filter', posts.filter))
 			return;
@@ -136,10 +129,9 @@
 
 	ON('#posts.form', function(component) {
 		component.submit = function(hide) {
-			var loading = FIND('loading');
-			loading.show();
-
+			var loading = FIND('loading').show();
 			var editor = FIND('#posts.editor');
+
 			posts.form.pictures = editor.getPictures();
 			posts.form.body = editor.getContent();
 			posts.form.pictures = editor.getPictures();
@@ -157,15 +149,14 @@
 					return;
 
 				hide();
-				posts_refresh(true);
+				posts_refresh();
 				success();
 			});
 		};
 	});
 
 	function posts_edit(id) {
-		var loading = FIND('loading');
-		loading.show();
+		var loading = FIND('loading').show();
 		AJAX('GET {0}/api/posts/{1}/'.format(managerurl, id), function(response, err) {
 
 			loading.hide(500);
@@ -210,20 +201,9 @@
 
 	// Method refreshes grid
 	function posts_refresh(reset) {
-
-		if (reset) {
+		if (reset)
 			posts.filter.page = 1;
-			posts.grid = [];
-		}
-
-		AJAX('GET {0}/api/posts/'.format(managerurl), posts.filter, function(response) {
-			SET((reset ? '' : '+') + 'posts.grid', response.items);
-			if (!reset)
-				return;
-			posts.info.count = response.count;
-			posts.info.pages = response.pages;
-			UPDATE('posts.info');
-		});
+		AJAX('GET {0}/api/posts/'.format(managerurl), posts.filter, 'posts.grid');
 	}
 
 	function posts_sourcecode() {
@@ -238,5 +218,4 @@
 			}, 500);
 		}
 	}
-
 </script>

@@ -212,8 +212,9 @@
 			if (!window.widgets)
 				self.refreshWidgets();
 			WATCH('widgets.grid', function(path, value, type) {
-				cmseditor.widgets = value; // cache
-				SET('cmseditor.widgets2', value);
+				var items = value && value.items ? value.items : [];
+				cmseditor.widgets = items; // cache
+				SET('cmseditor.widgets2', items);
 			}, true);
 		};
 
@@ -227,7 +228,10 @@
 		};
 
 		self.write = function(content) {
+
 			var frm = iframe.get(0).contentWindow;
+			if (!frm)
+				return;
 
 			frm.document.open('text/html', 'replace');
 

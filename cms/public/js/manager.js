@@ -84,19 +84,10 @@ if (window.su) {
 }
 
 jRouting.on('location', function(url) {
-	var nav = $('nav');
+	var nav = $('header nav');
 	nav.find('.selected').removeClass('selected');
 	nav.find('a[href="' + url + '"]').addClass('selected');
 });
-
-function loading(v, timeout) {
-	// @TODO: remove
-	return;
-
-	setTimeout(function() {
-		$('#loading').toggle(v);
-	}, timeout || 0);
-}
 
 function resizer() {
 	var h = $(window).height();

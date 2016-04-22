@@ -240,8 +240,7 @@ function settings_refresh() {
 }
 
 function settings_save() {
-	var loading = FIND('loading');
-	loading.show();
+	var loading = FIND('loading').show();
 	AJAX('PUT {0}/api/settings/'.format(managerurl), settings.form, function() {
 
 		success(true);

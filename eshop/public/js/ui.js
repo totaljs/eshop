@@ -778,55 +778,41 @@ COMPONENT('page', function() {
 COMPONENT('grid', function() {
 
 	var self = this;
-	var button;
-	var element;
-	var lastpage = -1;
+	var target;
+	var page;
 
 	self.click = function(index, row, button) {console.log(index, row, button)};
-	self.next = function(page) {};
-
-	self.hidemore = function() {
-		button.toggleClass('hidden', true);
-	};
-
 	self.make = function(template) {
 
-		element = self.element.find('script');
-		self.template = Tangular.compile(element.html());
+		var element = self.element.find('script');
 
+		self.template = Tangular.compile(element.html());
 		self.element.on('click', 'tr', function() {});
 		self.element.addClass('ui-grid');
-
-		element.replaceWith('<div></div>');
-		element = self.element.find('div:first-child');
-
-		if (self.attr('data-options-button'))
-			self.element.append('<div class="row"><div class="col-md-4"><button class="hidden" name="ui-grid-more"><span class="fa fa-plus-circle"></span> ' + self.attr('data-options-button') + '</button></div>');
-
-		button = self.element.find('button');
-
+		self.html('<div><div class="ui-grid-page"></div><table width="100%" cellpadding="0" cellspacing="0" border="0"><tbody></tbody></table></div><div data-component="pagination" data-component-path="{0}" data-max="8" data-pages="{1}" data-items="{2}" data-target-path="{3}"></div>'.format(self.path, self.attr('data-pages'), self.attr('data-items'), self.attr('data-pagination-path')));
 		self.element.on('click', 'button', function() {
 			switch (this.name) {
-				case 'ui-grid-more':
-					self.next(getPages(self.get().length, self.max) + 1);
-					break;
 				default:
-					var index = parseInt($(this).parent().parent().attr('data-index'));
-					self.click(index, self.get()[index], this);
+					var index = parseInt($(this).closest('tr').attr('data-index'));
+					self.click(index, self.get().items[index], this);
 					break;
 			}
 		});
 
+		target = self.element.find('tbody');
+		page = self.element.find('.ui-grid-page');
+
 		setTimeout(function() {
 			var max = self.attr('data-max');
 			if (max === 'auto')
-				self.max = (Math.floor(($(window).height() - (self.element.offset().top + 108)) / 26));
+				self.max = (Math.floor(($(window).height() - (self.element.offset().top + 110)) / 26));
 			else
 				self.max = parseInt(max);
-
 			if (self.max < 10)
 				self.max = 10;
 		}, 10);
+
+		return true;
 	};
 
 	self.refresh = function() {
@@ -838,43 +824,23 @@ COMPONENT('grid', function() {
 	};
 
 	self.setter = function(value) {
+		var output = [];
+		var items = value.items;
 
-		if (value === null || value === undefined){
-			button.toggleClass('hidden', true);
-			return;
+		if (items) {
+			for (var i = 0, length = items.length; i < length; i++)
+				output.push(self.prerender(i, items[i]));
 		}
 
-		var pages = getPages(value.length, self.max);
-		var output = '';
+		if (!output.length) {
+			page.html('&nbsp;');
+			output.push('<tr><td style="text-align:center;padding:50px 0;background-color:white"><div style="padding:40px 20px;border:2px solid #F0F0F0;max-width:500px;margin:0 auto;border-radius:4px">{0}</div></td></tr>'.format(self.attr('data-empty')));
+		} else
+			page.html(self.attr('data-page').replace(/\#/g, value.page));
 
-		button.toggleClass('hidden', value.length === 0 || value.length % self.max !== 0);
-
-		for (var i = 0; i < pages; i++) {
-
-			var skip = i * self.max;
-			var items = '';
-
-			for (var j = skip; j < skip + self.max; j++) {
-				if (value[j])
-					items += self.prerender(j, value[j]);
-			}
-
-			if (items.length > 0)
-				output += (self.attr('data-options-page') ? '<div class="ui-grid-page">' + self.attr('data-options-page').replace('#', i + 1).replace('$', value.length) + '</div>' : '') + '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tbody>' + items + '</tbody></table>';
-		}
-
-		element.html(output);
+		target.html(output);
 	};
 });
-
-function getPages(length, max) {
-	var pages = (length - 1) / max;
-	if (pages % max !== 0)
-		pages = Math.floor(pages) + 1;
-	if (pages === 0)
-		pages = 1;
-	return pages;
-}
 
 COMPONENT('form', function() {
 
@@ -2151,6 +2117,7 @@ COMPONENT('loading', function() {
 	self.show = function() {
 		clearTimeout(pointer);
 		self.element.toggleClass('hidden', false);
+		return self;
 	};
 
 	self.hide = function(timeout) {
@@ -2158,21 +2125,145 @@ COMPONENT('loading', function() {
 		pointer = setTimeout(function() {
 			self.element.toggleClass('hidden', true);
 		}, timeout || 1);
+		return self;
+	};
+});
+
+/**
+ * Pagination
+ * @version 1.0.0
+ */
+COMPONENT('pagination', function() {
+
+	var self = this;
+	var nav;
+	var info;
+	var cachePages = 0;
+	var cacheCount = 0;
+
+	self.template = Tangular.compile('<a href="#page{{ page }}" class="page{{ if selected }} selected{{ fi }}" data-page="{{ page }}">{{ page }}</a>');
+	self.readonly();
+	self.make = function() {
+		self.element.addClass('ui-pagination hidden');
+		self.append('<div></div><nav></nav>');
+		nav = self.find('nav');
+		info = self.find('div');
+		self.element.on('click', 'a', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			var el = $(this);
+			if (self.onPage)
+				self.onPage(el.attr('data-page').parseInt(), el);
+		});
+	};
+
+	self.onPage = function(page) {
+		self.set(self.attr('data-target-path'), page);
+	};
+
+	self.getPagination = function(page, pages, max, fn) {
+
+		var half = Math.ceil(max / 2);
+		var pageFrom = page - half;
+		var pageTo = page + half;
+		var plus = 0;
+
+		if (pageFrom <= 0) {
+			plus = Math.abs(pageFrom);
+			pageFrom = 1;
+			pageTo += plus;
+		}
+
+		if (pageTo >= pages) {
+			pageTo = pages;
+			pageFrom = pages - max;
+		}
+
+		if (pageFrom <= 0)
+			pageFrom = 1;
+
+		if (page < half + 1) {
+			pageTo++;
+			if (pageTo > pages)
+				pageTo--;
+		}
+
+		for (var i = pageFrom; i < pageTo + 1; i++)
+			fn(i);
+	};
+
+	self.getPages = function(length, max) {
+		var pages = (length - 1) / max;
+		if (pages % max !== 0)
+			pages = Math.floor(pages) + 1;
+		if (pages === 0)
+			pages = 1;
+		return pages;
+	};
+
+	self.setter = function(value) {
+
+		// value.page   --> current page index
+		// value.pages  --> count of pages
+		// value.count  --> count of items in DB
+
+		var is = false;
+
+		if (value.pages !== undefined) {
+			if (value.pages !== cachePages || value.count !== cacheCount) {
+				cachePages = value.pages;
+				cacheCount = value.count;
+				is = true;
+			}
+		}
+
+		var builder = [];
+
+		if (cachePages > 2) {
+			var prev = value.page - 1;
+			if (prev <= 0)
+				prev = cachePages;
+			builder.push('<a href="#prev" class="page" data-page="{0}"><span class="fa fa-arrow-left"></span></a>'.format(prev));
+		}
+
+		var max = self.attr('data-max');
+		if (max)
+			max = max.parseInt();
+		else
+			max = 8;
+
+		self.getPagination(value.page, cachePages, max, function(index) {
+			builder.push(self.template({ page: index, selected: value.page === index }));
+		});
+
+		if (cachePages > 2) {
+			var next = value.page + 1;
+			if (next > cachePages)
+				next = 1;
+			builder.push('<a href="#next" class="page" data-page="{0}"><span class="fa fa-arrow-right"></span></a>'.format(next));
+		}
+
+		nav.empty().append(builder.join(''));
+
+		if (!is)
+			return;
+
+		if (cachePages > 1) {
+			var pluralize_pages = [cachePages];
+			var pluralize_items = [cacheCount];
+
+			pluralize_pages.push.apply(pluralize_pages, self.attr('data-pages').split(',').trim());
+			pluralize_items.push.apply(pluralize_items, self.attr('data-items').split(',').trim());
+
+			info.empty().append(Tangular.helpers.pluralize.apply(value, pluralize_pages) + ' / ' + Tangular.helpers.pluralize.apply(value, pluralize_items));
+			self.element.toggleClass('hidden', false);
+		} else
+			self.element.toggleClass('hidden', true);
 	};
 });
 // ==========================================================
 // @{end}
 // ==========================================================
-
-Tangular.register('pluralize', function(value, zero, one, other, many) {
-	if (!value)
-		return '0 ' + zero;
-	if (value === 1)
-		return value + ' ' + one;
-	if (value > 4)
-		return value + ' ' +  many;
-	return value + ' ' + other;
-});
 
 jC.parser(function(path, value, type) {
 
