@@ -241,7 +241,7 @@
 
 				hide();
 
-				if (products.form.$index === undefined || products.grid[products.form.$index].category !== products.form.category || products.grid[products.form.$index].manufacturer !== products.form.manufacturer)
+				if (products.form.$index === undefined || products.grid.items[products.form.$index].category !== products.form.category || products.grid.items[products.form.$index].manufacturer !== products.form.manufacturer)
 					setTimeout(products_refresh_codelists, 2000);
 
 				products_refresh();
