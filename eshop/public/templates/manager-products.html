@@ -25,7 +25,7 @@
 	<div data-component="grid" data-component-path="products.grid" data-pagination-path="products.filter.page" data-component-id="products.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
 		<script type="text/html">
 		<tr>
-			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}{{ if manufacturer }} <span class="fs11 silver">({{ manufacturer }})</span>{{ fi }}</td>
+			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ name }}{{ if manufacturer }} <span class="fs11 silver">({{ manufacturer }})</span>{{ fi }}</td>
 			<td style="width:200px" class="silver hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
 			<td style="width:100px" class="ui-right active">{{ price | price(2) }}</td>
 			<td style="width:80px" class="ui-right">

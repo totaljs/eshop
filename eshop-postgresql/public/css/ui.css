@@ -29,6 +29,17 @@ button { outline: 0; }
 .ui-grid .row button:active { background: white; color: #A4A4A4; }
 .ui-grid .row button .fa { width: 20px; color: #377BB5; }
 
+.badge { font-size: 9px; padding: 0 6px; border-radius: 4px; background-color: #F0F0F0; line-height: 12px; vertical-align: middle; margin-top: -2px; position: relative; display: inline-block; }
+.badge-blue { background-color: #4CC1E9; color: white; }
+.badge-red { background-color: #DA4453; color: white; }
+.badge-green { background-color: #8CC152; color: white; }
+.badge-yellow { background-color: #EFDC05; color: white; }
+.badge-orange { background-color: #E9573F; color: white; }
+.badge-gray { background-color: #606060; color: white; }
+.badge-purple { background-color: #967ADC; color: white; }
+.badge-pink { background-color: #D770AD; color: white; }
+.badge-silver { background-color: #E0E0E0; color: gray; }
+
 .ui-form-container { width: 100%; position: fixed; left: 0; top: 0; bottom: 0; right: 0; background-color: rgba(230,233,237,0.8); z-index: 5; overflow-y: scroll; transform-style: preserve-3d; }
 .ui-form-container-padding { padding: 0 30px;}
 .ui-form { background-color: white; margin: 30px auto; border-radius: 4px; box-shadow: 0 0 20px #D0D0D0; transform: translate(0, 500px) scale(0.5); transition: all 0.3s; opacity: 0; }
