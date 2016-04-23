@@ -4,7 +4,7 @@
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
 				<div data-component="textbox" data-component-path="users.filter.search" data-placeholder="@(Search users ...)" data-control-icon="fa-search"></div>
-				<div class="help" data-component="template" data-component-path="users.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+				<div class="help" data-component="template" data-component-path="users.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
 		</div>
 	</div>
