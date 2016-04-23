@@ -23,6 +23,7 @@ __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREAT
 ## Installation
 
 - install `npm install total.js@beta`
+- install `npm install paypal-express-checkout`
 
 ### MongoDB version only
 
