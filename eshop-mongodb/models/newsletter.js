@@ -1,8 +1,8 @@
 NEWSCHEMA('Newsletter').make(function(schema) {
 
-	schema.define('email', 'String(200)', true);
+	schema.define('email', 'Email', true);
 	schema.define('ip', 'String(80)');
-	schema.define('language', 'String(3)');
+	schema.define('language', 'Lower(3)');
 
 	// Saves the model into the database
 	schema.setSave(function(error, model, options, callback) {

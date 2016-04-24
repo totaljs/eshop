@@ -1,6 +1,6 @@
 NEWSCHEMA('OrderItem').make(function(schema) {
 
-	schema.define('id', 'String(20)', true);
+	schema.define('id', 'UID', true);
 	schema.define('price', Number, true);
 	schema.define('name', 'String(50)', true);
 	schema.define('reference', 'String(20)');
@@ -11,16 +11,16 @@ NEWSCHEMA('OrderItem').make(function(schema) {
 
 NEWSCHEMA('Order').make(function(schema) {
 
-	schema.define('id', 'String(20)');
-	schema.define('iduser', 'String(20)');
+	schema.define('id', 'UID');
+	schema.define('iduser', 'UID');
 	schema.define('status', 'String(100)');
 	schema.define('delivery', 'String(30)', true);
-	schema.define('firstname', 'String(40)', true);
-	schema.define('lastname', 'String(40)', true);
-	schema.define('email', 'String(200)', true);
-	schema.define('phone', 'String(20)');
+	schema.define('firstname', 'Camelize(40)', true);
+	schema.define('lastname', 'Camelize(40)', true);
+	schema.define('email', 'Email', true);
+	schema.define('phone', 'Phone');
 	schema.define('address', 'String(1000)', true);
-	schema.define('language', 'String(3)');
+	schema.define('language', 'Lower(3)');
 	schema.define('reference', 'String(10)');
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');

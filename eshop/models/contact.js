@@ -1,12 +1,12 @@
 NEWSCHEMA('Contact').make(function(schema) {
 
-	schema.define('id', 'String(20)');
-	schema.define('firstname', 'String(40)', true);
-	schema.define('lastname', 'String(40)', true);
-	schema.define('email', 'String(200)', true);
+	schema.define('id', 'UID');
+	schema.define('firstname', 'Camelize(40)', true);
+	schema.define('lastname', 'Camelize(40)', true);
+	schema.define('email', 'Email', true);
 	schema.define('message', String, true);
-	schema.define('phone', 'String(20)');
-	schema.define('language', 'String(5)');
+	schema.define('phone', 'Phone');
+	schema.define('language', 'Lower(3)');
 	schema.define('ip', 'String(80)');
 	schema.define('datecreated', Date);
 

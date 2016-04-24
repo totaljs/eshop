@@ -11,10 +11,10 @@ NEWSCHEMA('SuperUser').make(function(schema) {
 
 NEWSCHEMA('Settings').make(function(schema) {
 
-	schema.define('emailcontactform', String, true);
-	schema.define('emailreply', String, true);
-	schema.define('emailsender', String, true);
-	schema.define('url', String, true);
+	schema.define('emailcontactform', 'email', true);
+	schema.define('emailreply', 'email', true);
+	schema.define('emailsender', 'email', true);
+	schema.define('url', 'Lower', true);
 	schema.define('templates', '[String]');
 	schema.define('posts', '[String]');
 	schema.define('navigations', '[String]');

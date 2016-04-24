@@ -10,12 +10,12 @@ NEWSCHEMA('Settings').make(function(schema) {
 
 	schema.define('currency', String, true);
 	schema.define('currency_entity', String);
-	schema.define('emailcontactform', String, true);
-	schema.define('emailorderform', String, true);
-	schema.define('emailreply', String, true);
-	schema.define('emailsender', String, true);
-	schema.define('emailuserform', String, true);
-	schema.define('url', String, true);
+	schema.define('emailcontactform', 'Email', true);
+	schema.define('emailorderform', 'Email', true);
+	schema.define('emailreply', 'Email', true);
+	schema.define('emailsender', 'Email', true);
+	schema.define('emailuserform', 'Email', true);
+	schema.define('url', 'Lower', true);
 	schema.define('templates', '[String]');
 	schema.define('navigations', '[String]');
 	schema.define('deliverytypes', '[String]');

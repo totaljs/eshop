@@ -1,6 +1,6 @@
 NEWSCHEMA('Widget').make(function(schema) {
 
-	schema.define('id', 'String(20)');
+	schema.define('id', 'UID');
 	schema.define('name', 'String(50)', true);
 	schema.define('category', 'String(50)');
 	schema.define('body', String);

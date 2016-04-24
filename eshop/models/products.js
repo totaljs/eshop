@@ -1,5 +1,5 @@
 NEWSCHEMA('Product').make(function(schema) {
-	schema.define('id', 'String(20)');
+	schema.define('id', 'UID');
 	schema.define('pictures', '[String]');
 	schema.define('reference', 'String(20)');
 	schema.define('category', 'String(300)', true);

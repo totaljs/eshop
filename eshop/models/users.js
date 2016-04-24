@@ -19,7 +19,7 @@ exports.createSession = function(profile) {
 
 NEWSCHEMA('User').make(function(schema) {
 
-	schema.define('id', 'String(20)');
+	schema.define('id', 'UID');
 	schema.define('idfacebook', 'String(30)');
 	schema.define('idgoogle', 'String(30)');
 	schema.define('idlinkedin', 'String(30)');
@@ -30,10 +30,10 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('idyahoo', 'String(30)');
 	schema.define('idlive', 'String(30)');
 	schema.define('ip', 'String(80)');
-	schema.define('name', 'String(50)', true);
-	schema.define('firstname', 'String(50)');
-	schema.define('lastname', 'String(50)');
-	schema.define('email', 'String(200)');
+	schema.define('name', 'Camelize(50)', true);
+	schema.define('firstname', 'Camelize(50)');
+	schema.define('lastname', 'Camelize(50)');
+	schema.define('email', 'Email');
 	schema.define('gender', 'String(20)');
 	schema.define('datecreated', Date);
 	schema.define('isblocked', Boolean);
