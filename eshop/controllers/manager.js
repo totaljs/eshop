@@ -96,7 +96,7 @@ function upload() {
 
 			// Store current file into the HDD
 			file.extension = U.getExtension(file.filename);
-			id.push(DB('files').binary.insert(file.filename, data) + file.extension);
+			id.push(DB('files').binary.insert(file.filename, data) + '.' + file.extension);
 
 			// Next file
 			setTimeout(next, 100);
