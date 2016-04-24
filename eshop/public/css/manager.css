@@ -21,7 +21,7 @@ h2 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 8px 0; paddin
 h2 b { font-weight: 700; }
 
 #loading { background: rgba(255,255,255,0.9) url(../img/preloader.gif) no-repeat 50% 50%; position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 15; }
-#success { width: 100px; height: 90px; left: 0; top: 50%; margin-left: -10px; margin-top: -45px; background-color: #66B258; border-radius: 4px; font-size: 40px; line-height: 0; position: fixed; z-index: 20; color: white; text-align: center; padding-top: 20px; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: none; }
+#success { height: 40px; left: 0; top: 0; right: 0; background-color: #66B258; font-size: 32px; line-height: 0; position: fixed; z-index: 20; color: white; text-align: center; padding-top: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: none; }
 
 .padding { padding: 20px; }
 .m { margin-bottom: 20px; }
@@ -106,15 +106,16 @@ canvas { display: block; }
 
 @media(max-width: 767px) {
 	.mainmenu { display: block; }
-	header { min-height: 45px; height: auto; }
-	nav { font-size: 20px; display: none; float: none; margin: 10px 0 15px; }
-	nav a { min-width: 25% !important; height: 55px; padding-top: 12px; border-bottom: 1px solid #D0D0D0; border-right: 0; background-color: #F9F9F9; }
-	nav a:nth-child(odd) { background-color: #E9E9E9; }
-	nav a:first-child { border-left: 0; }
-	nav .logoff { float: none; min-width: 25%; background-color: #E7331F !important; }
-	nav .logoff:hover { background-color: #E74839 !important; }
-	nav .selected { background-color: black !important; color: white; }
-	nav .highlight { background-color: #E9E9E9 !important; }
+	#success { height: 45px; font-size: 36px; }
+	header { min-height: 45px; height: auto; margin-bottom: 15px; }
+	header nav { font-size: 20px; display: none; float: none; margin: 10px 0 15px; }
+	header nav a { min-width: 25% !important; height: 55px; padding-top: 12px; border-bottom: 1px solid #D0D0D0; border-right: 0; background-color: #F9F9F9; }
+	header nav a:nth-child(odd) { background-color: #E9E9E9; }
+	header nav a:first-child { border-left: 0; }
+	header nav .logoff { float: none; min-width: 25%; background-color: #E7331F !important; }
+	header nav .logoff:hover { background-color: #E74839 !important; }
+	header nav .selected { background-color: black !important; color: white; }
+	header nav .highlight { background-color: #E9E9E9 !important; }
 	.ui-form-buttons button[name="submit"] { width: 140px; }
 	.table-xs thead { display: none; }
 	.table-xs tbody { margin-top: 15px; display: block; }

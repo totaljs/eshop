@@ -101,10 +101,10 @@ function resizer() {
 function success() {
 	var el = $('#success');
 	FIND('loading').hide(500);
-	el.css({ top: '0%' }).fadeIn(100).animate({ top: '50%' }, 1000, 'easeOutBounce', function() {
+	el.css({ right: '90%' }).delay(500).fadeIn(100).animate({ right: '0%' }, 1000, 'easeOutBounce', function() {
 		setTimeout(function() {
-			el.fadeOut(300);
-		}, 1000);
+			el.fadeOut(200);
+		}, 800);
 	});
 }
 
