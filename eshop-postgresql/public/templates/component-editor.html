@@ -24,6 +24,7 @@
 				<div data-component="textbox" data-component-path="cmseditor.crop.alt" data-required="true">@(Picture description)</div>
 			</div>
 			<div class="col-md-12" data-component="visible" data-component-path="cmseditor.crop.href" data-if="value && value.length > 0">
+				<div data-component="dropdown" data-component-path="cmseditor.crop.href" class="m" data-icon="fa-sitemap" data-source="pages.sitemap" data-source-key="name" data-source-value="url" data-empty="">@(URL according to the sitemap)</div>
 				<div data-component="textbox" data-component-path="cmseditor.crop.href">@(URL address)</div>
 			</div>
 		</div>
@@ -43,6 +44,7 @@
 				<div class="silver"><span class="fa fa-link"></span> @(<b>Change the target URL address</b> and other settings for the selected link.)</div>
 				<hr />
 				<div data-component="fileupload" data-component-path="cmseditor.link.file" data-placeholder="@(Browse device)" data-error-large="@(The uploaded file is too large.)" data-icon="fa-file" class="m" data-singlefile="true">@(Upload file)</div>
+				<div data-component="dropdown" data-component-path="cmseditor.link.href" class="m" data-icon="fa-sitemap" data-source="pages.sitemap" data-source-key="name" data-source-value="url" data-empty="">@(URL according to the sitemap)</div>
 				<div data-component="textbox" data-component-path="cmseditor.link.href" data-required="true" class="m" data-icon="fa-globe">@(URL address)</div>
 				<div data-component="dropdown" data-component-path="cmseditor.link.target" data-required="true" data-options="@(Current tab or window)|_self;@(New tab or window)|_blank" class="m">@(Target)</div>
 				<div data-component="textbox" data-component-path="cmseditor.link.title" data-icon="fa-info-circle">@(Title)</div>
