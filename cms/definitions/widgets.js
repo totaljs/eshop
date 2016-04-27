@@ -9,7 +9,7 @@ GETSCHEMA('Widget').addTransform('d5467a1697', function(error, model, data, call
 	// data.page
 	// data.controller
 	var options = {};
-	options.max = U.parseInt(data.settings, 5);
+	options.max = data.settings || '5';
 	GETSCHEMA('Post').query(options, (err, response) => callback(F.view('partial-blogs', response)));
 });
 

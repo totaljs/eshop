@@ -55,6 +55,8 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (options.search)
 			filter.like('search', options.search.keywords(true, true));
 
+		filter.take(take);
+		filter.skip(skip);
 		filter.fields('id', 'category', 'name', 'language', 'datecreated', 'linker', 'category_linker', 'pictures', 'perex', 'tags');
 		filter.sort('datecreated');
 

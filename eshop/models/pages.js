@@ -76,6 +76,8 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (options.search)
 			filter.like('search', options.search);
 
+		filter.take(take);
+		filter.skip(skip);
 		filter.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
 		filter.sort('datecreated', true);
 
