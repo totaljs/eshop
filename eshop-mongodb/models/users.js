@@ -19,7 +19,7 @@ exports.createSession = function(profile) {
 
 NEWSCHEMA('User').make(function(schema) {
 
-	schema.define('id', 'UID');
+	schema.define('id', 'String(20)');
 	schema.define('idfacebook', 'String(30)');
 	schema.define('idgoogle', 'String(30)');
 	schema.define('idlinkedin', 'String(30)');

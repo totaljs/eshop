@@ -1,6 +1,6 @@
 NEWSCHEMA('Contact').make(function(schema) {
 
-	schema.define('id', 'UID');
+	schema.define('id', 'String(20)');
 	schema.define('firstname', 'Camelize(40)', true);
 	schema.define('lastname', 'Camelize(40)', true);
 	schema.define('email', 'Email', true);

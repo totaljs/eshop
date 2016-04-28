@@ -9,8 +9,8 @@
 
 NEWSCHEMA('Page').make(function(schema) {
 
-	schema.define('id', 'UID');
-	schema.define('parent', 'UID');
+	schema.define('id', 'String(20)');
+	schema.define('parent', 'String(20)');
 	schema.define('template', 'String(30)');
 	schema.define('language', 'Lower(3)');
 	schema.define('url', 'String(200)');

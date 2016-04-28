@@ -1,6 +1,6 @@
 NEWSCHEMA('Post').make(function(schema) {
 
-	schema.define('id', 'UID');
+	schema.define('id', 'String(20)');
 	schema.define('category', 'String(50)');
 	schema.define('template', 'String(30)', true);
 	schema.define('language', 'Lower(3)');
