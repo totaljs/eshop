@@ -206,144 +206,161 @@ NEWSCHEMA('Product').make(function(schema) {
 
 	// Imports CSV
 	schema.addWorkflow('import.csv', function(error, model, filename, callback) {
-		require('fs').readFile(filename, function(err, buffer) {
+		// Reads all id + references (for updating/inserting)
+		DB('products').find().fields('id', 'reference').where('reference', '!=', '').callback(function(err, database) {
+			require('fs').readFile(filename, function(err, buffer) {
 
-			if (err) {
-				error.push(err);
-				callback();
-				return;
-			}
-
-			buffer = buffer.toString('utf8').split('\n');
-
-			var properties = [];
-			var schema = GETSCHEMA('Product');
-			var isFirst = true;
-			var count = 0;
-			var options = { importing: true };
-
-			buffer.wait(function(line, next) {
-
-				if (!line)
-					return next();
-
-				var data = line.replace(/\"/g, '').split(';')
-				var product = {};
-
-				for (var i = 0, length = data.length; i < length; i++) {
-					var value = data[i];
-					if (!value)
-						continue;
-
-					if (isFirst)
-						properties.push(value);
-					else
-						product[properties[i]] = value;
+				if (err) {
+					error.push(err);
+					callback();
+					return;
 				}
 
-				if (isFirst) {
-					isFirst = false;
-					return next();
-				}
+				buffer = buffer.toString('utf8').split('\n');
 
-				schema.make(product, function(err, model) {
-					if (err)
+				var properties = [];
+				var schema = GETSCHEMA('Product');
+				var isFirst = true;
+				var count = 0;
+				var options = { importing: true };
+
+				buffer.wait(function(line, next) {
+
+					if (!line)
 						return next();
-					count++;
-					model.$save(options, next);
-				});
-			}, function() {
 
-				if (count)
-					refresh();
+					var data = line.replace(/\"/g, '').split(';')
+					var product = {};
 
-				// Done, returns response
-				callback(SUCCESS(count > 0));
-			});
-		});
-	});
+					for (var i = 0, length = data.length; i < length; i++) {
+						var value = data[i];
+						if (!value)
+							continue;
+						if (isFirst)
+							properties.push(value);
+						else
+							product[properties[i]] = value;
+					}
 
-	// Imports XML
-	schema.addWorkflow('import.xml', function(error, model, filename, callback) {
+					if (isFirst) {
+						isFirst = false;
+						return next();
+					}
 
-		var products = [];
-		var count = 0;
-		var stream = require('fs').createReadStream(filename);
-		var options = { importing: true };
+					if (!product.id && product.reference) {
+						var tmp = database.findItem('reference', product.reference);
+						if (tmp)
+							product.id = tmp.id;
+					}
 
-		stream.on('data', U.streamer('<product>', '</product>', function(value) {
-
-			var index = value.indexOf('<product>');
-			if (index === -1)
-				return;
-
-			value = value.substring(index).trim();
-			xml = value.parseXML();
-
-			var obj = {};
-
-			Object.keys(xml).forEach(function(key) {
-				obj[key.replace('product.', '')] = xml[key];
-			});
-
-			products.push(obj);
-		}));
-
-		CLEANUP(stream, function() {
-
-			var Fs = require('fs');
-			var id;
-
-			products.wait(function(product, next) {
-
-				var fn = function() {
 					schema.make(product, function(err, model) {
 						if (err)
 							return next();
 						count++;
 						model.$save(options, next);
 					});
-				};
 
-				if (!product.pictures)
-					return fn();
-
-				id = [];
-
-				product.pictures.split(',').wait(function(picture, next) {
-					U.download(picture.trim(), ['get', 'dnscache'], function(err, response) {
-						if (err)
-							return next();
-						var filename = F.path.temp(U.GUID(10) + '.jpg');
-						var writer = Fs.createWriteStream(filename);
-						response.pipe(writer);
-						CLEANUP(writer, function() {
-							Fs.unlink(filename, NOOP);
-							Fs.readFile(filename, function(err, data) {
-								if (!err)
-									id.push(DB('files').binary.insert(U.getName(picture), 'image/jpeg', data));
-								setTimeout(next, 200);
-							});
-						});
-					});
 				}, function() {
-					product.pictures = id;
-					fn();
-				}, 3); // 3 threads
 
-			}, function() {
+					if (count)
+						refresh();
 
-				if (count)
-					refresh();
-
-				if (id)
-					Fs.unlink(filename, NOOP);
-
-				// Done, returns response
-				callback(SUCCESS(count > 0));
+					// Done, returns response
+					callback(SUCCESS(count > 0));
+				});
 			});
 		});
+	});
 
+	// Imports XML
+	schema.addWorkflow('import.xml', function(error, model, filename, callback) {
+		// Reads all id + references (for updating/inserting)
+		DB('products').find().fields('id', 'reference').where('reference', '!=', '').callback(function(err, database) {
+
+			var products = [];
+			var count = 0;
+			var stream = require('fs').createReadStream(filename);
+			var options = { importing: true };
+
+			stream.on('data', U.streamer('<product>', '</product>', function(value) {
+
+				var index = value.indexOf('<product>');
+				if (index === -1)
+					return;
+
+				value = value.substring(index).trim();
+				xml = value.parseXML();
+
+				var obj = {};
+
+				Object.keys(xml).forEach(key => obj[key.replace('product.', '')] = xml[key]);
+				products.push(obj);
+			}));
+
+			CLEANUP(stream, function() {
+
+				var Fs = require('fs');
+				var id;
+
+				products.wait(function(product, next) {
+
+					var fn = function() {
+
+						if (!product.id && product.reference) {
+							var tmp = database.findItem('reference', product.reference);
+							if (tmp)
+								product.id = tmp.id;
+						}
+
+						schema.make(product, function(err, model) {
+							if (err)
+								return next();
+							count++;
+							model.$save(options, next);
+						});
+
+					};
+
+					if (!product.pictures)
+						return fn();
+
+					id = [];
+
+					// Download pictures
+					product.pictures.split(',').wait(function(picture, next) {
+						U.download(picture.trim(), ['get', 'dnscache'], function(err, response) {
+							if (err)
+								return next();
+							var filename = F.path.temp(U.GUID(10) + '.jpg');
+							var writer = Fs.createWriteStream(filename);
+							response.pipe(writer);
+							CLEANUP(writer, function() {
+								Fs.unlink(filename, NOOP);
+								Fs.readFile(filename, function(err, data) {
+									if (!err)
+										id.push(DB('files').binary.insert(U.getName(picture), data));
+									setTimeout(next, 200);
+								});
+							});
+						});
+					}, function() {
+						product.pictures = id;
+						fn();
+					}, 3); // 3 threads
+
+				}, function() {
+
+					if (count)
+						refresh();
+
+					if (id)
+						Fs.unlink(filename, NOOP);
+
+					// Done, returns response
+					callback(SUCCESS(count > 0));
+				});
+			});
+		});
 	});
 
 	schema.addWorkflow('export.xml', function(error, model, options, callback) {
@@ -358,7 +375,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 				keys.forEach(function(key) {
 
-					if (key === 'id' || key === 'linker_category' || key === 'linker_manufacturer' || key === 'search' || key === 'linker')
+					if (key === 'linker_category' || key === 'linker_manufacturer' || key === 'search' || key === 'linker')
 						return;
 
 					var val = doc[key];

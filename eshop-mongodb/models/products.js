@@ -254,147 +254,185 @@ NEWSCHEMA('Product').make(function(schema) {
 
 	// Imports CSV
 	schema.addWorkflow('import.csv', function(error, model, filename, callback) {
-		require('fs').readFile(filename, function(err, buffer) {
 
-			if (err) {
-				error.push(err);
-				callback();
-				return;
-			}
+		var nosql = DB(error);
 
-			buffer = buffer.toString('utf8').split('\n');
-
-			var properties = [];
-			var schema = GETSCHEMA('Product');
-			var isFirst = true;
-			var count = 0;
-			var options = { importing: true };
-
-			buffer.wait(function(line, next) {
-
-				if (!line)
-					return next();
-
-				var data = line.replace(/\"/g, '').split(';')
-				var product = {};
-
-				for (var i = 0, length = data.length; i < length; i++) {
-					var value = data[i];
-					if (!value)
-						continue;
-
-					if (isFirst)
-						properties.push(value);
-					else
-						product[properties[i]] = value;
-				}
-
-				if (isFirst) {
-					isFirst = false;
-					return next();
-				}
-
-				schema.make(product, function(err, model) {
-					if (err)
-						return next();
-					count++;
-					model.$save(options, next);
-				});
-			}, function() {
-
-				if (count)
-					refresh();
-
-				// Done, returns response
-				callback(SUCCESS(count > 0));
-			});
+		nosql.select('products').make(function(builder) {
+			builder.where('isremoved', false);
+			builder.where('reference', '!=', '');
+			builder.fields('id', 'reference');
 		});
-	});
 
-	// Imports XML
-	schema.addWorkflow('import.xml', function(error, model, filename, callback) {
+		nosql.exec(function(err, database) {
 
-		var products = [];
-		var count = 0;
-		var stream = require('fs').createReadStream(filename);
-		var options = { importing: true };
+			if (err)
+				return callback();
 
-		stream.on('data', U.streamer('<product>', '</product>', function(value) {
+			require('fs').readFile(filename, function(err, buffer) {
 
-			var index = value.indexOf('<product>');
-			if (index === -1)
-				return;
+				if (err) {
+					error.push(err);
+					callback();
+					return;
+				}
 
-			value = value.substring(index).trim();
-			xml = value.parseXML();
+				buffer = buffer.toString('utf8').split('\n');
 
-			var obj = {};
+				var properties = [];
+				var schema = GETSCHEMA('Product');
+				var isFirst = true;
+				var count = 0;
+				var options = { importing: true };
 
-			Object.keys(xml).forEach(function(key) {
-				var prop = key.replace('product.', '');
-				obj[prop] = xml[key];
-			});
+				buffer.wait(function(line, next) {
 
-			products.push(obj);
-		}));
+					if (!line)
+						return next();
 
-		CLEANUP(stream, function() {
+					var data = line.replace(/\"/g, '').split(';')
+					var product = {};
 
-			var Fs = require('fs');
-			var id;
-			var db = DB();
+					for (var i = 0, length = data.length; i < length; i++) {
+						var value = data[i];
+						if (!value)
+							continue;
 
-			products.wait(function(product, next) {
+						if (isFirst)
+							properties.push(value);
+						else
+							product[properties[i]] = value;
+					}
 
-				var fn = function() {
+					if (isFirst) {
+						isFirst = false;
+						return next();
+					}
+
+					if (!product.id && product.reference) {
+						var tmp = database.findItem('reference', product.reference);
+						if (tmp)
+							product.id = tmp.id;
+					}
+
 					schema.make(product, function(err, model) {
 						if (err)
 							return next();
 						count++;
 						model.$save(options, next);
 					});
-				};
+				}, function() {
 
-				if (!product.pictures)
-					return fn();
+					if (count)
+						refresh();
 
-				id = [];
+					// Done, returns response
+					callback(SUCCESS(count > 0));
+				});
+			});
+		}, 0);
+	});
 
-				product.pictures.split(',').wait(function(picture, next) {
-					U.download(picture.trim(), ['get', 'dnscache'], function(err, response) {
-						if (err)
-							return next();
-						var filename = F.path.temp(U.GUID(10) + '.jpg');
-						var writer = Fs.createWriteStream(filename);
-						response.pipe(writer);
-						CLEANUP(writer, function() {
-							var tmp = new ObjectID();
-							db.writeFile(tmp, filename, U.getName(picture), null, function(err) {
-								Fs.unlink(filename, NOOP);
-								if (err)
-									return next();
-								id.push(tmp.toString());
-								setTimeout(next, 200);
+	// Imports XML
+	schema.addWorkflow('import.xml', function(error, model, filename, callback) {
+
+		var nosql = DB(error);
+
+		nosql.select('products').make(function(builder) {
+			builder.where('isremoved', false);
+			builder.where('reference', '!=', '');
+			builder.fields('id', 'reference');
+		});
+
+		nosql.exec(function(err, database) {
+
+			if (err)
+				return callback();
+
+			var products = [];
+			var count = 0;
+			var stream = require('fs').createReadStream(filename);
+			var options = { importing: true };
+
+			stream.on('data', U.streamer('<product>', '</product>', function(value) {
+
+				var index = value.indexOf('<product>');
+				if (index === -1)
+					return;
+
+				value = value.substring(index).trim();
+				xml = value.parseXML();
+
+				var obj = {};
+
+				Object.keys(xml).forEach(key => obj[key.replace('product.', '')] = xml[key]);
+				products.push(obj);
+			}));
+
+			CLEANUP(stream, function() {
+
+				var Fs = require('fs');
+				var id;
+				var db = DB();
+
+				products.wait(function(product, next) {
+
+					var fn = function() {
+
+						if (!product.id && product.reference) {
+							var tmp = database.findItem('reference', product.reference);
+							if (tmp)
+								product.id = tmp.id;
+						}
+
+						schema.make(product, function(err, model) {
+							if (err)
+								return next();
+							count++;
+							model.$save(options, next);
+						});
+					};
+
+					if (!product.pictures)
+						return fn();
+
+					id = [];
+
+					product.pictures.split(',').wait(function(picture, next) {
+						U.download(picture.trim(), ['get', 'dnscache'], function(err, response) {
+							if (err)
+								return next();
+							var filename = F.path.temp(U.GUID(10) + '.jpg');
+							var writer = Fs.createWriteStream(filename);
+							response.pipe(writer);
+							CLEANUP(writer, function() {
+								var tmp = new ObjectID();
+								db.writeFile(tmp, filename, U.getName(picture), null, function(err) {
+									Fs.unlink(filename, NOOP);
+									if (err)
+										return next();
+									id.push(tmp.toString());
+									setTimeout(next, 200);
+								});
 							});
 						});
-					});
+					}, function() {
+						product.pictures = id;
+						fn();
+					}, 3); // 3 threads
+
 				}, function() {
-					product.pictures = id;
-					fn();
-				}, 3); // 3 threads
 
-			}, function() {
+					if (count)
+						refresh();
 
-				if (count)
-					refresh();
+					if (id)
+						Fs.unlink(filename, NOOP);
 
-				if (id)
-					Fs.unlink(filename, NOOP);
-
-				// Done, returns response
-				callback(SUCCESS(count > 0));
+					// Done, returns response
+					callback(SUCCESS(count > 0));
+				});
 			});
-		});
+		}, 0);
 	});
 
 	schema.addWorkflow('export.xml', function(error, model, options, callback) {
@@ -403,7 +441,6 @@ NEWSCHEMA('Product').make(function(schema) {
 		nosql.select('products', 'products').make(function(builder) {
 			builder.where('isremoved', false);
 		});
-
 
 		nosql.exec(function(err, response) {
 
@@ -420,7 +457,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 				keys.forEach(function(key) {
 
-					if (key === 'id' || key === '_id' || key === 'linker_category' || key === 'linker_manufacturer' || key === 'isremoved' || key === 'search' || key === 'linker')
+					if (key === '_id' || key === 'linker_category' || key === 'linker_manufacturer' || key === 'isremoved' || key === 'search' || key === 'linker')
 						return;
 
 					var val = doc[key];
