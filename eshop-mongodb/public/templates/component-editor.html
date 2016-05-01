@@ -167,10 +167,9 @@
 			var data = new FormData();
 			var files = e.target.files;
 			var errmsg = $(this).attr('data-error-large');
-			var loading = FIND('loading');
+			var loading = FIND('loading').show();
 			data.append('file0', files[0]);
 			this.value = '';
-			loading.show();
 			jC.UPLOAD('{0}/upload/'.format(managerurl), data, function(response, err) {
 
 				if (err) {
@@ -183,8 +182,11 @@
 					return;
 				}
 
-				if (response && response.length)
+				if (response && response.length) {
 					cmseditor.instance.getTarget().attr('src', '/download/' + response[0]);
+					cmseditor.instance.change(true);
+				}
+
 				loading.hide(500);
 			});
 		});
