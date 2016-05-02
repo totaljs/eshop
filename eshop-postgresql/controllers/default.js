@@ -80,32 +80,31 @@ function file_read(req, res) {
 	F.exists(req, res, 10, function(next, filename) {
 
 		var sql = DB();
-		sql.readStream(id, function(err, stream) {
+		sql.readStream(id, function(err, stream, size) {
 
-			if (err) {
+			if (err || !size) {
 				next();
 				return res.throw404();
 			}
 
 			var writer = require('fs').createWriteStream(filename);
 			stream.pipe(writer).on('close', function() {
-				FINISHED(writer, function() {
-					DESTROY(writer);
 
-					var resize = req.query.s && (req.extension === 'jpg' || req.extension === 'gif' || req.extension === 'png') ? true : false;
-					if (!resize) {
-						res.file(filename, null, null, next);
-						return;
-					}
+			CLEANUP(writer, function() {
 
-					res.image(filename, function(image) {
-						image.output(req.extension);
-						if (req.extension === 'jpg')
-							image.quality(85);
-						image.resize(req.query.s + '%');
-						image.minify();
-					}, undefined, next);
-				});
+				var resize = req.query.s && (req.extension === 'jpg' || req.extension === 'gif' || req.extension === 'png') ? true : false;
+				if (!resize) {
+					res.file(filename, null, null, next);
+					return;
+				}
+
+				res.image(filename, function(image) {
+					image.output(req.extension);
+					if (req.extension === 'jpg')
+						image.quality(85);
+					image.resize(req.query.s + '%');
+					image.minify();
+				}, undefined, next);
 			});
 		});
 	});
@@ -132,30 +131,28 @@ function file_image(req, res) {
 	F.exists(req, res, 10, function(next, filename) {
 
 		var sql = DB();
-		sql.readStream(id, function(err, stream) {
+		sql.readStream(id, function(err, stream, size) {
 
-			if (err) {
+			if (err || !size) {
 				next();
 				return res.throw404();
 			}
 
 			var writer = require('fs').createWriteStream(filename);
-			stream.pipe(writer).on('close', function() {
-				FINISHED(writer, function() {
-					DESTROY(writer);
+			stream.pipe(writer);
 
-					res.image(filename, function(image) {
-						image.output('jpg');
-						image.quality(90);
+			CLEANUP(writer, function() {
+				res.image(filename, function(image) {
+					image.output('jpg');
+					image.quality(90);
 
-						if (req.path[1] === 'large')
-							image.miniature(600, 400);
-						else
-							image.miniature(200, 150);
+					if (req.path[1] === 'large')
+						image.miniature(600, 400);
+					else
+						image.miniature(200, 150);
 
-						image.minify();
-					}, undefined, next);
-				});
+					image.minify();
+				}, undefined, next);
 			});
 		});
 	});
