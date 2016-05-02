@@ -70,10 +70,12 @@ function file_read(req, res) {
 				}
 
 				var writer = require('fs').createWriteStream(filename);
+
 				CLEANUP(writer, function() {
 					res.file(filename);
 					next();
 				});
+
 				stream.pipe(writer);
 			});
 		});
@@ -100,8 +102,11 @@ function file_read(req, res) {
 			}
 
 			var writer = require('fs').createWriteStream(filename);
-			stream.pipe(writer);
-			stream.on('end', function() {
+
+			CLEANUP(writer, function() {
+
+				// Releases F.exists()
+				next();
 
 				// Image processing
 				res.image(filename, function(image) {
@@ -111,10 +116,9 @@ function file_read(req, res) {
 					image.resize(req.query.s + '%');
 					image.minify();
 				});
-
-				// Releases F.exists()
-				next();
 			});
+
+			stream.pipe(writer);
 		});
 	});
 }
@@ -136,8 +140,11 @@ function file_image(req, res) {
 			}
 
 			var writer = require('fs').createWriteStream(filename);
-			stream.pipe(writer);
-			stream.on('end', function() {
+
+			CLEANUP(writer, function() {
+
+				// Releases F.exists()
+				next();
 
 				// Image processing
 				res.image(filename, function(image) {
@@ -151,10 +158,9 @@ function file_image(req, res) {
 
 					image.minify();
 				});
-
-				// Releases F.exists()
-				next();
 			});
+
+			stream.pipe(writer);
 		});
 	});
 }
