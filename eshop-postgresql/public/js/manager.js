@@ -7,11 +7,13 @@ common.page = '';
 common.form = '';
 
 $(document).ready(function() {
-	$('.jrouting').jRouting().each(function() {
+	$('.jrouting').jRouting().each(function(index) {
 		var el = $(this);
-		var role = el.attr('data-role');
-		if (su.roles.length > 0 && su.roles.indexOf(role) === -1)
-			el.hide();
+		(function(el) {
+			setTimeout(function() {
+				el.toggleClass('hidden', su.roles.length && su.roles.indexOf(el.attr('data-role')) === -1);
+			}, index * 200);
+		})(el);
 	});
 
 	FIND('loading', function() {

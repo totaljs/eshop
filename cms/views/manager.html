@@ -34,13 +34,13 @@
 				<a href="javascript:mainmenu()" class="mainmenu-button"><span class="fa fa-navicon"></span></a>
 			</div>
 			<nav>
-				<a href="/" title="E-shop" class="highlight"><span class="fa fa-globe"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/" title="@(Dashboard)" data-role="dashboard"><span class="fa fa-dashboard"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/pages/" title="@(Pages)" data-role="pages"><span class="fa fa-file-text"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/posts/" title="@(Posts)" data-role="posts"><span class="fa fa-hashtag"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/settings/" title="@(Settings)" data-role="settings"><span class="fa fa-cogs"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/system/" title="@(System)" data-role="system"><span class="fa fa-database"></span></a>
+				<a href="/" title="Website" class="highlight"><span class="fa fa-globe"></span></a>
+				<a class="jrouting hidden" href="@{CONFIG('manager-url')}/" title="@(Dashboard)" data-role="dashboard"><span class="fa fa-dashboard"></span></a>
+				<a class="jrouting hidden" href="@{CONFIG('manager-url')}/pages/" title="@(Pages)" data-role="pages"><span class="fa fa-file-text"></span></a>
+				<a class="jrouting hidden" href="@{CONFIG('manager-url')}/posts/" title="@(Posts)" data-role="posts"><span class="fa fa-hashtag"></span></a>
+				<a class="jrouting hidden" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
+				<a class="jrouting hidden" href="@{CONFIG('manager-url')}/settings/" title="@(Settings)" data-role="settings"><span class="fa fa-cogs"></span></a>
+				<a class="jrouting hidden" href="@{CONFIG('manager-url')}/system/" title="@(System)" data-role="system"><span class="fa fa-database"></span></a>
 				@{place('manager-menu')}
 				<a class="logoff" href="@{CONFIG('manager-url')}/logoff/" title="@(Sign out)"><span class="fa fa-sign-out"></span></a>
 			</nav>
