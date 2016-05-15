@@ -593,7 +593,7 @@ function refresh() {
 		categories.sort(function(a, b) {
 			if (a.level > b.level)
 				return 1;
-			return a.level < b.level ? -1 : 0;
+			return a.level < b.level ? -1 : a.name.localeCompare2(b.name);
 		});
 
 		// Prepares manufacturers
@@ -607,6 +607,8 @@ function refresh() {
 			var item = db_manufacturers[name];
 			manufacturers.push({ name: name, linker: item.linker, count: item.count });
 		}
+
+		manufacturers.quicksort('name');
 
 		F.global.categories = categories;
 		F.global.manufacturers = manufacturers;
