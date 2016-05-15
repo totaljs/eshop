@@ -70,7 +70,7 @@
 					<div class="row">
 						@{foreach m in global.categories}
 							@{if m.count > 0 && !m.level}
-							<div class="col-sm-4 col-md-4"><a href="/shop/@{m.linker}/">@{m.name}</a></div>
+							<div class="col-sm-4 col-md-4"><a href="@{sitemap_url('products')}@{m.linker}/">@{m.name}</a></div>
 							@{fi}
 						@{end}
 					</div>
