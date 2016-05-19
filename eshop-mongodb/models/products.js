@@ -340,7 +340,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		nosql.select('products').make(function(builder) {
 			builder.where('isremoved', false);
 			builder.where('reference', '!=', '');
-			builder.fields('id', 'reference');
+			builder.fields('id', 'reference', 'pictures');
 		});
 
 		nosql.exec(function(err, database) {
@@ -371,24 +371,25 @@ NEWSCHEMA('Product').make(function(schema) {
 			CLEANUP(stream, function() {
 
 				var Fs = require('fs');
-				var id;
 				var db = DB();
+				var id;
 
 				products.wait(function(product, next) {
 
+					var tmp;
+					if (!product.id && product.reference) {
+						var tmp = database.findItem('reference', product.reference);
+						if (tmp)
+							product.id = tmp.id;
+					}
+
 					var fn = function() {
-
-						if (!product.id && product.reference) {
-							var tmp = database.findItem('reference', product.reference);
-							if (tmp)
-								product.id = tmp.id;
-						}
-
 						schema.make(product, function(err, model) {
 							if (err)
 								return next();
 							count++;
 							model.$save(options, next);
+							// TODO: remove older pictures
 						});
 					};
 
@@ -406,7 +407,7 @@ NEWSCHEMA('Product').make(function(schema) {
 							response.pipe(writer);
 							CLEANUP(writer, function() {
 								var tmp = new ObjectID();
-								db.writeFile(tmp, filename, U.getName(picture), null, function(err) {
+								db.writeFile(tmp, filename, 'picture.jpg', null, function(err) {
 									Fs.unlink(filename, NOOP);
 									if (err)
 										return next();
@@ -424,9 +425,6 @@ NEWSCHEMA('Product').make(function(schema) {
 
 					if (count)
 						refresh();
-
-					if (id)
-						Fs.unlink(filename, NOOP);
 
 					// Done, returns response
 					callback(SUCCESS(count > 0));

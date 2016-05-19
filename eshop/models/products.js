@@ -275,7 +275,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	// Imports XML
 	schema.addWorkflow('import.xml', function(error, model, filename, callback) {
 		// Reads all id + references (for updating/inserting)
-		DB('products').find().fields('id', 'reference').where('reference', '!=', '').callback(function(err, database) {
+		DB('products').find().fields('id', 'reference', 'pictures').where('reference', '!=', '').callback(function(err, database) {
 
 			var products = [];
 			var count = 0;
@@ -304,19 +304,24 @@ NEWSCHEMA('Product').make(function(schema) {
 
 				products.wait(function(product, next) {
 
+					var tmp;
+
+					if (!product.id && product.reference) {
+						tmp = database.findItem('reference', product.reference);
+						if (tmp)
+							product.id = tmp.id;
+					}
+
 					var fn = function() {
-
-						if (!product.id && product.reference) {
-							var tmp = database.findItem('reference', product.reference);
-							if (tmp)
-								product.id = tmp.id;
-						}
-
 						schema.make(product, function(err, model) {
 							if (err)
 								return next();
 							count++;
-							model.$save(options, next);
+							model.$save(options, function() {
+								if (tmp && tmp.pictures)
+									tmp.pictures.forEach(id => NOSQL('products').binary.remove(id));
+								next();
+							});
 						});
 
 					};
@@ -329,16 +334,21 @@ NEWSCHEMA('Product').make(function(schema) {
 					// Download pictures
 					product.pictures.split(',').wait(function(picture, next) {
 						U.download(picture.trim(), ['get', 'dnscache'], function(err, response) {
-							if (err)
+
+							if (err || response.status === 302)
 								return next();
+
 							var filename = F.path.temp(U.GUID(10) + '.jpg');
 							var writer = Fs.createWriteStream(filename);
 							response.pipe(writer);
 							CLEANUP(writer, function() {
-								Fs.unlink(filename, NOOP);
 								Fs.readFile(filename, function(err, data) {
-									if (!err)
-										id.push(DB('files').binary.insert(U.getName(picture), data));
+
+									if (data && data.length > 3000)
+										Fs.unlink(filename, NOOP);
+										id.push(DB('files').binary.insert('picture.jpg', data));
+									}
+
 									setTimeout(next, 200);
 								});
 							});
@@ -352,9 +362,6 @@ NEWSCHEMA('Product').make(function(schema) {
 
 					if (count)
 						refresh();
-
-					if (id)
-						Fs.unlink(filename, NOOP);
 
 					// Done, returns response
 					callback(SUCCESS(count > 0));

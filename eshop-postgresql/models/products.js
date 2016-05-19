@@ -365,7 +365,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		sql.select('products').make(function(builder) {
 			builder.where('isremoved', false);
 			builder.where('reference', '!=', '');
-			builder.fields('id', 'reference');
+			builder.fields('id', 'reference', 'pictures');
 		});
 
 		sql.exec(function(err, database) {
@@ -397,19 +397,21 @@ NEWSCHEMA('Product').make(function(schema) {
 				var sql = DB();
 				products.wait(function(product, next) {
 
+					var tmp;
+
+					if (!product.id && product.reference) {
+						tmp = database.findItem('reference', product.reference);
+						if (tmp)
+							product.id = tmp.id;
+					}
+
 					var fn = function() {
-
-						if (!product.id && product.reference) {
-							var tmp = database.findItem('reference', product.reference);
-							if (tmp)
-								product.id = tmp.id;
-						}
-
 						schema.make(product, function(err, model) {
 							if (err)
 								return next();
 							count++;
 							model.$save(options, next);
+							// TODO: remove older pictures
 						});
 					};
 
@@ -424,6 +426,7 @@ NEWSCHEMA('Product').make(function(schema) {
 								response.pipe(writer);
 							});
 						}, function(err, oid) {
+
 							if (err)
 								return next();
 
