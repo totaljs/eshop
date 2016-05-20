@@ -57,7 +57,7 @@ function view_page() {
 // URL: /download/*.*
 function file_read(req, res) {
 
-	var id = req.path[1].replace('.' + req.extension, '');
+	var id = req.split[1].replace('.' + req.extension, '');
 
 	if (!req.query.s || (req.extension !== 'jpg' && req.extension !== 'gif' && req.extension !== 'png')) {
 		// Reads specific file by ID
@@ -121,7 +121,7 @@ function file_image(req, res) {
 	// Below method checks if the file exists (processed) in temporary directory
 	// More information in total.js documentation
 	F.exists(req, res, 10, function(next, filename) {
-		DB().readFile(ObjectID.parse(req.path[2].replace('.jpg', '')), function(err, fs, close) {
+		DB().readFile(ObjectID.parse(req.split[2].replace('.jpg', '')), function(err, fs, close) {
 
 			if (err) {
 				next();
@@ -135,7 +135,7 @@ function file_image(req, res) {
 					image.output('jpg');
 					image.quality(90);
 
-					if (req.path[1] === 'large')
+					if (req.split[1] === 'large')
 						image.miniature(600, 400);
 					else
 						image.miniature(200, 150);

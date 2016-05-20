@@ -29,7 +29,7 @@ function view_page() {
 // URL: /download/*.*
 function file_read(req, res) {
 
-	var id = req.path[1].replace('.' + req.extension, '');
+	var id = req.split[1].replace('.' + req.extension, '');
 	var resize = req.query.s && (req.extension === 'jpg' || req.extension === 'gif' || req.extension === 'png') ? true : false;
 
 	if (!resize) {

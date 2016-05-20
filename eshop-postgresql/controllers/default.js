@@ -57,7 +57,7 @@ function view_page() {
 // URL: /download/*.*
 function file_read(req, res) {
 
-	var arr = req.path[1].replace('.' + req.extension, '').split('x');
+	var arr = req.split[1].replace('.' + req.extension, '').split('x');
 	var id = arr[0];
 	var count = 0;
 
@@ -113,7 +113,7 @@ function file_read(req, res) {
 // Reads specific picture from database
 // URL: /images/small|large/*.jpg
 function file_image(req, res) {
-	var arr = req.path[2].replace('.' + req.extension, '').split('x');
+	var arr = req.split[2].replace('.' + req.extension, '').split('x');
 	var id = arr[0];
 	var count = 0;
 
@@ -146,7 +146,7 @@ function file_image(req, res) {
 					image.output('jpg');
 					image.quality(90);
 
-					if (req.path[1] === 'large')
+					if (req.split[1] === 'large')
 						image.miniature(600, 400);
 					else
 						image.miniature(200, 150);

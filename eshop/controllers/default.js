@@ -57,7 +57,7 @@ function view_page() {
 // URL: /download/*.*
 function file_read(req, res) {
 
-	var id = req.path[1].replace('.' + req.extension, '');
+	var id = req.split[1].replace('.' + req.extension, '');
 
 	if (!req.query.s || (req.extension !== 'jpg' && req.extension !== 'gif' && req.extension !== 'png')) {
 		// Reads specific file by ID
@@ -132,7 +132,7 @@ function file_image(req, res) {
 	F.exists(req, res, 10, function(next, filename) {
 
 		// Reads specific file by ID
-		DB('files').binary.read(req.path[2].replace('.jpg', ''), function(err, stream, header) {
+		DB('files').binary.read(req.split[2].replace('.jpg', ''), function(err, stream, header) {
 
 			if (err) {
 				next();
@@ -151,7 +151,7 @@ function file_image(req, res) {
 					image.output('jpg');
 					image.quality(90);
 
-					if (req.path[1] === 'large')
+					if (req.split[1] === 'large')
 						image.miniature(600, 400);
 					else
 						image.miniature(200, 150);
