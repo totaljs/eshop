@@ -496,6 +496,7 @@ T670819326                       : Zákazník
 
 // themes/default/views/eshop/checkout-detail.html, themes/default/views/eshop/checkout.html
 T80997156                        : Celkom
+T-1398430432                     : Spolu:
 
 // themes/default/views/eshop/checkout-detail.html, themes/default/views/eshop/checkout.html, themes/default/views/mails/order-status.html, themes/default/views/mails/order.html
 T-777172703                      : Sumarizácia
@@ -508,7 +509,9 @@ T-290915896                      : Zaplatiť znova
 // themes/default/views/eshop/checkout.html
 T1748897631                      : Váš nákupný košík je prázdny, <b>skúste navštíviť stránku neskôr</b>.
 T65298671                        : Počet
+T1975880230                      : Kus:
 T1117399742                      : <b>Prihláste sa</b> teraz a sledujte stav Vašich objednávok.
+T-1386031319                     : Vytvoriť účet
 T-1076755335                     : Informácie o objednávke
 T629865476                       : Ulica + číslo, PSČ, Mesto
 T2434066                         : Poznámka
