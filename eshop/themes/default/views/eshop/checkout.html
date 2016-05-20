@@ -38,10 +38,10 @@
 					<tbody data-component="repeater" data-component-path="datasource">
 						<script type="text/html">
 							<tr>
-								<td><a href="{{ linker }}">{{ name }}</a><div class="visible-xs fs11 mt10">One piece: @{currency('{{ price | format(2) }}')}</div></td>
+								<td><a href="{{ linker }}">{{ name }}</a><div class="visible-xs fs11 mt10">@(One piece:) @{currency('{{ price | format(2) }}')}</div></td>
 								<td class="ui-right col-xs-2">@{currency('{{ price | format(2) }}')}</td>
 								<td class="ui-right col-xs-2 col-sm-1 active"><input type="text" value="{{ count }}" data-id="{{ id }}" maxlength="2" /></td>
-								<td class="ui-right col-xs-3 col-sm-2 b warning"><span class="visible-xs checkoutlist-label">Together:</span><span class="checkoutlist-item-price" data-format="@{currency('{0}')}">@{currency('{{ price | sum(2) }}')}</span><span class="fa fa-times-circle hidden-xs" data-id="{{ id }}"></span></td>
+								<td class="ui-right col-xs-3 col-sm-2 b warning"><span class="visible-xs checkoutlist-label">@(Together:)</span><span class="checkoutlist-item-price" data-format="@{currency('{0}')}">@{currency('{{ price | sum(2) }}')}</span><span class="fa fa-times-circle hidden-xs" data-id="{{ id }}"></span></td>
 							</tr>
 						</script>
 					</tbody>
@@ -70,7 +70,7 @@
 					<div class="col-md-6 col-md-offset-3 ui-center">
 						<div>@(<b>Sign up</b> now and watch states of your orders easily. It's easy, safe and very fast.)</div>
 						<br />
-						<a href="@{sitemap_url('account')}" class="linkbutton linkbutton-small">Create account</a>
+						<a href="@{sitemap_url('account')}" class="linkbutton linkbutton-small">@(Create account)</a>
 					</div>
 				</div>
 				<br />
@@ -272,7 +272,7 @@
 			}
 
 			FIND('checkout').clear();
-			window.location.href = jRouting.path(window.location.pathname) + response.value + '/?success=1';
+			location.href = jRouting.path(location.pathname) + response.value + '/?success=1';
 		});
 	});
 

@@ -344,7 +344,7 @@ NEWSCHEMA('Product').make(function(schema) {
 							CLEANUP(writer, function() {
 								Fs.readFile(filename, function(err, data) {
 
-									if (data && data.length > 3000)
+									if (data && data.length > 3000) {
 										Fs.unlink(filename, NOOP);
 										id.push(DB('files').binary.insert('picture.jpg', data));
 									}
