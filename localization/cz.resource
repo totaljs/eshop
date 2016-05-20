@@ -1,28 +1,28 @@
 // Total.js translation file
 // Created: 2016-05-16 22:27
 
-error-404                        : Page not found.
-error-404-product                : Product not found.
-error-404-page                   : Page not found.
-error-404-order                  : Order not found.
-error-404-widget                 : Widget not found.
-error-404-user                   : User not found.
-error-404-post                   : Post not found.
-error-501                        : Not implemented.
-error-user-data                  : Sorry, your user's data doesn't contain valid data.
-error-user-blocked               : Your account has been banned.
-error-user-exists                : Email uses another user.
+error-404                        : Stránka nenalezena.
+error-404-product                : Produkt nenalezen.
+error-404-page                   : Stránka nenalezena.
+error-404-order                  : Objednávka nenalezena.
+error-404-widget                 : Widget nenalezen.
+error-404-user                   : Uživatel nenalezen.
+error-404-post                   : Příspěvek nenalezen.
+error-501                        : Není implementováno.
+error-user-data                  : Litujeme, vaše uživatelské údaje neobsahují platná data.
+error-user-blocked               : Váš účet byl zablokován.
+error-user-exists                : Email již používá jiný uživatel.
 
 // sitemap
 T-420727794                      : Úvodní stránka
 T2576150                         : Obchod
 T1601548646                      : Objednávka
-T-1359785684                     : Checkout Payment
+T-1359785684                     : Pokladna - platba
 T487334413                       : Účet
-T-618668810                      : Account Settings
+T-618668810                      : Nastavení účtu
 T1355179215                      : Výrobek
-T64279793                        : Blogs
-T-731349393                      : Blog detail
+T64279793                        : Blogy
+T-731349393                      : Detaily blogu
 
 // sitemap, themes/default/views/index.html
 T-1678787584                     : Kontakt
@@ -34,17 +34,17 @@ T76453678                        : Objednávka
 T115155230                       : Kategorie
 
 // models/contact.js
-T-1756619801                     : Contact form #
+T-1756619801                     : Kontaktní formulář #
 
 // models/orders.js
-T457541553                       : Order #
-T-1257666163                     : Order (update) #
+T457541553                       : Objednávka #
+T-1257666163                     : Aktualizace objednávky #
 
 // models/users.js, themes/default/views/eshop/account-unlogged.html
-T-907041958                      : Password recovery
+T-907041958                      : Obnova hesla
 
 // models/users.js
-T-1185989415                     : Registration
+T-1185989415                     : Registrace
 
 // views/manager-login.html
 T-785010297                      : Zadejte Vaše jméno
@@ -64,7 +64,7 @@ T-542111160                      : Přihlásit se
 T65203672                        : Zavřít
 
 // views/manager.html, public/templates/manager-dashboard.html
-T956107380                       : Dashboard
+T956107380                       : Nástěnka
 
 // views/manager.html, public/templates/manager-orders.html
 T-1924903163                     : Objednávky
@@ -76,7 +76,7 @@ T-939117180                      : Výrobky
 T76873636                        : Stránky
 
 // views/manager.html, public/templates/manager-posts.html
-T77302707                        : Posts
+T77302707                        : Příspěvky
 
 // views/manager.html, public/templates/manager-users.html
 T82025960                        : Uživatelé
@@ -85,7 +85,7 @@ T82025960                        : Uživatelé
 T-1198923559                     : Newsletter
 T1354720503                      : NE,PO,ÚT,ST,ČT,PÁ,SO
 T-769884949                      : Leden,Únor,Březen,Duben,Květen,Červen,Červenec,Srpen,Září,Říjen,Listopad,Prosinec
-T-830911952                      : Nastaviť na dnešný dátum
+T-830911952                      : Nastavit na dnešní datum
 
 // views/manager.html, public/templates/component-editor.html, themes/default/views/eshop/account.html
 T1499275331                      : Nastavení
@@ -100,7 +100,7 @@ T374429323                       : Odhlásit se
 T1700030920                      : Vybrat rozšíření
 T-787153169                      : Editor obrázku
 T-1677408326                     : Popis obrázku
-T932731472                       : URL according to the sitemap
+T932731472                       : URL podle mapy webu
 T-715295693                      : Editor odkazu
 T710885571                       : <b>Změnit cíl odkazu</b> a ostatní nastavení pro vybraný odkaz.
 T-1620699109                     : Nahrát soubor
@@ -187,9 +187,9 @@ T-315169681                      : <b>Stáhnout CSV</b> s e-mailovými adresami
 
 // public/templates/manager-newsletter.html, public/templates/manager-orders.html, public/templates/manager-pages.html, public/templates/manager-posts.html, public/templates/manager-products.html, public/templates/manager-users.html
 T861066414                       : Strana: #
-T423569127                       : # pages,# page,# pages,# pages
-T1367455719                      : # items,# item,# items,# items
-T1575821685                      : Database does not contain any data.
+T423569127                       : # stránky,# stránka,# stránky,# stránky
+T1367455719                      : # položky,# položka,# položky,# položky
+T1575821685                      : Databáze neobsahuje žádné údaje.
 
 // public/templates/manager-orders.html
 T-302235637                      : Hledat objednávky ...
@@ -199,12 +199,12 @@ T1306456528                      : Nedokončené a nezaplacené
 T-130849757                      : Nedokončené a zaplacené
 T601036331                       : Dokončené
 T-1603685770                     : Evidence objednávky
-T-1752165074                     : User #
+T-1752165074                     : Uživatel #
 T1127534884                      : Stav objednávky
 T-243557845                      : Objednávka je zpracovaná a ukončená
 T-1973412142                     : Informovat objednatele o změně stavu objednávky
 T219944208                       : Objednávka je zaplacená
-T1747670712                      : Custom number
+T1747670712                      : Zákaznické číslo
 T-1736303937                     : Interní poznámka
 T-1727678635                     : Interní poznámka
 T-195873094                      : Kód
@@ -212,8 +212,8 @@ T1632282194                      : Přidat další výrobek
 T163412261                       : Chcete vymazat vybranou objednávku?
 
 // public/templates/manager-orders.html, public/templates/manager-pages.html, public/templates/manager-posts.html, public/templates/manager-products.html, public/templates/manager-users.html
-T-1974779697                     : '# items','# item','# items','# items'
-T60935759                        : '# pages','# page','# pages','# pages'
+T-1974779697                     : '# položky','# položka','# položky','# položky'
+T60935759                        : '# stránky','# stránky','# stránky','# stránky'
 T2524                            : OK
 
 // public/templates/manager-orders.html, public/templates/manager-pages.html, public/templates/manager-posts.html, public/templates/manager-products.html, public/templates/manager-settings.html, public/templates/manager-users.html
@@ -244,7 +244,7 @@ T417000390                       : Způsob doručení
 
 // public/templates/manager-orders.html, public/templates/manager-users.html, themes/default/views/contact.html, themes/default/views/eshop/account-settings.html, themes/default/views/eshop/account-unlogged.html, themes/default/views/eshop/checkout.html
 T1774297627                      : Jméno
-T-336058955                      : Přezdívka
+T-336058955                      : Příjmení
 
 // public/templates/manager-orders.html, themes/default/views/eshop/checkout-detail.html, themes/default/views/eshop/checkout.html
 T1518691304                      : Adresa doručení
@@ -272,11 +272,11 @@ T1820265895                      : Titulek stránky
 T-1133263968                     : Relativní URL adresa
 T2002811396                      : Obsahuje jen část obsahu
 T1635301966                      : Vytvořit vlastní obsah
-T-1404484644                     : Doesn't contain any navigation.
+T-1404484644                     : Neobsahuje navigaci.
 T-438835660                      : Navigace
 T-355489880                      : Stránka se bude nacházet v zadaných navigacích.
-T-1045153305                     : Doesn't contain any partial pages.
-T-482527972                      : Nested partial pages
+T-1045153305                     : Neobsahuje žádnou podstránku.
+T-482527972                      : Vnořené podstránky
 T-1911556918                     : Rodič
 T1230442517                      : Ovlivňuje navigační lištu a stromovou strukturu
 T587793354                       : Klíčová slova
@@ -309,27 +309,27 @@ T2420395                         : Název
 T-26888337                       : Chcete vymazat
 
 // public/templates/manager-posts.html
-T-648186807                      : Search posts ...
-T108637300                       : All posts
-T-1229475617                     : Add post
-T-346626012                      : Post form
-T-346401301                      : Post name
-T2598969                         : Tags
+T-648186807                      : Hledat příspěvky ...
+T108637300                       : Všechny příspěvky
+T-1229475617                     : Vytvořit příspěvek
+T-346626012                      : Vložit formulář
+T-346401301                      : Vložit jméno
+T2598969                         : Tagy
 
 // public/templates/manager-products.html
 T-824286966                      : Hledat výrobky ...
 T541839651                       : Všechny výrobky
-T227134146                       : Export products to XML
+T227134146                       : Exportovat produkty do XML
 T254826576                       : Přidat výrobek
-T-508022033                      : Import CSV or XML
+T-508022033                      : Importovat CSV nebo XML
 T-1880884982                     : Změnit kategorii
 T83253                           : TOP
 T1120289141                      : Evidence výrobku
-T1803110230                      : Označit jako <b>top tovar</b>
-T-697912365                      : Vybrat existující kategórii
+T1803110230                      : Označit jako <b>top zboží</b>
+T-697912365                      : Vybrat existující kategorii
 T-1861865283                     : Přidat podkategorii
-T-1966036954                     : Existing manufacturer
-T-1805027343                     : Manufacturer
+T-1966036954                     : Existující výrobce
+T-1805027343                     : Výrobce
 T-56677412                       : Popis
 T1201109677                      : Vlastní kód výrobku
 T-665475243                      : Obrázky
@@ -371,22 +371,22 @@ T317882171                       : Registrované šablony
 T-1191944431                     : Šablona musí být vytvořená manuálně v <code>/views/cms/</code> adresáři.
 T680524897                       : Registrované navigace
 T-300564914                      : Navigace musí být aplikovaná na stránce manuálně programátorem přes příkaz <code>F.global.navigation.NAME</code>
-T1550046377                      : Posts categories
-T1933186500                      : Posts must be rendered manually in the layout or view. Categories: <code>F.global.posts</code>
+T1550046377                      : Vložit kategorii
+T1933186500                      : Příspěvek musí být renderován ručně v rozvržení nebo zobrazení. Kategorie: <code>F.global.posts</code>
 T-2009840224                     : Jméno uživatele
 T-1217415016                     : Podpis
-T1522855907                      : Povolit <b>testovací mód pre PayPal</b>
-T-2020943141                     : Pro vytvoření jiného přístupu do administráce klikněte na níže uvedené tlačítko:
+T1522855907                      : Povolit <b>testovací mód pro PayPal</b>
+T-2020943141                     : Pro vytvoření jiného přístupu do administrace klikněte na níže uvedené tlačítko:
 T406441582                       : Přidat nového administrátora
 T837562214                       : ULOŽIT NASTAVENÍ
 T1804909970                      : Přihlašovací heslo
-T-1047860588                     : dashboard
+T-1047860588                     : nástěnka
 T-1008770331                     : objednávky
 T-1003761308                     : výrobky
 T106426308                       : stránky
-T106855379                       : posts
+T106855379                       : příspěvky
 T1102578873                      : newsletter
-T111578632                       : users
+T111578632                       : uživatelé
 T1434631203                      : nastavení
 T-887328209                      : systém
 T79142557                        : Přístupová práva
@@ -395,19 +395,19 @@ T750501482                       : super admin
 T1609102859                      : Authorize Callback URL
 
 // public/templates/manager-settings.html, public/templates/manager-users.html
-T-2010064935                     : Evidence užívatele
+T-2010064935                     : Evidence uživatele
 
 // public/templates/manager-system.html
 T-935636288                      : Zálohování
 T1026858686                      : Zálohovat databázi + nastavení
 T1057871768                      : Zálohovat
 T-1412125304                     : Zálohovat celou stránku
-T854951573                       : Čištení
-T2930710                         : Zmazat všechny výrobky
+T854951573                       : Čištění
+T2930710                         : Smazat všechny výrobky
 T731520611                       : Vymazat
 T-940683753                      : Vymazat všechny objednávky
 T939906642                       : Vymazat všechny stránky
-T945058966                       : Clear all users
+T945058966                       : Vymazat všechny uživatele
 T-843945539                      : Vymazat všechna rozšíření
 T930914565                       : Vymazat všechny soubory
 T-469815374                      : Vymazat newsletter
@@ -426,9 +426,9 @@ T-1278174388                     : female
 T2129321697                      : Pohlaví
 
 // themes/default/views/404.html
-T-1533985374                     : 404: Stránka se nenašla
-T276916285                       : Litujeme, stránka se nenašla.
-T-102207407                      : Zkuste navštívit stránku později nebo použijte <a href="/contact/">kontaktný formulár</a>.
+T-1533985374                     : 404: Stránka nenalezena.
+T276916285                       : Litujeme, stránka nenalezena.
+T-102207407                      : Zkuste navštívit stránku později nebo použijte <a href="/contact/">kontaktní formulář</a>.
 T1311276570                      : Prohledávat výrobky
 
 // themes/default/views/contact.html
@@ -451,31 +451,31 @@ T-1069410038                     : Ochrana soukromí
 T-1482605639                     : Můj účet
 T1102570955                      : Váš nákupní košík
 T-497344074                      : Hledat položky ...
-T-864113921                      : Show categories
+T-864113921                      : Ukázat kategorie
 T187117500                       : Všechna práva vyhrazena
 
 // themes/default/views/eshop/account-settings.html, themes/default/views/eshop/account-unlogged.html
-T-170519789                      : E-mail address
+T-170519789                      : E-mailová adresa
 
 // themes/default/views/eshop/account-unlogged.html
-T1229304788                      : Forgot your password?
-T2022304625                      : I know my password
-T-1955990934                     : Create a new account
-T1285893563                      : Password again
-T976417721                       : We sent you email with instructions for resetting of your password.
+T1229304788                      : Zapomněli jste své heslo?
+T2022304625                      : Znám své heslo
+T-1955990934                     : Vytvořit nový účet
+T1285893563                      : Heslo znovu
+T976417721                       : Poslali jsme Vám email s pokyny pro obnovení Vašeho hesla.
 
 // themes/default/views/eshop/account-unlogged.html, themes/default/views/eshop/checkout.html
 T68140841                        : Souhlasím s podmínkami internetového obchodu
 
 // themes/default/views/eshop/account.html
-T-190113873                      : Support
-T355504755                       : Explore
+T-190113873                      : Podpora
+T355504755                       : Prozkoumat
 T1964327598                      : Nemáte žádné objednávky.
-T1117918113                      : My orders:
-T100526016                       : items
+T1117918113                      : Mé objednávky:
+T100526016                       : položky
 
 // themes/default/views/eshop/checkout-detail.html
-T1649684595                      : Děkujeme. <b>Vaše objednávka byla vytvořená a čeká na zpracování</b>.
+T1649684595                      : Děkujeme. <b>Vaše objednávka byla vytvořena a čeká na zpracování</b>.
 T2035092654                      : Děkujeme za zaplacení. Vaši platbu evidujeme.
 T1615842596                      : STAV OBJEDNÁVKY
 T662464619                       : Chcete stornovat tuto objednávku?
@@ -535,8 +535,8 @@ T1693729697                      : Potřebujete více informací?
 T-1539820533                     : Podobné
 
 // themes/default/views/mails/contact.html
-T-1701314625                     : Dear administrator
-T1111165939                      : On your website has been sent a contact form. Please check the contact form data below and reply on it:
+T-1701314625                     : Vážený administrátore
+T1111165939                      : Z Vašich stránek byl odeslán kontaktní formulář. Prosím zkontrolujte informace a odpovězte:
 T-1522202775                     : Identifikátor
 T-397449933                      : Zpráva:
 
@@ -544,22 +544,22 @@ T-397449933                      : Zpráva:
 T2125970                         : Vážený
 
 // themes/default/views/mails/order-status.html
-T-1049952821                     : <b>the order has been updated.</b> Please review the status of this order and click on the button below.
+T-1049952821                     : <b>objednávka byla aktualizovaná.</b> Prosím zobrazte stav této objednávky a klikněte na tlačítko dole.
 
 // themes/default/views/mails/order-status.html, themes/default/views/mails/order.html
 T985652347                       : Číslo objednávky
 T-1808614382                     : Stav
 T888111124                       : Způsob doručení
-T-1615636185                     : Your address
-T-1435643911                     : TRACK ORDER
+T-1615636185                     : Vaše adresa
+T-1435643911                     : SLEDOVAT OBJEDNÁVKU
 
 // themes/default/views/mails/order.html
 T1841011644                      : Děkujeme za Vaši objednávku. Objednávka byla úspěšně vytvořena a tento email slouží jako potvrzení.
 
 // themes/default/views/mails/password.html
-T1577305707                      : you used the password recovery. Please click on the button below for resetting your password. If you received this email by mistake then you remove it.
-T-320795736                      : CLICK HERE
+T1577305707                      : vyžádal jste si obnovu hesla. Prosím klikněte na tlačítko níže pro obnovu hesla. Pokud jste obdrželi tento email omylem, smažte ho.
+T-320795736                      : KLIKNĚTE ZDE
 
 // themes/default/views/mails/registration.html
-T174804690                       : thank you for your registration. Your account has been created successfully and this message is an automated reply to your registration request.
-T-425308263                      : MY ACCOUNT
+T174804690                       : děkujeme za Vaši registraci. Váš účet byl úspěšně vytvořen a tato zpráva je vytvořená automaticky v souvislosti s vaším požadavkem registrace.
+T-425308263                      : MŮJ ÚČET
