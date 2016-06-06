@@ -494,10 +494,13 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.addWorkflow('clear', function(error, model, options, callback) {
 		var sql = DB(error);
 		sql.remove('tbl_page');
-		sql.exec(function() {
-			// Refreshes internal information e.g. sitemap
-			setTimeout(refresh, 1000);
+		sql.exec(function(err) {
+
 			callback(SUCCESS(true));
+
+			// Refreshes internal information e.g. sitemap
+			if (!err)
+				setTimeout(refresh, 1000);
 		});
 	});
 

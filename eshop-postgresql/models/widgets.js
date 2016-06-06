@@ -1,3 +1,5 @@
+const EMPTYOBJECT = {};
+
 NEWSCHEMA('Widget').make(function(schema) {
 
 	schema.define('id', 'String(20)');
@@ -19,7 +21,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 
-		var sql = DB();
+		var sql = DB(error);
 
 		sql.select('items', 'tbl_widget').make(function(builder) {
 			builder.where('isremoved', false);
@@ -35,7 +37,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 		// options.url {String}
 		// options.id {String}
 
-		var sql = DB();
+		var sql = DB(error);
 
 		sql.select('item', 'tbl_widget').make(function(builder) {
 			builder.where('isremoved', false);
@@ -53,17 +55,14 @@ NEWSCHEMA('Widget').make(function(schema) {
 	// Removes specific widget
 	schema.setRemove(function(error, id, callback) {
 
-		var sql = DB();
+		var sql = DB(error);
 
 		sql.update('tbl_widget').make(function(builder) {
 			builder.set('isremoved', true);
 			builder.where('id', id);
 		});
 
-		sql.exec(function(err) {
-			error.push(err);
-			callback(SUCCESS(true));
-		});
+		sql.exec(() => callback(SUCCESS(true)));
 	});
 
 	// Saves the widget into the database
@@ -111,8 +110,12 @@ NEWSCHEMA('Widget').make(function(schema) {
 	// Loads widgets for rendering
 	schema.addWorkflow('load', function(error, model, widgets, callback) {
 
+		if (!widgets || !widgets.length)
+			return callback(EMPTYOBJECT);
+
 		// widgets - contains String Array of ID widgets
-		var sql = DB();
+		var sql = DB(error);
+
 		sql.select('items', 'tbl_widget').make(function(builder) {
 			builder.in('id', widgets);
 			builder.where('istemplate', false);

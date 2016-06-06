@@ -104,18 +104,14 @@ NEWSCHEMA('User').make(function(schema) {
 			builder.set('isremoved', true);
 		});
 
-		sql.exec(function() {
-			callback(SUCCESS(true));
-		});
+		sql.exec(() => callback(SUCCESS(true)));
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
 		var sql = DB(error);
 		sql.remove('tbl_user');
-		sql.exec(function() {
-			callback(SUCCESS(true));
-		});
+		sql.exec(() => callback(SUCCESS(true)));
 	});
 
 	// Sets default values

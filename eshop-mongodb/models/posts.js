@@ -190,8 +190,8 @@ NEWSCHEMA('Post').make(function(schema) {
 		var nosql = DB(error);
 		nosql.remove('posts');
 		nosql.exec(function(err) {
-			callback();
-			if (err)
+			callback(SUCCESS(true));
+			if (!err)
 				setTimeout(refresh, 1000);
 		});
 	});

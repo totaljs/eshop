@@ -198,7 +198,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		sql.remove('tbl_post');
 		sql.exec(function(err) {
 			callback();
-			if (err)
+			if (!err)
 				setTimeout(refresh, 1000);
 		});
 	});

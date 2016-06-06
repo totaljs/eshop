@@ -221,10 +221,13 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.addWorkflow('clear', function(error, model, options, callback) {
 		var sql = DB(error);
 		sql.remove('tbl_product');
-		sql.exec(function() {
-			// Refreshes internal information e.g. categories
-			setTimeout(refresh, 1000);
+		sql.exec(function(err) {
+
 			callback(SUCCESS(true));
+
+			// Refreshes internal information e.g. categories
+			if (!err)
+				setTimeout(refresh, 1000);
 		});
 	});
 
@@ -535,6 +538,9 @@ function refresh() {
 	});
 
 	sql.exec(function(err, response) {
+
+		if (err)
+			F.error(err, 'models/products.js');
 
 		// Prepares categories with their subcategories
 		var categories = [];
