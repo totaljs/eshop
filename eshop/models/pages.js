@@ -70,8 +70,8 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (options.language)
 			filter.where('language', options.language);
 
-		if (options.navigations)
-			filter.in('navigations', options.navigations);
+		if (options.navigation)
+			filter.in('navigations', options.navigation);
 
 		if (options.search)
 			filter.like('search', options.search);
