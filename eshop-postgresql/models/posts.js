@@ -187,7 +187,7 @@ NEWSCHEMA('Post').make(function(schema) {
 
 			F.emit('posts.save', model);
 
-			// Refreshes internal informations e.g. sitemap
+			// Refreshes internal informations e.g. categories
 			setTimeout(refresh, 1000);
 		});
 	});
@@ -198,13 +198,14 @@ NEWSCHEMA('Post').make(function(schema) {
 		sql.remove('tbl_post');
 		sql.exec(function(err) {
 			callback();
-			if (!err)
-				setTimeout(refresh, 1000);
+			if (err)
+				return;
+			setTimeout(refresh, 1000);
 		});
 	});
 });
 
-// Refreshes internal informations (sitemap and navigations)
+// Refreshes internal informations (categories)
 function refresh() {
 
 	var categories = {};
