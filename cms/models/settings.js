@@ -18,6 +18,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('templates', '[String]');
 	schema.define('posts', '[String]');
 	schema.define('navigations', '[String]');
+	schema.define('languages', '[String(2)]');
 	schema.define('users', '[SuperUser]');
 
 	// Saves settings into the file
@@ -84,6 +85,9 @@ NEWSCHEMA('Settings').make(function(schema) {
 			// Rewrites internal framework settings
 			F.config['mail.address.from'] = F.config.custom.emailsender;
 			F.config['mail.address.reply'] = F.config.custom.emailreply;
+
+			if (!F.config.custom.languages)
+				F.config.custom.languages = [];
 
 			F.emit('settings', settings);
 

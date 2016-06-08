@@ -22,6 +22,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('deliverytypes', '[String]');
 	schema.define('defaultorderstatus', String);
 	schema.define('users', '[SuperUser]');
+	schema.define('languages', '[String(2)]');
 
 	// PayPal account
 	schema.define('paypaluser', String);
@@ -129,6 +130,9 @@ NEWSCHEMA('Settings').make(function(schema) {
 			// Rewrites internal framework settings
 			F.config['mail.address.from'] = F.config.custom.emailsender;
 			F.config['mail.address.reply'] = F.config.custom.emailreply;
+
+			if (!F.config.custom.languages)
+				F.config.custom.languages = [];
 
 			// Currency settings
 			switch (F.config.custom.currency.toLowerCase()) {

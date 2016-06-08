@@ -8,11 +8,15 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<div data-component="dropdown" data-component-path="pages.filter.navigation" data-source="pages.dependencies.navigations" data-empty="@(All pages)"></div>
+				<div>&nbsp;</div>
 			</div>
-			<div class="col-md-6 m">
+			<div class="col-md-2 col-sm-6 m">
+				<div data-component="dropdown" data-component-path="pages.filter.language" data-source="languages" data-empty="@(All languages)"></div>
+			</div>
+			<div class="col-md-4 col-sm-6 m">
 				<div class="row">
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" data-component-path="pages_new" class="linkbutton"><span class="fa fa-file-text"></span>@(Add new page)</a></div>
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" data-component-path="widgets_new" class="linkbutton"><span class="fa fa-plug"></span>@(Add new widget)</a></div>
+					<div class="col-xs-6"><a href="javascript:void(0)" data-component="click" data-component-path="pages_new" class="linkbutton"><span class="fa fa-file-text"></span>@(Add new page)</a></div>
+					<div class="col-xs-6"><a href="javascript:void(0)" data-component="click" data-component-path="widgets_new" class="linkbutton"><span class="fa fa-plug"></span>@(Add new widget)</a></div>
 				</div>
 			</div>
 		</div>
@@ -127,7 +131,7 @@
 				<div class="help">@(Affects navigation ordering.)</div>
 			</div>
 			<div class="col-md-2 m">
-				<div data-component="textbox" data-component-path="pages.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag" data-placeholder="@(e.g. en)">@(Language)</div>
+				<div data-component="dropdown" data-component-path="pages.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag" data-source="languages" data-empty="">@(Language)</div>
 			</div>
 			<div class="col-md-2 m">
 				<div data-component="textbox" data-component-path="pages.form.icon" data-align="center" data-maxlength="20" data-placeholder="e.g. home" data-icon="fa-camera">@(Icon)</div>

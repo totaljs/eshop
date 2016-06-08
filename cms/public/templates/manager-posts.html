@@ -8,10 +8,14 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<div data-component="dropdown" data-component-path="posts.filter.category" data-source="posts.categories" data-empty="@(All posts)" data-source-value="name"></div>
+				<div>&nbsp;</div>
 			</div>
-			<div class="col-md-6 m">
+			<div class="col-md-2 col-sm-6 m">
+				<div data-component="dropdown" data-component-path="posts.filter.language" data-source="languages" data-empty="@(All languages)"></div>
+			</div>
+			<div class="col-md-4 col-sm-6 m">
 				<div class="row">
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="posts_new"><span class="fa fa-plus-circle"></span>@(Add post)</a></div>
+					<div class="col-xs-6"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="posts_new"><span class="fa fa-plus-circle"></span>@(Add post)</a></div>
 				</div>
 			</div>
 		</div>
@@ -58,7 +62,7 @@
 				<div data-component="textboxtags" data-component-path="posts.form.tags">@(Tags)</div>
 			</div>
 			<div class="col-md-2 m">
-				<div data-component="textbox" data-component-path="posts.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag" data-placeholder="@(e.g. en)">@(Language)</div>
+				<div data-component="dropdown" data-component-path="posts.form.language" data-align="center" data-maxlength="2" data-source="languages" data-empty="" data-icon="fa-flag">@(Language)</div>
 			</div>
 		</div>
 	</div>

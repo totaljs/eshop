@@ -18,6 +18,7 @@
 		var managerurl="@{!CONFIG('manager-url')}";
 		var currency='@{!config.custom.currency_entity}';
 		var su=JSON.parse('@{json(user)}');
+		var languages='@{config.custom.languages.join(';')}'.split(';');
 	</script>
 </head>
 <body>
