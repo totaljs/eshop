@@ -1,15 +1,10 @@
-// Total.js cleaned file
-// Created: 2016-05-16 22:30
-// Total.js translation file
-// Created: 2016-05-16 22:27
-
-error-404                        : Page not found.
-error-404-product                : Product not found.
-error-404-page                   : Page not found.
-error-404-order                  : Order not found.
-error-404-widget                 : Widget not found.
-error-404-user                   : User not found.
-error-404-post                   : Post not found.
+error-404                        : Stránka sa nenašla.
+error-404-product                : Tovar sa nenašiel.
+error-404-page                   : Stránka sa nenašla.
+error-404-order                  : Objednávka sa nenašla.
+error-404-widget                 : Modul sa nenašiel.
+error-404-user                   : Užívateľ sa nenašiel.
+error-404-post                   : Príspevok sa nenašiel.
 error-501                        : Not implemented.
 error-user-data                  : Sorry, your user's data doesn't contain valid data.
 error-user-blocked               : Your account has been banned.
@@ -21,7 +16,7 @@ T2576150                         : Obchod
 T1601548646                      : Objednávka
 T-1359785684                     : Checkout Payment
 T487334413                       : Účet
-T-618668810                      : Account Settings
+T-618668810                      : Nastavenie účtu
 T1355179215                      : Tovar
 T64279793                        : Blogs
 T-731349393                      : Blog detail
@@ -133,7 +128,7 @@ T2249058                         : Skryť
 T2011110042                      : Zrušiť
 
 // public/templates/component-editor.html, public/templates/manager-pages.html, public/templates/manager-settings.html
-T1803797027                      : URL addresa
+T1803797027                      : URL adresa
 
 // public/templates/component-editor.html, public/templates/manager-orders.html, public/templates/manager-pages.html, public/templates/manager-posts.html, public/templates/manager-products.html, public/templates/manager-settings.html, public/templates/manager-users.html, themes/default/views/index.html, themes/default/views/eshop/account-settings.html, themes/default/views/eshop/account-unlogged.html
 T-1838205928                     : ODOSLAŤ
@@ -294,6 +289,7 @@ T1076350031                      : Vytvoriť vlastný HTML obsah
 T1805337141                      : Formulár načíta šablónu zo servera bez obsahu a vloží do nej nižšie uvedený obsah.
 
 // public/templates/manager-pages.html, public/templates/manager-posts.html
+T-2107649988                     : Všetky jazyky
 T-1256902502                     : Šablóna
 T767050594                       : Formátovanie:
 T3029637                         : tučné
@@ -301,7 +297,6 @@ T-1178781136                     : kurzíva
 T-1026963764                     : podčiarknuté
 T3321850                         : odkaz
 T1608611804                      : Zobraziť zdrojový kód
-T857026553                       : e.g. en
 T-1548945544                     : Jazyk
 
 // public/templates/manager-pages.html, public/templates/manager-posts.html, public/templates/manager-products.html, public/templates/manager-users.html
@@ -375,6 +370,8 @@ T680524897                       : Registrované navigácie
 T-300564914                      : Navigácia musí byť aplikovaná na stránke manuálne programátorom cez príkaz <code>F.global.navigation.NAME</code>
 T1550046377                      : Posts categories
 T1933186500                      : Posts must be rendered manually in the layout or view. Categories: <code>F.global.posts</code>
+T862721801                       : Podporované jazyky
+T610129703                       : E.g. <code>en</code> <code>sk</code> <code>ru</code>
 T-2009840224                     : Meno užívateľa
 T-1217415016                     : Podpis
 T1522855907                      : Povoliť <b>testovací mód pre PayPal</b>
@@ -447,7 +444,7 @@ T-848688042                      : Odoberať novinky emailom
 T-1001660743                     : Prehľadávať tovary
 
 // themes/default/views/layout.html
-T1540939693                      : <b>Tento obchod je príklad.</b> Kliknite pre stiahnutie zdrojového kódu.
+T1648886032                      : <b>This eshop is example.</b> Download the source-code.
 T-1294691335                     : Tieto stránky používajú súbory cookies kvôli meraniu návštevnosti. Tým, že na stránkach zotrváte, súhlasíte s tým, že ich môžeme používať.
 T-1069410038                     : Ochrana súkromia
 T-1482605639                     : Môj účet
@@ -487,7 +484,6 @@ T917578051                       : Zaplatiť cez
 T2008679964                      : Budete presmerovaný na zabezpečenú stránku PayPal
 T171486165                       : Zaplatiť teraz
 T2024258859                      : Počet:
-T-1398430432                     : Spolu:
 T705029261                       : Celková cena:
 T1526402414                      : Začať nový nákup
 
