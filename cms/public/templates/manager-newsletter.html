@@ -49,6 +49,10 @@
 
 	function newsletter_refresh() {
 		AJAX('GET {0}/api/newsletter/'.format(managerurl), function(response) {
+
+			if (isError(arguments))
+				return;
+
 			var csv = response.split('\n');
 			var arr = [];
 			csv.reverse();

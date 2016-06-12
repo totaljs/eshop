@@ -268,6 +268,8 @@
 
 		self.refreshWidgets = function() {
 			AJAX('GET {0}/api/widgets/'.format(managerurl), function(response) {
+				if (isError(arguments))
+					return;
 				response.sort(FN('(a,b) => a.name.localeCompare(b.name)'));
 				SET('cmseditor.widgets', response);
 			});
@@ -839,11 +841,12 @@
 				return;
 			}
 
-			var loading = FIND('loading');
-			loading.show();
+			SETTER('loading', 'show');
 			AJAX('POST {0}/api/pages/preview/'.format(managerurl), options, function(response) {
+				if (isError(arguments))
+					return;
 				self.write(response.replace('</body>', '<div id="CMS_panel"><span class="fa fa-pencil" title="@(Edit)" data-name="edit"></span><span class="fa fa-link" title="@(Change link)" data-name="link"></span><span class="fa fa-quote-left" title="@(Change attributes)" data-name="attribute"></span><span class="fa fa-copy" title="@(Duplicate)" data-name="repeat"></span></span><span class="fa fa-plug" title="@(Add widget)" data-name="widgets"></span><span class="fa fa-trash" title="@(Remove content)" data-name="remove"></span><span class="fa fa-toggle-down" title="@(Hide)" data-name="hide"></span></div></body>'));
-				loading.hide(500);
+				SETTER('loading', 'hide', 500);
 			});
 		};
 
@@ -890,9 +893,10 @@
 				return;
 			}
 
-			var loading = FIND('loading');
-			loading.show();
-			AJAX('GET {0}/api/widgets/{1}/'.format(managerurl, id), function(response, err) {
+			SETTER('loading', 'show');
+			AJAX('GET {0}/api/widgets/{1}/'.format(managerurl, id), function(respons) {
+				if (isError(arguments))
+					return;
 				var content = '<div class="CMS_template CMS_remove">' + response.body + '</div>';
 				if (target.hasClass('CMS_widgets'))
 					target.append(content);
@@ -900,7 +904,7 @@
 					target.after(content);
 				editor.change(true);
 				editor.resize();
-				loading.hide(500);
+				SETTER('loading', 'hide', 500);
 			});
 		});
 	});

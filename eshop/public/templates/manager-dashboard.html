@@ -145,13 +145,12 @@
 	<br />
 	<div class="row">
 		<div class="col-md-6 m">
-			<div class="ui-center b">@(Yearly stats of orders)</div>
-			<canvas id="dashboard-monthly-orders"></canvas>
+			<div class="ui-center b m">@(Yearly stats of orders)</div>
+			<canvas id="dashboard-monthly-orders" height="115"></canvas>
 		</div>
-		<div class="col-md-1"></div>
-		<div class="col-md-5 m">
-			<div class="ui-center b">@(Yearly stats of views)</div>
-			<canvas id="dashboard-monthly-hits"></canvas>
+		<div class="col-md-6 m">
+			<div class="ui-center b m">@(Yearly stats of views)</div>
+			<canvas id="dashboard-monthly-hits" height="115"></canvas>
 		</div>
 	</div>
 	<br />
@@ -172,7 +171,8 @@
 					<label><span class="fa fa-square" style="color:#FFCE54"></span><span>@(Visitors)</span></label>
 					<label><span class="fa fa-square" style="color:#FC6E51"></span><span>@(Unique Visitors)</span></label>
 				</div>
-				<canvas id="dashboard-monthly-visitors"></canvas>
+				<br />
+				<canvas id="dashboard-monthly-visitors" height="100"></canvas>
 			</div>
 		</div>
 		<br />
@@ -180,6 +180,8 @@
 </div>
 
 <script>
+
+	Chart.defaults.global.legend.display = false;
 
 	var dashboard = {};
 
@@ -190,23 +192,31 @@
 	// dashboard.year;
 
 	function dashboard_refresh() {
-		$.components.AJAX('GET ' + managerurl + '/api/dashboard/', function(response) {
+		AJAX('GET {0}/api/dashboard/'.format(managerurl), function(response, err) {
+
+			if (isError(arguments))
+				return;
 
 			SET('dashboard.data', response);
-
 			if (dashboard.cache.processed)
 				return;
 
 			dashboard.cache.processed = true;
-			var data = [];
-			data.push(dashboard_charts_pie_item(response.webcounter.today.search, '@(Organic search)', '#61E727'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.social, '@(Social networks)', '#479AD0'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.direct, '@(Direct)', '#E22926'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.advert, '@(Advert)', '#FFEE32'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.unknown, '@(Other)', '#585858'));
-			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'));
-			dashboard.cache.online.Doughnut(data, { responsive: true });
 
+			var data = {};
+			var options = {};
+			var labels = ['@(Organic search)', '@(Social networks)', '@(Direct)', '@(Advert)', '@(Other)'];
+
+			data.data = [response.webcounter.today.search, response.webcounter.today.social, response.webcounter.today.direct, response.webcounter.today.advert, response.webcounter.today.unknown];
+			data.backgroundColor = ['#61E727', '#479AD0', '#E22926', '#FFEE32', '#585858'];
+
+			options.type = 'doughnut';
+			options.data = { labels: labels, datasets: [data], display: false };
+
+			if (dashboard.cache.online)
+				dashboard.cache.online.destroy();
+
+			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'), options);
 			dashboard.year = (new Date()).getFullYear();
 			dashboard.years = [];
 
@@ -240,7 +250,8 @@
 	}
 
 	// Helper method for generating bar chart
-	function dashboard_charts_bar_items(obj, name, year) {
+	function dashboard_charts_bar_items(color, obj, name, year) {
+
 		var stats = [];
 
 		for (var i = 0; i < 12; i++) {
@@ -251,7 +262,8 @@
 			else
 				stats[i] = value[name];
 		}
-		return stats;
+
+		return { data: stats, label: name, backgroundColor: color };
 	}
 
 	WATCH('dashboard.year', function(path, value) {
@@ -260,42 +272,44 @@
 
 	function dashboard_yearstats(year) {
 		var el;
-		var data = {};
+		var data = [];
+		var options = {};
 
-		data.labels = window.$calendar.months_short;
-		data.datasets = [{ fillColor: '#FFCE54', data: dashboard_charts_bar_items(dashboard.data.webcounter.stats, 'count', year) }, { fillColor: '#FC6E51', data: dashboard_charts_bar_items(dashboard.data.webcounter.stats, 'unique', year) }];
+		data.push(dashboard_charts_bar_items('#FFCE54', dashboard.data.webcounter.stats, 'count', year));
+		data.push(dashboard_charts_bar_items('#FC6E51', dashboard.data.webcounter.stats, 'unique', year));
+
+		options.type = 'bar';
+		options.data = { labels: window.$calendar.months_short, datasets: data };
 
 		if (dashboard.cache.visitors)
 			dashboard.cache.visitors.$chart.destroy();
 
 		el = $('#dashboard-monthly-visitors');
-		el.height(350);
-		dashboard.cache.visitors = new Chart(el.get(0).getContext('2d'));
-		dashboard.cache.visitors.$chart = dashboard.cache.visitors.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false });
+		dashboard.cache.visitors = new Chart(el.get(0).getContext('2d'), options);
 
-		data = {};
-		data.labels = window.$calendar.months_short;
-		data.datasets = [{ fillColor: '#48CFAD', data: dashboard_charts_bar_items(dashboard.data.webcounter.stats, 'orders', year) }];
+		options = {};
+		data = [];
+		data.push(dashboard_charts_bar_items('#48CFAD', dashboard.data.webcounter.stats, 'orders', year));
+		options.type = 'bar';
+		options.data = { labels: window.$calendar.months_short, datasets: data };
 
 		if (dashboard.cache.orders)
 			dashboard.cache.orders.$chart.destroy();
 
 		el = $('#dashboard-monthly-orders');
-		el.height(200);
-		dashboard.cache.orders = new Chart(el.get(0).getContext('2d'));
-		dashboard.cache.orders.$chart = dashboard.cache.orders.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
+		dashboard.cache.orders = new Chart(el.get(0).getContext('2d'), options);
 
-		data = {};
-		data.labels = window.$calendar.months_short;
-		data.datasets = [{ fillColor: '#AC92EC', data: dashboard_charts_bar_items(dashboard.data.webcounter.stats, 'hits', year) }];
+		options = {};
+		data = [];
+		data.push(dashboard_charts_bar_items('#AC92EC', dashboard.data.webcounter.stats, 'hits', year));
+		options.type = 'bar';
+		options.data = { labels: window.$calendar.months_short, datasets: data };
 
 		if (dashboard.cache.hits)
 			dashboard.cache.hits.$chart.destroy();
 
 		el = $('#dashboard-monthly-hits');
-		el.height(200);
-		dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'));
-		dashboard.cache.hits.$chart = dashboard.cache.hits.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
+		dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'), options);
 	}
 
 	// Refresh online users
@@ -307,6 +321,8 @@
 
 	function dashboard_refresh_online() {
 		AJAX('GET {0}/api/dashboard/online/'.format(managerurl), function(response) {
+			if (isError(arguments))
+				return;
 			if (NOTMODIFIED('dashboard.online', response))
 				return;
 			SET('dashboard.online', response);

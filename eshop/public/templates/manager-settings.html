@@ -237,6 +237,9 @@ settings.cache = {};
 function settings_refresh() {
 	AJAX('GET {0}/api/settings/'.format(managerurl), function(response) {
 
+		if (isError(arguments))
+			return;
+
 		if (response.users)
 			response.users = { items: response.users, page: 1, count: response.users.length, pages: 1, limit: 100 };
 		else
@@ -257,6 +260,9 @@ function settings_save() {
 
 	var loading = FIND('loading').show();
 	AJAX('PUT {0}/api/settings/'.format(managerurl), settings.form, function() {
+
+		if (isError(arguments))
+			return;
 
 		success(true);
 		RESET('settings.form.*');

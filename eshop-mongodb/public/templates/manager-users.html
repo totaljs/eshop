@@ -138,6 +138,8 @@
 							return;
 						var loading = FIND('loading').show();
 						AJAX('DELETE {0}/api/users'.format(managerurl), { id: row.id }, function() {
+							if (isError(arguments))
+								return;
 							users_refresh();
 							loading.hide(500);
 						});
@@ -152,6 +154,9 @@
 		component.submit = function(hide) {
 			var loading = FIND('loading').show();
 			AJAX('PUT {0}/api/users/'.format(managerurl), users.form, function(response) {
+
+				if (isError(arguments))
+					return;
 
 				loading.hide(500);
 
@@ -169,7 +174,10 @@
 
 	function users_edit(id) {
 		var loading = FIND('loading').show();
-		AJAX('GET {0}/api/users/{1}'.format(managerurl, id), function(response, err) {
+		AJAX('GET {0}/api/users/{1}'.format(managerurl, id), function(response) {
+
+			if (isError(arguments))
+				return;
 
 			loading.hide(500);
 

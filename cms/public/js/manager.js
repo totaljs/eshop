@@ -7,7 +7,8 @@ common.page = '';
 common.form = '';
 
 $(document).ready(function() {
-	$('.jrouting').jRouting().each(function(index) {
+	jR.clientside('.jrouting');
+	$('.jrouting').each(function(index) {
 		var el = $(this);
 		(function(el) {
 			setTimeout(function() {
@@ -24,6 +25,10 @@ $(document).ready(function() {
 	resizer();
 });
 
+function isError(arguments) {
+	return false;
+}
+
 // Because of login form
 if (window.su) {
 	jRouting.route(managerurl + '/', function() {
@@ -36,21 +41,9 @@ if (window.su) {
 		jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
 	});
 
-	if (can('orders')) {
-		jRouting.route(managerurl + '/orders/', function() {
-			SET('common.page', 'orders');
-		});
-	}
-
 	if (can('posts')) {
 		jRouting.route(managerurl + '/posts/', function() {
 			SET('common.page', 'posts');
-		});
-	}
-
-	if (can('products')) {
-		jRouting.route(managerurl + '/products/', function() {
-			SET('common.page', 'products');
 		});
 	}
 

@@ -191,6 +191,10 @@
 							return;
 						loading.show();
 						AJAX('DELETE {0}/api/products/'.format(managerurl), { id: row.id }, function() {
+
+							if (isError(arguments))
+								return;
+
 							loading.hide(500);
 							products_refresh();
 						});
@@ -232,6 +236,9 @@
 			loading.show();
 			AJAX('POST {0}/api/products/'.format(managerurl), products.form, function(response) {
 
+				if (isError(arguments))
+					return;
+
 				loading.hide(500);
 
 				// Error handling
@@ -257,6 +264,10 @@
 			var loading = FIND('loading');
 			loading.show();
 			AJAX('POST {0}/api/products/category/'.format(managerurl), products.category, function(response) {
+
+				if (isError(arguments))
+					return;
+
 				loading.hide(500);
 				setTimeout(function() {
 					setTimeout(products_refresh_codelists, 2000);
@@ -287,7 +298,10 @@
 	function products_edit(id, index) {
 		var loading = FIND('loading');
 		loading.show();
-		AJAX('GET /api/products/{0}/'.format(id), function(response, err) {
+		AJAX('GET /api/products/{0}/'.format(id), function(response) {
+
+			if (isError(arguments))
+				return;
 
 			loading.hide(500);
 
@@ -317,6 +331,10 @@
 	// Method refreshes categories
 	function products_refresh_codelists() {
 		AJAX('GET {0}/api/products/codelists/'.format(managerurl), function(response) {
+
+			if (isError(arguments))
+				return;
+
 			response.categories.sort(FN('(a, b) => a.name.localeCompare(b.name)'));
 			SET('products.categories', response.categories);
 			SET('products.manufacturers', response.manufacturers);

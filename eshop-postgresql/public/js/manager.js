@@ -7,7 +7,8 @@ common.page = '';
 common.form = '';
 
 $(document).ready(function() {
-	$('.jrouting').jRouting().each(function(index) {
+	jR.clientside('.jrouting');
+	$('.jrouting').each(function(index) {
 		var el = $(this);
 		(function(el) {
 			setTimeout(function() {
@@ -23,6 +24,10 @@ $(document).ready(function() {
 	$(window).on('resize', resizer);
 	resizer();
 });
+
+function isError(arguments) {
+	return false;
+}
 
 // Because of login form
 if (window.su) {

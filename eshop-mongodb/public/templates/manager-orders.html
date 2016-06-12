@@ -188,6 +188,9 @@
 						loading.show();
 						AJAX('DELETE {0}/api/orders'.format(managerurl), { id: row.id }, function() {
 
+							if (isError(arguments))
+								return;
+
 							loading.hide();
 							orders_refresh();
 
@@ -225,6 +228,9 @@
 			loading.show();
 
 			AJAX('PUT {0}/api/orders/'.format(managerurl), orders.form, function(response) {
+
+				if (isError(arguments))
+					return;
 
 				loading.hide(500);
 
@@ -285,6 +291,9 @@
 		var loading = FIND('loading');
 		loading.show();
 		AJAX('GET {0}/api/orders/{1}/'.format(managerurl, id), function(response, err) {
+
+			if (isError(arguments))
+				return;
 
 			loading.hide(500);
 

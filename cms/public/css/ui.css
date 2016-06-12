@@ -42,8 +42,8 @@ button { outline: 0; }
 
 .ui-form-container { width: 100%; position: fixed; left: 0; top: 0; bottom: 0; right: 0; background-color: rgba(230,233,237,0.8); z-index: 5; overflow-y: scroll; transform-style: preserve-3d; }
 .ui-form-container-padding { padding: 0 30px;}
-.ui-form { background-color: white; margin: 30px auto; border-radius: 4px; box-shadow: 0 0 20px #D0D0D0; transform: translate(0, 500px) scale(0.5); transition: all 0.3s; opacity: 0; }
-.ui-form-animate { transform: translate(0,0) scale(1); opacity: 1; }
+.ui-form { background-color: white; margin: 30px auto; border-radius: 4px; box-shadow: 0 0 20px #D0D0D0; transform: translate(0, 500px); transition: all 0.3s; opacity: 0; }
+.ui-form-animate { transform: translate(0,0); opacity: 1; }
 .ui-form-padding { padding: 0 30px; }
 .ui-form-title { padding: 20px; font-size: 20px; user-select: none; color: #AAB2BD; background-color: #F8F8F8; font-family: 'Source Sans Pro'; }
 .ui-form-title .fa-times { float: right; cursor: pointer; font-size: 18px; margin-top: 4px; }
@@ -171,6 +171,7 @@ button { outline: 0; }
     .ui-pagination nav { display: inline-block; }
     .ui-pagination div { float: none; margin-bottom: 10px; }
     .ui-confirm button { display: block; margin: 10px 0 0; display: block; width: 100%; }
+    .ui-form-container-padding { padding: 0 20px; }
 }
 /* ==========================================================
  * @{end}
