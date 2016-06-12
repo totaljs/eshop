@@ -894,7 +894,7 @@
 			}
 
 			SETTER('loading', 'show');
-			AJAX('GET {0}/api/widgets/{1}/'.format(managerurl, id), function(respons) {
+			AJAX('GET {0}/api/widgets/{1}/'.format(managerurl, id), function(response) {
 				if (isError(arguments))
 					return;
 				var content = '<div class="CMS_template CMS_remove">' + response.body + '</div>';
