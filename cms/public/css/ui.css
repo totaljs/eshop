@@ -115,7 +115,7 @@ button { outline: 0; }
 .ui-codemirror-invalid .CodeMirror { background-color: #FFF3F3 !important; border: 1px solid #E1A1A1 !important; }
 .CodeMirror { border: 1px solid #E0E0E0; border-radius: 3px; }
 
-.filter { border-bottom: 2px solid #F0F0F0; padding: 0 0 5px; margin-bottom: 20px; font-size: 11px; background: linear-gradient(white, #F8F8F8); }
+.filter { border-bottom: 2px solid #F0F0F0; padding: 0 0 5px; margin: 20px 0; font-size: 11px; background: linear-gradient(white, #F8F8F8); }
 .filter {
 	.caption { font-size: 20px; margin-bottom: 20px; font-family: 'Source Sans Pro'; color: #AAB2BD; }
 	.m { margin-bottom: 10px; }

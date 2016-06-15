@@ -3,8 +3,9 @@
 html { overflow: hidden; }
 html,body { margin: 0; height: 100%; position: relative; }
 body { background-color: white; padding: 0; color: gray; font-smoothing: antialiased; overflow-y: scroll; overflow-x: hidden; overflow-scrolling: touch; }
-header { background-color: #E0E0E0; height: 40px; margin-bottom: 30px; }
+.scroller { height: 100%; overflow-y: auto; overflow-x: hidden; max-height: 100%; overflow-scrolling: touch; }
 
+header { background-color: #E0E0E0; height: 40px; }
 header nav { font-size: 20px; position: relative; display: inline-block; font-smoothing: antialiased; width: 100%; }
 header nav a { color: gray; border-right: 1px solid #D0D0D0; padding: 6px 0 0; position: relative; display: inline-block; min-width: 60px; text-align: center; height: 40px; }
 header nav a:first-child { border-left: 1px solid #D0D0D0; }
@@ -13,6 +14,7 @@ header nav .selected { background-color: white; color: black; }
 header nav .highlight { background-color: #D0D0D0 !important; color: gray; }
 header nav .logoff { float: right; border-right: 0; background-color: #E7331F; color: white !important; padding-left: 4px; }
 header nav .logoff:hover { background-color: #E74839; }
+header nav img { float: right; height: 40px; }
 
 h1 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 20px 0; padding: 0; color: black; font-size: 30px; }
 h1 b { font-weight: 400; }
@@ -107,8 +109,8 @@ canvas { display: block; }
 @media(max-width: 767px) {
 	.mainmenu { display: block; }
 	#success { height: 45px; font-size: 36px; }
-	header { min-height: 45px; height: auto; margin-bottom: 15px; }
-	header nav { font-size: 20px; display: none; float: none; margin: 10px 0 15px; }
+	header { min-height: 45px; height: auto; margin-bottom: 15px; padding: 0 20px; }
+	header nav { font-size: 20px; display: none; float: none; margin: 10px 0 15px; padding-bottom: 20px; }
 	header nav a { min-width: 25% !important; height: 55px; padding-top: 12px; border-bottom: 1px solid #D0D0D0; border-right: 0; background-color: #F9F9F9; }
 	header nav a:nth-child(odd) { background-color: #E9E9E9; }
 	header nav a:first-child { border-left: 0; }

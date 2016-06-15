@@ -98,7 +98,10 @@ jRouting.on('location', function(url) {
 
 function resizer() {
 	var h = $(window).height();
-	var el = $('#body');
+	var el = $('.scroller');
+	if (el.length)
+		el.height($(window).height() - el.offset().top);
+	el = $('#body');
 	if (!el.length)
 		return;
 	var t = el.offset().top + 100;
