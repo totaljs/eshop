@@ -40,9 +40,6 @@ NEWSCHEMA('Post').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var filter = DB('posts').find();
 
-		if (options.search)
-			options.search = options.search ? options.search.toSearch().split(' ') : [];
-
 		if (options.category)
 			options.category = options.category.slug();
 
@@ -132,7 +129,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (category)
 			model.category_linker = category.linker;
 
-		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true);
+		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ').max(1000);
 
 		var fn = function(err, count) {
 			// Returns response

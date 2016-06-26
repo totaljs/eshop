@@ -75,9 +75,8 @@ NEWSCHEMA('Page').make(function(schema) {
 			if (options.navigation)
 				builder.in('navigations', options.navigation);
 
-			if (options.search) {
+			if (options.search)
 				builder.in('search', options.search.keywords(true, true));
-			}
 
 			builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
 			builder.sort('name');
@@ -166,8 +165,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		} else
 			model.dateupdated = new Date();
 
-		if (model.search)
-			model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).keywords(true, true);
+		model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true);
 
 		// Sanitizes URL
 		if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {

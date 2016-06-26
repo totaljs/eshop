@@ -215,7 +215,7 @@ NEWSCHEMA('User').make(function(schema) {
 				response.user.firstname = options.profile.firstname;
 				response.user.lastname = options.profile.lastname;
 				response.user.ip = options.profile.ip;
-				response.user.search = (options.profile.name + ' ' + (options.profile.email || '')).toSearch().max(80);
+				response.user.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ').max(80);
 				response.user[id] = options.profile[id];
 
 				// Inserts new user

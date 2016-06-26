@@ -49,8 +49,8 @@ NEWSCHEMA('Post').make(function(schema) {
 			builder.where('isremoved', false);
 
 			// Prepares searching
-			if (typeof(options.search) === 'string')
-				builder.like('search', options.search, '*');
+			if (options.search)
+				builder.in('search', options.search.keywords(true, true));
 
 			// Checks language
 			if (options.language)
@@ -156,7 +156,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (category)
 			model.category_linker = category.linker;
 
-		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ');
+		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true);
 
 		var nosql = DB(error);
 

@@ -168,7 +168,7 @@ NEWSCHEMA('User').make(function(schema) {
 				doc.email = options.profile.email;
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
-				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ');
+				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ').max(500);
 				doc[id] = options.profile[id];
 				DB('users').insert(doc.$clean(), F.error());
 
@@ -207,7 +207,7 @@ NEWSCHEMA('UserSettings').make(function(schema) {
 			model.password = model.password.hash('sha1');
 
 		model.name = model.firstname + ' ' + model.lastname;
-		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ');
+		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
 
 		var user = options.controller.user;
 		user.name = model.name;
@@ -311,7 +311,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.gender = model.gender;
 			user.password = model.password.hash('sha1');
 			user.ip = options.ip;
-			user.search = (user.name + ' ' + (user.email || '')).keywords(true, true).join(' ');
+			user.search = (user.name + ' ' + (user.email || '')).keywords(true, true).join(' ').max(500);
 
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
 

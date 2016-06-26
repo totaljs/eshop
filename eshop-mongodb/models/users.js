@@ -71,7 +71,7 @@ NEWSCHEMA('User').make(function(schema) {
 		if (!model.id)
 			model.id = UID();
 
-		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ');
+		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true);
 		model.isremoved = false;
 
 		nosql.save('item', 'users', newbie, function(builder, newbie) {
@@ -147,7 +147,7 @@ NEWSCHEMA('User').make(function(schema) {
 			builder.where('isremoved', false);
 
 			if (options.search)
-				builder.like('search', options.search.toSearch(), '*');
+				builder.in('search', options.search.keywords(true, true));
 
 			builder.sort('datecreated', true);
 			builder.skip(skip);
@@ -214,7 +214,7 @@ NEWSCHEMA('User').make(function(schema) {
 				response.user.firstname = options.profile.firstname;
 				response.user.lastname = options.profile.lastname;
 				response.user.ip = options.profile.ip;
-				response.user.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ');
+				response.user.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true);
 				response.user[id] = options.profile[id];
 
 				// Inserts new user
@@ -254,7 +254,7 @@ NEWSCHEMA('UserSettings').make(function(schema) {
 			model.password = model.password.hash('sha1');
 
 		model.name = model.firstname + ' ' + model.lastname;
-		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ');
+		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true);
 
 		var user = options.controller.user;
 		user.name = model.name;

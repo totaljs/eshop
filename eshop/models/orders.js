@@ -178,7 +178,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		if (model.ispaid && !model.datepaid)
 			model.datepaid = new Date();
 
-		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ');
+		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(500);
 
 		// Update order in database
 		DB('orders').update(model).where('id', model.id).callback(function(err, count) {

@@ -36,10 +36,6 @@ NEWSCHEMA('Product').make(function(schema) {
 		if (options.id && typeof(options.id) === 'string')
 			options.id = options.id.split(',');
 
-		var search;
-		if (options.search)
-			search = options.search.keywords(true, true);
-
 		if (options.page < 0)
 			options.page = 0;
 
@@ -55,8 +51,8 @@ NEWSCHEMA('Product').make(function(schema) {
 		if (options.manufacturer)
 			filter.where('manufacturer', options.manufacturer);
 
-		if (search)
-			filter.like('search', search);
+		if (options.search)
+			filter.like('search', options.search.keywords(true, true));
 
 		if (options.id)
 			filter.in('id', options.id);
@@ -110,7 +106,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		model.category = category.name;
 		model.linker_category = category.linker;
-		model.search = (model.name + ' ' + (model.manufacturer || '') + ' ' + (model.reference || '')).keywords(true, true).join(' ');
+		model.search = (model.name + ' ' + (model.manufacturer || '') + ' ' + (model.reference || '')).keywords(true, true).join(' ').max(500);
 
 		var fn = function() {
 			F.emit('products.save', model);

@@ -159,8 +159,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			newbie = true;
 		}
 
-		if (model.search)
-			model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).toSearch();
+		model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).keywords(true, true).join(' ').max(1000);
 
 		// Sanitizes URL
 		if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
