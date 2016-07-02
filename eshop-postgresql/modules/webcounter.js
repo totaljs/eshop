@@ -3,9 +3,10 @@
  * @author Peter Širka
  */
 
-var COOKIE = '__webcounter';
-var REG_ROBOT = /search|agent|bot|crawler/i;
-var TIMEOUT_VISITORS = 1200; // 20 MINUTES
+const COOKIE = '__webcounter';
+const REG_ROBOT = /search|agent|bot|crawler/i;
+const REG_HOSTNAME = /(http|https)\:\/\/(www\.)/gi;
+const TIMEOUT_VISITORS = 1200; // 20 MINUTES
 
 function WebCounter() {
 	this.stats = { pages: 0, day: 0, month: 0, year: 0, hits: 0, unique: 0, uniquemonth: 0, count: 0, search: 0, direct: 0, social: 0, unknown: 0, advert: 0, mobile: 0, desktop: 0, visitors: 0, orders: 0, newsletter: 0, contactforms: 0, users: 0, robots: 0 };
@@ -16,7 +17,7 @@ function WebCounter() {
 	this.current = 0;
 	this.last = 0;
 	this.lastvisit = null;
-	this.social = ['plus.url.google', 'plus.google', 'twitter', 'facebook', 'linkedin', 'tumblr', 'flickr', 'instagram', 'vkontakte'];
+	this.social = ['plus.url.google', 'plus.google', 'twitter', 'facebook', 'linkedin', 'tumblr', 'flickr', 'instagram', 'vkontakte', 'snapchat', 'skype', 'whatsapp', 'wechat'];
 	this.search = ['google', 'bing', 'yahoo', 'duckduckgo', 'yandex'];
 	this.ip = [];
 	this.url = [];
@@ -321,15 +322,10 @@ WebCounter.prototype.save = function() {
  * @return {Module]
  */
 WebCounter.prototype.daily = function(callback) {
-
 	var self = this;
 	var sql = DB();
-
 	sql.query('stats', self.query()).group(['day', 'month', 'year']);
-	sql.exec(function(err, response) {
-		callback(response.stats);
-	});
-
+	sql.exec((err, response) => callback(response.stats));
 	return self;
 };
 
@@ -435,17 +431,21 @@ function sum(a, b) {
 	Object.keys(b).forEach(function(o) {
 		if (o === 'day' || o === 'year' || o === 'month')
 			return;
-		if (typeof(a[o]) === 'undefined')
+
+		if (o === 'visitors') {
+			a[o] = Math.max(a[o] || 0, b[o] || 0);
+			return;
+		}
+
+		if (a[o] === undefined)
 			a[o] = 0;
-		if (typeof(b[o]) !== 'undefined')
+		if (b[o] !== undefined)
 			a[o] += b[o];
 	});
 }
 
 function reset(stats) {
-
 	delete stats.last;
-
 	var keys = Object.keys(stats);
 	for (var i = 0, length = keys.length; i < length; i++)
 		stats[keys[i]] = 0;
@@ -466,13 +466,13 @@ var delegate_request = function(controller, name) {
 };
 
 module.exports.name = 'webcounter';
-module.exports.version = 'v3.0.0';
+module.exports.version = 'v3.1.0';
 module.exports.instance = webcounter;
 
-framework.on('controller', delegate_request);
+F.on('controller', delegate_request);
 
 module.exports.usage = function() {
-	var stats = utils.extend({}, webcounter.stats);
+	var stats = U.extend({}, webcounter.stats);
 	stats.online = webcounter.online;
 	return stats;
 };
@@ -490,6 +490,8 @@ module.exports.install = function() {
 
 	setTimeout(refresh_hostname, 10000);
 	F.on('service', function(counter) {
+		if (counter % 10 === 0)
+			webcounter.save();
 		if (counter % 120 === 0)
 			refresh_hostname();
 	});
@@ -503,7 +505,7 @@ function refresh_hostname() {
 		url = F.config.url || F.config.hostname;
 	if (!url)
 		return;
-	url = url.toString().replace(/(http|https)\:\/\/(www\.)/gi, '');
+	url = url.toString().replace(REG_HOSTNAME, '');
 	var index = url.indexOf('/');
 	if (index !== -1)
 		url = url.substring(0, index);

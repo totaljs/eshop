@@ -3,9 +3,10 @@
  * @author Peter Širka
  */
 
-var COOKIE = '__webcounter';
-var REG_ROBOT = /search|agent|bot|crawler/i;
-var TIMEOUT_VISITORS = 1200; // 20 MINUTES
+const COOKIE = '__webcounter';
+const REG_ROBOT = /search|agent|bot|crawler/i;
+const REG_HOSTNAME = /(http|https)\:\/\/(www\.)/gi;
+const TIMEOUT_VISITORS = 1200; // 20 MINUTES
 
 require('sqlagent');
 
@@ -17,7 +18,7 @@ function WebCounter() {
 	this.current = 0;
 	this.last = 0;
 	this.lastvisit = null;
-	this.social = ['plus.url.google', 'plus.google', 'twitter', 'facebook', 'linkedin', 'tumblr', 'flickr', 'instagram', 'vkontakte'];
+	this.social = ['plus.url.google', 'plus.google', 'twitter', 'facebook', 'linkedin', 'tumblr', 'flickr', 'instagram', 'vkontakte', 'snapchat', 'skype', 'whatsapp', 'wechat'];
 	this.search = ['google', 'bing', 'yahoo', 'duckduckgo', 'yandex'];
 	this.ip = [];
 	this.url = [];
@@ -65,7 +66,7 @@ WebCounter.prototype = {
 
 	get today() {
 		var self = this;
-		var stats = utils.copy(self.stats);
+		var stats = U.copy(self.stats);
 		stats.last = self.lastvisit;
 		stats.pages = stats.hits && stats.count ? (stats.hits / stats.count).floor(2) : 0;
 		return stats;
@@ -471,9 +472,9 @@ function sum(a, b) {
 			return;
 		}
 
-		if (typeof(a[o]) === 'undefined')
+		if (a[o] === undefined)
 			a[o] = 0;
-		if (typeof(b[o]) !== 'undefined')
+		if (b[o] !== undefined)
 			a[o] += b[o];
 	});
 }
@@ -494,10 +495,10 @@ var delegate_request = function(controller, name) {
 };
 
 module.exports.name = 'webcounter';
-module.exports.version = 'v3.0.0';
+module.exports.version = 'v3.1.0';
 module.exports.instance = webcounter;
 
-framework.on('controller', delegate_request);
+F.on('controller', delegate_request);
 
 function refresh_hostname() {
 	var url;
@@ -507,7 +508,7 @@ function refresh_hostname() {
 		url = F.config.url || F.config.hostname;
 	if (!url)
 		return;
-	url = url.toString().replace(/(http|https)\:\/\/(www\.)/gi, '');
+	url = url.toString().replace(REG_HOSTNAME, '');
 	var index = url.indexOf('/');
 	if (index !== -1)
 		url = url.substring(0, index);
@@ -517,13 +518,15 @@ function refresh_hostname() {
 module.exports.install = function() {
 	setTimeout(refresh_hostname, 10000);
 	F.on('service', function(counter) {
+		if (counter % 10 === 0)
+			webcounter.save();
 		if (counter % 120 === 0)
 			refresh_hostname();
 	});
 };
 
 module.exports.usage = function() {
-	var stats = utils.extend({}, webcounter.stats);
+	var stats = U.extend({}, webcounter.stats);
 	stats.online = webcounter.online;
 	return stats;
 };
