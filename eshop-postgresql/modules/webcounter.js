@@ -281,8 +281,8 @@ WebCounter.prototype.save = function() {
 			builder.set('dateupdated', new Date());
 			sql.update('tbl_visitor').replace(builder).where('id', id);
 		} else {
-			stats.day = dt.getDate() + 1;
-			stats.month = dt.getMonth();
+			stats.day = dt.getDate();
+			stats.month = dt.getMonth() + 1;
 			stats.year = dt.getFullYear();
 			builder.set(stats);
 			builder.set('id', id);
@@ -412,12 +412,6 @@ function sum(a, b) {
 	Object.keys(b).forEach(function(o) {
 		if (o === 'day' || o === 'year' || o === 'month')
 			return;
-
-		if (o === 'visitors') {
-			a[o] = Math.max(a[o] || 0, b[o] || 0);
-			return;
-		}
-
 		if (a[o] === undefined)
 			a[o] = 0;
 		if (b[o] !== undefined)
@@ -464,8 +458,12 @@ module.exports.install = function() {
 		var sql = DB();
 		sql.select('stats', 'tbl_visitor').where('id', (new Date()).format('yyyyMMdd')).first();
 		sql.exec(function(err, response) {
-			if (response.stats)
-				webcounter.history = response.stats;
+			if (!response.stats)
+				return;
+			webcounter.history = response.stats;
+			webcounter.stats.day = webcounter.history.day;
+			webcounter.stats.month = webcounter.history.month;
+			webcounter.stats.year = webcounter.history.year;
 		});
 	}, 1000);
 

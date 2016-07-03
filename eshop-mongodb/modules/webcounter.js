@@ -506,8 +506,6 @@ function refresh_hostname() {
 module.exports.install = function() {
 	setTimeout(refresh_hostname, 10000);
 	F.on('service', function(counter) {
-		if (counter % 10 === 0)
-			webcounter.save();
 		if (counter % 120 === 0)
 			refresh_hostname();
 	});
