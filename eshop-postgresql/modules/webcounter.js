@@ -28,13 +28,11 @@ function WebCounter() {
 	this._onValid = function(req) {
 		var self = this;
 		var agent = req.headers['user-agent'];
-		if (!agent || req.headers['x-moz'] === 'prefetch')
+
+		if (!agent || req.headers['x-moz'] === 'prefetch' || (self.onValid && !self.onValid(req)))
 			return false;
 
-		if (self.onValid && !self.onValid(req))
-			return false;
-
-		if (agent.match(REG_ROBOT)) {
+		if (REG_ROBOT.test(agent)) {
 			self.stats.robots++;
 			return false;
 		}
@@ -72,24 +70,22 @@ WebCounter.prototype = {
 WebCounter.prototype.clean = function() {
 
 	var self = this;
-
-	self.interval++;
-
 	var now = new Date();
 	var stats = self.stats;
 
+	self.interval++;
 	self.current = now.getTime();
 
 	var day = now.getDate();
 	var month = now.getMonth() + 1;
 	var year = now.getFullYear();
-	var length = 0;
 
 	if (stats.day !== day || stats.month !== month || stats.year !== year) {
 		stats.day = day;
 		stats.month = month;
 		stats.year = year;
 		self.save();
+		reset(self.history);
 	} else if (self.interval % 20 === 0)
 		self.save();
 
@@ -103,7 +99,7 @@ WebCounter.prototype.clean = function() {
 
 	if (tmp0 !== arr[0] || tmp1 !== arr[1]) {
 		var online = arr[0] + arr[1];
-		if (online != self.last) {
+		if (online !== self.last) {
 			if (self.allowIP)
 				self.ip = self.ip.slice(tmp0);
 			self.last = online;
@@ -121,7 +117,7 @@ WebCounter.prototype.increment = function(type) {
 
 	var self = this;
 
-	if (typeof(self.stats[type]) === 'undefined')
+	if (self.stats[type] === undefined)
 		self.stats[type] = 1;
 	else
 		self.stats[type]++;
@@ -136,17 +132,7 @@ WebCounter.prototype.increment = function(type) {
 WebCounter.prototype.counter = function(req, res) {
 
 	var self = this;
-
-	if (!self._onValid(req))
-		return false;
-
-	if (req.xhr && !self.allowXHR)
-		return false;
-
-	if (req.method !== 'GET')
-		return false;
-
-	if (!req.headers['accept'] || !req.headers['accept-language'])
+	if (!self._onValid(req) || req.method !== 'GET' || (req.xhr && !self.allowXHR) || !req.headers['accept'] || !req.headers['accept-language'])
 		return false;
 
 	var arr = self.arr;
@@ -164,7 +150,6 @@ WebCounter.prototype.counter = function(req, res) {
 		sum = Math.abs(self.current - user) / 1000;
 
 	var isHits = user ? sum >= TIMEOUT_VISITORS : true;
-
 	if (!ping || isHits) {
 		stats.hits++;
 		history.hits++;
@@ -247,9 +232,7 @@ WebCounter.prototype.counter = function(req, res) {
 		return true;
 	}
 
-	var length = self.social.length;
-
-	for (var i = 0; i < length; i++) {
+	for (var i = 0, length = self.social.length; i < length; i++) {
 		if (referer.indexOf(self.social[i]) !== -1) {
 			stats.social++;
 			history.social++;
@@ -257,9 +240,7 @@ WebCounter.prototype.counter = function(req, res) {
 		}
 	}
 
-	var length = self.search.length;
-
-	for (var i = 0; i < length; i++) {
+	for (var i = 0, length = self.search.length; i < length; i++) {
 		if (referer.indexOf(self.search[i]) !== -1) {
 			stats.search++;
 			history.search++;
@@ -459,9 +440,9 @@ function getReferer(host) {
 }
 
 // Instance
-var webcounter = new WebCounter();
+const webcounter = new WebCounter();
 
-var delegate_request = function(controller, name) {
+const delegate_request = function(controller) {
 	webcounter.counter(controller.req, controller.res);
 };
 
@@ -483,15 +464,12 @@ module.exports.install = function() {
 		var sql = DB();
 		sql.select('stats', 'tbl_visitor').where('id', (new Date()).format('yyyyMMdd')).first();
 		sql.exec(function(err, response) {
-			if (response.stats)
-				webcounter.history = response.stats;
+			response.stats &&  webcounter.history = response.stats;
 		});
 	}, 1000);
 
 	setTimeout(refresh_hostname, 10000);
 	F.on('service', function(counter) {
-		if (counter % 10 === 0)
-			webcounter.save();
 		if (counter % 120 === 0)
 			refresh_hostname();
 	});
