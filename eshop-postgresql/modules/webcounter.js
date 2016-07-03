@@ -464,7 +464,8 @@ module.exports.install = function() {
 		var sql = DB();
 		sql.select('stats', 'tbl_visitor').where('id', (new Date()).format('yyyyMMdd')).first();
 		sql.exec(function(err, response) {
-			response.stats &&  webcounter.history = response.stats;
+			if (response.stats)
+				webcounter.history = response.stats;
 		});
 	}, 1000);
 
