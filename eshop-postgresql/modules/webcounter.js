@@ -172,10 +172,8 @@ WebCounter.prototype.counter = function(req, res) {
 		}
 
 		var date = new Date(user);
-		if (date.getDate() !== now.getDate() || date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear()) {
+		if (date.getDate() !== now.getDate() || date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear())
 			isUnique = true;
-			reset(history);
-		}
 
 		if (date.diff('months') < 0) {
 			history.uniquemonth++;
@@ -290,6 +288,9 @@ WebCounter.prototype.save = function() {
 		}
 
 		reset(self.stats);
+		self.stats.day = dt.getDate();
+		self.stats.month = dt.getMonth() + 1;
+		self.stats.year = dt.getFullYear();
 		resume();
 	});
 
