@@ -971,12 +971,11 @@ COMPONENT('pictures', function() {
 	var self = this;
 
 	self.skip = false;
+	self.readonly();
 
 	self.make = function() {
 		self.element.addClass('ui-pictures');
 	};
-
-	self.readonly();
 
 	self.setter = function(value) {
 
@@ -992,16 +991,20 @@ COMPONENT('pictures', function() {
 		this.element.find('img').unbind('click');
 		this.element.empty();
 
-		if (!(value instanceof Array) || value.length === 0)
+		if (!(value instanceof Array) || !value.length)
 			return;
+
+		var count = 0;
+		var builder = [];
 
 		for (var i = 0, length = value.length; i < length; i++) {
 			var id = value[i];
-			if (id)
-				this.element.append('<div data-id="' + id + '" class="col-xs-3 m"><span class="fa fa-times"></span><img src="/images/small/' + id + '.jpg" class="img-responsive" alt="" /></div>');
+			id && builder.push('<div data-id="' + id + '" class="col-xs-3 m"><span class="fa fa-times"></span><img src="/images/small/{0}.jpg" class="img-responsive" alt="" /></div>'.format(id));
 		}
 
-		var self = this;
+		self.html(builder);
+		setTimeout(FN('() => $(window).trigger("resize");'), 500);
+
 		this.element.find('.fa').bind('click', function(e) {
 
 			var el = $(this).parent().remove();
@@ -1022,7 +1025,7 @@ COMPONENT('pictures', function() {
 
 			el.toggleClass('selected');
 
-			if (selected.length === 0)
+			if (!selected.length)
 				return;
 
 			var id1 = el.parent().attr('data-id');
