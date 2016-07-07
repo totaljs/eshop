@@ -88,7 +88,7 @@ function file_read(req, res) {
 			}
 
 			var writer = require('fs').createWriteStream(filename);
-			stream.pipe(writer).on('close', function() {
+			stream.pipe(writer);
 
 			CLEANUP(writer, function() {
 
