@@ -13,8 +13,8 @@
 						<br />
 						<table class="table">
 							<tr>
-								<td class="b">@(Today orders)</td>
-								<td class="col-xs-3 ui-right">{{ if webcounter.today.orders }}{{ webcounter.today.orders | format(0) }}{{ else }}0{{ fi }}x</td>
+								<td class="b">@(Today contact forms)</td>
+								<td class="col-xs-3 ui-right">{{ if webcounter.today.contactforms }}{{ webcounter.today.contactforms | format(0) }}{{ else }}0{{ fi }}x</td>
 							</tr>
 							<tr>
 								<td>@(Hits)</td>
@@ -86,39 +86,7 @@
 			</div>
 		</div>
 	</div>
-
 	<br />
-	<div class="bg-smoke">
-		<br />
-		<div class="container" data-component="template" data-component-path="dashboard.data.Order">
-			<script type="text/html">
-				<div class="row">
-					<div class="col-md-3 m red">
-						<div class="b">@(Pending orders)</div>
-						<div>{{ pending }}x</div>
-						<hr class="nmb" />
-					</div>
-					<div class="col-md-3 m">
-						<div class="b">@(Completed orders)</div>
-						<div>{{ completed }}x</div>
-						<hr class="nmb" />
-					</div>
-					<div class="col-md-3 m red">
-						<div class="b">@(Pending money)</div>
-						<div>{{ pending_price | price(2) }}</div>
-						<hr class="nmb" />
-					</div>
-					<div class="col-md-3 m">
-						<div class="b">@(Earned money)</div>
-						<div>{{ completed_price | price(2) }}</div>
-						<hr class="nmb" />
-					</div>
-				</div>
-			</script>
-		</div>
-	</div>
-	<br />
-
 	<div class="container">
 		<br />
 		<div class="ui-center b">@(Desktop devices vs. Mobile devices)</div>
