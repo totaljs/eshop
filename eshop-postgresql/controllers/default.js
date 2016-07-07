@@ -88,7 +88,6 @@ function file_read(req, res) {
 			}
 
 			var writer = require('fs').createWriteStream(filename);
-			stream.pipe(writer);
 
 			CLEANUP(writer, function() {
 
@@ -106,6 +105,8 @@ function file_read(req, res) {
 					image.minify();
 				}, undefined, next);
 			});
+
+			stream.pipe(writer);
 		});
 	});
 }
@@ -139,7 +140,6 @@ function file_image(req, res) {
 			}
 
 			var writer = require('fs').createWriteStream(filename);
-			stream.pipe(writer);
 
 			CLEANUP(writer, function() {
 				res.image(filename, function(image) {
@@ -154,6 +154,8 @@ function file_image(req, res) {
 					image.minify();
 				}, undefined, next);
 			});
+
+			stream.pipe(writer);
 		});
 	});
 }
