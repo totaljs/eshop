@@ -1,26 +1,43 @@
 @{notranslate}
 @{nocompress html}
 
-<div id="CMS">
-	@{if repository.page && repository.page.body}
-		<!-- RENDER UPDATED CONTENT -->
-		@{!repository.page.body}
-	@{else}
-		<div class="CMS_widgets"></div>
-	@{fi}
-</div>
+@{if repository.preview}
+    <div id="CMS">
+        @{if repository.page && repository.page.body}
 
-<script>
-function $cmseditor_load(type) {
-	// type === undefined  --> load new content
-	// type === sourcecode --> content changed
-}
+            <!-- RENDER UPDATED CONTENT -->
+            @{!repository.page.body}
 
-function $cmseditor_save(type) {
-	// type === undefined  --> save the content
-	// type === sourcecode --> get source-code
+        @{else}
+            <div class="CMS_widgets">
+                <div style="cursor:pointer" class="CMS_hidden"><span class="fa fa-plus"></span> Widgets</div>
+                <br />
+            </div>
+        @{fi}
+    </div>
 
-	// changed the DOM
-	// DOM will be saved
-}
-</script>
+    <script>
+    function $cmseditor_load(type) {
+        // type === undefined  --> load new content
+        // type === sourcecode --> content changed
+    }
+
+    function $cmseditor_save(type) {
+        // type === undefined  --> save the content
+        // type === sourcecode --> get source-code
+
+        // changed the DOM
+        // DOM will be saved
+    }
+    </script>
+
+@{else}
+
+    @{if repository.page && repository.page.body}
+
+        <!-- RENDER UPDATED CONTENT -->
+        @{!repository.page.body}
+
+    @{fi}
+
+@{fi}
