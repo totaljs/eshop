@@ -862,11 +862,13 @@ COMPONENT('form', function() {
 
 	var self = this;
 	var autocenter;
+	window.$$form_level = window.$$form_level || 1;
 
 	if (!MAN.$$form) {
 		MAN.$$form = true;
 		$(document).on('click', '.ui-form-button-close', function() {
 			SET($.components.findById($(this).attr('data-id')).path, '');
+			window.$$form_level--;
 		});
 
 		$(window).on('resize', function() {
@@ -876,11 +878,13 @@ COMPONENT('form', function() {
 				component.resize();
 			});
 		});
-
 	}
+
+	self.onHide = function(){};
 
 	var hide = self.hide = function() {
 		self.set('');
+		self.onHide();
 	};
 
 	self.readonly();
@@ -911,7 +915,7 @@ COMPONENT('form', function() {
 		self.condition = self.attr('data-if');
 		self.element.empty();
 
-		$(document.body).append('<div id="' + self._id + '" class="hidden ui-form-container"' + (self.attr('data-top') ? ' style="z-index:10"' : '') + '><div class="ui-form-container-padding"><div class="ui-form" style="max-width:' + width + '"><div class="ui-form-title"><span class="fa fa-times ui-form-button-close" data-id="' + self.id + '"></span>' + self.attr('data-title') + '</div>' + content + '</div></div>');
+		$(document.body).append('<div id="' + self._id + '" class="hidden ui-form-container"><div class="ui-form-container-padding"><div class="ui-form" style="max-width:' + width + '"><div class="ui-form-title"><span class="fa fa-times ui-form-button-close" data-id="' + self.id + '"></span>' + self.attr('data-title') + '</div>' + content + '</div></div>');
 
 		self.element = $('#' + self._id);
 		self.element.data(COM_ATTR, self);
@@ -921,7 +925,8 @@ COMPONENT('form', function() {
 				window.$calendar.hide();
 		});
 
-		self.element.find('button').on('click', function(e) {
+		self.element.find('button').on('click', function(e) {			
+			window.$$form_level--;
 			switch (this.name) {
 				case 'submit':
 					self.submit(hide);
@@ -961,6 +966,9 @@ COMPONENT('form', function() {
 			var el = self.element.find('input,select,textarea');
 			if (el.length > 0)
 				el.eq(0).focus();
+
+			window.$$form_level++;
+			self.element.css('z-index', window.$$form_level * 10);
 
 			self.element.animate({ scrollTop: 0 }, 0, function() {
 				setTimeout(function() {

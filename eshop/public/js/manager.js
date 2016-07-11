@@ -91,9 +91,10 @@ if (window.su) {
 }
 
 jRouting.on('location', function(url) {
+	url = url.split('/');
 	var nav = $('header nav');
 	nav.find('.selected').removeClass('selected');
-	nav.find('a[href="' + url + '"]').addClass('selected');
+	nav.find('a[href="' + '/' + url[1] + '/' + (url[2] && url[2] + '/') + '"]').addClass('selected');
 });
 
 function resizer() {

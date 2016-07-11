@@ -1,4 +1,4 @@
-<div data-component="form" data-title="@(Select widget)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="500px" data-top="true" data-component-id="cmseditor_widgets">
+<div data-component="form" data-title="@(Select widget)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="500px" data-component-id="cmseditor_widgets">
 	<div class="padding">
 		<div data-component="repeater-group" data-component-path="cmseditor.widgets2" data-group="category">
 			<script type="text/html">
@@ -15,7 +15,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Picture editor)" data-component-path="cmseditor.window" data-if="value === 'picture'" data-width="1100px" data-top="true" data-component-id="cmseditor_picture">
+<div data-component="form" data-title="@(Picture editor)" data-component-path="cmseditor.window" data-if="value === 'picture'" data-width="1100px" data-component-id="cmseditor_picture">
 	<div class="padding">
 		<div data-component="crop" data-component-path="cmseditor.crop.url" data-width="700" data-height="500" data-component-id="cmseditor.crop"></div>
 		<div class="row">
@@ -37,7 +37,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Link editor)" data-component-path="cmseditor.window" data-if="value === 'link'" data-width="450px" data-top="true" data-component-id="cmseditor_link">
+<div data-component="form" data-title="@(Link editor)" data-component-path="cmseditor.window" data-if="value === 'link'" data-width="450px" data-component-id="cmseditor_link">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
@@ -59,7 +59,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Attributes editor)" data-component-path="cmseditor.window" data-if="value === 'attribute'" data-width="450px" data-top="true" data-component-id="cmseditor_attribute">
+<div data-component="form" data-title="@(Attributes editor)" data-component-path="cmseditor.window" data-if="value === 'attribute'" data-width="450px" data-component-id="cmseditor_attribute">
 	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12">
@@ -99,7 +99,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Icon editor)" data-component-path="cmseditor.window" data-if="value === 'icon'" data-width="700px" data-top="true" data-component-id="cmseditor_icon">
+<div data-component="form" data-title="@(Icon editor)" data-component-path="cmseditor.window" data-if="value === 'icon'" data-width="700px" data-component-id="cmseditor_icon">
 	<div class="padding">
 		<div class="row font-awesome-editor" id="cmseditoricons"></div>
 	</div>
@@ -108,7 +108,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Widget settings)" data-component-path="cmseditor.window" data-if="value === 'widget'" data-width="500px" data-top="true" data-component-id="cmseditor_widget">
+<div data-component="form" data-title="@(Widget settings)" data-component-path="cmseditor.window" data-if="value === 'widget'" data-width="500px" data-component-id="cmseditor_widget">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
@@ -126,7 +126,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Source code editor)" data-component-path="cmseditor.window" data-if="value === 'source'" data-width="1100px" data-top="true" data-component-id="cmseditor_source">
+<div data-component="form" data-title="@(Source code editor)" data-component-path="cmseditor.window" data-if="value === 'source'" data-width="1100px" data-component-id="cmseditor_source">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
@@ -228,7 +228,7 @@
 				w.$cmseditor_save(type);
 			if (w.COM)
 				w.COM.emit('cmseditor.save', type);
-			setTimeout(callback, 500);
+			setTimeout(callback, 1000);
 		};
 
 		self.write = function(content) {
@@ -807,7 +807,7 @@
 					w.$cmseditor_load(type);
 				if (w.COM)
 					w.COM.emit('cmseditor.load', type);
-			}, 500);
+			}, 1000);
 		};
 
 		self.resize = function(force) {
@@ -1102,6 +1102,13 @@
 			editor.doFind('#CMS').html(cmseditor.source);
 			editor.resize();
 			editor.change(true);
+			editor.load('sourcecode');
+			hide();
+		};
+
+		component.cancel = function(hide) {
+			var editor = cmseditor.instance;
+			editor.resize();
 			editor.load('sourcecode');
 			hide();
 		};
