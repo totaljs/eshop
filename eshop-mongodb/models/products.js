@@ -87,7 +87,7 @@ NEWSCHEMA('Product').make(function(schema) {
 				if (linker_detail)
 					item.linker = linker_detail.url.format(item.linker);
 				if (linker_category)
-					item.linker_category = linker_category.url.format(item.linker_category);
+					item.linker_category = linker_category.url + item.linker_category;
 			});
 
 			if (!data.pages)
