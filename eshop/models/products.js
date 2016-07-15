@@ -70,7 +70,7 @@ NEWSCHEMA('Product').make(function(schema) {
 				if (linker_detail)
 					doc.linker = linker_detail.url.format(doc.linker);
 				if (linker_category)
-					doc.linker_category = linker_category.url.format(doc.linker_category);
+					doc.linker_category = linker_category.url + doc.linker_category;
 				delete doc.body;
 			}
 
