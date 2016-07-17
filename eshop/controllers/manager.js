@@ -235,8 +235,9 @@ function json_dashboard_clear() {
 	var self = this;
 	var instance = MODULE('webcounter').instance;
 
-	F.fs.rm.database('webcounter.nosql');
-	F.fs.rm.database('webcounter.cache');
+	var fs = require('fs');
+	fs.unlink('databases/webcounter.nosql', NOOP);
+	fs.unlink('databases/webcounter.cache', NOOP);
 
 	Object.keys(instance.stats).forEach(function(key) {
 		instance.stats[key] = 0;
