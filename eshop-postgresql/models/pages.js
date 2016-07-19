@@ -585,8 +585,7 @@ F.eval(function() {
 		var page = F.global.sitemap[key];
 
 		if (!page) {
-			self.status = 404;
-			self.plain(U.httpStatus(404, true));
+			self.throw404();
 			return self;
 		}
 

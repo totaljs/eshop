@@ -504,9 +504,8 @@ F.eval(function() {
 		var key = (self.language ? self.language + ':' : '') + url;
 		var page = F.global.sitemap[key];
 
-		if (!page) {
-			self.status = 404;
-			self.plain(U.httpStatus(404, true));
+		if (!page) {			
+			self.throw404();
 			return self;
 		}
 		self.page(self.url, view, model, cache);
