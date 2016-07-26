@@ -1,4 +1,9 @@
-======================== v5.0.0 (BETA)
+======================== v6.0.0
+
+- fixed bugs
+- updated jComponent version
+
+======================== v5.0.0
 
 - pages can support partial pages
 - eshop routing (products, details, checkout) is linked with the sitemap
