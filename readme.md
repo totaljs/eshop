@@ -1,3 +1,7 @@
+[![MIT License][license-image]][license-url]
+
+[![Support](https://www.totaljs.com/img/button-support.png)](https://www.totaljs.com/support/)
+
 # Node.js Eshop and CMS
 
 Please do not change the code, just create a new issues. I solve all problems as soon as possible. Do you want special upgrades? Contact me <petersirka@gmail.com>.
@@ -53,3 +57,6 @@ Sign up on <https://www.webhostingy.com/en/totaljs>
 - everything under control
 
 ![VPS hosting](https://www.totaljs.com/img/eshop-vps-hosting.jpg)
+
+[license-image]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat
+[license-url]: license.txt
