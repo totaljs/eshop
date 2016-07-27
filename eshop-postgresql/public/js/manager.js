@@ -8,13 +8,10 @@ common.form = '';
 
 $(document).ready(function() {
 	jR.clientside('.jrouting');
+
 	$('.jrouting').each(function(index) {
 		var el = $(this);
-		(function(el) {
-			setTimeout(function() {
-				el.toggleClass('hidden', su.roles.length && su.roles.indexOf(el.attr('data-role')) === -1);
-			}, index * 200);
-		})(el);
+		el.toggleClass('hidden', su.roles.length && su.roles.indexOf(el.attr('data-role')) === -1);
 	});
 
 	FIND('loading', function() {
@@ -99,10 +96,7 @@ jRouting.on('location', function(url) {
 
 function resizer() {
 	var h = $(window).height();
-	var el = $('.scroller');
-	if (el.length)
-		el.height($(window).height() - el.offset().top);
-	el = $('#body');
+	var el = $('#body');
 	if (!el.length)
 		return;
 	var t = el.offset().top + 100;
@@ -111,12 +105,15 @@ function resizer() {
 
 function success() {
 	var el = $('#success');
-	FIND('loading').hide(500);
-	el.css({ right: '90%' }).delay(500).fadeIn(100).animate({ right: '0%' }, 1000, 'easeOutBounce', function() {
+	el.show();
+	el.addClass('success-animation');
+	setTimeout(function() {
+		el.removeClass('success-animation');
 		setTimeout(function() {
-			el.fadeOut(200);
-		}, 800);
-	});
+			el.hide();
+		}, 1000);
+	}, 1500);
+	FIND('loading').hide(500);
 }
 
 function can(name) {
