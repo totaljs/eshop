@@ -2,6 +2,7 @@
 
 - fixed bugs
 - updated jComponent version
+- improved UI design
 
 ======================== v5.0.0
 
