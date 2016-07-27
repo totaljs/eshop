@@ -1,148 +1,147 @@
-<div class="scroller">
-	<br />
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<h2 class="ui-center">@(Today statistics)</h2>
+<br />
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<h2 class="ui-center">@(Today statistics)</h2>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4 m">
+			<div data-component="template" data-component-path="dashboard.data">
+				<script type="text/html">
+					<br />
+					<table class="table">
+						<tr>
+							<td class="b">@(Today contact forms)</td>
+							<td class="col-xs-3 ui-right">{{ if webcounter.today.contactforms }}{{ webcounter.today.contactforms | format(0) }}{{ else }}0{{ fi }}x</td>
+						</tr>
+						<tr>
+							<td>@(Hits)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.hits | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td>@(Visitors)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.count | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td>@(Unique visitors)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.unique | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td>@(Visited pages per user)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.pages | format(0) }}x</td>
+						</tr>
+					</table>
+				</script>
+			</div>
+			<div data-component="template" data-component-path="dashboard.online">
+				<script type="text/html">
+					<div class="fs11 silver ui-center">@(Memory usage) <b>{{ memoryused | format(2) }}</b> @(from) <b>{{ memorytotal | format(2) }} MB</b></div>
+				</script>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-4 m">
-				<div data-component="template" data-component-path="dashboard.data">
-					<script type="text/html">
-						<br />
-						<table class="table">
-							<tr>
-								<td class="b">@(Today contact forms)</td>
-								<td class="col-xs-3 ui-right">{{ if webcounter.today.contactforms }}{{ webcounter.today.contactforms | format(0) }}{{ else }}0{{ fi }}x</td>
-							</tr>
-							<tr>
-								<td>@(Hits)</td>
-								<td class="col-xs-3 ui-right">{{ webcounter.today.hits | format(0) }}x</td>
-							</tr>
-							<tr>
-								<td>@(Visitors)</td>
-								<td class="col-xs-3 ui-right">{{ webcounter.today.count | format(0) }}x</td>
-							</tr>
-							<tr>
-								<td>@(Unique visitors)</td>
-								<td class="col-xs-3 ui-right">{{ webcounter.today.unique | format(0) }}x</td>
-							</tr>
-							<tr>
-								<td>@(Visited pages per user)</td>
-								<td class="col-xs-3 ui-right">{{ webcounter.today.pages | format(0) }}x</td>
-							</tr>
-						</table>
-					</script>
-				</div>
+		<div class="col-md-4 m">
+			<hr />
+			<div class="fs11 silver ui-center">@(Online visitors)</div>
+			<div class="dashboard-online-counter">
 				<div data-component="template" data-component-path="dashboard.online">
 					<script type="text/html">
-						<div class="fs11 silver ui-center">@(Memory usage) <b>{{ memoryused | format(2) }}</b> @(from) <b>{{ memorytotal | format(2) }} MB</b></div>
+						<span>{{ visitors }}</span>
+						<div class="ui-center">@(Last visitor:) <b>{{ if last }}{{ last | format('@(yyyy-MM-dd HH:mm)') }}{{ else }}............{{ fi }}</b></div>
 					</script>
 				</div>
+				<br />
+				<canvas id="dashboard-online"></canvas>
 			</div>
-			<div class="col-md-4 m">
-				<hr />
-				<div class="fs11 silver ui-center">@(Online visitors)</div>
-				<div class="dashboard-online-counter">
-					<div data-component="template" data-component-path="dashboard.online">
-						<script type="text/html">
-							<span>{{ visitors }}</span>
-							<div class="ui-center">@(Last visitor:) <b>{{ if last }}{{ last | format('@(yyyy-MM-dd HH:mm)') }}{{ else }}............{{ fi }}</b></div>
-						</script>
-					</div>
+		</div>
+		<div class="col-md-4 m">
+			<div data-component="template" data-component-path="dashboard.online">
+				<script type="text/html">
 					<br />
-					<canvas id="dashboard-online"></canvas>
-				</div>
+					<table class="table">
+						<tr>
+							<td style="border-left:5px solid #61E727">@(Organic search)</td>
+							<td class="col-xs-3 ui-right">{{ today.search | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #479AD0">@(Social networks)</td>
+							<td class="col-xs-3 ui-right">{{ today.social | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #E22926">@(Direct visitors)</td>
+							<td class="col-xs-3 ui-right">{{ today.direct | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #FFEE32">@(Visitors from adverts)</td>
+							<td class="col-xs-3 ui-right">{{ today.advert | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #585858">@(Unknown visitors)</td>
+							<td class="col-xs-3 ui-right">{{ today.unknown | format(0) }}x</td>
+						</tr>
+					</table>
+				</script>
 			</div>
-			<div class="col-md-4 m">
-				<div data-component="template" data-component-path="dashboard.online">
-					<script type="text/html">
-						<br />
-						<table class="table">
-							<tr>
-								<td style="border-left:5px solid #61E727">@(Organic search)</td>
-								<td class="col-xs-3 ui-right">{{ today.search | format(0) }}x</td>
-							</tr>
-							<tr>
-								<td style="border-left:5px solid #479AD0">@(Social networks)</td>
-								<td class="col-xs-3 ui-right">{{ today.social | format(0) }}x</td>
-							</tr>
-							<tr>
-								<td style="border-left:5px solid #E22926">@(Direct visitors)</td>
-								<td class="col-xs-3 ui-right">{{ today.direct | format(0) }}x</td>
-							</tr>
-							<tr>
-								<td style="border-left:5px solid #FFEE32">@(Visitors from adverts)</td>
-								<td class="col-xs-3 ui-right">{{ today.advert | format(0) }}x</td>
-							</tr>
-							<tr>
-								<td style="border-left:5px solid #585858">@(Unknown visitors)</td>
-								<td class="col-xs-3 ui-right">{{ today.unknown | format(0) }}x</td>
-							</tr>
-						</table>
-					</script>
-				</div>
-			</div>
-		</div>
-	</div>
-	<br />
-	<div class="container">
-		<br />
-		<div class="ui-center b">@(Desktop devices vs. Mobile devices)</div>
-		<br />
-		<div class="dashboard-devices">
-			<div class="dashboard-devices-desktop"><span class="fa fa-desktop"></span>@(Desktop)</div>
-			<div class="dashboard-devices-mobile">@(Mobile)<span class="fa fa-tablet"></span></div>
-			<div class="dashboard-devices-stats"></div>
-		</div>
-	</div>
-
-	<br />
-	<div class="container">
-		<br />
-		<ul class="tabmenu" data-component="tabmenu" data-component-path="dashboard.year" data-component-type="number">
-			<script type="text/html" data-component="repeater" data-component-path="dashboard.years">
-				<li data-value="{{}}">{{}}</li>
-			</script>
-		</ul>
-		<br />
-		<div class="row">
-			<div class="col-md-6 m">
-				<div class="ui-center b m">@(Yearly stats of contact forms)</div>
-				<canvas id="dashboard-monthly-contactforms" height="115"></canvas>
-			</div>
-			<div class="col-md-6 m">
-				<div class="ui-center b m">@(Yearly stats of views)</div>
-				<canvas id="dashboard-monthly-hits" height="115"></canvas>
-			</div>
-		</div>
-		<br />
-	</div>
-	<br />
-
-	<div class="bg-smoke">
-		<div class="container">
-			<br />
-			<div class="row">
-				<div class="col-md-12">
-					<h2 class="ui-center">@(Yearly stats <b>Visitors vs. Unique Visitors</b>)</h2>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12 m">
-					<div class="legend">
-						<label><span class="fa fa-square" style="color:#FFCE54"></span><span>@(Visitors)</span></label>
-						<label><span class="fa fa-square" style="color:#FC6E51"></span><span>@(Unique Visitors)</span></label>
-					</div>
-					<br />
-					<canvas id="dashboard-monthly-visitors" height="100"></canvas>
-				</div>
-			</div>
-			<br />
 		</div>
 	</div>
 </div>
+<br />
+<div class="container">
+	<br />
+	<div class="ui-center b">@(Desktop devices vs. Mobile devices)</div>
+	<br />
+	<div class="dashboard-devices">
+		<div class="dashboard-devices-desktop"><span class="fa fa-desktop"></span>@(Desktop)</div>
+		<div class="dashboard-devices-mobile">@(Mobile)<span class="fa fa-tablet"></span></div>
+		<div class="dashboard-devices-stats"></div>
+	</div>
+</div>
+
+<br />
+<div class="container">
+	<br />
+	<ul class="tabmenu" data-component="tabmenu" data-component-path="dashboard.year" data-component-type="number">
+		<script type="text/html" data-component="repeater" data-component-path="dashboard.years">
+			<li data-value="{{}}">{{}}</li>
+		</script>
+	</ul>
+	<br />
+	<div class="row">
+		<div class="col-md-6 m">
+			<div class="ui-center b m">@(Yearly stats of contact forms)</div>
+			<canvas id="dashboard-monthly-contactforms" height="115"></canvas>
+		</div>
+		<div class="col-md-6 m">
+			<div class="ui-center b m">@(Yearly stats of views)</div>
+			<canvas id="dashboard-monthly-hits" height="115"></canvas>
+		</div>
+	</div>
+	<br />
+</div>
+<br />
+
+<div class="bg-smoke">
+	<div class="container">
+		<br />
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="ui-center">@(Yearly stats <b>Visitors vs. Unique Visitors</b>)</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 m">
+				<div class="legend">
+					<label><span class="fa fa-square" style="color:#FFCE54"></span><span>@(Visitors)</span></label>
+					<label><span class="fa fa-square" style="color:#FC6E51"></span><span>@(Unique Visitors)</span></label>
+				</div>
+				<br />
+				<canvas id="dashboard-monthly-visitors" height="100"></canvas>
+			</div>
+		</div>
+		<br />
+	</div>
+</div>
+
 
 <script>
 
@@ -247,7 +246,7 @@
 		options.data = { labels: window.$calendar.months_short, datasets: data };
 
 		if (dashboard.cache.visitors)
-			dashboard.cache.visitors.$chart.destroy();
+			dashboard.cache.visitors.destroy();
 
 		el = $('#dashboard-monthly-visitors');
 		dashboard.cache.visitors = new Chart(el.get(0).getContext('2d'), options);
@@ -259,7 +258,7 @@
 		options.data = { labels: window.$calendar.months_short, datasets: data };
 
 		if (dashboard.cache.contactforms)
-			dashboard.cache.contactforms.$chart.destroy();
+			dashboard.cache.contactforms.destroy();
 
 		el = $('#dashboard-monthly-contactforms');
 		dashboard.cache.contactforms = new Chart(el.get(0).getContext('2d'), options);
@@ -271,7 +270,7 @@
 		options.data = { labels: window.$calendar.months_short, datasets: data };
 
 		if (dashboard.cache.hits)
-			dashboard.cache.hits.$chart.destroy();
+			dashboard.cache.hits.destroy();
 
 		el = $('#dashboard-monthly-hits');
 		dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'), options);
@@ -296,6 +295,5 @@
 
 	dashboard_refresh_online();
 	dashboard_refresh();
-	resizer();
 
 </script>

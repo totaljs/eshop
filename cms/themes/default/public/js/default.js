@@ -188,10 +188,10 @@ COMPONENT('newsletter', function() {
 		button.on('click', function() {
 
 			var mail = input.val();
-			if (!mail.match(/^[a-z0-9A-Z_\.]+@[0-9a-zA-Z_]+?\.[a-zA-Z]{2,3}$/))
+			if (!mail.isEmail())
 				return;
 
-			$.components.POST('/api/newsletter/', { email: input.val() }, function(response) {
+			AJAX('POST /api/newsletter/', { email: input.val() }, function(response) {
 
 				if (response.success) {
 					input.addClass('newsletter-success');
