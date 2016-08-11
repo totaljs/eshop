@@ -201,10 +201,7 @@
 		var width;
 		var offsetter = '<span id="cmseditorheight"></span>';
 
-		self.options = MAKE(function(options) {
-			options.template = 'default';
-		});
-
+		self.options = { template: 'default' };
 		self.readonly();
 
 		self.make = function() {
