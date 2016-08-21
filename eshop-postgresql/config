@@ -1,6 +1,6 @@
 name                      : E-shop
 version                   : 6.0.0
-author                    : Total.js Labs
+author                    : Totaljs.com Ltd
 
 // IMPORTANT: PLEASE CREATE YOUR OWN DB on your server or on some PostgreSQL cloud.
 // DON'T CHANGE A DATA

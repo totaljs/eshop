@@ -1,6 +1,6 @@
 name                      : E-shop
 version                   : 6.0.0
-author                    : Total.js Labs
+author                    : Totaljs.com Ltd
 
 // A relative URL address into the eshop management
 manager-url               : /$manager
