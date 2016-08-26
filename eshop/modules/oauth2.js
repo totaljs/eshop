@@ -1,16 +1,15 @@
 // MIT License
 // Copyright Peter Širka <petersirka@gmail.com>
 
-var Qs = require('querystring');
+const Qs = require('querystring');
+const stats = { facebook: 0, google: 0,linkedin: 0, yahoo: 0, dropbox: 0, github: 0, yandex: 0, instagram: 0, vk: 0, live: 0 };
+const OAUTH2_HEADER = { code: '', client_id: '', client_secret: '', redirect: '', grant_type: 'authorization_code' };
+const OAUTH2_BEARER = { Authorization: '', 'User-Agent': 'total.js' };
+const FLAG_POST = ['post'];
+const FLAG_GET = ['get'];
 
 exports.id = 'oauth2';
-exports.version = '1.3';
-
-var stats = { facebook: 0, google: 0,linkedin: 0, yahoo: 0, dropbox: 0, github: 0, yandex: 0, instagram: 0, vk: 0, live: 0 };
-var OAUTH2_HEADER = { code: '', client_id: '', client_secret: '', redirect: '', grant_type: 'authorization_code' };
-var OAUTH2_BEARER = { Authorization: '', 'User-Agent': 'total.js' };
-var FLAG_POST = ['post'];
-var FLAG_GET = ['get'];
+exports.version = 'v1.4.0';
 
 exports.usage = function() {
 	return stats;

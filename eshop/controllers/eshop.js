@@ -1,4 +1,4 @@
-var PayPal = require('paypal-express-checkout');
+const PayPal = require('paypal-express-checkout');
 
 exports.install = function() {
 

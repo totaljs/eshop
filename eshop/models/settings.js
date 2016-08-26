@@ -1,5 +1,5 @@
-var Fs = require('fs');
-var filename = F.path.databases('settings.json');
+const Fs = require('fs');
+const filename = F.path.databases('settings.json');
 
 NEWSCHEMA('SuperUser').make(function(schema) {
 

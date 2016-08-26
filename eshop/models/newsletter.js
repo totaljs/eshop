@@ -1,5 +1,5 @@
-var Fs = require('fs');
-var filename = F.path.databases('newsletter.csv');
+const Fs = require('fs');
+const filename = F.path.databases('newsletter.csv');
 
 NEWSCHEMA('Newsletter').make(function(schema) {
 
