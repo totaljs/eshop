@@ -10,7 +10,7 @@ NEWSCHEMA('Post').make(function(schema) {
 	schema.define('keywords', 'String(200)');
 	schema.define('tags', '[String]');
 	schema.define('search', 'String(1000)');
-	schema.define('pictures', '[String]')  		// URL addresses for first 5 pictures
+	schema.define('pictures', '[String]');  		// URL addresses for first 5 pictures
 	schema.define('body', String);
 	schema.define('datecreated', Date);
 
