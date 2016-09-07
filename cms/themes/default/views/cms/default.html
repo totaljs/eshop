@@ -1,7 +1,6 @@
 @{notranslate}
 @{nocompress html}
 
-<<<<<<< HEAD
 @{if repository.preview}
     <div id="CMS">
         @{if repository.page && repository.page.body}
@@ -42,7 +41,7 @@
     @{fi}
 
 @{fi}
-=======
+
 @{if repository.preview}<!-- render preview for editing in $manager -->
 	<div id="CMS">
 		@{if repository.page && repository.page.body}
@@ -58,11 +57,11 @@
 		// type === undefined  --> load new content
 		// type === sourcecode --> content changed
 	}
-	
+
 	function $cmseditor_save(type) {
 		// type === undefined  --> save the content
 		// type === sourcecode --> get source-code
-	
+
 		// changed the DOM
 		// DOM will be saved
 	}
@@ -72,6 +71,3 @@
         @{!repository.page.body}
     @{fi}
 @{fi}
-
-
->>>>>>> v6.0.0
