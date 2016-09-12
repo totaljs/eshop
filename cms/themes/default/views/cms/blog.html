@@ -37,17 +37,17 @@
 		// type === undefined  --> load new content
 		// type === sourcecode --> content changed
 	}
-	
+
 	function $cmseditor_save(type) {
 		// type === undefined  --> save the content
 		// type === sourcecode --> get source-code
-	
+
 		// changed the DOM
 		// DOM will be saved
 	}
 	</script>
 @{else}<!-- render normal page for visitors -->
-    @{if repository.page && repository.page.body}
-        @{!repository.page.body}
-    @{fi}
+	@{if repository.page && repository.page.body}
+		@{!repository.page.body}
+	@{fi}
 @{fi}
