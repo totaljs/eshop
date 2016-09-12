@@ -1,6 +1,7 @@
 exports.install = function() {
 	// CMS rendering
 	F.route('/*', view_page);
+	F.route('/demo/');
 
 	// POSTS
 	F.route('#blogs',            view_blogs, ['*Post']);
