@@ -1,23 +1,21 @@
 <div class="filter">
 	<div class="container">
-		<div class="caption"><span class="fa fa-file-text mr5"></span> @(Pages)</div>
+		<nav class="buttons">
+			<a href="javascript:void(0)" data-component="click" data-component-path="widgets_new" title="@(Add new widget)"><i class="fa fa-plug"></i><span>@(Add new widget)</span></a>
+			<a href="javascript:void(0)" data-component="click" data-component-path="pages_new" title="@(Add new page)"><i class="fa fa-plus-circle"></i><span>@(Add new page)</span></a>
+		</nav>
+		<div class="caption"><i class="fa fa-file-text"></i>@(Pages)</div>
 		<div class="row">
-			<div class="col-md-3 col-sm-6 m">
+			<div class="col-md-4 m">
 				<div data-component="textbox" data-component-path="pages.filter.search" data-placeholder="@(Search pages ...)" data-control-icon="fa-search"></div>
 				<div class="help" data-component="template" data-component-path="pages.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
-			<div class="col-md-3 col-sm-6 m">
+			<div class="col-md-4 m">
 				<div data-component="dropdown" data-component-path="pages.filter.navigation" data-source="pages.dependencies.navigations" data-empty="@(All pages)"></div>
 				<div>&nbsp;</div>
 			</div>
-			<div class="col-md-2 col-sm-6 m">
+			<div class="col-md-4 m">
 				<div data-component="dropdown" data-component-path="pages.filter.language" data-source="languages" data-empty="@(All languages)"></div>
-			</div>
-			<div class="col-md-4 col-sm-6 m">
-				<div class="row">
-					<div class="col-xs-6"><a href="javascript:void(0)" data-component="click" data-component-path="pages_new" class="linkbutton"><span class="fa fa-file-text"></span>@(Add new page)</a></div>
-					<div class="col-xs-6"><a href="javascript:void(0)" data-component="click" data-component-path="widgets_new" class="linkbutton"><span class="fa fa-plug"></span>@(Add new widget)</a></div>
-				</div>
 			</div>
 		</div>
 	</div>
@@ -68,7 +66,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Page form)" data-component-path="common.form" data-if="value === 'pages'" data-width="1200px" data-component-id="pages.form">
+<div data-component="form" data-title="@(Page form)" data-component-path="common.form" data-if="value === 'pages'" data-width="1300px" data-component-id="pages.form">
 	<div class="padding" style="padding-bottom:10px">
 		<div class="row">
 			<div class="col-md-4 m">
@@ -81,7 +79,7 @@
 			</div>
 			<div class="col-md-4 m">
 				<div data-component="textbox" data-component-path="pages.form.url" data-required="true" data-placeholder="@(Page relative URL address)" data-icon="fa-globe">@(URL address)</div>
-				<div data-component="checkbox" data-component-path="pages.form.ispartial" class="fs11 green mt5">@(Is partial content)</div>
+				<div data-component="checkbox" data-component-path="pages.form.ispartial" class="green mt10">@(Is partial content)</div>
 			</div>
 			<div class="col-md-4 m">
 				<div data-component="dropdown" data-component-path="pages.form.template" data-source="pages.dependencies.templates" data-empty="">@(Template)</div>
@@ -114,14 +112,14 @@
 					<div class="col-md-6 m">
 						<div data-component="textbox" data-component-path="pages.form.name" data-maxlenght="50">@(Name)</div>
 					</div>
-					<div class="col-md-6 m">
+					<div class="col-md-6">
 						<div data-component="textbox" data-component-path="pages.form.keywords" data-maxlenght="80" data-icon="fa-tags">@(Keywords)</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="padding">
+	<div class="padding npt">
 		<div class="row">
 			<div class="col-md-6 m">
 				<div data-component="textboxtags" data-component-path="pages.form.tags">@(Internal tags)</div>
@@ -196,7 +194,7 @@
 				<div class="silver">@(The form loads template from the server <u>without default content</u> and creates a new content according to <b>HTML</b> editor. The existing content will be replaced.)</div>
 				<hr />
 				<div data-component="dropdown" data-component-path="pages.html.template" data-source="pages.dependencies.templates" class="m" data-empty="" data-required="true">@(Template)</div>
-				<div data-component="codemirror" data-component-path="pages.html.body" data-icon="fa-code" data-height="300px" data-required="true" class="ui-textarea-code">@(HTML)</div>
+				<div data-component="codemirror" data-component-path="pages.html.body" data-icon="fa-code" data-height="500px" data-required="true" class="ui-textarea-code">@(HTML)</div>
 			</div>
 		</div>
 	</div>

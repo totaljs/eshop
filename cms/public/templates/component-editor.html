@@ -37,7 +37,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Link editor)" data-component-path="cmseditor.window" data-if="value === 'link'" data-width="450px" data-component-id="cmseditor_link">
+<div data-component="form" data-title="@(Link editor)" data-component-path="cmseditor.window" data-if="value === 'link'" data-width="500px" data-component-id="cmseditor_link">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
@@ -59,7 +59,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Attributes editor)" data-component-path="cmseditor.window" data-if="value === 'attribute'" data-width="450px" data-component-id="cmseditor_attribute">
+<div data-component="form" data-title="@(Attributes editor)" data-component-path="cmseditor.window" data-if="value === 'attribute'" data-width="500px" data-component-id="cmseditor_attribute">
 	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12">
@@ -130,7 +130,7 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
-				<div data-component="codemirror" data-component-path="cmseditor.source" data-icon="fa-code" data-height="400px" data-required="true" class="ui-textarea-code">@(HTML)</div>
+				<div data-component="codemirror" data-component-path="cmseditor.source" data-icon="fa-code" data-height="500px" data-required="true" class="ui-textarea-code">@(HTML)</div>
 			</div>
 		</div>
 	</div>
@@ -237,7 +237,7 @@
 			frm.document.open('text/html', 'replace');
 
 			if (!content) {
-				frm.document.write('<html><head></head><body style="color:gray;text-align:center;padding:90px 0 0;margin:0;font-family:Arial;font-size:11px;color:#ADADAD;line-height:16px">@(<b>WITHOUT CONTENT</b><br />Choose the template for content editing.)</body></html>');
+				frm.document.write('<html><head></head><body style="color:gray;text-align:center;padding:140px 0 0;margin:0;font-family:Arial;font-size:11px;color:#ADADAD;line-height:16px">@(<b>WITHOUT CONTENT</b><br />Choose the template for content editing.)</body></html>');
 				frm.document.close();
 				iframe.css({ height: 'auto' });
 				return;
@@ -359,11 +359,9 @@
 				text += ' ' + this.innerText;
 			});
 
-			if (!text) {
-				self.doFind('.CMS_edit').each(function(index) {
-					text += ' ' + this.innerText;
-				});
-			}
+			!text && self.doFind('.CMS_edit').each(function(index) {
+				text += ' ' + this.innerText;
+			});
 
 			return find_keywords(text);
 		};
@@ -377,7 +375,7 @@
 			var words = content.toLowerCase().match(/[a-ž]+/gi);
 
 			if (words === null)
-				words = [];
+				words = EMPTYARRAY;
 
 			var length = words.length;
 			var dic = {};
@@ -432,8 +430,7 @@
 				var url = el.attr('src');
 				if (pictures.indexOf(url) !== -1)
 					return;
-				if (pictures.length < 5)
-					pictures.push(url);
+				pictures.length < 5 && pictures.push(url);
 			});
 
 			return pictures;
