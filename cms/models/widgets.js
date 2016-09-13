@@ -8,14 +8,6 @@ NEWSCHEMA('Widget').make(function(schema) {
 	schema.define('istemplate', Boolean);
 	schema.define('datecreated', Date);
 
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 		var filter = DB('widgets').find();
@@ -26,9 +18,6 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 	// Gets a specific widget
 	schema.setGet(function(error, model, options, callback) {
-
-		// options.url {String}
-		// options.id {String}
 
 		// Gets a specific document
 		var filter = DB('widgets').one();
@@ -59,10 +48,10 @@ NEWSCHEMA('Widget').make(function(schema) {
 		if (!model.id) {
 			newbie = true;
 			model.id = UID();
+			model.datecreated = F.datetime;
 		}
 
-
-		var fn = function(err, count) {
+		(newbie ? DB('widgets').insert(model) : DB('widgets').update(model).where('id', model.id)).callback(function(err, count) {
 			// Returns response
 			callback(SUCCESS(true));
 
@@ -74,16 +63,9 @@ NEWSCHEMA('Widget').make(function(schema) {
 			if (newbie)
 				return;
 
-			model.datebackuped = new Date();
+			model.datebackuped = F.datetime;
 			DB('widgets_backup').insert(model);
-		};
-
-		if (newbie) {
-			DB('widgets').insert(model).callback(fn);
-			return;
-		}
-
-		DB('widgets').update(model).where('id', model.id).callback(fn);
+		});
 	});
 
 	// Clears widget database
@@ -96,13 +78,10 @@ NEWSCHEMA('Widget').make(function(schema) {
 	schema.addWorkflow('load', function(error, model, widgets, callback) {
 		// widgets - contains String Array of ID widgets
 		var output = {};
-
 		var filter = DB('widgets').find();
 
 		filter.filter(function(doc) {
-			if (doc.istemplate)
-				return;
-			if (widgets.indexOf(doc.id) !== -1)
+			if (!doc.istemplate && widgets.indexOf(doc.id) !== -1)
 				output[doc.id] = doc;
 		});
 

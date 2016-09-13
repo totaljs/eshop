@@ -26,11 +26,17 @@ h2 b { font-weight: 700; }
 #body { margin: 0 40px 0 80px; }
 .success-animation { transform: scale(2) translate(10px, 10px); }
 
+.buttons { float: right; }
+.buttons a { float: left; height: 30px; background-color: #F0F0F0; width: 34px; text-align: center; font-size: 14px; padding: 5px 0 0 0; border-radius: 4px; color: #A0A0A0; margin-left: 5px; text-shadow: 1px 1px 1px white; }
+.buttons a:hover { background-color: #E0E0E0; color: black; }
+.buttons a span { display: none; }
+
 .padding { padding: 20px; }
 .m { margin-bottom: 20px; }
 .cl { clear: both; }
 
 .mt5 { margin-top: 5px; }
+.mt10 { margin-top: 10px; }
 .mr5 { margin-right: 5px !important; }
 .ml5 { margin-left: 5px !important; }
 .mr15 { margin-right: 15px !important; }
@@ -54,6 +60,7 @@ table td { vertical-align: middle !important;}
 .order-completed td { background-color: rgba(150,150,150,0.1); color: gray; }
 .order-completed .fa-check-circle { color: #66B258; margin-right: 5px; }
 
+.fs10 { font-size: 10px !important; }
 .fs11 { font-size: 11px !important; }
 .help { font-size: 11px; color: #AAB2BD; margin-top: 7px; line-height: 13px; }
 .help code { font: normal normal 11px Arial; background-color: #F0F0F0; padding: 2px 5px; border-radius: 4px; }
@@ -76,7 +83,7 @@ canvas { display: block; }
 .dashboard-devices-stats { height:30px; background-color: #656D78; width:0; border-radius: 0 50px 50px 0; border-right: 4px solid #8CC152; }
 
 .pages-editor { border-top: 2px solid #E0E0E0; border-bottom: 2px solid #E0E0E0; line-height: 0; }
-.pages-editor iframe { width: 100%; min-height: 200px; border: 0; margin: 0; padding: 0; background-color: #F0F0F0 }
+.pages-editor iframe { width: 100%; min-height: 300px; border: 0; margin: 0; padding: 0; background-color: #F0F0F0 }
 .pages-editor-widget { border-bottom: 1px solid #F0F0F0; padding: 4px 5px; cursor: pointer; }
 .pages-editor-widget:hover { background-color: #F0F0F0; }
 

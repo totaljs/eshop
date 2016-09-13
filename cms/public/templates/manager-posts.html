@@ -1,22 +1,20 @@
 <div class="filter">
 	<div class="container">
+		<nav class="buttons">
+			<a href="javascript:void(0)" data-component="click" data-component-path="posts_new" title="@(Add post)"><i class="fa fa-plus-circle"></i><span>@(Add post)</span></a>
+		</nav>
 		<div class="caption"><span class="fa fa-hashtag mr5"></span> @(Posts)</div>
 		<div class="row">
-			<div class="col-md-3 col-sm-6 m">
+			<div class="col-md-4 m">
 				<div data-component="textbox" data-component-path="posts.filter.search" data-placeholder="@(Search posts ...)" data-control-icon="fa-search"></div>
 				<div class="help" data-component="template" data-component-path="posts.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
-			<div class="col-md-3 col-sm-6 m">
+			<div class="col-md-4 m">
 				<div data-component="dropdown" data-component-path="posts.filter.category" data-source="posts.categories" data-empty="@(All posts)" data-source-value="name"></div>
 				<div>&nbsp;</div>
 			</div>
-			<div class="col-md-2 col-sm-6 m">
+			<div class="col-md-4 m">
 				<div data-component="dropdown" data-component-path="posts.filter.language" data-source="languages" data-empty="@(All languages)"></div>
-			</div>
-			<div class="col-md-4 col-sm-6 m">
-				<div class="row">
-					<div class="col-xs-6"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="posts_new"><span class="fa fa-plus-circle"></span>@(Add post)</a></div>
-				</div>
 			</div>
 		</div>
 	</div>
@@ -38,7 +36,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Post form)" data-component-path="common.form" data-if="value === 'posts'" data-width="1200px" data-component-id="posts.form">
+<div data-component="form" data-title="@(Post form)" data-component-path="common.form" data-if="value === 'posts'" data-width="1300px" data-component-id="posts.form">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-4 m">

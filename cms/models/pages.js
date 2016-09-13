@@ -31,14 +31,6 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('body', String);
 	schema.define('datecreated', Date);
 
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 
@@ -97,25 +89,11 @@ NEWSCHEMA('Page').make(function(schema) {
 
 			// Returns data
 			callback(data);
-
 		});
 	});
 
 	// Gets a specific page
 	schema.setGet(function(error, model, options, callback) {
-
-		// options.url {String}
-		// options.id {String}
-		// options.language {String}
-
-		// Filter for reading
-		var filter = function(doc) {
-			if (doc.url !== options.url && doc.id !== options.id)
-				return;
-			if (options.language && doc.language !== options.language)
-				return;
-			return doc;
-		};
 
 		var filter = DB('pages').one();
 
@@ -130,8 +108,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		// Gets specific document
 		filter.callback(function(err, doc) {
-			if (!doc)
-				error.push('error-404-page');
+			!doc && error.push('error-404-page');
 			callback(doc);
 		});
 	});
@@ -139,8 +116,7 @@ NEWSCHEMA('Page').make(function(schema) {
 	// Removes a specific page
 	schema.setRemove(function(error, id, callback) {
 		DB('pages').remove().where('id', id).callback(callback);
-		// Refreshes internal informations e.g. sitemap
-		setTimeout(refresh, 1000);
+		setTimeout2('pages', refresh, 1000);
 	});
 
 	// Saves the page into the database
@@ -156,6 +132,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		if (!model.id) {
 			model.id = UID();
+			model.datecreated = F.datetime;
 			newbie = true;
 		}
 
@@ -168,29 +145,18 @@ NEWSCHEMA('Page').make(function(schema) {
 				model.url = '/' + model.url;
 		}
 
-		var fn = function(count) {
+		(newbie ? DB('pages').insert(model) : DB('pages').update(model).where('id', model.id)).callback(function(err, count) {
 
-			// Returns response
 			callback(SUCCESS(true));
-
-			// create a backup
-			if (!newbie) {
-				model.datebackuped = new Date();
-				DB('pages_backup').insert(model);
-			}
-
 			F.emit('pages.save', model);
+			setTimeout2('pages', refresh, 1000);
 
-			// Refreshes internal informations e.g. sitemap
-			setTimeout(refresh, 1000);
-		};
+			if (newbie)
+				return;
 
-		if (newbie) {
-			DB('pages').insert(model).callback(fn);
-			return;
-		}
-
-		DB('pages').update(model).where('id', model.id).callback(fn);
+			model.datebackuped = F.datetime;
+			DB('pages_backup').insert(model);
+		});
 	});
 
 	schema.addWorkflow('create-url', function(error, model, options, callback) {
@@ -322,6 +288,7 @@ NEWSCHEMA('Page').make(function(schema) {
 								var keys = Object.keys(partial);
 								for (var i = 0, length = keys.length; i < length; i++)
 									arr.push(partial[keys[i]]);
+
 								response.partial = arr;
 								callback(response);
 							});
@@ -433,7 +400,7 @@ function refresh() {
 			var name = doc.navigations[i];
 			if (!navigation[name])
 				navigation[name] = [];
-			navigation[name].push({ url: doc.url, name: doc.name, title: doc.title, priority: doc.priority, language: doc.language, icon: doc.icon, tags: doc.tags });
+			navigation[name].push({ url: doc.url, name: doc.name, title: doc.title, priority: doc.priority, language: doc.language, icon: doc.icon, tags: doc.tags, external: doc.url.match(/(https|http)\:\/\//) != null });
 		}
 	};
 
@@ -464,11 +431,11 @@ F.eval(function() {
 		var key = (self.language ? self.language + ':' : '') + url;
 		var page = F.global.sitemap[key];
 
-		if (!page) {
+		if (page)
+			self.page(self.url, view, model, cache);
+		else
 			self.throw404();
-			return self;
-		}
-		self.page(self.url, view, model, cache);
+
 		return self;
 	};
 

@@ -10,9 +10,7 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 	// Saves the model into the database
 	schema.setSave(function(error, model, options, callback) {
 
-		// Appends new email into tohe newsletter file
-		Fs.appendFile(filename, model.email + ';' + model.ip + ';' + model.language + ';' + (new Date()).format('yyyy-MM-dd') + '\n');
-
+		Fs.appendFile(filename, model.email + ';' + model.ip + ';' + model.language + ';' + F.datetime.format('yyyy-MM-dd') + '\n');
 		F.emit('newsletter.save', model);
 
 		// Writes stats
@@ -25,9 +23,7 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 		Fs.readFile(filename, function(err, buffer) {
-			if (err)
-				buffer = '';
-			else if (buffer)
+			if (buffer)
 				buffer = buffer.toString('utf8');
 			callback(buffer);
 		});

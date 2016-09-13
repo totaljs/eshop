@@ -167,18 +167,15 @@
 			var data = new FormData();
 			var files = e.target.files;
 			var errmsg = $(this).attr('data-error-large');
-			var loading = FIND('loading').show();
+			SETTER('loading', 'show');
 			data.append('file0', files[0]);
 			this.value = '';
-			jC.UPLOAD('{0}/upload/'.format(managerurl), data, function(response, err) {
+			UPLOAD('{0}/upload/'.format(managerurl), data, function(response, err) {
+
+				SETTER('loading', 'hide', 100);
 
 				if (err) {
-					loading.hide();
-					var message = FIND('message');
-					if (message)
-						message.warning(errmsg);
-					else
-						alert(errmsg);
+					SETTER('message', 'warning', errmsg);
 					return;
 				}
 
@@ -186,8 +183,6 @@
 					cmseditor.instance.getTarget().attr('src', '/download/' + response[0]);
 					cmseditor.instance.change(true);
 				}
-
-				loading.hide(500);
 			});
 		});
 	}, 1000);
@@ -210,8 +205,7 @@
 		};
 
 		self.init = function() {
-			if (!window.widgets)
-				self.refreshWidgets();
+			!window.widgets && self.refreshWidgets();
 			WATCH('widgets.grid', function(path, value, type) {
 				var items = value && value.items ? value.items : [];
 				cmseditor.widgets = items; // cache
@@ -221,10 +215,8 @@
 
 		self.save = function(callback, type) {
 			var w = self.getWindow();
-			if (w.$cmseditor_save)
-				w.$cmseditor_save(type);
-			if (w.COM)
-				w.COM.emit('cmseditor.save', type);
+			w.$cmseditor_save && w.$cmseditor_save(type);
+			w.COM && w.COM.emit('cmseditor.save', type);
 			setTimeout(callback, 1000);
 		};
 
@@ -246,7 +238,6 @@
 			frm.document.write(content.replace('</body>', offsetter + '</body>'));
 			frm.document.close();
 			frm.$cmseditor = true;
-
 			iframe.css({ height: 'auto' });
 
 			setTimeout(function() {
@@ -330,8 +321,7 @@
 		};
 
 		self.state = function(type, who) {
-			if (who === 2)
-				self.resize(true);
+			who === 2 && self.resize(true);
 		};
 
 		self.getWidgets = function() {
@@ -426,11 +416,8 @@
 		self.getPictures = function() {
 			var pictures = [];
 			self.doFind('img.CMS_edit').each(function() {
-				var el = $(this);
-				var url = el.attr('src');
-				if (pictures.indexOf(url) !== -1)
-					return;
-				pictures.length < 5 && pictures.push(url);
+				var url = $(this).attr('src');
+				pictures.indexOf(url) === -1 && pictures.length < 5 && pictures.push(url);
 			});
 
 			return pictures;
@@ -452,8 +439,7 @@
 				if (this.nodeName === 'IMG')
 					return;
 				var cls = this.getAttribute('class');
-				if (cls.indexOf('CMS_widget') === -1 && cls.indexOf('fa') === -1)
-					$(this).remove();
+				cls.indexOf('CMS_widget') === -1 && cls.indexOf('fa') === -1 && $(this).remove();
 			});
 			return (content.find('#CMS').html() || '').trim().replace(offsetter, '');
 		};
@@ -571,7 +557,7 @@
 					var url = '#' + Date.now();
 					self.getDocument().execCommand('CreateLink', false, url);
 					var tmp = self.getTarget().find('a[href="' + url + '"]');
-					if (tmp.length === 0)
+					if (!tmp.length)
 						return;
 
 					tmp.attr('class', 'CMS_edit');
@@ -639,8 +625,7 @@
 						var arr = [];
 
 						cls.forEach(function(cls) {
-							if (cls.substring(0, 4) !== 'CMS_')
-								arr.push(cls);
+							cls.substring(0, 4) !== 'CMS_' && arr.push(cls);
 						});
 
 						cmseditor.attribute.isimage = target.get(0).nodeName === 'IMG';
@@ -733,7 +718,7 @@
 							cmseditor.crop.href = '';
 
 							var parent = target.parent('a');
-							if (parent.length > 0)
+							if (parent.length)
 								cmseditor.crop.href = parent.attr('href');
 
 							UPDATE('cmseditor.crop', true);
@@ -797,10 +782,8 @@
 		self.load = function(type) {
 			setTimeout(function() {
 				var w = self.getWindow();
-				if (w.$cmseditor_load)
-					w.$cmseditor_load(type);
-				if (w.COM)
-					w.COM.emit('cmseditor.load', type);
+				w.$cmseditor_load && w.$cmseditor_load(type);
+				w.COM && w.COM.emit('cmseditor.load', type);
 			}, 1000);
 		};
 
@@ -821,7 +804,7 @@
 			// Sets the current instance of editor to global variable
 			cmseditor.instance = self;
 
-			if (value === null || value === undefined) {
+			if (value == null) {
 				self.write('');
 				return;
 			}
@@ -912,10 +895,7 @@
 			var cropper = FIND('#cmseditor.crop');
 
 			target.attr('alt', cmseditor.crop.alt);
-
-			if (cmseditor.crop.href)
-				target.parent('a').attr('href', cmseditor.crop.href);
-
+			cmseditor.crop.href && target.parent('a').attr('href', cmseditor.crop.href);
 			editor.change(true);
 
 			// Is the picture changed?
@@ -925,36 +905,27 @@
 			}
 
 			var data = cropper.output();
-			var loading = FIND('loading');
-
-			loading.show();
+			SETTER('loading', 'show');
 
 			AJAX('POST {0}/upload/base64/'.format(managerurl), { file: data }, function(response, err) {
 
+				SETTER('loading', 'hide', 500);
+
 				if (err) {
-					var errmsg = $('#cmseditor_inlineupload').attr('data-error-large');
-					var message = FIND('message');
-					if (message)
-						message.warning(errmsg);
-					else
-						alert(errmsg);
-					loading.hide(500);
+					SETTER('message', 'warning', $('#cmseditor_inlineupload').attr('data-error-large'));
 					return;
 				}
 
-				if (response) {
-					setTimeout(function() {
-						var size = target.attr('data-size');
-						if (size) {
-							target.attr('data-original', response);
-							target.attr('src', response + '?s=' + size.replace('%', ''));
-						} else
-							target.attr('src', response);
-					}, 1000);
-				}
+				response && setTimeout(function() {
+					var size = target.attr('data-size');
+					if (size) {
+						target.attr('data-original', response);
+						target.attr('src', response + '?s=' + size.replace('%', ''));
+					} else
+						target.attr('src', response);
+				}, 1000);
 
 				setTimeout(hide, 1000);
-				loading.hide(1500);
 			});
 		};
 	});
@@ -984,9 +955,7 @@
 			else
 				link.attr('target', cmseditor.link.target);
 
-			if (target.data('temporary'))
-				target.removeData('temporary');
-
+			target.data('temporary') && target.removeData('temporary');
 			editor.change(true);
 			hide();
 		};
@@ -1038,10 +1007,8 @@
 			var arr = target.attr('class').split(' ');
 			var cls = [];
 
-			for (var i = 0, length = arr.length; i < length; i++) {
-				if (arr[i].substring(0, 4) === 'CMS_')
-					cls.push(arr[i]);
-			}
+			for (var i = 0, length = arr.length; i < length; i++)
+				arr[i].substring(0, 4) === 'CMS_' && cls.push(arr[i]);
 
 			if (cmseditor.attribute.isimage) {
 				if (cmseditor.attribute.datawidth)
@@ -1060,9 +1027,7 @@
 					target.removeAttr('data-size');
 			}
 
-			if (cmseditor.attribute.cls)
-				cls.push(cmseditor.attribute.cls.trim());
-
+			cmseditor.attribute.cls && cls.push(cmseditor.attribute.cls.trim());
 			target.attr('class', cls.join(' '));
 			cmseditor.instance.change(true);
 			hide();
@@ -1117,8 +1082,7 @@
 
 		var arr = [];
 		cmseditor.widgets.forEach(function(item) {
-			if (item.istemplate)
-				arr.push(item);
+			item.istemplate && arr.push(item);
 		});
 
 		SET('cmseditor.widgets2', arr);

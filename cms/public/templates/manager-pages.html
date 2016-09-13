@@ -35,9 +35,10 @@
 				<tr>
 					<td{{ if ispartial }} class="green"{{ fi }}>{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ if icon }}<span class="fa fa-{{ icon }} w18 mr5"></span>{{ fi }}{{ name }}</td>
 					<td class="col-xs-3 silver fs11 hidden-xs"><span class="fa fa-globe"></span> {{ url }}</td>
-					<td class="col-xs-2 silver fs11 hidden-xs">{{ if navigations && navigations.length > 0 }}<span class="fa fa-sitemap"></span> {{ navigations | join }}{{ fi }}</td>
+					<td class="col-xs-2 fs11 hidden-xs">{{ if navigations && navigations.length > 0 }}<span class="fa fa-sitemap"></span> {{ navigations | join }}{{ fi }}</td>
+					<td style="width:40px" class="ui-center silver fs10 hidden-xs active">{{ priority }}</td>
 					<td style="width:160px" class="ui-right">{{ if ispartial }}<span class="fs11 silver">ID: {{ id }}</span>{{ else }}<a href="{{ url }}" class="fs11" target="_blank">@(show page)</a>{{ fi }}</td>
-					<td style="width:80px" class="ui-right">
+					<td style="width:70px" class="ui-right">
 						<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
 						<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
 					</td>
@@ -99,6 +100,7 @@
 					<div data-component="dropdowncheckbox" data-component-path="pages.form.navigations" data-source="pages.dependencies.navigations" data-icon="fa-bars" data-empty="@(Doesn't contain any navigation.)">@(Navigation)</div>
 					<div class="help m">@(Where will be the page shown?)</div>
 					<div data-component="dropdowncheckbox" data-component-path="pages.form.partial" data-source="pages.partial" data-icon="fa-database" data-empty="@(Doesn't contain any partial pages.)">@(Nested partial pages)</div>
+					<div class="help">@(Join other partial pages with this.)</div>
 				</div>
 			</div>
 			<div class="col-md-6 m">
@@ -111,18 +113,25 @@
 				<div class="row">
 					<div class="col-md-6 m">
 						<div data-component="textbox" data-component-path="pages.form.name" data-maxlenght="50">@(Name)</div>
+						<div class="help">@(Name in sitemap.)</div>
 					</div>
 					<div class="col-md-6">
 						<div data-component="textbox" data-component-path="pages.form.keywords" data-maxlenght="80" data-icon="fa-tags">@(Keywords)</div>
+						<div class="help">@(Meta keywords, maximum 6 words.)</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="padding npt">
+	<hr class="nmt" />
+	<div class="padding">
 		<div class="row">
 			<div class="col-md-6 m">
 				<div data-component="textboxtags" data-component-path="pages.form.tags">@(Internal tags)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-component="textbox" data-component-path="pages.form.icon" data-align="center" data-maxlength="20" data-placeholder="e.g. home" data-icon="fa-camera">@(Icon)</div>
+				<div class="help"><a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font-Awesome</a> @(without) <code>fa-</code></div>
 			</div>
 			<div class="col-md-2 m">
 				<div data-component="textbox" data-component-path="pages.form.priority" data-align="center" data-component-type="number" data-maxlength="3" data-increment="true" data-icon="fa-sort-amount-desc">@(Priority)</div>
@@ -130,10 +139,6 @@
 			</div>
 			<div class="col-md-2 m">
 				<div data-component="dropdown" data-component-path="pages.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag" data-source="languages" data-empty="">@(Language)</div>
-			</div>
-			<div class="col-md-2 m">
-				<div data-component="textbox" data-component-path="pages.form.icon" data-align="center" data-maxlength="20" data-placeholder="e.g. home" data-icon="fa-camera">@(Icon)</div>
-				<div class="help"><a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font-Awesome</a> @(without) <code>fa-</code></div>
 			</div>
 		</div>
 	</div>
@@ -518,5 +523,4 @@
 			}, 500);
 		}
 	}
-
 </script>

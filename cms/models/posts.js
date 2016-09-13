@@ -14,21 +14,8 @@ NEWSCHEMA('Post').make(function(schema) {
 	schema.define('body', String);
 	schema.define('datecreated', Date);
 
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
-
-		// options.search {String}
-		// options.language {String}
-		// options.page {String or Number}
-		// options.max {String or Number}
 
 		options.page = U.parseInt(options.page) - 1;
 		options.max = U.parseInt(options.max, 20);
@@ -105,9 +92,7 @@ NEWSCHEMA('Post').make(function(schema) {
 	schema.setRemove(function(error, id, callback) {
 		// Updates database file
 		DB('posts').remove().where('id', id).callback(callback);
-
-		// Refreshes internal informations e.g. sitemap
-		setTimeout(refresh, 1000);
+		setTimeout2('posts', refresh, 1000);
 	});
 
 	// Saves the post into the database
@@ -120,6 +105,7 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		if (!model.id) {
 			model.id = UID();
+			model.datecreated = F.datetime;
 			newbie = true;
 		}
 
@@ -130,8 +116,8 @@ NEWSCHEMA('Post').make(function(schema) {
 			model.category_linker = category.linker;
 
 		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ').max(1000);
+		(newbie ? DB('posts').insert(model) : DB('posts').update(model).where('id', model.id)).callback(function(err, count) {
 
-		var fn = function(err, count) {
 			// Returns response
 			callback(SUCCESS(true));
 
@@ -139,28 +125,19 @@ NEWSCHEMA('Post').make(function(schema) {
 				return;
 
 			F.emit('posts.save', model);
-
-			// Refreshes internal informations e.g. sitemap
-			setTimeout(refresh, 1000);
+			setTimeout2('posts', refresh, 1000);
 
 			if (newbie)
 				return;
 
-			model.datebackuped = new Date();
+			model.datebackuped = F.datetime;
 			DB('posts_backup').insert(model);
-		};
-
-		if (newbie) {
-			DB('posts').insert(model).callback(fn);
-			return;
-		}
-
-		DB('posts').update(model).where('id', model.id).callback(fn);
+		});
 	});
 
 	// Clears database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		DB('posts').remove().callback(() => setTimeout(refresh, 1000));
+		DB('posts').remove().callback(() => setTimeout2('posts', refresh, 1000));
 		callback(SUCCESS(true));
 	});
 });
@@ -169,9 +146,7 @@ NEWSCHEMA('Post').make(function(schema) {
 function refresh() {
 
 	var categories = {};
-
-	if (F.config.custom.posts)
-		F.config.custom.posts.forEach(item => categories[item] = 0);
+	F.config.custom.posts && F.config.custom.posts.forEach(item => categories[item] = 0);
 
 	var prepare = function(doc) {
 		if (categories[doc.category] !== undefined)

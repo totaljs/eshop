@@ -42,10 +42,11 @@ button { outline: 0; }
 
 .ui-form-container { width: 100%; position: fixed; left: 0; top: 0; bottom: 0; right: 0; background-color: rgba(230,233,237,0.8); z-index: 5; overflow-y: scroll; transform-style: preserve-3d; }
 .ui-form-container-padding { padding: 0 30px;}
-.ui-form { background-color: white; margin: 30px auto; border-radius: 4px; box-shadow: 0 0 20px #D0D0D0; transform: translate(0, 500px); transition: all 0.3s; opacity: 0; }
+.ui-form { background-color: white; margin: 0 auto 30px; border-radius: 4px; box-shadow: 0 0 20px #D0D0D0; transform: translate(0, -500px); transition: all 0.2s; opacity: 0; }
 .ui-form-animate { transform: translate(0,0); opacity: 1; }
+.ui-form-animate-click { transform: translate(0,-18px) scale(0.97); }
 .ui-form-padding { padding: 0 30px; }
-.ui-form-title { padding: 20px; font-size: 20px; user-select: none; color: #AAB2BD; background-color: #F8F8F8; font-family: 'Source Sans Pro'; }
+.ui-form-title { padding: 15px 20px; font-size: 16px; user-select: none; color: #AAB2BD; background-color: #F8F8F8; font-family: 'Source Sans Pro'; border-bottom: 1px solid #F0F0F0; }
 .ui-form-title .fa-times { float: right; cursor: pointer; font-size: 18px; margin-top: 4px; }
 .ui-form-title .fa-times:hover { color: black; }
 .ui-form-title .fa-times:active { margin-top: 5px; }
@@ -74,19 +75,16 @@ button { outline: 0; }
 .ui-dropdowncheckbox-values span { margin-left: 5px; vertical-align: middle; }
 .ui-dropdowncheckbox-invalid { border-color: #E7B8B8 !important; background-color: #FFF3F3 !important; }
 
-.ui-textboxtags * { box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; }
 .ui-textboxtags { border: 2px solid #E0E0E0; padding: 4px 5px; border-radius: 2px; position: relative; display: block; width: 100%; background-color: white; }
 .ui-textboxtags-label { margin-bottom: 5px; font-size: 12px; color: gray; text-align: left; }
 .ui-textboxtags-label .fa { width: 14px; }
 .ui-textboxtags-label-required:before { color: red; content: '***'; margin-right: 5px; }
-.ui-textboxtags-invalid { border-color: #E7B8B8 !important; background-color: #FFF3F3 !important; }
+.ui-textboxtags-invalid { border: 1px solid #E1A1A1 !important; background-color: #FFF3F3 !important; }
 .ui-textboxtags-values { min-height: 60px; }
-.ui-textboxtags-values ul { position: relative; display: inline-block; margin: 0; padding: 0; }
-.ui-textboxtags-values li { padding: 4px 6px 4px 8px; line-height: 16px; vertical-align: middle; background-color: #F0F0F0; font-size: 12px; position: relative; display: inline-block; margin: 2px; border-radius: 3px; }
-.ui-textboxtags-values li .fa { font-size: 12px; color: red; margin-left: 5px; cursor: pointer; }
+.ui-textboxtags-tag { padding: 4px 6px 4px 8px; line-height: 16px; vertical-align: middle; background-color: #F0F0F0; font-size: 12px; position: relative; display: inline-block; margin: 2px; border-radius: 3px; }
+.ui-textboxtags-tag .fa { font-size: 12px; color: red; margin-left: 5px; cursor: pointer; }
 .ui-textboxtags input { background-color: transparent; font-size: 12px; color: black; width: auto; position: relative; display: inline-block; border: 0; width: 99px; outline: 0; margin: 2px; padding: 5px 0; }
 
-.ui-pictures {}
 .ui-pictures img { border-radius: 4px; border: 4px solid #F0F0F0; cursor: pointer; }
 .ui-pictures .fa-times { position: absolute; margin: -6px 0 0 -8px; color: white; background-color: red; border-radius: 40px; width: 21px; text-align: center; padding: 3px 0 2px; cursor: pointer; border-bottom: 2px solid #BE1317; }
 .ui-pictures .fa-times:active { margin-top: -3px; }
@@ -112,12 +110,13 @@ button { outline: 0; }
 .ui-codemirror-label { margin-bottom: 5px; font-size: 12px; text-align: left; }
 .ui-codemirror-label .fa { width: 14px; }
 .ui-codemirror-label-required:before { color: red; content: '***'; margin-right: 5px; }
-.ui-codemirror-invalid .CodeMirror { background-color: #FFF3F3 !important; border: 1px solid #E1A1A1 !important; }
-.CodeMirror { border: 1px solid #E0E0E0; border-radius: 3px; }
+.ui-codemirror-invalid .CodeMirror { background-color: #FFF3F3 !important; border-color: #E1A1A1 !important; }
+.CodeMirror { border: 2px solid #E0E0E0; border-radius: 3px; }
 
-.filter { border-bottom: 3px solid #F0F0F0; padding: 0 0 8px; margin: 20px 0; font-size: 11px; }
+.filter { border-bottom: 3px solid #F0F0F0; padding: 0 0 8px; margin: 20px 0; font-size: 11px }
 .filter {
 	.caption { font-size: 18px; margin-bottom: 20px; font-family: 'Source Sans Pro'; color: #AAB2BD; background-color: #F0F0F0; position: relative; display: inline-block; padding: 2px 10px; border-radius: 3px; text-transform: uppercase; border-bottom: 2px solid #E0E0E0; }
+	.caption .fa { margin-right: 6px; }
 	.m { margin-bottom: 10px; }
 	.ui-dropdown { height: 28px; padding-top: 1px; }
 	.ui-dropdown select { height: 18px; font-size: 11px; }
@@ -150,6 +149,7 @@ button { outline: 0; }
 .ui-confirm { background-color: rgba(255,255,255,0.9); position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 20; width: 100%; display: table; height: 100%; transition: 0.5s all; opacity: 0; }
 .ui-confirm > div { display: table-cell; vertical-align: middle; text-align: center; color: white; padding: 15px; }
 .ui-confirm-body { padding: 30px; position: relative; display: inline-block; border-radius: 4px; max-width: 600px; text-align: left; transform: scale(0.5); transition: 0.3s all; color: gray; border: 1px solid #E0E0E0; background-color: white; box-shadow: 0 0 30px rgba(0,0,0,0.1); }
+.ui-confirm-click { transform: scale(0.96) !important; }
 .ui-confirm-message { border-bottom: 1px solid #F0F0F0; padding: 0 0 20px 0; margin-bottom: 20px; }
 .ui-confirm button { font-size: 12px; position: relative; display: inline-block; cursor: pointer; outline: 0; background-color: #E0E0E0; border: 0; border-radius: 4px; color: gray; padding: 0 20px; height: 30px; font-weight: bold; margin: 0 10px 0 0; }
 .ui-confirm button:hover { background-color: #E5E5E5; }
@@ -177,7 +177,6 @@ button { outline: 0; }
  * @{end}
  * ========================================================== */
 
-.ui-textbox-container * { box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; }
 .ui-textbox { border: 2px solid #E0E0E0; padding: 5px 2px 5px 5px; border-radius: 2px; position: relative; width: 100%; background-color: white; display: table; }
 .ui-textbox input { display: table-cell; border: 0; outline: 0; font: normal 14px Arial; color: black; width: 100%; background-color: white; padding: 0; }
 .ui-textbox div { width: 1%; position: relative; vertical-align: middle; display: table-cell; text-align: center; white-space: nowrap; text-overflow: clip; border-left: 1px solid #E0E0E0; width: 30px; color: silver; user-select: none; }
@@ -201,7 +200,6 @@ button { outline: 0; }
 .ui-textarea-invalid textarea { background-color: #FFF3F3 !important; }
 .ui-textarea-code textarea { font-family: monospace; font-size: 14px; }
 
-.ui-dropdown-container * { box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; }
 .ui-dropdown-values { position: relative; display: block; height: 34px; text-align: left; }
 .ui-dropdown { border: 2px solid #E0E0E0; padding: 0 10px; border-radius: 2px; outline: 0; height: 34px; overflow: hidden; float: left; width: 100%; background-color: white; position: relative; }
 .ui-dropdown select { width: 120%; outline: 0; border: 0; height: 26px; background-color: white; font-size: 14px; float: left; cursor: pointer; padding: 0; margin: 2px 0 0 -3px; color: black; appearance: none; -moz-appearance: none; -webkit-appearance: none; }
@@ -220,11 +218,11 @@ button { outline: 0; }
 .button-small { padding: 13px 0; }
 
 .ui-disabled { background-color: #F0F0F0; cursor: not-allowed; }
-.ui-disabled > div { background-color: #F0F0F0; }
+.ui-disabled > div { background-color: #F0F0F0; color: gray; }
 
 .ui-checkbox { margin-bottom: 5px; line-height: 10px; font-size: 12px; }
 .ui-checkbox span { cursor: pointer; vertical-align: middle; }
-.ui-checkbox div { position: relative; display: inline-block; width: 16px; height: 16px; border: 2px solid #E0E0E0; margin-right: 8px; vertical-align: middle; cursor: pointer; color: white; font-size: 11px; text-align: center; padding: 1px 0 0 1px; background-color: white; border-radius: 3px; }
+.ui-checkbox div { position: relative; display: inline-block; width: 16px; height: 16px; border: 2px solid #E0E0E0; margin-right: 6px; vertical-align: middle; cursor: pointer; color: white; font-size: 11px; text-align: center; padding: 1px 0 0 1px; background-color: white; border-radius: 3px; }
 .ui-checkbox .fa { display: none; }
 .ui-checkbox-checked div { background-color: #017CCA; border-color: #017CCA; }
 .ui-checkbox-checked .fa { display: block !important; }

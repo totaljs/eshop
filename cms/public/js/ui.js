@@ -515,7 +515,13 @@ COMPONENT('repeater', function() {
 	self.readonly();
 
 	self.make = function() {
-		var element = self.element.find('script');
+		var element = self.find('script');
+
+		if (!element.length) {
+			element = self.element;
+			self.element = self.element.parent();
+		}
+
 		var html = element.html();
 		element.remove();
 		self.template = Tangular.compile(html);
@@ -887,8 +893,9 @@ COMPONENT('form', function() {
 			});
 		});
 
-		$(document).on('click', '.ui-form-container-padding', function(e) {
-			if (!$(e.target).hasClass('ui-form-container-padding'))
+		$(document).on('click', '.ui-form-container', function(e) {
+			var el = $(e.target);
+			if (!(el.hasClass('ui-form-container-padding') || el.hasClass('ui-form-container')))
 				return;
 			var form = $(this).find('.ui-form');
 			var cls = 'ui-form-animate-click';
