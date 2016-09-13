@@ -4,12 +4,11 @@
 
 # Node.js Eshop
 
-Please do not change the code, just create a new issues. I solve all problems as soon as possible. Do you want special upgrades? Contact me <petersirka@gmail.com>.
+Please do not change the code, just create a new issues. I solve all problems as soon as possible. Do you want special upgrades? Contact us [www.totaljs.com/support](https://www.totaljs.com/support/).
 
 __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREATE YOUR OWN BACKUP AND RESTORE IT ON YOU SERVERS OR CLOUD.__
 
-- New version: `v7.0.0` (works only with __Total.js 2.0__)
-- [Documentation](http://docs.totaljs.com/eshop/latest.html)
+- New version: `v7.0.0` (works only with __Total.js v2.0.2__)
 
 ---
 
