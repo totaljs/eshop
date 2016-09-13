@@ -72,6 +72,7 @@ function file_read(req, res) {
 				fs.stream(true).on('end', function() {
 					res.file(filename);
 					next();
+					close();
 				}).pipe(require('fs').createWriteStream(filename));
 			});
 		});
@@ -109,6 +110,7 @@ function file_read(req, res) {
 
 				// Releases F.exists()
 				next();
+				close();
 			}).pipe(require('fs').createWriteStream(filename));
 		});
 	});
@@ -145,6 +147,7 @@ function file_image(req, res) {
 
 				// Releases F.exists()
 				next();
+				close();
 			}).pipe(require('fs').createWriteStream(filename));
 		});
 	});
