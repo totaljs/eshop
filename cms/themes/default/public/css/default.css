@@ -21,11 +21,12 @@ h1 { font-family: $font; margin: 10px 0 30px; padding: 0; font-size: 34px; font-
 h1 b, h1 strong { font-weight: 700; }
 h2 { font-family: $font; margin: 0 0 10px; padding: 0; font-size: 20px; font-weight: 400; }
 h2.large { font-size: 30px; margin-bottom: 15px; font-weight: 200; }
-
 h3 { font-family: $font; margin: 0 0 10px; padding: 0; font-size: 20px; font-weight: 400; color: #656D78; }
 h3.large { font-size: 30px; margin-bottom: 15px; font-weight: 200; }
 
 .m { margin-bottom: 20px; }
+.b { font-weight: bold; }
+.fs11 { font-size: 11px; }
 
 .newsletter { background-color: #F0F0F0; margin: 20px 0; }
 .newsletter-input { margin-right: 150px; padding: 0 20px; background-color: #F0F0F0; }
