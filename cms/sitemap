@@ -1,4 +1,0 @@
-// ID : Title ---> URL --> [Parent]
-homepage                 : @(Homepage)               --> /
-blogs                    : @(Blogs)                  --> /blogs/                      --> homepage
-blogsdetail              : @(Blog detail)            --> /blogs/{0}/                  --> blogs
