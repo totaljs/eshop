@@ -75,9 +75,9 @@ NEWSCHEMA('Order').make(function(schema) {
 			if (type === 1)
 				builder.where('iscompleted', false); // uncompleted
 			else if (type === 2)
-				builder.or().where('iscompleted', false).where('ispaid', false).end(); // uncompleted and not paid
+				builder.where('iscompleted', false).where('ispaid', false); // uncompleted and not paid
 			else if (type === 3)
-				builder.or().where('iscompleted', false).where('ispaid', true).end(); // uncompleted and paid
+				builder.where('iscompleted', false).where('ispaid', true); // uncompleted and paid
 			else if (type === 4)
 				builder.where('iscompleted', true); // completed
 
