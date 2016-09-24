@@ -2,11 +2,9 @@ const Fs = require('fs');
 const filename = F.path.databases('settings.json');
 
 NEWSCHEMA('SuperUser').make(function(schema) {
-
 	schema.define('login', String, true);
 	schema.define('password', String, true);
 	schema.define('roles', '[String]');
-
 });
 
 NEWSCHEMA('Settings').make(function(schema) {
@@ -58,9 +56,9 @@ NEWSCHEMA('Settings').make(function(schema) {
 		if (settings.url.endsWith('/'))
 			settings.url = settings.url.substring(0, settings.url.length - 1);
 
-		settings.datebackuped = new Date();
+		settings.datebackuped = F.datetime;
 		DB('settings_backup').insert(JSON.parse(JSON.stringify(settings)));
-		delete settings.datebackuped;
+		settings.datebackuped = undefined;
 
 		// Writes settings into the file
 		Fs.writeFile(filename, JSON.stringify(settings), function() {

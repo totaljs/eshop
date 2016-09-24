@@ -4,7 +4,7 @@ exports.install = function() {
 
 	// COMMON
 	F.route(CONFIG('manager-url') + '/*', '~manager');
-	F.route(CONFIG('manager-url') + '/upload/',                  upload, ['post', 'upload', 10000], 3084); // 3 MB
+	F.route(CONFIG('manager-url') + '/upload/',                  upload,        ['post', 'upload', 10000], 3084); // 3 MB
 	F.route(CONFIG('manager-url') + '/upload/base64/',           upload_base64, ['post', 10000], 2048); // 2 MB
 	F.route(CONFIG('manager-url') + '/logoff/',                  redirect_logoff);
 
@@ -17,68 +17,64 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/dashboard/clear/',     json_dashboard_clear);
 
 	// ORDERS
-	F.route(CONFIG('manager-url') + '/api/orders/',              json_orders_query, ['*Order']);
-	F.route(CONFIG('manager-url') + '/api/orders/{id}/',         json_orders_read, ['*Order']);
-	F.route(CONFIG('manager-url') + '/api/orders/',              json_orders_save, ['put', '*Order']);
-	F.route(CONFIG('manager-url') + '/api/orders/',              json_orders_remove, ['delete', '*Order']);
-	F.route(CONFIG('manager-url') + '/api/orders/clear/',        json_orders_clear, ['*Order']);
+	F.route(CONFIG('manager-url') + '/api/orders/',              json_query,  ['*Order']);
+	F.route(CONFIG('manager-url') + '/api/orders/{id}/',         json_read,   ['*Order']);
+	F.route(CONFIG('manager-url') + '/api/orders/',              json_save,   ['put', '*Order']);
+	F.route(CONFIG('manager-url') + '/api/orders/',              json_remove, ['delete', '*Order']);
+	F.route(CONFIG('manager-url') + '/api/orders/clear/',        json_clear,  ['*Order']);
 
 	// USERS
-	F.route(CONFIG('manager-url') + '/api/users/',              json_users_query, ['*User']);
-	F.route(CONFIG('manager-url') + '/api/users/{id}/',         json_users_read, ['*User']);
-	F.route(CONFIG('manager-url') + '/api/users/',              json_users_save, ['put', '*User']);
-	F.route(CONFIG('manager-url') + '/api/users/',              json_users_remove, ['delete', '*User']);
-	F.route(CONFIG('manager-url') + '/api/users/clear/',        json_users_clear, ['*User']);
+	F.route(CONFIG('manager-url') + '/api/users/',               json_query,  ['*User']);
+	F.route(CONFIG('manager-url') + '/api/users/{id}/',          json_read,   ['*User']);
+	F.route(CONFIG('manager-url') + '/api/users/',               json_save,   ['put', '*User']);
+	F.route(CONFIG('manager-url') + '/api/users/',               json_remove, ['delete', '*User']);
+	F.route(CONFIG('manager-url') + '/api/users/clear/',         json_clear,  ['*User']);
 
 	// PRODUCTS
-	F.route(CONFIG('manager-url') + '/api/products/',            json_products_query, ['*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/',            json_products_save, ['post', '*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/{id}/',       json_products_read, ['*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/',            json_products_remove, ['delete', '*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/clear/',      json_products_clear, ['*Product']);
+	F.route(CONFIG('manager-url') + '/api/products/',            json_query,  ['*Product']);
+	F.route(CONFIG('manager-url') + '/api/products/',            json_save,   ['post', '*Product']);
+	F.route(CONFIG('manager-url') + '/api/products/{id}/',       json_read,   ['*Product']);
+	F.route(CONFIG('manager-url') + '/api/products/',            json_remove, ['delete', '*Product']);
+	F.route(CONFIG('manager-url') + '/api/products/clear/',      json_clear,  ['*Product']);
 	F.route(CONFIG('manager-url') + '/api/products/import/',     json_products_import, ['upload', 1000 * 60 * 5], 1024);
 	F.route(CONFIG('manager-url') + '/api/products/export/',     json_products_export, ['*Product', 10000]);
 	F.route(CONFIG('manager-url') + '/api/products/codelists/',  json_products_codelists);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   json_products_category_replace, ['post']);
 
 	// POSTS
-	F.route(CONFIG('manager-url') + '/api/posts/',               json_posts_query, ['*Post']);
-	F.route(CONFIG('manager-url') + '/api/posts/',               json_posts_save, ['post', '*Post']);
-	F.route(CONFIG('manager-url') + '/api/posts/{id}/',          json_posts_read, ['*Post']);
-	F.route(CONFIG('manager-url') + '/api/posts/',               json_posts_remove, ['delete', '*Post']);
-	F.route(CONFIG('manager-url') + '/api/posts/clear/',         json_posts_clear, ['*Post']);
+	F.route(CONFIG('manager-url') + '/api/posts/',               json_query,  ['*Post']);
+	F.route(CONFIG('manager-url') + '/api/posts/',               json_save,   ['post', '*Post']);
+	F.route(CONFIG('manager-url') + '/api/posts/{id}/',          json_read,   ['*Post']);
+	F.route(CONFIG('manager-url') + '/api/posts/',               json_remove, ['delete', '*Post']);
+	F.route(CONFIG('manager-url') + '/api/posts/clear/',         json_clear,  ['*Post']);
 	F.route(CONFIG('manager-url') + '/api/posts/codelists/',     json_posts_codelists);
 
 	// PAGES
-	F.route(CONFIG('manager-url') + '/api/pages/',               json_pages_query, ['*Page']);
+	F.route(CONFIG('manager-url') + '/api/pages/',               json_query,  ['*Page']);
+	F.route(CONFIG('manager-url') + '/api/pages/',               json_remove, ['delete', '*Page']);
+	F.route(CONFIG('manager-url') + '/api/pages/{id}/',          json_read,   ['*Page']);
+	F.route(CONFIG('manager-url') + '/api/pages/clear/',         json_clear,  ['*Page']);
 	F.route(CONFIG('manager-url') + '/api/pages/',               json_pages_save, ['post', '*Page']);
-	F.route(CONFIG('manager-url') + '/api/pages/',               json_pages_remove, ['delete', '*Page']);
-	F.route(CONFIG('manager-url') + '/api/pages/{id}/',          json_pages_read, ['*Page']);
 	F.route(CONFIG('manager-url') + '/api/pages/preview/',       view_pages_preview, ['json']);
 	F.route(CONFIG('manager-url') + '/api/pages/dependencies/',  json_pages_dependencies);
-	F.route(CONFIG('manager-url') + '/api/pages/clear/',         json_pages_clear, ['*Page']);
 	F.route(CONFIG('manager-url') + '/api/pages/sitemap/',       json_pages_sitemap);
 
 	// WIDGETS
-	F.route(CONFIG('manager-url') + '/api/widgets/',             json_widgets_query, ['*Widget']);
-	F.route(CONFIG('manager-url') + '/api/widgets/',             json_widgets_save, ['post', '*Widget']);
-	F.route(CONFIG('manager-url') + '/api/widgets/',             json_widgets_remove, ['delete', '*Widget']);
-	F.route(CONFIG('manager-url') + '/api/widgets/{id}/',        json_widgets_read, ['*Widget']);
-	F.route(CONFIG('manager-url') + '/api/widgets/clear/',       json_widgets_clear, ['*Widget']);
+	F.route(CONFIG('manager-url') + '/api/widgets/',             json_query,  ['*Widget']);
+	F.route(CONFIG('manager-url') + '/api/widgets/',             json_save,   ['post', '*Widget']);
+	F.route(CONFIG('manager-url') + '/api/widgets/',             json_remove, ['delete', '*Widget']);
+	F.route(CONFIG('manager-url') + '/api/widgets/{id}/',        json_read,   ['*Widget']);
+	F.route(CONFIG('manager-url') + '/api/widgets/clear/',       json_clear,  ['*Widget']);
 
 	// NEWSLETTER
-	F.route(CONFIG('manager-url') + '/api/newsletter/',          json_newsletter, ['*Newsletter']);
+	F.route(CONFIG('manager-url') + '/api/newsletter/',          json_query,  ['*Newsletter']);
+	F.route(CONFIG('manager-url') + '/api/newsletter/clear/',    json_clear,  ['*Newsletter']);
 	F.route(CONFIG('manager-url') + '/api/newsletter/csv/',      file_newsletter, ['*Newsletter']);
-	F.route(CONFIG('manager-url') + '/api/newsletter/clear/',    json_newsletter_clear, ['*Newsletter']);
 
 	// SETTINGS
 	F.route(CONFIG('manager-url') + '/api/settings/',            json_settings, ['*Settings']);
 	F.route(CONFIG('manager-url') + '/api/settings/',            json_settings_save, ['put', '*Settings']);
 
-	// SYSTEM
-	F.route(CONFIG('manager-url') + '/api/backup/website/',      file_backup_website, [15000]);
-	F.route(CONFIG('manager-url') + '/api/backup/database/',     file_backup_database);
-	F.route(CONFIG('manager-url') + '/api/restore/database/',    file_restore_database, ['upload', 15000], 20000);
 };
 
 // ==========================================================================
@@ -102,10 +98,7 @@ function upload() {
 			setTimeout(next, 100);
 		});
 
-	}, function() {
-		// Returns response
-		self.json(id);
-	});
+	}, () => self.json(id));
 }
 
 // Upload base64
@@ -118,7 +111,6 @@ function upload_base64() {
 	}
 
 	var type = self.body.file.base64ContentType();
-	var data = self.body.file.base64ToBuffer();
 	var ext;
 
 	switch (type) {
@@ -131,8 +123,12 @@ function upload_base64() {
 		case 'image/gif':
 			ext = '.gif';
 			break;
+		default:
+			self.json(null);
+			return;
 	}
 
+	var data = self.body.file.base64ToBuffer();
 	var id = DB('files').binary.insert('base64' + ext, data);
 	self.json('/download/' + id + ext);
 }
@@ -153,12 +149,45 @@ function json_files_clear() {
 	var Fs = require('fs');
 
 	U.ls(DB('files').binary.directory, function(files) {
-		files.wait(function(item, next) {
-			Fs.unlink(item, next);
-		});
+		files.wait((item, next) => Fs.unlink(item, next));
 	});
 
 	this.json(SUCCESS(true));
+}
+
+// ==========================================================================
+// COMMON CRUD OPERATIONS
+// ==========================================================================
+
+// Reads all items
+function json_query() {
+	var self = this;
+	self.$query(self.query, self.callback());
+}
+
+// Saves specific item
+function json_save() {
+	var self = this;
+	self.body.$save(self.callback());
+}
+
+// Removes specific item
+function json_remove() {
+	var self = this;
+	self.$remove(self.body.id, self.callback());
+}
+
+// Clears all items
+function json_clear() {
+	var self = this;
+	self.$workflow('clear', self.callback());
+}
+
+// Reads a specific item by ID
+function json_read(id) {
+	var self = this;
+	self.id = id;
+	self.$get(self, self.callback());
 }
 
 // ==========================================================================
@@ -197,9 +226,8 @@ function json_dashboard() {
 		var pending = [];
 
 		EACHSCHEMA(function(group, name, schema) {
-			if (!schema.operations || !schema.operations['dashboard'])
-				return;
-			pending.push(schema);
+			if (schema.operations && schema.operations['dashboard'])
+				pending.push(schema);
 		});
 
 		pending.wait(function(schema, next) {
@@ -250,34 +278,6 @@ function json_dashboard_clear() {
 // PRODUCTS
 // ==========================================================================
 
-// Gets all products
-function json_products_query() {
-	var self = this;
-	self.$query(self.query, self.callback());
-}
-
-// Saves (update or create) specific product
-function json_products_save() {
-	var self = this;
-
-	self.body.$save(self.callback());
-
-	// Clears view cache
-	setTimeout(() => F.cache.removeAll('cache.'), 2000);
-}
-
-// Removes specific product
-function json_products_remove() {
-	var self = this;
-	self.$remove(self.body.id, self.callback());
-}
-
-// Clears all products
-function json_products_clear() {
-	var self = this;
-	self.$workflow('clear', self.callback());
-}
-
 // Imports products from CSV
 function json_products_import() {
 	var self = this;
@@ -319,41 +319,9 @@ function json_products_category_replace() {
 	GETSCHEMA('Product').workflow2('category', self.body, self.callback());
 }
 
-// Reads a specific product by ID
-function json_products_read(id) {
-	var self = this;
-	var options = {};
-	options.id = id;
-	self.$get(options, self.callback());
-}
-
 // ==========================================================================
 // POSTS
 // ==========================================================================
-
-// Gets all posts
-function json_posts_query() {
-	var self = this;
-	self.$query(self.query, self.callback());
-}
-
-// Saves (update or create) specific post
-function json_posts_save() {
-	var self = this;
-	self.body.$save(self.callback());
-}
-
-// Removes specific post
-function json_posts_remove() {
-	var self = this;
-	self.$remove(self.body.id, self.callback());
-}
-
-// Clears all posts
-function json_posts_clear() {
-	var self = this;
-	self.$workflow('clear', self.callback());
-}
 
 // Reads all post categories and manufacturers
 function json_posts_codelists() {
@@ -361,95 +329,9 @@ function json_posts_codelists() {
 	self.json({ categories: F.global.posts, templates: F.config.custom.templates });
 }
 
-// Reads a specific post by ID
-function json_posts_read(id) {
-	var self = this;
-	var options = {};
-	options.id = id;
-	self.$get(options, self.callback());
-}
-
-// ==========================================================================
-// ORDERS
-// ==========================================================================
-
-// Reads all orders
-function json_orders_query() {
-	var self = this;
-	self.$query(self.query, self.callback());
-}
-
-// Saves specific order (order must exist)
-function json_orders_save() {
-	var self = this;
-	self.body.$save(self.callback());
-}
-
-// Removes specific order
-function json_orders_remove() {
-	var self = this;
-	self.$remove(self.body.id, self.callback());
-}
-
-// Clears all orders
-function json_orders_clear() {
-	var self = this;
-	self.$workflow('clear', self.callback());
-}
-
-// Reads a specific order by ID
-function json_orders_read(id) {
-	var self = this;
-	var options = {};
-	options.id = id;
-	self.$get(options, self.callback());
-}
-
-// ==========================================================================
-// USERS
-// ==========================================================================
-
-// Reads all users
-function json_users_query() {
-	var self = this;
-	self.$query(self.query, self.callback());
-}
-
-// Saves specific user (user must exist)
-function json_users_save() {
-	var self = this;
-	self.body.$save(self.callback());
-}
-
-// Removes specific user
-function json_users_remove() {
-	var self = this;
-	self.$remove(self.body.id, self.callback());
-}
-
-// Reads a specific user by ID
-function json_users_read(id) {
-	var self = this;
-	var options = {};
-	options.id = id;
-	self.$get(options, self.callback());
-}
-
-// Clears all users
-function json_users_clear() {
-	var self = this;
-	self.$workflow('clear', self.callback());
-}
-
 // ==========================================================================
 // PAGES
 // ==========================================================================
-
-// Gets all pages
-function json_pages_query() {
-	var self = this;
-	self.$query(self.query, self.callback());
-}
 
 // Creates HTML preview
 function view_pages_preview() {
@@ -480,67 +362,8 @@ function json_pages_save() {
 	setTimeout(() => F.cache.removeAll('cache.'), 2000);
 }
 
-// Reads a specific page
-function json_pages_read(id) {
-	var self = this;
-	var options = {};
-	options.id = id;
-	self.$get(options, self.callback());
-}
-
-// Removes specific page
-function json_pages_remove() {
-	var self = this;
-	self.$remove(self.body.id, self.callback());
-}
-
-// Clears all pages
-function json_pages_clear() {
-	var self = this;
-	self.$workflow('clear', self.callback());
-}
-
 function json_pages_sitemap() {
 	this.json({ sitemap: F.global.sitemap, partial: F.global.partial });
-}
-
-// ==========================================================================
-// WIDGETS
-// ==========================================================================
-
-// Gets all widgets
-function json_widgets_query() {
-	var self = this;
-	self.$query(self.query, self.callback());
-}
-
-// Saves (updates or creates) specific widget
-function json_widgets_save() {
-	var self = this;
-	self.body.$save(self.callback());
-
-	// Clears view cache
-	setTimeout(() => F.cache.removeAll('cache.'));
-}
-
-// Reads specific widget
-function json_widgets_read(id) {
-	var self = this;
-	var options = {};
-	options.id = id;
-	self.$get(options, self.callback());
-}
-
-// Removes specific widget
-function json_widgets_remove() {
-	var self = this;
-	self.$remove(self.body.id, self.callback());
-}
-
-// Clears all widgets
-function json_widgets_clear() {
-	var self = this;
-	self.$workflow('clear', self.callback());
 }
 
 // ==========================================================================
@@ -560,59 +383,11 @@ function json_settings_save() {
 }
 
 // ==========================================================================
-// SYSTEM
-// ==========================================================================
-
-// Full backup
-// How do I restore backup? Total.js must be installed as global module, terminal:
-// $ tpm restore filename
-function file_backup_website() {
-	var self = this;
-	var filename = F.path.temp('website.backup');
-	F.backup(filename, F.path.root(), function() {
-		self.file('~' + filename, 'website.backup', null, () => require('fs').unlink(filename, NOOP));
-	}, path => !path.startsWith('/tmp'));
-}
-
-// Backup databases
-function file_backup_database() {
-	var self = this;
-	var filename = F.path.temp('databases.backup');
-	F.backup(filename, F.path.databases(), function() {
-		self.file('~' + filename, 'databases.backup', null, () => require('fs').unlink(filename, NOOP));
-	});
-}
-
-// Restore databases
-function file_restore_database() {
-	var self = this;
-	var filename = F.path.temp('databases.backup');
-	F.restore(self.files[0].path, F.path.databases(), function() {
-		// Clear all databases instances
-		F.databases = {};
-		GETSCHEMA('Product').workflow('refresh', null, null, NOOP, true);
-		self.json(SUCCESS(true));
-	});
-}
-
-// ==========================================================================
 // NEWSLETTER
 // ==========================================================================
-
-// Reads all emails from newsletter file
-function json_newsletter() {
-	var self = this;
-	self.$query(self.callback());
-}
 
 // Downloads all email address as CSV
 function file_newsletter() {
 	var self = this;
 	self.$workflow('download', self);
-}
-
-// Clears all email addreses in newsletter
-function json_newsletter_clear() {
-	var self = this;
-	self.$workflow('clear', self.callback());
 }

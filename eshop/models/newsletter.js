@@ -12,14 +12,10 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 
 		// Appends new email into tohe newsletter file
 		Fs.appendFile(filename, model.email + ';' + model.ip + ';' + model.language + ';' + (new Date()).format('yyyy-MM-dd') + '\n');
-
 		F.emit('newsletter.save', model);
-
-		// Writes stats
-		MODULE('webcounter').increment('newsletter');
-
-		// Returns response
 		callback(SUCCESS(true));
+
+		MODULE('webcounter').increment('newsletter');
 	});
 
 	// Gets listing
@@ -35,7 +31,6 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 
 	// Performs download
 	schema.addWorkflow('download', function(error, model, controller, callback) {
-		// Returns CSV
 		controller.file('~' + filename, 'newsletter.csv');
 		callback();
 	});

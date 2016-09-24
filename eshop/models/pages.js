@@ -7,6 +7,8 @@
 // Supported workflows
 // "create-url"
 
+const REGEXP_HTML_CLASS = /(\s)class\=\".*?\"/g;
+
 NEWSCHEMA('Page').make(function(schema) {
 
 	schema.define('id', 'String(20)');
@@ -31,23 +33,8 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('body', String);
 	schema.define('datecreated', Date);
 
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
-
-		// options.search {String}
-		// options.navigation {String}
-		// options.language {String}
-		// options.ispartial {Boolean}
-		// options.page {String or Number}
-		// options.max {String or Number}
 
 		options.page = U.parseInt(options.page) - 1;
 		options.max = U.parseInt(options.max, 20);
@@ -62,7 +49,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (options.search)
 			options.search = options.search.keywords(true, true);
 
-		var filter = DB('pages').find();
+		var filter = NOSQL('pages').find();
 
 		if (options.ispartial)
 			filter.where('ispartial', options.ispartial);
@@ -79,7 +66,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		filter.take(take);
 		filter.skip(skip);
 		filter.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
-		filter.sort('datecreated', true);
+		filter.sort('name');
 
 		filter.callback(function(err, docs, count) {
 
@@ -90,34 +77,20 @@ NEWSCHEMA('Page').make(function(schema) {
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
-			if (data.pages === 0)
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
 
 			// Returns data
 			callback(data);
-
 		});
 	});
 
 	// Gets a specific page
 	schema.setGet(function(error, model, options, callback) {
 
-		// options.url {String}
-		// options.id {String}
-		// options.language {String}
-
-		// Filter for reading
-		var filter = function(doc) {
-			if (doc.url !== options.url && doc.id !== options.id)
-				return;
-			if (options.language && doc.language !== options.language)
-				return;
-			return doc;
-		};
-
-		var filter = DB('pages').one();
+		var filter = NOSQL('pages').one();
 
 		if (options.url)
 			filter.where('url', options.url);
@@ -128,34 +101,32 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (options.language)
 			filter.where('language', options.language);
 
-		// Gets specific document
 		filter.callback(function(err, doc) {
-			if (!doc)
-				error.push('error-404-page');
+			!doc && error.push('error-404-page');
 			callback(doc);
 		});
 	});
 
 	// Removes a specific page
 	schema.setRemove(function(error, id, callback) {
-		DB('pages').remove().where('id', id).callback(callback);
-		// Refreshes internal informations e.g. sitemap
-		setTimeout(refresh, 1000);
+		var db = NOSQL('pages');
+		db.remove().where('id', id).callback(callback);
+		db.counter.remove(id);
+		setTimeout2('pages', refresh, 1000);
 	});
 
 	// Saves the page into the database
 	schema.setSave(function(error, model, options, callback) {
 
-		// options.id {String}
-		// options.url {String}
-
 		if (!model.name)
 			model.name = model.title;
 
 		var newbie = false;
+		var nosql = NOSQL('pages');
 
 		if (!model.id) {
 			model.id = UID();
+			model.datecreated = F.datetime;
 			newbie = true;
 		}
 
@@ -168,29 +139,15 @@ NEWSCHEMA('Page').make(function(schema) {
 				model.url = '/' + model.url;
 		}
 
-		var fn = function(count) {
+		(newbie ? nosql.insert(model) : nosql.update(model).where('id', model.id)).callback(function(err, count) {
+			F.emit('pages.save', model);
+			setTimeout2('pages', refresh, 1000);
 
-			// Returns response
 			callback(SUCCESS(true));
 
-			// create a backup
-			if (!newbie) {
-				model.datebackuped = new Date();
-				DB('pages_backup').insert(model);
-			}
-
-			F.emit('pages.save', model);
-
-			// Refreshes internal informations e.g. sitemap
-			setTimeout(refresh, 1000);
-		};
-
-		if (newbie) {
-			DB('pages').insert(model).callback(fn);
-			return;
-		}
-
-		DB('pages').update(model).where('id', model.id).callback(fn);
+			model.datebackuped = F.datetime;
+			DB('pages_backup').insert(model);
+		});
 	});
 
 	schema.addWorkflow('create-url', function(error, model, options, callback) {
@@ -246,7 +203,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			var key = (response.language ? response.language + ':' : '') + response.url;
 			schema.operation('breadcrumb', key, function(err, breadcrumb) {
 
-				if (breadcrumb && breadcrumb.length > 0)
+				if (breadcrumb && breadcrumb.length)
 					breadcrumb[0].first = true;
 
 				response.breadcrumb = breadcrumb;
@@ -291,24 +248,7 @@ NEWSCHEMA('Page').make(function(schema) {
 						if (response.language)
 							response.body = F.translator(response.language, response.body);
 
-						response.body = U.minifyHTML(response.body.replace(/<br>/g, '<br />'));
-
-						// cleaner
-						response.body = response.body.replace(/(\s)class\=\".*?\"/g, function(text) {
-
-							var is = text[0] === ' ';
-							var arr = text.substring(is ? 8 : 7, text.length - 1).split(' ');
-							var builder = '';
-
-							for (var i = 0, length = arr.length; i < length; i++) {
-								var cls = arr[i];
-								if (cls[0] === 'C' && cls[3] === '_' && cls !== 'CMS_hidden')
-									continue;
-								builder += (builder ? ' ' : '') + cls;
-							}
-
-							return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
-						});
+						response.body = clean(response.body);
 
 						if (response.partial && response.partial.length) {
 							schema.operation2('render-multiple', { id: response.partial }, function(err, partial) {
@@ -399,7 +339,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	// Clears database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		DB('pages').remove().callback(() => setTimeout(refresh, 1000));
+		NOSQL('pages').remove().callback(() => setTimeout(refresh, 1000));
 		callback(SUCCESS(true));
 	});
 });
@@ -433,11 +373,11 @@ function refresh() {
 			var name = doc.navigations[i];
 			if (!navigation[name])
 				navigation[name] = [];
-			navigation[name].push({ url: doc.url, name: doc.name, title: doc.title, priority: doc.priority, language: doc.language, icon: doc.icon, tags: doc.tags });
+			navigation[name].push({ url: doc.url, name: doc.name, title: doc.title, priority: doc.priority, language: doc.language, icon: doc.icon, tags: doc.tags, external: doc.url.match(/(https|http)\:\/\//) != null });
 		}
 	};
 
-	DB('pages').find().prepare(prepare).callback(function() {
+	NOSQL('pages').find().prepare(prepare).callback(function() {
 
 		// Pairs parents by URL
 		Object.keys(sitemap).forEach(function(key) {
@@ -464,11 +404,11 @@ F.eval(function() {
 		var key = (self.language ? self.language + ':' : '') + url;
 		var page = F.global.sitemap[key];
 
-		if (!page) {
+		if (page)
+			self.page(self.url, view, model, cache);
+		else
 			self.throw404();
-			return self;
-		}
-		self.page(self.url, view, model, cache);
+
 		return self;
 	};
 
@@ -521,7 +461,7 @@ F.eval(function() {
 			}
 		}
 
-		self.memorize('cache.' + url, '1 minute', DEBUG || cache !== true, function() {
+		self.memorize('cache.' + url, '3 minute', cache !== true, function() {
 
 			var options = {};
 
@@ -541,6 +481,8 @@ F.eval(function() {
 				self.repository.render = true;
 				self.repository.page = response;
 
+				NOSQL('pages').counter.hit(self.repository.page.id);
+
 				self.sitemap(response.breadcrumb);
 				self.title(response.title);
 
@@ -549,10 +491,135 @@ F.eval(function() {
 
 				self.view(view, model);
 			});
-		});
 
+		}, NOOP, () => NOSQL('pages').counter.hit(self.repository.page.id));
 		return self;
 	};
 });
+
+function clean(body) {
+
+	var beg;
+	var end;
+	var index = 0;
+	var count = 0;
+	var a = '<div class="CMS_template CMS_remove">';
+	var b = ' data-themes="';
+	var c = 'CMS_unwrap';
+	var tag;
+	var tagend;
+
+	body = U.minifyHTML(body);
+
+	while (true) {
+		beg = body.indexOf(a, beg);
+		if (beg === -1)
+			break;
+
+		index = beg + a.length;
+		count = 0;
+
+		while (true) {
+			var str = body.substring(index++, index + 3);
+			if (index >= body.length) {
+				beg = body.length;
+				break;
+			}
+
+			if (str === '</di') {
+
+				if (count) {
+					count--;
+					continue;
+				}
+
+				body = body.substring(0, beg) + body.substring(beg + a.length, index - 1) + body.substring(index + 5);
+				beg -= a.length;
+				break;
+			}
+
+			if (str === '<div')
+				count++;
+		}
+	}
+
+	while (true) {
+		beg = body.indexOf(b, beg);
+		if (beg === -1)
+			break;
+		index = body.indexOf('"', beg + b.length);
+		if (index === -1)
+			break;
+		body = body.substring(0, beg) + body.substring(index + 1);
+	}
+
+	var tmp = 0;
+
+	while (true) {
+		beg = body.indexOf(c, beg);
+		if (beg === -1)
+			break;
+
+		index = beg;
+		while (true) {
+			if (body[--index] === '<' || index <= 0)
+				break;
+		}
+
+		if (index === beg || index <= 0)
+			return;
+
+		tag = body.substring(index + 1, body.indexOf('>', index + 1));
+		end = index + tag.length + 2;
+		tag = tag.substring(0, tag.indexOf(' '));
+		tagend = '</' + tag;
+		tag = '<' + tag;
+		count = 0;
+		beg = index;
+		index = end;
+
+		while (true) {
+			var str = body.substring(index, index + tagend.length);
+
+			if (index >= body.length) {
+				beg = body.length;
+				break;
+			}
+
+			if (str === tagend) {
+
+				if (count) {
+					count--;
+					index++;
+					continue;
+				}
+
+				body = body.substring(0, beg) + body.substring(end, index) + body.substring(index + 1 + tagend.length);
+				break;
+			}
+
+			if (str.substring(0, tag.length) === tag)
+				count++;
+
+			index++;
+		}
+	}
+
+	return body.replace(REGEXP_HTML_CLASS, function(text) {
+
+		var is = text[0] === ' ';
+		var arr = text.substring(is ? 8 : 7, text.length - 1).split(' ');
+		var builder = '';
+
+		for (var i = 0, length = arr.length; i < length; i++) {
+			var cls = arr[i];
+			if (cls[0] === 'C' && cls[3] === '_' && cls !== 'CMS_hidden')
+				continue;
+			builder += (builder ? ' ' : '') + cls;
+		}
+
+		return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
+	});
+}
 
 F.on('settings', refresh);
