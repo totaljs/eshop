@@ -74,7 +74,6 @@ exports.install = function() {
 	// SETTINGS
 	F.route(CONFIG('manager-url') + '/api/settings/',            json_settings, ['*Settings']);
 	F.route(CONFIG('manager-url') + '/api/settings/',            json_settings_save, ['put', '*Settings']);
-
 };
 
 // ==========================================================================

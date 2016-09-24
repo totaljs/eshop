@@ -21,6 +21,6 @@ GETSCHEMA('Widget').addTransform('e319342961', function(error, model, data, call
 		}
 
 		// Renders products
-		callback(F.view('eshop/partial-products', response, true));
+		callback(F.view('eshop/partial-products', response));
 	});
 });

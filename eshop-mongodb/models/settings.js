@@ -1,9 +1,7 @@
 NEWSCHEMA('SuperUser').make(function(schema) {
-
 	schema.define('login', String, true);
 	schema.define('password', String, true);
 	schema.define('roles', '[String]');
-
 });
 
 NEWSCHEMA('Settings').make(function(schema) {
@@ -97,7 +95,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 				return;
 			}
 
-			if (doc) {
+			if (doc && doc.common) {
 				callback(doc.common);
 				return;
 			}
@@ -112,7 +110,6 @@ NEWSCHEMA('Settings').make(function(schema) {
 	// Loads settings + rewrites framework configuration
 	schema.addWorkflow('load', function(error, model, options, callback) {
 		schema.get(null, function(err, settings) {
-
 
 			F.config.custom = settings;
 

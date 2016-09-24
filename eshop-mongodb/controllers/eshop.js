@@ -67,7 +67,7 @@ function view_products_category() {
 	self.memorize('cache.' + options.category + '.' + options.page, '1 minute', DEBUG, function() {
 		self.$query(options, function(err, data) {
 
-			if (data.items.length === 0)
+			if (!data.items.length)
 				return self.throw404();
 
 			self.repository.subcategories = F.global.categories.where('parent', options.category);
@@ -127,8 +127,9 @@ function view_checkout(linker) {
 			var paypal = PayPal.create(F.config.custom.paypaluser, F.config.custom.paypalpassword, F.config.custom.paypalsignature, redirect, redirect, F.config.custom.paypaldebug);
 			paypal.pay(data.id, data.price, F.config.name, F.config.custom.currency, function(err, url) {
 				if (err)
-					return self.throw500(err);
-				self.redirect(url);
+					self.throw500(err);
+				else
+					self.redirect(url);
 			});
 			return;
 		}
@@ -161,9 +162,7 @@ function process_payment_paypal(linker) {
 		if (!success)
 			return self.view('checkout-error');
 
-		self.$workflow('paid', linker, function() {
-			self.redirect('../?success=1');
-		});
+		self.$workflow('paid', linker, () => self.redirect('../?success=1'));
 	});
 }
 
