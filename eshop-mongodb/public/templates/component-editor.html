@@ -1,13 +1,21 @@
-<div data-component="form" data-title="@(Select widget)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="500px" data-component-id="cmseditor_widgets">
+<div data-component="form" data-title="@(Select widget)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="600px" data-component-id="cmseditor_widgets">
+	<div class="padding npb">
+		<div data-component="textbox" data-component-path="cmseditor.widgetssearch" data-control-icon="fa-search" data-placeholder="@(Search widgets)"></div>
+	</div>
+	<hr class="nmb" />
 	<div class="padding">
-		<div data-component="repeater-group" data-component-path="cmseditor.widgets2" data-group="category">
-			<script type="text/html">
-				<div class="pages-editor-widget" data-id="{{ id }}" data-template="{{ istemplate }}" data-name="{{ name }}"><span class="fa fa-{{ if icon }}{{ icon }}{{ else if istemplate }}code{{ else }}plug{{ fi }} w18"></span> {{ name }}</div>
-			</script>
-			<script type="text/html">
-				<br />
-				<div class="silver fs11" style="margin-bottom:5px">{{ category }}</div>
-			</script>
+		<div data-component="search" data-component-path="cmseditor.widgetssearch" data-selector=".inline-search" data-class="hidden">
+			<div data-component="repeater-group" data-component-path="cmseditor.widgets2" data-group="category">
+				<script type="text/html">
+					<div class="pages-editor-widget inline-search" data-id="{{ id }}" data-template="{{ istemplate }}" data-name="{{ name }}" data-search="{{ name }}"><span class="fa fa-{{ if icon }}{{ icon }}{{ else if istemplate }}code{{ else }}plug{{ fi }} w18"></span> {{ name }}</div>
+				</script>
+				<script type="text/html">
+					<div class="inline-search">
+						{{ if index }}<br />{{ fi }}
+						<div class="silver fs11 mb5">{{ category }}</div>
+					</div>
+				</script>
+			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
@@ -37,7 +45,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Link editor)" data-component-path="cmseditor.window" data-if="value === 'link'" data-width="450px" data-component-id="cmseditor_link">
+<div data-component="form" data-title="@(Link editor)" data-component-path="cmseditor.window" data-if="value === 'link'" data-width="500px" data-component-id="cmseditor_link">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
@@ -59,16 +67,28 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Attributes editor)" data-component-path="cmseditor.window" data-if="value === 'attribute'" data-width="450px" data-component-id="cmseditor_attribute">
+<div data-component="form" data-title="@(Attributes editor)" data-component-path="cmseditor.window" data-if="value === 'attribute'" data-width="500px" data-component-id="cmseditor_attribute">
 	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12">
 				<div data-component="textbox" data-component-path="cmseditor.attribute.title" class="m">@(Title)</div>
 				<div data-component="textbox" data-component-path="cmseditor.attribute.id" class="m">@(ID)</div>
+				<div data-component="visible" data-component-path="cmseditor.attribute.themes" data-if="value && value.length">
+					<div data-component="dropdown" data-component-path="cmseditor.attribute.theme" class="m b" data-source="cmseditor.attribute.themes" data-icon="fa-paint-brush">@(Theme)</div>
+				</div>
 				<div data-component="textbox" data-component-path="cmseditor.attribute.cls" class="m">@(Class name)</div>
+				<div data-component="textbox" data-component-path="cmseditor.attribute.css" class="m">@(Custom styles)</div>
 			</div>
 		</div>
 	</div>
+
+	<div data-component="visible" data-component-path="cmseditor.attribute.isiframe" data-if="value === true">
+		<hr />
+		<div class="padding npt">
+			<div data-component="textbox" data-component-path="cmseditor.attribute.src" class="m">@(URL)</div>
+		</div>
+	</div>
+
 	<div data-component="visible" data-component-path="cmseditor.attribute.isimage" data-if="value === true">
 		<hr />
 		<div class="padding npt">
@@ -87,7 +107,7 @@
 				<div class="col-md-4">
 					<div data-component="textbox" data-component-path="cmseditor.attribute.dataheight" class="m" data-maxlenght="4" data-placeholder="120" data-align="center">@(Height)</div>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-4" data-component="visible" data-component-path="cmseditor.attribute.imgdefined" data-if="value">
 					<div data-component="textbox" data-component-path="cmseditor.attribute.datasize" class="m" data-maxlenght="4" data-placeholder="0%" data-align="center">@(Percentage)</div>
 				</div>
 			</div>
@@ -130,7 +150,7 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
-				<div data-component="codemirror" data-component-path="cmseditor.source" data-icon="fa-code" data-height="400px" data-required="true" class="ui-textarea-code">@(HTML)</div>
+				<div data-component="codemirror" data-component-path="cmseditor.source" data-icon="fa-code" data-height="500px" data-required="true" class="ui-textarea-code">@(HTML)</div>
 			</div>
 		</div>
 	</div>
@@ -161,24 +181,24 @@
 	cmseditor.widgets = []; // Contains all widgets
 	cmseditor.widgets2 = []; // Contains all filtered widgets
 	cmseditor.settings = []; // Contains all widgets settings
+	cmseditor.widgetssearch = '';
+	cmseditor.wrap = null; // Helper for wrapped element
+	cmseditor.wrap_widgets = null;
 
 	setTimeout(function() {
 		$('#cmseditor_inlineupload').on('change', function(e) {
 			var data = new FormData();
 			var files = e.target.files;
 			var errmsg = $(this).attr('data-error-large');
-			var loading = FIND('loading').show();
+			SETTER('loading', 'show');
 			data.append('file0', files[0]);
 			this.value = '';
-			jC.UPLOAD('{0}/upload/'.format(managerurl), data, function(response, err) {
+			UPLOAD('{0}/upload/'.format(managerurl), data, function(response, err) {
+
+				SETTER('loading', 'hide', 100);
 
 				if (err) {
-					loading.hide();
-					var message = FIND('message');
-					if (message)
-						message.warning(errmsg);
-					else
-						alert(errmsg);
+					SETTER('message', 'warning', errmsg);
 					return;
 				}
 
@@ -186,8 +206,6 @@
 					cmseditor.instance.getTarget().attr('src', '/download/' + response[0]);
 					cmseditor.instance.change(true);
 				}
-
-				loading.hide(500);
 			});
 		});
 	}, 1000);
@@ -210,8 +228,7 @@
 		};
 
 		self.init = function() {
-			if (!window.widgets)
-				self.refreshWidgets();
+			!window.widgets && self.refreshWidgets();
 			WATCH('widgets.grid', function(path, value, type) {
 				var items = value && value.items ? value.items : [];
 				cmseditor.widgets = items; // cache
@@ -221,10 +238,8 @@
 
 		self.save = function(callback, type) {
 			var w = self.getWindow();
-			if (w.$cmseditor_save)
-				w.$cmseditor_save(type);
-			if (w.COM)
-				w.COM.emit('cmseditor.save', type);
+			w.$cmseditor_save && w.$cmseditor_save(type);
+			w.COM && w.COM.emit('cmseditor.save', type);
 			setTimeout(callback, 1000);
 		};
 
@@ -237,7 +252,7 @@
 			frm.document.open('text/html', 'replace');
 
 			if (!content) {
-				frm.document.write('<html><head></head><body style="color:gray;text-align:center;padding:90px 0 0;margin:0;font-family:Arial;font-size:11px;color:#ADADAD;line-height:16px">@(<b>WITHOUT CONTENT</b><br />Choose the template for content editing.)</body></html>');
+				frm.document.write('<html><head></head><body style="color:gray;text-align:center;padding:140px 0 0;margin:0;font-family:Arial;font-size:11px;color:#ADADAD;line-height:16px">@(<b>WITHOUT CONTENT</b><br />Choose the template for content editing.)</body></html>');
 				frm.document.close();
 				iframe.css({ height: 'auto' });
 				return;
@@ -246,13 +261,24 @@
 			frm.document.write(content.replace('</body>', offsetter + '</body>'));
 			frm.document.close();
 			frm.$cmseditor = true;
-
 			iframe.css({ height: 'auto' });
 
 			setTimeout(function() {
 				self.setEvents();
 				self.resize(10);
 			}, 500);
+
+			setTimeout(function() {
+				self.resize();
+			}, 3000);
+
+			setTimeout(function() {
+				self.resize();
+			}, 6000);
+
+			setTimeout(function() {
+				self.resize();
+			}, 10000);
 		};
 
 		self.setTemplate = function(name) {
@@ -330,8 +356,7 @@
 		};
 
 		self.state = function(type, who) {
-			if (who === 2)
-				self.resize(true);
+			who === 2 && self.resize(true);
 		};
 
 		self.getWidgets = function() {
@@ -359,11 +384,9 @@
 				text += ' ' + this.innerText;
 			});
 
-			if (!text) {
-				self.doFind('.CMS_edit').each(function(index) {
-					text += ' ' + this.innerText;
-				});
-			}
+			!text && self.doFind('.CMS_edit').each(function(index) {
+				text += ' ' + this.innerText;
+			});
 
 			return find_keywords(text);
 		};
@@ -377,7 +400,7 @@
 			var words = content.toLowerCase().match(/[a-ž]+/gi);
 
 			if (words === null)
-				words = [];
+				words = EMPTYARRAY;
 
 			var length = words.length;
 			var dic = {};
@@ -386,11 +409,8 @@
 			for (var i = 0; i < length; i++) {
 				var word = words[i].trim();
 
-				if (word.length < min)
+				if (word.length < min || counter >= count)
 					continue;
-
-				if (counter >= count)
-					break;
 
 				if (alternative)
 					word = word.substring(0, (word.length / 100) * 80);
@@ -428,12 +448,8 @@
 		self.getPictures = function() {
 			var pictures = [];
 			self.doFind('img.CMS_edit').each(function() {
-				var el = $(this);
-				var url = el.attr('src');
-				if (pictures.indexOf(url) !== -1)
-					return;
-				if (pictures.length < 5)
-					pictures.push(url);
+				var url = $(this).attr('src');
+				url.substring(0, 5).toLowerCase() !== 'data:' && pictures.indexOf(url) === -1 && pictures.length < 5 && pictures.push(url);
 			});
 
 			return pictures;
@@ -443,7 +459,7 @@
 			var content = self.getContents();
 			content.find('[contenteditable]').removeAttr('contenteditable');
 			content.find('.CMS_selected').removeClass('CMS_selected');
-			return (content.find('#CMS').html() || '').trim().replace(offsetter, '');
+			return (content.find('#CMS').html() || '').trim().replace(/&nbsp;/g, ' ').replace(offsetter, '');
 		};
 
 		self.getContent = function() {
@@ -452,11 +468,11 @@
 			content.find('.CMS_widget').html('');
 			content.find('.CMS_selected').removeClass('CMS_selected');
 			content.find('.CMS_edit:empty,.CMS_remove:empty,.CMS_widgets:empty').each(function() {
-				if (this.nodeName === 'IMG')
+				var tag = this.nodeName;
+				if (tag === 'IMG' || tag === 'IFRAME')
 					return;
 				var cls = this.getAttribute('class');
-				if (cls.indexOf('CMS_widget') === -1 && cls.indexOf('fa') === -1)
-					$(this).remove();
+				cls.indexOf('CMS_widget') === -1 && cls.indexOf('fa') === -1 && $(this).detach().remove();
 			});
 			return (content.find('#CMS').html() || '').trim().replace(offsetter, '');
 		};
@@ -488,17 +504,28 @@
 				if (left + 270 > width)
 					left = width - 270;
 
-				panel.css({ left: left, top: off.top - panel.innerHeight() - 5 });
-
 				// Firefox
 				setTimeout(function() {
 					panel.show();
 				}, 100);
 
 				var arr = el.attr('class').split(/\s+/);
+				var tag = this.nodeName;
+				var info = body.find('#CMS_panel_info');
+
 				target = el;
 
-				panel.find('span').each(function() {
+				if (tag === 'IMG')
+					info.html('&lt;img /&gt; <b>{0}</b>x<b>{1}</b>px'.format(this.width, this.height));
+				else
+					info.html('&lt;{0}{1}&gt;'.format(tag.toLowerCase(), tag === 'BR' || tag === 'HR' ? ' /' : ''));
+
+				var wrap = self.getParent('CMS_template') || self.getParent('CMS_widget');
+				cmseditor.wrap = wrap;
+
+				panel.css({ left: left, top: off.top - panel.innerHeight() - 5 });
+				panel.find('#CMS_panel_buttons_move').toggle(wrap && wrap.length ? true : false);
+				panel.find('.CMS_panel_buttons span').each(function() {
 					var el = $(this);
 					var name = el.attr('data-name');
 
@@ -526,8 +553,13 @@
 					if (disabled && name === 'remove')
 						disabled = self.getParent('CMS_remove') === null;
 
-					if (disabled && name === 'widgets')
-						disabled = self.getParent('CMS_widgets', 5) === null;
+					if (disabled && name === 'widgets') {
+						cmseditor.wrap_widgets = self.getParent('CMS_widgets', 5);
+						disabled = cmseditor.wrap_widgets == null;
+					}
+
+					if (name === 'edit' && tag === 'IFRAME')
+						disabled = true;
 
 					el.toggleClass('CMS_panel_disabled', disabled);
 				});
@@ -542,15 +574,28 @@
 				var text = e.originalEvent.clipboardData.getData('text/plain');
 				if (target.hasClass('CMS_singleline'))
 					text = text.replace(/\n\r/g, ' ');
-				self.getDocument().execCommand('insertText', false, text);
+				self.getDocument().execCommand('insertText', false, text.trim().replace(/\s{2,}/g, ' ').replace(/\&nbsp;/g, ' '));
 			});
 
 			body.unbind('keydown').on('keydown', function(e) {
+
 				if (!target)
 					return;
 
 				if (e.keyCode === 13 && target.hasClass('CMS_singleline')) {
 					e.preventDefault();
+					return;
+				}
+
+				if (e.keyCode === 13) {
+					// "div" prevention
+					var tmp = target.html();
+					self.getDocument().execCommand('insertHTML', false, '<br>');
+					var end = target.html().trim();
+					if (end.substring(end.length - 3) !== tmp.substring(tmp.length - 3))
+						self.getDocument().execCommand('insertHTML', false, '<br><br>');
+					e.preventDefault();
+					e.stopPropagation();
 					return;
 				}
 
@@ -574,7 +619,7 @@
 					var url = '#' + Date.now();
 					self.getDocument().execCommand('CreateLink', false, url);
 					var tmp = self.getTarget().find('a[href="' + url + '"]');
-					if (tmp.length === 0)
+					if (!tmp.length)
 						return;
 
 					tmp.attr('class', 'CMS_edit');
@@ -614,6 +659,14 @@
 				e.preventDefault();
 			});
 
+			body.find('#CMS_panel').on('mouseenter mouseleave', '.fa-arrow-up,.fa-arrow-down', function(e) {
+				cmseditor.wrap && cmseditor.wrap.length && cmseditor.wrap.toggleClass('CMS_selected_template', e.type === 'mouseenter');
+			});
+
+			body.find('#CMS_panel').on('mouseenter mouseleave', '.fa-plug', function(e) {
+				cmseditor.wrap_widgets && cmseditor.wrap_widgets.length && cmseditor.wrap_widgets.toggleClass('CMS_selected_template', e.type === 'mouseenter');
+			});
+
 			body.find('#CMS_panel').on('click', 'span', function(e) {
 
 				e.preventDefault();
@@ -624,17 +677,30 @@
 					return;
 
 				var name = el.attr('data-name');
+				var tmp;
 				switch (name) {
 
-					case 'widgets':
-						SET('cmseditor.window', 'widgets');
-						return;
+					case 'up':
+						tmp = cmseditor.wrap.prev();
+						tmp.length && tmp.before(cmseditor.wrap);
+						body.find('#CMS_panel').find('[data-name="hide"]').trigger('click');
+						break;
+					case 'down':
+						tmp = cmseditor.wrap.next();
+						tmp.length && tmp.after(cmseditor.wrap);
+						body.find('#CMS_panel').find('[data-name="hide"]').trigger('click');
+						break;
 
 					case 'hide':
 						self.getToolbar().hide();
 						target.removeAttr('contentEditable');
 						target.removeClass('CMS_selected');
+						body.find('.CMS_selected_template').removeClass('CMS_selected_template');
 						target = null;
+						return;
+
+					case 'widgets':
+						SET('cmseditor.window', 'widgets');
 						return;
 
 					case 'attribute':
@@ -642,18 +708,52 @@
 						var arr = [];
 
 						cls.forEach(function(cls) {
-							if (cls.substring(0, 4) !== 'CMS_')
-								arr.push(cls);
+							cls.substring(0, 4) !== 'CMS_' && arr.push(cls);
 						});
 
-						cmseditor.attribute.isimage = target.get(0).nodeName === 'IMG';
+						var tag = target.get(0).nodeName;
+						cmseditor.attribute.isimage = tag === 'IMG';
+						cmseditor.attribute.isiframe = tag === 'IFRAME';
 						cmseditor.attribute.id = target.attr('id') || '';
 						cmseditor.attribute.cls = arr.join(' ');
+						cmseditor.attribute.css = target.attr('style') || '';
 						cmseditor.attribute.title = target.attr('title') || '';
+						cmseditor.attribute.themes = target.attr('data-themes');
+
+						if (cmseditor.attribute.themes) {
+							arr = [{ name: '', id: '' }];
+							var selected = '';
+							cmseditor.attribute.themes.split(';').forEach(function(value) {
+								value = value.split('|');
+								var obj = { name: value[0], id: value[1] == null ? value[0] : value[1] };
+								arr.push(obj);
+								if (cmseditor.attribute.cls.indexOf(obj.id) !== -1) {
+									selected = obj.id;
+									cmseditor.attribute.cls = cmseditor.attribute.cls.replace(obj.id, '').trim().replace(/\s{2,}/g, '');
+								}
+							});
+
+							cmseditor.attribute.themes = arr;
+							cmseditor.attribute.theme = selected;
+						}
+
+						if (cmseditor.attribute.isiframe)
+							cmseditor.attribute.src = target.attr('src') || '';
 
 						if (cmseditor.attribute.isimage) {
-							cmseditor.attribute.datawidth = target.attr('data-width');
-							cmseditor.attribute.dataheight = target.attr('data-height');
+
+							var tw = target.attr('data-width');
+							var th = target.attr('data-height');
+
+							cmseditor.attribute.imgdefined = tw != null || th != null;
+
+							if (!cmseditor.attribute.imgdefined) {
+								tw = target.attr('width');
+								th = target.attr('height');
+							}
+
+							cmseditor.attribute.datawidth = tw;
+							cmseditor.attribute.dataheight = th;
 							cmseditor.attribute.datasize = target.attr('data-size');
 							cmseditor.attribute.alt = target.attr('alt') || '';
 						}
@@ -702,11 +802,11 @@
 							if (typeof(cmseditor.icons) === 'string') {
 								// Generate icons
 								cmseditor.icons = cmseditor.icons.split(',');
-								var builder = '';
+								var builder = [];
 								for (var i = 0, length = cmseditor.icons.length; i < length; i++)
-									builder += '<div class="col-xs-1"><span class="fa fa-' + cmseditor.icons[i] + '"></span></div>';
-								delete cmseditor.icons;
-								$('#cmseditoricons').html(builder);
+									builder.push('<div class="col-xs-1 inline-search" data-search="{0}"><span class="fa fa-{0}"></span></div>'.format(cmseditor.icons[i]));
+								cmseditor.icons = undefined;
+								$('#cmseditoricons').html(builder.join(''));
 							}
 
 							SET('cmseditor.window', 'icon');
@@ -736,7 +836,7 @@
 							cmseditor.crop.href = '';
 
 							var parent = target.parent('a');
-							if (parent.length > 0)
+							if (parent.length)
 								cmseditor.crop.href = parent.attr('href');
 
 							UPDATE('cmseditor.crop', true);
@@ -800,17 +900,18 @@
 		self.load = function(type) {
 			setTimeout(function() {
 				var w = self.getWindow();
-				if (w.$cmseditor_load)
-					w.$cmseditor_load(type);
-				if (w.COM)
-					w.COM.emit('cmseditor.load', type);
+				w.$cmseditor_load && w.$cmseditor_load(type);
+				w.COM && w.COM.emit('cmseditor.load', type);
 			}, 1000);
 		};
 
 		self.resize = function(force) {
-			setTimeout(function() {
+			setTimeout2('cmseditor', function() {
 				var contents = self.getContents();
-				var h = navigator.userAgent.indexOf('Safari') === -1 ? contents.outerHeight() : contents.find('#cmseditorheight').offset().top;
+				var elheight = contents.find('#cmseditorheight');
+				if (!elheight.length)
+					return self.resize(500);
+				var h = navigator.userAgent.indexOf('Safari') === -1 ? contents.outerHeight() : elheight.offset().top;
 				iframe.css({ height: h + 50 });
 				width = contents.width();
 				setTimeout(function() {
@@ -824,7 +925,7 @@
 			// Sets the current instance of editor to global variable
 			cmseditor.instance = self;
 
-			if (value === null || value === undefined) {
+			if (value == null) {
 				self.write('');
 				return;
 			}
@@ -842,7 +943,7 @@
 			AJAX('POST {0}/api/pages/preview/'.format(managerurl), options, function(response) {
 				if (isError(arguments))
 					return;
-				self.write(response.replace('</body>', '<div id="CMS_panel"><span class="fa fa-pencil" title="@(Edit)" data-name="edit"></span><span class="fa fa-link" title="@(Change link)" data-name="link"></span><span class="fa fa-quote-left" title="@(Change attributes)" data-name="attribute"></span><span class="fa fa-copy" title="@(Duplicate)" data-name="repeat"></span></span><span class="fa fa-plug" title="@(Add widget)" data-name="widgets"></span><span class="fa fa-trash" title="@(Remove content)" data-name="remove"></span><span class="fa fa-toggle-down" title="@(Hide)" data-name="hide"></span></div></body>'));
+				self.write(response.replace('</body>', '<div id="CMS_panel"><div id="CMS_panel_buttons_move"><span class="fa fa-arrow-up" data-name="up" title="@(Move up)"></span><span class="fa fa-arrow-down" data-name="down" title="@(Move down)"></span></div><div id="CMS_panel_info"></div><div class="CMS_panel_buttons"><span class="fa fa-pencil" title="@(Edit)" data-name="edit"></span><span class="fa fa-link" title="@(Change link)" data-name="link"></span><span class="fa fa-quote-left" title="@(Change attributes)" data-name="attribute"></span><span class="fa fa-copy" title="@(Duplicate)" data-name="repeat"></span></span><span class="fa fa-plug" title="@(Add widget)" data-name="widgets"></span><span class="fa fa-trash" title="@(Remove content)" data-name="remove"></span><span class="fa fa-caret-square-o-down" title="@(Hide)" data-name="hide"></span></div></div></body>'));
 				SETTER('loading', 'hide', 500);
 			});
 		};
@@ -915,10 +1016,7 @@
 			var cropper = FIND('#cmseditor.crop');
 
 			target.attr('alt', cmseditor.crop.alt);
-
-			if (cmseditor.crop.href)
-				target.parent('a').attr('href', cmseditor.crop.href);
-
+			cmseditor.crop.href && target.parent('a').attr('href', cmseditor.crop.href);
 			editor.change(true);
 
 			// Is the picture changed?
@@ -928,36 +1026,27 @@
 			}
 
 			var data = cropper.output();
-			var loading = FIND('loading');
-
-			loading.show();
+			SETTER('loading', 'show');
 
 			AJAX('POST {0}/upload/base64/'.format(managerurl), { file: data }, function(response, err) {
 
+				SETTER('loading', 'hide', 500);
+
 				if (err) {
-					var errmsg = $('#cmseditor_inlineupload').attr('data-error-large');
-					var message = FIND('message');
-					if (message)
-						message.warning(errmsg);
-					else
-						alert(errmsg);
-					loading.hide(500);
+					SETTER('message', 'warning', $('#cmseditor_inlineupload').attr('data-error-large'));
 					return;
 				}
 
-				if (response) {
-					setTimeout(function() {
-						var size = target.attr('data-size');
-						if (size) {
-							target.attr('data-original', response);
-							target.attr('src', response + '?s=' + size.replace('%', ''));
-						} else
-							target.attr('src', response);
-					}, 1000);
-				}
+				response && setTimeout(function() {
+					var size = target.attr('data-size');
+					if (size) {
+						target.attr('data-original', response);
+						target.attr('src', response + '?s=' + size.replace('%', ''));
+					} else
+						target.attr('src', response);
+				}, 1000);
 
 				setTimeout(hide, 1000);
-				loading.hide(1500);
 			});
 		};
 	});
@@ -987,9 +1076,7 @@
 			else
 				link.attr('target', cmseditor.link.target);
 
-			if (target.data('temporary'))
-				target.removeData('temporary');
-
+			target.data('temporary') && target.removeData('temporary');
 			editor.change(true);
 			hide();
 		};
@@ -1025,6 +1112,9 @@
 			else
 				target.removeAttr('title');
 
+			if (cmseditor.attribute.isiframe)
+				target.attr('src', cmseditor.attribute.src.trim());
+
 			if (cmseditor.attribute.isimage) {
 				if (cmseditor.attribute.alt)
 					target.attr('alt', cmseditor.attribute.alt.trim());
@@ -1037,36 +1127,59 @@
 			else
 				target.removeAttr('id');
 
-			// var arr = cmseditor.attribute.cls.split(' ');
 			var arr = target.attr('class').split(' ');
 			var cls = [];
 
-			for (var i = 0, length = arr.length; i < length; i++) {
-				if (arr[i].substring(0, 4) === 'CMS_')
-					cls.push(arr[i]);
-			}
+			for (var i = 0, length = arr.length; i < length; i++)
+				arr[i].substring(0, 4) === 'CMS_' && cls.push(arr[i]);
 
 			if (cmseditor.attribute.isimage) {
-				if (cmseditor.attribute.datawidth)
-					target.attr('data-width', cmseditor.attribute.datawidth);
-				else
-					target.removeAttr('data-width');
-
-				if (cmseditor.attribute.dataheight)
-					target.attr('data-width', cmseditor.attribute.dataheight);
-				else
-					target.removeAttr('data-width');
-
-				if (cmseditor.attribute.datasize)
-					target.attr('data-size', cmseditor.attribute.datasize + (cmseditor.attribute.datasize.lastIndexOf('%') === -1 ? '%' : ''));
-				else
-					target.removeAttr('data-size');
+				if (cmseditor.attribute.imgdefined) {
+					if (cmseditor.attribute.datawidth)
+						target.attr('data-width', cmseditor.attribute.datawidth);
+					else
+						target.removeAttr('data-width');
+					if (cmseditor.attribute.dataheight)
+						target.attr('data-width', cmseditor.attribute.dataheight);
+					else
+						target.removeAttr('data-width');
+					if (cmseditor.attribute.datasize)
+						target.attr('data-size', cmseditor.attribute.datasize + (cmseditor.attribute.datasize.lastIndexOf('%') === -1 ? '%' : ''));
+					else
+						target.removeAttr('data-size');
+				} else {
+					if (cmseditor.attribute.datawidth)
+						target.attr('width', cmseditor.attribute.datawidth);
+					else
+						target.removeAttr('width');
+					if (cmseditor.attribute.datawidth)
+						target.attr('height', cmseditor.attribute.dataheight);
+					else
+						target.removeAttr('height');
+				}
 			}
 
-			if (cmseditor.attribute.cls)
-				cls.push(cmseditor.attribute.cls.trim());
+			if (cmseditor.attribute.css)
+				target.attr('style', cmseditor.attribute.css);
+			else
+				target.removeAttr('style');
 
-			target.attr('class', cls.join(' '));
+			cmseditor.attribute.cls && cls.push(cmseditor.attribute.cls.trim());
+
+			var clsnames = cls.join(' ');
+
+			if (cmseditor.attribute.themes) {
+
+				cmseditor.attribute.themes.forEach(function(theme) {
+					if (clsnames.indexOf(theme.id) !== -1)
+						clsnames = clsnames.replace(theme.id, '').replace(/\s{2,}/g, ' ').trim();
+				});
+
+				if (cmseditor.attribute.theme)
+					clsnames = (clsnames ? clsnames + ' ' : '') + cmseditor.attribute.theme;
+			}
+
+			target.attr('class', clsnames);
 			cmseditor.instance.change(true);
 			hide();
 		};
@@ -1120,8 +1233,7 @@
 
 		var arr = [];
 		cmseditor.widgets.forEach(function(item) {
-			if (item.istemplate)
-				arr.push(item);
+			item.istemplate && arr.push(item);
 		});
 
 		SET('cmseditor.widgets2', arr);
