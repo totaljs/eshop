@@ -7,6 +7,8 @@
 // Supported workflows
 // "create-url"
 
+const REGEXP_HTML_CLASS = /(\s)class\=\".*?\"/g;
+
 NEWSCHEMA('Page').make(function(schema) {
 
 	schema.define('id', 'String(20)');
@@ -30,14 +32,6 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('ispartial', Boolean);
 	schema.define('body', String);
 	schema.define('datecreated', Date);
-
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -63,20 +57,10 @@ NEWSCHEMA('Page').make(function(schema) {
 
 			builder.where('isremoved', false);
 
-			// Checks partial content
-			if (options.ispartial)
-				builder.where('ispartial', options.ispartial);
-
-			// Checks language
-			if (options.language)
-				builder.where('language', options.language);
-
-			// Checks navigations
-			if (options.navigation)
-				builder.in('navigations', options.navigation);
-
-			if (options.search)
-				builder.in('search', options.search.keywords(true, true));
+			options.ispartial && builder.where('ispartial', options.ispartial);
+			options.language && builder.where('language', options.language);
+			options.navigation && builder.in('navigations', options.navigation);
+			options.search && builder.in('search', options.search.keywords(true, true));
 
 			builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
 			builder.sort('name');
@@ -93,7 +77,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
-			if (data.pages === 0)
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
@@ -116,14 +100,9 @@ NEWSCHEMA('Page').make(function(schema) {
 			builder.first();
 			builder.where('isremoved', false);
 
-			if (options.url)
-				builder.where('url', options.url);
-
-			if (options.id)
-				builder.where('id', options.id);
-
-			if (options.language)
-				builder.where('language', options.language);
+			options.url && builder.where('url', options.url);
+			options.id && builder.where('id', options.id);
+			options.language && builder.where('language', options.language);
 		});
 
 		nosql.validate('page', 'error-404-page');
@@ -142,9 +121,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		});
 
 		nosql.exec(SUCCESS(callback));
-
-		// Refreshes internal informations e.g. sitemap
-		setTimeout(refresh, 1000);
+		setTimeout2('pages', refresh, 1000);
 	});
 
 	// Saves the page into the database
@@ -156,14 +133,14 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (!model.name)
 			model.name = model.title;
 
-		var isnew = false;
+		var newbie = false;
 
 		if (!model.id) {
 			model.id = UID();
-			model.datecreated = new Date();
-			isnew = true;
+			model.datecreated = F.datetime;
+			newbie = true;
 		} else
-			model.dateupdated = new Date();
+			model.dateupdated = F.datetime;
 
 		model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true);
 
@@ -179,13 +156,13 @@ NEWSCHEMA('Page').make(function(schema) {
 		// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
 		var nosql = DB(error);
 
-		nosql.save('page', 'pages', isnew, function(builder, isnew) {
+		nosql.save('page', 'pages', newbie, function(builder) {
 			builder.set(model);
-			if (isnew)
+			if (newbie)
 				return;
 			builder.rem('id');
 			builder.rem('datecreated');
-			builder.set('dateupdated', new Date());
+			builder.set('dateupdated', F.datetime);
 			builder.where('id', model.id);
 		});
 
@@ -198,9 +175,7 @@ NEWSCHEMA('Page').make(function(schema) {
 				return;
 
 			F.emit('pages.save', model);
-
-			// Refreshes internal informations e.g. sitemap
-			setTimeout(refresh, 1000);
+			setTimeout2('pages', refresh, 1000);
 		});
 	});
 
@@ -302,24 +277,7 @@ NEWSCHEMA('Page').make(function(schema) {
 						if (response.language)
 							response.body = F.translator(response.language, response.body);
 
-						response.body = U.minifyHTML(response.body.replace(/<br>/g, '<br />'));
-
-						// cleaner
-						response.body = response.body.replace(/(\s)class\=\".*?\"/g, function(text) {
-
-							var is = text[0] === ' ';
-							var arr = text.substring(is ? 8 : 7, text.length - 1).split(' ');
-							var builder = '';
-
-							for (var i = 0, length = arr.length; i < length; i++) {
-								var cls = arr[i];
-								if (cls[0] === 'C' && cls[3] === '_' && cls !== 'CMS_hidden')
-									continue;
-								builder += (builder ? ' ' : '') + cls;
-							}
-
-							return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
-						});
+						response.body = clean(response.body);
 
 						if (response.partial && response.partial.length) {
 							schema.operation2('render-multiple', { id: response.partial }, function(err, partial) {
@@ -504,7 +462,7 @@ F.eval(function() {
 		var key = (self.language ? self.language + ':' : '') + url;
 		var page = F.global.sitemap[key];
 
-		if (!page) {			
+		if (!page) {
 			self.throw404();
 			return self;
 		}
@@ -607,5 +565,130 @@ F.middleware('page', function(req, res, next, options, controller) {
 		controller.page(controller.url);
 	});
 });
+
+function clean(body) {
+
+	var beg;
+	var end;
+	var index = 0;
+	var count = 0;
+	var a = '<div class="CMS_template CMS_remove">';
+	var b = ' data-themes="';
+	var c = 'CMS_unwrap';
+	var tag;
+	var tagend;
+
+	body = U.minifyHTML(body);
+
+	while (true) {
+		beg = body.indexOf(a, beg);
+		if (beg === -1)
+			break;
+
+		index = beg + a.length;
+		count = 0;
+
+		while (true) {
+			var str = body.substring(index++, index + 3);
+			if (index >= body.length) {
+				beg = body.length;
+				break;
+			}
+
+			if (str === '</di') {
+
+				if (count) {
+					count--;
+					continue;
+				}
+
+				body = body.substring(0, beg) + body.substring(beg + a.length, index - 1) + body.substring(index + 5);
+				beg -= a.length;
+				break;
+			}
+
+			if (str === '<div')
+				count++;
+		}
+	}
+
+	while (true) {
+		beg = body.indexOf(b, beg);
+		if (beg === -1)
+			break;
+		index = body.indexOf('"', beg + b.length);
+		if (index === -1)
+			break;
+		body = body.substring(0, beg) + body.substring(index + 1);
+	}
+
+	var tmp = 0;
+
+	while (true) {
+		beg = body.indexOf(c, beg);
+		if (beg === -1)
+			break;
+
+		index = beg;
+		while (true) {
+			if (body[--index] === '<' || index <= 0)
+				break;
+		}
+
+		if (index === beg || index <= 0)
+			return;
+
+		tag = body.substring(index + 1, body.indexOf('>', index + 1));
+		end = index + tag.length + 2;
+		tag = tag.substring(0, tag.indexOf(' '));
+		tagend = '</' + tag;
+		tag = '<' + tag;
+		count = 0;
+		beg = index;
+		index = end;
+
+		while (true) {
+			var str = body.substring(index, index + tagend.length);
+
+			if (index >= body.length) {
+				beg = body.length;
+				break;
+			}
+
+			if (str === tagend) {
+
+				if (count) {
+					count--;
+					index++;
+					continue;
+				}
+
+				body = body.substring(0, beg) + body.substring(end, index) + body.substring(index + 1 + tagend.length);
+				break;
+			}
+
+			if (str.substring(0, tag.length) === tag)
+				count++;
+
+			index++;
+		}
+	}
+
+	return body.replace(REGEXP_HTML_CLASS, function(text) {
+
+		var is = text[0] === ' ';
+		var arr = text.substring(is ? 8 : 7, text.length - 1).split(' ');
+		var builder = '';
+
+		for (var i = 0, length = arr.length; i < length; i++) {
+			var cls = arr[i];
+			if (cls[0] === 'C' && cls[3] === '_' && cls !== 'CMS_hidden')
+				continue;
+			builder += (builder ? ' ' : '') + cls;
+		}
+
+		return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
+	});
+}
 
 F.on('settings', refresh);

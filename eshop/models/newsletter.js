@@ -9,12 +9,10 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 
 	// Saves the model into the database
 	schema.setSave(function(error, model, options, callback) {
-
 		// Appends new email into tohe newsletter file
-		Fs.appendFile(filename, model.email + ';' + model.ip + ';' + model.language + ';' + (new Date()).format('yyyy-MM-dd') + '\n');
+		Fs.appendFile(filename, model.email + ';' + model.ip + ';' + model.language + ';' + F.datetime.format('yyyy-MM-dd') + '\n');
 		F.emit('newsletter.save', model);
 		callback(SUCCESS(true));
-
 		MODULE('webcounter').increment('newsletter');
 	});
 

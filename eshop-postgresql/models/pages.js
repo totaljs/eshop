@@ -7,6 +7,8 @@
 // Supported workflows
 // "create-url"
 
+const REGEXP_HTML_CLASS = /(\s)class\=\".*?\"/g;
+
 NEWSCHEMA('Page').make(function(schema) {
 
 	schema.define('id', 'String(20)');
@@ -30,14 +32,6 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('ispartial', Boolean);
 	schema.define('body', String);
 	schema.define('datecreated', Date);
-
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -63,37 +57,20 @@ NEWSCHEMA('Page').make(function(schema) {
 			options.search = options.search.keywords(true, true).join(' ');
 
 		var sql = DB(error);
-		var filter = sql.$;
 
-		filter.where('isremoved', false);
+		sql.listing('items', 'tbl_page', 'id').make(function(builder) {
 
-		// Checks partial content
-		if (options.ispartial)
-			filter.where('ispartial', options.ispartial);
+			builder.where('isremoved', false);
 
-		// Checks language
-		if (options.language)
-			filter.where('language', options.language);
+			options.ispartial && builder.where('ispartial', options.ispartial);
+			options.language && builder.where('language', options.language);
+			options.navigation && builder.like('navigations', options.navigation, '*');
+			options.search && builder.like('search', options.search, '*');
 
-		// Checks navigations
-		if (options.navigation)
-			filter.like('navigations', options.navigation, '*');
-
-		// Searchs in "title"
-		// @TODO: improve full-text search
-		if (options.search)
-			filter.like('search', options.search, '*');
-
-		sql.select('items', 'tbl_page').make(function(builder) {
-			builder.replace(filter);
 			builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
 			builder.sort('name');
 			builder.skip(skip);
 			builder.take(take);
-		});
-
-		sql.count('count', 'tbl_page', 'id').make(function(builder) {
-			builder.replace(filter);
 		});
 
 		sql.exec(function(err, response) {
@@ -102,9 +79,10 @@ NEWSCHEMA('Page').make(function(schema) {
 				return callback();
 
 			var empty = [];
+			var items = response.items.items;
 
-			for (var i = 0, length = response.items.length; i < length; i++) {
-				var item = response.items[i];
+			for (var i = 0, length = items.length; i < length; i++) {
+				var item = items[i];
 				if (item.navigations)
 					item.navigations = item.navigations.split(';');
 				else
@@ -122,8 +100,8 @@ NEWSCHEMA('Page').make(function(schema) {
 			}
 
 			var data = {};
-			data.count = response.count;
-			data.items = response.items;
+			data.count = response.items.count;
+			data.items = items;
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
@@ -146,12 +124,11 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		sql.select('item', 'tbl_page').make(function(builder) {
 			builder.where('isremoved', false);
-			if (options.url)
-				builder.where('url', options.url);
-			if (options.language)
-				builder.where('language', options.language);
-			if (options.id)
-				builder.where('id', options.id);
+
+			options.url && builder.where('url', options.url);
+			options.language && builder.where('language', options.language);
+			options.id && builder.where('id', options.id);
+
 			builder.first();
 		});
 
@@ -199,12 +176,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		sql.exec(function(err) {
 			callback(SUCCESS(true));
-
-			if (err)
-				return;
-
-			// Refreshes internal information e.g. sitemap
-			setTimeout(refresh, 1000);
+			!err && setTimeout2('pages', refresh, 1000);
 		});
 	});
 
@@ -218,10 +190,12 @@ NEWSCHEMA('Page').make(function(schema) {
 			model.name = model.title;
 
 		var count = 0;
-		var isNew = model.id ? false : true;
+		var newbie = model.id ? false : true;
 
-		if (!model.id)
+		if (!model.id) {
 			model.id = UID();
+			model.datecreated = F.datetime;
+		}
 
 		// Sanitizes URL
 		if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
@@ -241,25 +215,27 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (clean.search)
 			clean.search = ((clean.title || '') + ' ' + (clean.keywords || '') + ' ' + clean.search).keywords(true, true).join(' ').max(2000);
 
-		delete clean.settings;
-		delete clean.widgets;
+		clean.settings = undefined;
+		clean.widgets = undefined;
 
 		// settings
 		// widgets
 
 		var sql = DB(error);
 
-		sql.save('item', 'tbl_page', isNew, function(builder, isNew) {
+		sql.save('item', 'tbl_page', newbie, function(builder) {
 			builder.set(clean);
-			if (isNew)
+
+			if (newbie)
 				return;
-			builder.set('dateupdated', new Date());
+
+			builder.set('dateupdated', F.datetime);
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', clean.id);
 		});
 
-		if (!isNew)
+		if (!newbie)
 			sql.remove('tbl_page_widget').where('idpage', model.id);
 
 		for (var i = 0, length = model.widgets.length; i < length; i++) {
@@ -280,9 +256,7 @@ NEWSCHEMA('Page').make(function(schema) {
 				return;
 
 			F.emit('pages.save', model);
-
-			// Refreshes internal information e.g. categories
-			setTimeout(refresh, 1000);
+			setTimeout2('pages', refresh, 1000);
 		});
 	});
 
@@ -380,28 +354,12 @@ NEWSCHEMA('Page').make(function(schema) {
 						}, true);
 
 					}, function() {
+
 						// DONE
 						if (response.language)
 							response.body = F.translator(response.language, response.body);
 
-						response.body = U.minifyHTML(response.body.replace(/<br>/g, '<br />'));
-
-						// cleaner
-						response.body = response.body.replace(/(\s)class\=\".*?\"/g, function(text) {
-
-							var is = text[0] === ' ';
-							var arr = text.substring(is ? 8 : 7, text.length - 1).split(' ');
-							var builder = '';
-
-							for (var i = 0, length = arr.length; i < length; i++) {
-								var cls = arr[i];
-								if (cls[0] === 'C' && cls[3] === '_' && cls !== 'CMS_hidden')
-									continue;
-								builder += (builder ? ' ' : '') + cls;
-							}
-
-							return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
-						});
+						response.body = clean(response.body);
 
 						if (response.partial && response.partial.length) {
 							schema.operation2('render-multiple', { id: response.partial }, function(err, partial) {
@@ -688,5 +646,130 @@ F.middleware('page', function(req, res, next, options, controller) {
 		controller.page(controller.url);
 	});
 });
+
+function clean(body) {
+
+	var beg;
+	var end;
+	var index = 0;
+	var count = 0;
+	var a = '<div class="CMS_template CMS_remove">';
+	var b = ' data-themes="';
+	var c = 'CMS_unwrap';
+	var tag;
+	var tagend;
+
+	body = U.minifyHTML(body);
+
+	while (true) {
+		beg = body.indexOf(a, beg);
+		if (beg === -1)
+			break;
+
+		index = beg + a.length;
+		count = 0;
+
+		while (true) {
+			var str = body.substring(index++, index + 3);
+			if (index >= body.length) {
+				beg = body.length;
+				break;
+			}
+
+			if (str === '</di') {
+
+				if (count) {
+					count--;
+					continue;
+				}
+
+				body = body.substring(0, beg) + body.substring(beg + a.length, index - 1) + body.substring(index + 5);
+				beg -= a.length;
+				break;
+			}
+
+			if (str === '<div')
+				count++;
+		}
+	}
+
+	while (true) {
+		beg = body.indexOf(b, beg);
+		if (beg === -1)
+			break;
+		index = body.indexOf('"', beg + b.length);
+		if (index === -1)
+			break;
+		body = body.substring(0, beg) + body.substring(index + 1);
+	}
+
+	var tmp = 0;
+
+	while (true) {
+		beg = body.indexOf(c, beg);
+		if (beg === -1)
+			break;
+
+		index = beg;
+		while (true) {
+			if (body[--index] === '<' || index <= 0)
+				break;
+		}
+
+		if (index === beg || index <= 0)
+			return;
+
+		tag = body.substring(index + 1, body.indexOf('>', index + 1));
+		end = index + tag.length + 2;
+		tag = tag.substring(0, tag.indexOf(' '));
+		tagend = '</' + tag;
+		tag = '<' + tag;
+		count = 0;
+		beg = index;
+		index = end;
+
+		while (true) {
+			var str = body.substring(index, index + tagend.length);
+
+			if (index >= body.length) {
+				beg = body.length;
+				break;
+			}
+
+			if (str === tagend) {
+
+				if (count) {
+					count--;
+					index++;
+					continue;
+				}
+
+				body = body.substring(0, beg) + body.substring(end, index) + body.substring(index + 1 + tagend.length);
+				break;
+			}
+
+			if (str.substring(0, tag.length) === tag)
+				count++;
+
+			index++;
+		}
+	}
+
+	return body.replace(REGEXP_HTML_CLASS, function(text) {
+
+		var is = text[0] === ' ';
+		var arr = text.substring(is ? 8 : 7, text.length - 1).split(' ');
+		var builder = '';
+
+		for (var i = 0, length = arr.length; i < length; i++) {
+			var cls = arr[i];
+			if (cls[0] === 'C' && cls[3] === '_' && cls !== 'CMS_hidden')
+				continue;
+			builder += (builder ? ' ' : '') + cls;
+		}
+
+		return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
+	});
+}
 
 F.on('settings', refresh);

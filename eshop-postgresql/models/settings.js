@@ -63,10 +63,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 		});
 
 		sql.exec(function() {
-
 			F.emit('settings.save', settings);
-
-			// Returns response
 			callback(SUCCESS(true));
 		});
 	});
@@ -160,8 +157,6 @@ NEWSCHEMA('Settings').make(function(schema) {
 			}
 
 			F.emit('settings', settings);
-
-			// Returns response
 			callback(SUCCESS(true));
 		});
 	});

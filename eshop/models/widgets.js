@@ -19,42 +19,33 @@ NEWSCHEMA('Widget').make(function(schema) {
 	// Gets a specific widget
 	schema.setGet(function(error, model, options, callback) {
 		var filter = NOSQL('widgets').one();
-
-		if (options.url)
-			filter.where('url', options.url);
-
-		if (options.id)
-			filter.where('id', options.id);
-
+		options.url && filter.where('url', options.url);
+		options.id && filter.where('id', options.id);
 		filter.callback(callback, 'error-404-widget');
 	});
 
 	// Removes a specific widget
 	schema.setRemove(function(error, id, callback) {
-		// Updates database file
 		NOSQL('widgets').remove().where('id', id).callback(callback);
 	});
 
 	// Saves the widget into the database
 	schema.setSave(function(error, model, options, callback) {
 
-		var newbie = false;
+		var newbie = model.id ? false : true;
 		var nosql = NOSQL('widgets');
 
-		if (!model.id) {
+		if (newbie) {
 			newbie = true;
 			model.id = UID();
 			model.datecreated = F.datetime;
 		}
 
-		(newbiew ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
-
+		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
 			F.emit('widgets.save', model);
 			callback(SUCCESS(true));
-
 			model.datebackuped = F.datetime;
 			DB('widgets_backup').insert(model);
-
 			setTimeout2('cache', () => F.cache.removeAll('cache.'), 1000);
 		});
 	});

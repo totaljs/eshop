@@ -69,17 +69,10 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		var filter = NOSQL('posts').one();
 
-		if (options.category)
-			filter.where('category_linker', options.category);
-
-		if (options.linker)
-			filter.where('linker', options.linker);
-
-		if (options.id)
-			filter.where('id', options.id);
-
-		if (options.language)
-			filter.where('language', options.language);
+		options.category && filter.where('category_linker', options.category);
+		options.linker && filter.where('linker', options.linker);
+		options.id && filter.where('id', options.id);
+		options.language && filter.where('language', options.language);
 
 		filter.callback(callback, 'error-404-post');
 	});
@@ -93,13 +86,12 @@ NEWSCHEMA('Post').make(function(schema) {
 	// Saves the post into the database
 	schema.setSave(function(error, model, options, callback) {
 
-		var newbie = false;
+		var newbie = model.id ? false : true;
 		var nosql = NOSQL('posts');
 
 		if (!model.id) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-			newbie = true;
 		}
 
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
@@ -110,7 +102,7 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ').max(1000);
 
-		(newbiew ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
+		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
 
 			F.emit('posts.save', model);
 			callback(SUCCESS(true));

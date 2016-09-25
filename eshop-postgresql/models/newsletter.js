@@ -20,6 +20,7 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 			resume();
 		});
 
+		model.datecreated = F.datetime;
 		sql.insert('tbl_newsletter').set(model).primary('email');
 		sql.exec(F.error());
 

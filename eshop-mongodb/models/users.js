@@ -9,7 +9,7 @@ exports.login = function(req, res, id) {
 
 exports.logoff = function(req, res, user) {
 	delete online[user.id];
-	res.cookie('__user', '', new Date().add('-1 day'));
+	res.cookie(COOKIE, '', new Date().add('-1 day'));
 };
 
 exports.createSession = function(profile) {
@@ -42,20 +42,13 @@ NEWSCHEMA('User').make(function(schema) {
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
 
-		// options.id {String}
-
 		var nosql = DB(error);
 
 		nosql.select('item', 'users').make(function(builder) {
 			builder.where('isremoved', false);
-
-			if (options.email)
-				builder.where('email', options.email);
-			if (options.password)
-				builder.where('password', options.password);
-			if (options.id)
-				builder.where('id', options.id);
-
+			options.email && builder.where('email', options.email);
+			options.password && builder.where('password', options.password);
+			options.id && builder.where('id', options.id);
 			builder.first();
 		});
 
@@ -68,8 +61,10 @@ NEWSCHEMA('User').make(function(schema) {
 		var nosql = DB(error);
 		var newbie = model.id ? false : true;
 
-		if (!model.id)
+		if (newbie) {
 			model.id = UID();
+			model.datecreated = F.datetime;
+		}
 
 		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true);
 		model.isremoved = false;
@@ -116,14 +111,6 @@ NEWSCHEMA('User').make(function(schema) {
 		nosql.exec(SUCCESS(callback), -1);
 	});
 
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 
@@ -143,12 +130,8 @@ NEWSCHEMA('User').make(function(schema) {
 		var nosql = DB(error);
 
 		nosql.listing('users', 'users').make(function(builder) {
-
 			builder.where('isremoved', false);
-
-			if (options.search)
-				builder.in('search', options.search.keywords(true, true));
-
+			options.search && builder.in('search', options.search.keywords(true, true));
 			builder.sort('datecreated', true);
 			builder.skip(skip);
 			builder.take(take);
@@ -165,7 +148,7 @@ NEWSCHEMA('User').make(function(schema) {
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
-			if (data.pages === 0)
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
@@ -215,6 +198,7 @@ NEWSCHEMA('User').make(function(schema) {
 				response.user.lastname = options.profile.lastname;
 				response.user.ip = options.profile.ip;
 				response.user.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true);
+				response.user.datecreated = F.datetime;
 				response.user[id] = options.profile[id];
 
 				// Inserts new user
@@ -366,7 +350,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.gender = model.gender;
 			user.password = model.password.hash('sha1');
 			user.ip = options.ip;
-			user.datecreated = user.datecreated.format();
+			user.datecreated = F.datetime;
 
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
 
@@ -458,7 +442,6 @@ F.onAuthorize = function(req, res, flags, callback) {
 		});
 
 		nosql.exec(F.error());
-
 		req.user = exports.createSession(response);
 		res.cookie(COOKIE, F.encrypt({ id: response.id, ip: req.ip }, SECRET, true), '6 days');
 		callback(true);

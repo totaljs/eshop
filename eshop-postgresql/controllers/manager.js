@@ -211,8 +211,9 @@ function json_clear() {
 // Reads a specific item by ID
 function json_read(id) {
 	var self = this;
-	self.id = id;
-	self.$get(self, self.callback());
+	var options = {};
+	options.id = id;
+	self.$get(options, self.callback());
 }
 
 // ==========================================================================

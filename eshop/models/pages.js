@@ -51,17 +51,10 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		var filter = NOSQL('pages').find();
 
-		if (options.ispartial)
-			filter.where('ispartial', options.ispartial);
-
-		if (options.language)
-			filter.where('language', options.language);
-
-		if (options.navigation)
-			filter.in('navigations', options.navigation);
-
-		if (options.search)
-			filter.like('search', options.search);
+		options.ispartial && filter.where('ispartial', options.ispartial);
+		options.language && filter.where('language', options.language);
+		options.navigation && filter.in('navigations', options.navigation);
+		options.search && filter.like('search', options.search);
 
 		filter.take(take);
 		filter.skip(skip);
@@ -92,14 +85,9 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		var filter = NOSQL('pages').one();
 
-		if (options.url)
-			filter.where('url', options.url);
-
-		if (options.id)
-			filter.where('id', options.id);
-
-		if (options.language)
-			filter.where('language', options.language);
+		options.url && filter.where('url', options.url);
+		options.id && filter.where('id', options.id);
+		options.language && filter.where('language', options.language);
 
 		filter.callback(function(err, doc) {
 			!doc && error.push('error-404-page');
@@ -121,13 +109,12 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (!model.name)
 			model.name = model.title;
 
-		var newbie = false;
+		var newbie = model.id ? false : true;
 		var nosql = NOSQL('pages');
 
-		if (!model.id) {
+		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-			newbie = true;
 		}
 
 		model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).keywords(true, true).join(' ').max(1000);
@@ -142,9 +129,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		(newbie ? nosql.insert(model) : nosql.update(model).where('id', model.id)).callback(function(err, count) {
 			F.emit('pages.save', model);
 			setTimeout2('pages', refresh, 1000);
-
 			callback(SUCCESS(true));
-
 			model.datebackuped = F.datetime;
 			DB('pages_backup').insert(model);
 		});

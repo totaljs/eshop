@@ -7,7 +7,7 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 	// Saves the model into the database
 	schema.setSave(function(error, model, options, callback) {
 
-		model.datecreated = new Date();
+		model.datecreated = F.datetime;
 
 		var nosql = DB(error);
 		nosql.insert('newsletter').set(model);

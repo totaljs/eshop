@@ -8,7 +8,7 @@ exports.login = function(req, res, id) {
 
 exports.logoff = function(req, res, user) {
 	delete online[user.id];
-	res.cookie('__user', '', new Date().add('-1 day'));
+	res.cookie(COOKIE, '', new Date().add('-1 day'));
 };
 
 exports.createSession = function(profile) {
@@ -42,14 +42,9 @@ NEWSCHEMA('User').make(function(schema) {
 
 		var filter = NOSQL('users').one();
 
-		if (options.id)
-			filter.where('id', options.id);
-
-		if (options.email)
-			filter.where('email', options.email);
-
-		if (options.password)
-			filter.where('password', options.password);
+		options.id && filter.where('id', options.id);
+		options.email && filter.where('email', options.email);
+		options.password && filter.where('password', options.password);
 
 		filter.callback(callback, 'error-404-user');
 	});
@@ -74,14 +69,6 @@ NEWSCHEMA('User').make(function(schema) {
 		callback(SUCCESS(true));
 	});
 
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 
@@ -96,9 +83,7 @@ NEWSCHEMA('User').make(function(schema) {
 
 		var filter = NOSQL('users').find();
 
-		// Prepares searching
-		if (options.search)
-			filter.like('search', options.search.keywords(true, true));
+		options.search && filter.like('search', options.search.keywords(true, true));
 
 		filter.take(take);
 		filter.skip(skip);
@@ -111,7 +96,7 @@ NEWSCHEMA('User').make(function(schema) {
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
-			if (data.pages === 0)
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
@@ -148,6 +133,7 @@ NEWSCHEMA('User').make(function(schema) {
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
 				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ').max(500);
+				doc.datecreated = F.datetime;
 				doc[id] = options.profile[id];
 				NOSQL('users').insert(doc.$clean(), F.error());
 
@@ -290,6 +276,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.gender = model.gender;
 			user.password = model.password.hash('sha1');
 			user.ip = options.ip;
+			user.datecreated = F.datetime;
 			user.search = (user.name + ' ' + (user.email || '')).keywords(true, true).join(' ').max(500);
 
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
@@ -301,8 +288,6 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 
 			// Login user
 			exports.login(options.controller.req, options.controller.res, user.id);
-
-			// Reponse
 			callback(SUCCESS(true));
 		});
 	});

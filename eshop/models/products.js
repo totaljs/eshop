@@ -31,20 +31,11 @@ NEWSCHEMA('Product').make(function(schema) {
 		var linker_category = F.sitemap('category', true);
 		var filter = NOSQL('products').find();
 
-		if (options.category)
-			filter.like('linker_category', options.category, 'beg');
-
-		if (options.manufacturer)
-			filter.where('manufacturer', options.manufacturer);
-
-		if (options.search)
-			filter.like('search', options.search.keywords(true, true));
-
-		if (options.id)
-			filter.in('id', options.id);
-
-		if (options.skip)
-			filter.where('id', '<>', options.skip);
+		options.category && filter.like('linker_category', options.category, 'beg');
+		options.manufacturer && filter.where('manufacturer', options.manufacturer);
+		options.search && filter.like('search', options.search.keywords(true, true));
+		options.id && filter.in('id', options.id);
+		options.skip && filter.where('id', '<>', options.skip);
 
 		filter.sort('datecreated', true);
 		filter.skip(skip);
@@ -77,10 +68,10 @@ NEWSCHEMA('Product').make(function(schema) {
 	// Saves the product into the database
 	schema.setSave(function(error, model, options, callback) {
 
-		var newbie = false;
+		var newbie = model.id ? false : true;
 		var nosql = NOSQL('products');
 
-		if (!model.id) {
+		if (newbie) {
 			newbie = true;
 			model.id = UID();
 			model.datecreated = F.datetime;
@@ -94,7 +85,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		model.linker_category = category.linker;
 		model.search = (model.name + ' ' + (model.manufacturer || '') + ' ' + (model.reference || '')).keywords(true, true).join(' ').max(500);
 
-		(newbiew ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
+		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
 
 			F.emit('products.save', model);
 			callback(SUCCESS(true));
@@ -113,14 +104,9 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		var filter = NOSQL('products').one();
 
-		if (options.category)
-			filter.where('linker_category', options.category);
-
-		if (options.linker)
-			filter.where('linker', options.linker);
-
-		if (options.id)
-			filter.where('id', options.id);
+		options.category && filter.where('linker_category', options.category);
+		options.linker && filter.where('linker', options.linker);
+		options.id && filter.where('id', options.id);
 
 		filter.callback(function(err, doc) {
 			!doc && error.push('error-404-product');

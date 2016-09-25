@@ -42,8 +42,6 @@ NEWSCHEMA('Order').make(function(schema) {
 		switch (name) {
 			case 'status':
 				return F.config.custom.defaultorderstatus;
-			case 'datecreated':
-				return new Date();
 		}
 	});
 
@@ -81,14 +79,9 @@ NEWSCHEMA('Order').make(function(schema) {
 			else if (type === 4)
 				builder.where('iscompleted', true); // completed
 
-			if (options.delivery)
-				builder.where('delivery', delivery); // by delivery
-
-			if (options.search)
-				builder.in('search', options.search.keywords(true, true));
-
-			if (options.iduser)
-				builder.where('iduser', options.iduser);
+			options.delivery && builder.where('delivery', delivery);// by delivery
+			options.search && builder.in('search', options.search.keywords(true, true));
+			options.iduser && builder.where('iduser', options.iduser);
 
 			builder.sort('_id', true);
 			builder.take(take);
@@ -104,7 +97,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
-			if (data.pages === 0)
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
@@ -129,6 +122,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.id = UID();
 		model.price = price;
 		model.count = count;
+		model.datecreated = F.datetime;
 		model.isremoved = false;
 		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true);
 
@@ -140,9 +134,9 @@ NEWSCHEMA('Order').make(function(schema) {
 		}
 
 		// Cleans unnecessary properties
-		delete model.isnewsletter;
-		delete model.isterms;
-		delete model.isemail;
+		model.isnewsletter = undefined;
+		model.isterms = undefined;
+		model.isemail = undefined;
 
 		var nosql = DB(error);
 
@@ -185,18 +179,18 @@ NEWSCHEMA('Order').make(function(schema) {
 		var isemail = model.isemail;
 
 		// Cleans unnecessary properties
-		delete model.isnewsletter;
-		delete model.isterms;
-		delete model.isemail;
+		model.isnewsletter = undefined;
+		model.isterms = undefined;
+		model.isemail = undefined;
 
 		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true);
 		model.isremoved = false;
 
 		if (model.iscompleted && !model.datecompleted)
-			model.datecompleted = new Date();
+			model.datecompleted = F.datetime;
 
 		if (model.ispaid && !model.datepaid)
-			model.datepaid = new Date();
+			model.datepaid = F.datetime;
 
 		var nosql = DB(error);
 
@@ -204,20 +198,14 @@ NEWSCHEMA('Order').make(function(schema) {
 			builder.set(model.$clean());
 			builder.rem('id');
 			builder.rem('datecreated');
-			builder.set('dateupdated', new Date());
+			builder.set('dateupdated', F.datetime);
 			builder.where('id', model.id);
 			builder.first();
 		});
 
 		nosql.exec(function(err) {
-
-			// Returns response
 			callback(SUCCESS(true));
-
-			if (err)
-				return;
-
-			F.emit('orders.save', model);
+			!err && F.emit('orders.save', model);
 		});
 
 		if (!isemail)
@@ -312,7 +300,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			builder.where('isremoved', false);
 			builder.where('ispaid', false);
 			builder.set('ispaid', true);
-			builder.set('datepaid', new Date());
+			builder.set('datepaid', F.datetime);
 			builder.first();
 		});
 

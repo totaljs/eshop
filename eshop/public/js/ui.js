@@ -89,7 +89,7 @@ COMPONENT('message', function() {
 
 	self.content = function(cls, text, icon) {
 		!is && self.html('<div><div class="ui-message-body"><span class="fa fa-warning"></span><div class="ui-center"></div></div><button>' + (self.attr('data-button') || 'Close') + '</button></div>');
-		timer && meout(timer);
+		timer && clearTimeout(timer);
 		visible = true;
 		self.element.find('.ui-message-body').removeClass().addClass('ui-message-body ' + cls);
 		self.element.find('.fa').removeClass().addClass('fa ' + icon);

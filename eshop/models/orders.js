@@ -78,11 +78,8 @@ NEWSCHEMA('Order').make(function(schema) {
 		else if (type === 4)
 			filter.where('iscompleted', true); // Uncompleted and paid
 
-		if (options.iduser)
-			filter.where('iduser', options.iduser);
-
-		if (options.search)
-			filter.like('search', options.search.keywords(true, true));
+		options.iduser && filter.where('iduser', options.iduser);
+		options.search && filter.like('search', options.search.keywords(true, true));
 
 		filter.skip(skip);
 		filter.take(take);
