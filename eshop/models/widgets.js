@@ -36,7 +36,6 @@ NEWSCHEMA('Widget').make(function(schema) {
 		var nosql = NOSQL('widgets');
 
 		if (newbie) {
-			newbie = true;
 			model.id = UID();
 			model.datecreated = F.datetime;
 		}

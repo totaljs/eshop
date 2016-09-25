@@ -27,17 +27,10 @@ NEWSCHEMA('Post').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var filter = NOSQL('posts').find();
 
-		if (options.category)
-			options.category = options.category.slug();
-
-		if (options.language)
-			filter.where('language', options.language);
-
-		if (options.category)
-			filter.where('category_linker', options.category);
-
-		if (options.search)
-			filter.like('search', options.search.keywords(true, true));
+		options.category && options.category = options.category.slug();
+		options.language && filter.where('language', options.language);
+		options.category && filter.where('category_linker', options.category);
+		options.search && filter.like('search', options.search.keywords(true, true));
 
 		filter.take(take);
 		filter.skip(skip);
@@ -89,7 +82,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		var newbie = model.id ? false : true;
 		var nosql = NOSQL('posts');
 
-		if (!model.id) {
+		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
 		}
