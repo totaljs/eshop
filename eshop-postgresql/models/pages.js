@@ -455,12 +455,8 @@ NEWSCHEMA('Page').make(function(schema) {
 		var sql = DB(error);
 		sql.remove('tbl_page');
 		sql.exec(function(err) {
-
 			callback(SUCCESS(true));
-
-			// Refreshes internal information e.g. sitemap
-			if (!err)
-				setTimeout(refresh, 1000);
+			!err && setTimeout(refresh, 1000);
 		});
 	});
 
@@ -531,6 +527,8 @@ function refresh() {
 		F.global.navigations = navigation;
 		F.global.sitemap = sitemap;
 		F.global.partial = partial;
+
+		F.cache.removeAll('cache.');
 	});
 }
 

@@ -451,6 +451,8 @@ function refresh() {
 		F.global.navigations = navigation;
 		F.global.sitemap = sitemap;
 		F.global.partial = partial;
+
+		F.cache.removeAll('cache.');
 	});
 }
 
