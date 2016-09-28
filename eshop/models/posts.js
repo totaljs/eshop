@@ -27,7 +27,9 @@ NEWSCHEMA('Post').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var filter = NOSQL('posts').find();
 
-		options.category && options.category = options.category.slug();
+		if (options.category)
+			options.category = options.category.slug();
+
 		options.language && filter.where('language', options.language);
 		options.category && filter.where('category_linker', options.category);
 		options.search && filter.like('search', options.search.keywords(true, true));
