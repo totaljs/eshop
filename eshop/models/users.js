@@ -51,7 +51,8 @@ NEWSCHEMA('User').make(function(schema) {
 
 	schema.setSave(function(error, model, options, callback) {
 		// Update the user in database
-		NOSQL('users').update(model).where('id', model.id).callback(function(count) {
+		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
+		NOSQL('users').modify(model).where('id', model.id).callback(function(count) {
 			// Returns response
 			callback(SUCCESS(true));
 			count && F.emit('users.save', model);
