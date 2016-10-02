@@ -362,7 +362,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 					return callback();
 
 				// Login user
-				exports.login(options.controller.req, options.controller.res, response.value.id);
+				exports.login(options.controller.req, options.controller.res, response.value);
 
 				// Response
 				callback(SUCCESS(true));
