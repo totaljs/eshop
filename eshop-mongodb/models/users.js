@@ -42,6 +42,11 @@ NEWSCHEMA('User').make(function(schema) {
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
 
+		if(!options.email || !options.password || !options.id) {
+		    error.push('error-404-user');
+		    return callback();
+		}
+
 		var nosql = DB(error);
 
 		nosql.select('item', 'users').make(function(builder) {
