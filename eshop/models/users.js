@@ -40,6 +40,11 @@ NEWSCHEMA('User').make(function(schema) {
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
 
+		if(!(options.email || options.password || options.id)) {
+		    error.push('error-404-user');
+		    return callback();
+		}
+
 		var filter = NOSQL('users').one();
 
 		options.id && filter.where('id', options.id);

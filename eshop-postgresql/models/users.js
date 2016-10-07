@@ -91,6 +91,11 @@ NEWSCHEMA('User').make(function(schema) {
 
 		// options.id {String}
 
+		if(!(options.email || options.password || options.id)) {
+		    error.push('error-404-user');
+		    return callback();
+		}
+
 		var sql = DB(error);
 
 		sql.select('item', 'tbl_user').make(function(builder) {
