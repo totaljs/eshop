@@ -8,14 +8,6 @@ NEWSCHEMA('Widget').make(function(schema) {
 	schema.define('istemplate', Boolean);
 	schema.define('datecreated', Date);
 
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 		var nosql = DB(error);
@@ -38,13 +30,8 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 		nosql.select('widgets', 'widgets').make(function(builder) {
 			builder.where('isremoved', false);
-
-			if (options.url)
-				builder.where('url', options.url);
-
-			if (options.id)
-				builder.where('id', options.id);
-
+			options.url && builder.where('url', options.url);
+			options.id && builder.where('id', options.id);
 			builder.first();
 		});
 
@@ -72,35 +59,30 @@ NEWSCHEMA('Widget').make(function(schema) {
 		// options.id {String}
 		// options.url {String}
 
-		var isnew = false;
+		var newbie = model.id ? false : true;
 
-		if (!model.id) {
+		if (newbie) {
 			model.id = UID();
-			model.datecreated = new Date();
-			isnew = true;
+			model.datecreated = F.datetime;
 		} else
-			model.dateupdated = new Date();
+			model.dateupdated = F.datetime;
 
 		model.isremoved = false;
 
 		var nosql = DB(error);
 
-		nosql.save('widgets', 'widgets', isnew, function(builder) {
+		nosql.save('widgets', 'widgets', newbie, function(builder) {
 			builder.set(model);
-			if (isnew)
+			if (newbie)
 				return;
-			builder.set('dateupdated', new Date());
 			builder.rem('datecreated');
 			builder.rem('id');
 			builder.where('id', model.id);
 		});
 
 		nosql.exec(function(err, response) {
-			// Returns response
 			callback(SUCCESS(true));
-			if (err)
-				return;
-			F.emit('widgets.save', model);
+			!err && F.emit('widgets.save', model);
 		});
 	});
 

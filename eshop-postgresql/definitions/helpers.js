@@ -15,7 +15,7 @@ F.helpers.sitemap_category = function(url, category) {
 
 	for (var i = 0, length = a.length; i < length; i++) {
 		linker += (linker ? '/' : '') + b[i];
-		builder += '<li><span class="fa fa-caret-right"></span><a href="{0}">{1}</a></li>'.format(url.format(linker), a[i].trim());
+		builder += '<li><span class="fa fa-caret-right"></span><a href="{0}/">{1}</a></li>'.format(url + linker, a[i].trim());
 	}
 
 	return builder;

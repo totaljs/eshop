@@ -7,14 +7,12 @@
 // "clear" removes all orders
 
 NEWSCHEMA('OrderItem').make(function(schema) {
-
 	schema.define('id', 'String(20)', true);
 	schema.define('price', Number, true);
 	schema.define('name', 'String(50)', true);
 	schema.define('reference', 'String(20)');
 	schema.define('pictures', '[String]');
 	schema.define('count', Number, true);
-
 });
 
 NEWSCHEMA('Order').make(function(schema) {
@@ -49,20 +47,11 @@ NEWSCHEMA('Order').make(function(schema) {
 		switch (name) {
 			case 'status':
 				return F.config.custom.defaultorderstatus;
-			case 'datecreated':
-				return new Date();
 		}
 	});
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
-
-		// options.search {String}
-		// options.delivery {String}
-		// options.type {String}
-		// options.page {String or Number}
-		// options.max {String or Number}
-		// options.iduser {String}
 
 		options.page = U.parseInt(options.page) - 1;
 		options.max = U.parseInt(options.max, 20);
@@ -78,7 +67,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var type = U.parseInt(options.type);
 
-		var filter = DB('orders').find();
+		var filter = NOSQL('orders').find();
 
 		if (type === 1)
 			filter.where('iscompleted', false); // Uncompleted
@@ -89,11 +78,8 @@ NEWSCHEMA('Order').make(function(schema) {
 		else if (type === 4)
 			filter.where('iscompleted', true); // Uncompleted and paid
 
-		if (options.iduser)
-			filter.where('iduser', options.iduser);
-
-		if (options.search)
-			filter.like('search', options.search.keywords(true, true));
+		options.iduser && filter.where('iduser', options.iduser);
+		options.search && filter.like('search', options.search.keywords(true, true));
 
 		filter.skip(skip);
 		filter.take(take);
@@ -106,7 +92,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
-			if (data.pages === 0)
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
@@ -131,6 +117,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.id = UID();
 		model.price = price;
 		model.count = count;
+		model.datecreated = F.datetime;
 
 		if (model.isnewsletter) {
 			var newsletter = GETSCHEMA('Newsletter').create();
@@ -140,11 +127,11 @@ NEWSCHEMA('Order').make(function(schema) {
 		}
 
 		// Cleans unnecessary properties
-		delete model.isnewsletter;
-		delete model.isemail;
+		model.isnewsletter = undefined;
+		model.isemail = undefined;
 
 		// Inserts order into the database
-		DB('orders').insert(model);
+		NOSQL('orders').insert(model);
 
 		// Returns response with order id
 		callback(SUCCESS(true, model.id));
@@ -159,8 +146,7 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Gets a specific order
 	schema.setGet(function(error, model, options, callback) {
-		// options.id {String}
-		DB('orders').one().where('id', options.id).callback(callback, 'error-404-order');
+		NOSQL('orders').one().where('id', options.id).callback(callback, 'error-404-order');
 	});
 
 	// Saves the order into the database
@@ -169,19 +155,19 @@ NEWSCHEMA('Order').make(function(schema) {
 		var isemail = model.isemail;
 
 		// Cleans unnecessary properties
-		delete model.isnewsletter;
-		delete model.isemail;
+		model.isnewsletter = undefined;
+		model.isemail = undefined;
 
 		if (model.iscompleted && !model.datecompleted)
-			model.datecompleted = new Date();
+			model.datecompleted = F.datetime;
 
 		if (model.ispaid && !model.datepaid)
-			model.datepaid = new Date();
+			model.datepaid = F.datetime;
 
 		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(500);
 
 		// Update order in database
-		DB('orders').update(model).where('id', model.id).callback(function(err, count) {
+		NOSQL('orders').update(model).where('id', model.id).callback(function(err, count) {
 
 			// Returns response
 			callback(SUCCESS(true));
@@ -190,7 +176,8 @@ NEWSCHEMA('Order').make(function(schema) {
 				return;
 
 			F.emit('orders.save', model);
-			model.datebackuped = new Date();
+
+			model.datebackuped = F.datetime;
 			DB('orders_backup').insert(model);
 		});
 
@@ -204,13 +191,12 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Removes order from DB
 	schema.setRemove(function(error, id, callback) {
-		// Updates database file
-		DB('orders').remove().where('id', id).callback(callback);
+		NOSQL('orders').remove().where('id', id).callback(callback);
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		DB('orders').remove();
+		NOSQL('orders').remove();
 		callback(SUCCESS(true));
 	});
 
@@ -235,12 +221,12 @@ NEWSCHEMA('Order').make(function(schema) {
 		};
 
 		// Returns data for dashboard
-		DB('orders').find().prepare(prepare).callback(() => callback(stats));
+		NOSQL('orders').find().prepare(prepare).callback(() => callback(stats));
 	});
 
 	// Sets the payment status to paid
 	schema.addWorkflow('paid', function(error, model, id, callback) {
-		DB('orders').modify({ ispaid: true, datepaid: new Date() }).where('id', id).callback(callback);
+		NOSQL('orders').modify({ ispaid: true, datepaid: F.datetime }).where('id', id).callback(callback);
 	});
 
 });

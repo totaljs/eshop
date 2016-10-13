@@ -1,1 +1,0 @@
-find . -type f -not -iwholename '*.git*' -exec md5 "{}" + > checksum.txt

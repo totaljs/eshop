@@ -1,5 +1,3 @@
-const EMPTYOBJECT = {};
-
 NEWSCHEMA('Widget').make(function(schema) {
 
 	schema.define('id', 'String(20)');
@@ -9,14 +7,6 @@ NEWSCHEMA('Widget').make(function(schema) {
 	schema.define('icon', 'String(20)');
 	schema.define('istemplate', Boolean);
 	schema.define('datecreated', Date);
-
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -41,10 +31,8 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 		sql.select('item', 'tbl_widget').make(function(builder) {
 			builder.where('isremoved', false);
-			if (options.url)
-				builder.where('url', options.url);
-			if (options.id)
-				builder.where('id', options.id);
+			options.url && builder.where('url', options.url);
+			options.id && builder.where('id', options.id);
 			builder.first();
 		});
 
@@ -71,31 +59,28 @@ NEWSCHEMA('Widget').make(function(schema) {
 		// options.id {String}
 		// options.url {String}
 
-		var count = 0;
-		var isNew = model.id ? false : true;
+		var newbie = false;
 		var sql = DB();
 
-		if (!model.id)
+		if (!model.id) {
 			model.id = UID();
+			model.datecreated = F.datetime;
+			newbie = true;
+		}
 
-		sql.save('item', 'tbl_widget', isNew, function(builder, isNew) {
+		sql.save('item', 'tbl_widget', newbie, function(builder) {
 			builder.set(model);
-			if (isNew)
+			if (newbie)
 				return;
-			builder.set('dateupdated', new Date());
+			builder.set('dateupdated', F.datetime);
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', model.id);
 		});
 
 		sql.exec(function(err) {
-			// Returns response
 			callback(SUCCESS(true));
-
-			if (err)
-				return;
-
-			F.emit('widgets.save', model);
+			!err && F.emit('widgets.save', model);
 		});
 	});
 

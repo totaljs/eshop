@@ -13,14 +13,6 @@ NEWSCHEMA('Post').make(function(schema) {
 	schema.define('body', String);
 	schema.define('datecreated', Date);
 
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 
@@ -48,16 +40,9 @@ NEWSCHEMA('Post').make(function(schema) {
 
 			builder.where('isremoved', false);
 
-			// Prepares searching
-			if (options.search)
-				builder.in('search', options.search.keywords(true, true));
-
-			// Checks language
-			if (options.language)
-				builder.where('language', options.language);
-
-			if (options.category)
-				builder.where('category_linker', options.category.slug());
+			options.search && builder.in('search', options.search.keywords(true, true));
+			options.language && builder.where('language', options.language);
+			options.category && builder.where('category_linker', options.category.slug());
 
 			builder.fields('id', 'name', 'category', 'language', 'datecreated', 'linker', 'category_linker', 'pictures', 'perex', 'tags');
 			builder.sort('_id', true);
@@ -99,14 +84,10 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		noql.select('post', 'posts').make(function(builder) {
 			builder.where('isremoved', false);
-			if (options.category)
-				builder.where('category_linker', options.category);
-			if (options.linker)
-				builder.where('linker', options.linker);
-			if (options.id)
-				builder.where('id', options.id);
-			if (options.language)
-				builder.where('language', options.language);
+			options.category && builder.where('category_linker', options.category);
+			options.linker && builder.where('linker', options.linker);
+			options.id && builder.where('id', options.id);
+			options.language && builder.where('language', options.language);
 			builder.first();
 		});
 
@@ -131,9 +112,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		});
 
 		noql.exec(SUCCESS(callback), -1);
-
-		// Refreshes internal informations e.g. sitemap
-		setTimeout(refresh, 1000);
+		setTimeout2('posts', refresh, 1000);
 	});
 
 	// Saves the blog into the database
@@ -142,11 +121,11 @@ NEWSCHEMA('Post').make(function(schema) {
 		// options.id {String}
 		// options.url {String}
 
-		var newbie = false;
+		var newbie = model.id ? false : true;
 
-		if (!model.id) {
-			newbie = true;
+		if (newbie) {
 			model.id = UID();
+			model.datecreated = F.datetime;
 		}
 
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
@@ -164,7 +143,7 @@ NEWSCHEMA('Post').make(function(schema) {
 			builder.set(model);
 			if (newbie)
 				return;
-			builder.set('dateupdated', new Date());
+			builder.set('dateupdated', F.datetime);
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', model.id);
@@ -179,9 +158,7 @@ NEWSCHEMA('Post').make(function(schema) {
 				return;
 
 			F.emit('posts.save', model);
-
-			// Refreshes internal informations e.g. categories
-			setTimeout(refresh, 1000);
+			setTimeout2('posts', refresh, 1000);
 		});
 	});
 
@@ -191,11 +168,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		nosql.remove('posts');
 		nosql.exec(function(err) {
 			callback(SUCCESS(true));
-
-			if (err)
-				return;
-
-			setTimeout(refresh, 1000);
+			!err && setTimeout2('posts', refresh, 1000);
 		});
 	});
 });
@@ -205,11 +178,9 @@ function refresh() {
 
 	var categories = {};
 
-	if (F.config.custom.posts) {
-		F.config.custom.posts.forEach(function(item) {
-			categories[item] = { name: item, linker: item.slug(), count: 0 };
-		});
-	}
+	F.config.custom.posts && F.config.custom.posts.forEach(function(item) {
+		categories[item] = { name: item, linker: item.slug(), count: 0 };
+	});
 
 	var nosql = DB();
 

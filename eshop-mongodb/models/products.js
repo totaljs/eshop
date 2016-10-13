@@ -48,20 +48,11 @@ NEWSCHEMA('Product').make(function(schema) {
 
 			builder.where('isremoved', false);
 
-			if (options.category)
-				builder.like('linker_category', '^' + options.category);
-
-			if (options.manufacturer)
-				builder.where('manufacturer', options.manufacturer);
-
-			if (options.search)
-				builder.in('search', options.search.keywords(true, true));
-
-			if (options.id)
-				builder.in('id', options.id);
-
-			if (options.skip)
-				builder.where('id', '<>', options.skip);
+			options.category && builder.like('linker_category', '^' + options.category);
+			options.manufacturer && builder.where('manufacturer', options.manufacturer);
+			options.search && builder.in('search', options.search.keywords(true, true));
+			options.id && builder.in('id', options.id);
+			options.skip && builder.where('id', '<>', options.skip);
 
 			builder.limit(take);
 			builder.skip(skip);
@@ -102,15 +93,13 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.setSave(function(error, model, options, callback) {
 
 		var count = 0;
-		var isnew = false;
-		var dt = new Date();
+		var newbie = model.id ? false : true;
 
-		if (!model.id) {
+		if (newbie) {
 			model.id = UID();
-			model.datecreated = dt;
-			isnew = true;
+			model.datecreated = F.datetime;
 		} else
-			model.dateupdated = dt;
+			model.dateupdated = F.datetime;
 
 		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
 		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
@@ -123,11 +112,10 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		var nosql = DB(error);
 
-		nosql.save('product', 'products', isnew, function(builder, isnew) {
+		nosql.save('product', 'products', newbie, function(builder) {
 			builder.set(model);
-			if (isnew)
+			if (newbie)
 				return;
-			builder.set('dateupdated', new Date());
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', model.id);
@@ -144,11 +132,10 @@ NEWSCHEMA('Product').make(function(schema) {
 
 			F.emit('products.save', model);
 
-			// Refreshes internal information e.g. categories
 			if (options && options.importing)
 				return;
 
-			setTimeout(refresh, 1000);
+			setTimeout2('products', refresh, 1000);
 		});
 	});
 
@@ -162,14 +149,10 @@ NEWSCHEMA('Product').make(function(schema) {
 		var nosql = DB(error);
 
 		nosql.select('product', 'products').make(function(builder) {
-			if (options.category)
-				builder.regex('linker_category', new RegExp('^' + options.category));
 
-			if (options.linker)
-				builder.where('linker', options.linker);
-
-			if (options.id)
-				builder.where('id', options.id);
+			options.category && builder.regex('linker_category', new RegExp('^' + options.category));
+			options.linker && builder.where('linker', options.linker);
+			options.id && builder.where('id', options.id);
 
 			builder.first();
 		});
@@ -245,8 +228,7 @@ NEWSCHEMA('Product').make(function(schema) {
 				});
 				nosql.exec(next, -1);
 			}, function() {
-				if (updates.length)
-					setTimeout(refresh, 100);
+				updates.length && setTimeout2('products', refresh, 1000);
 				callback(SUCCESS(true));
 			});
 		});
@@ -321,11 +303,7 @@ NEWSCHEMA('Product').make(function(schema) {
 						model.$save(options, next);
 					});
 				}, function() {
-
-					if (count)
-						refresh();
-
-					// Done, returns response
+					count && refresh();
 					callback(SUCCESS(count > 0));
 				});
 			});
@@ -422,11 +400,7 @@ NEWSCHEMA('Product').make(function(schema) {
 					}, 3); // 3 threads
 
 				}, function() {
-
-					if (count)
-						refresh();
-
-					// Done, returns response
+					count && refresh();
 					callback(SUCCESS(count > 0));
 				});
 			});

@@ -9,7 +9,7 @@ exports.login = function(req, res, id) {
 
 exports.logoff = function(req, res, user) {
 	delete online[user.id];
-	res.cookie('__user', '', new Date().add('-1 day'));
+	res.cookie(COOKIE, '', new Date().add('-1 day'));
 };
 
 exports.createSession = function(profile) {
@@ -39,22 +39,71 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('datecreated', Date);
 	schema.define('isblocked', Boolean);
 
+	schema.setQuery(function(error, options, callback) {
+
+		// options.search {String}
+		// options.page {String or Number}
+		// options.max {String or Number}
+
+		options.page = U.parseInt(options.page) - 1;
+		options.max = U.parseInt(options.max, 20);
+
+		if (options.page < 0)
+			options.page = 0;
+
+		var take = U.parseInt(options.max);
+		var skip = U.parseInt(options.page * options.max);
+
+		var sql = DB(error);
+
+		sql.listing('items', 'tbl_user', 'id').make(function(builder) {
+			builder.where('isremoved', false);
+
+			options.search && builder.like('search', options.search.keywords(true, true).join(' '), '*');
+
+			builder.sort('datecreated', true);
+			builder.skip(skip);
+			builder.take(take);
+		});
+
+		sql.exec(function(err, response) {
+
+			if (err)
+				return callback();
+
+			var data = {};
+			data.count = response.items.count;
+			data.items = response.items.items;
+			data.limit = options.max;
+			data.pages = Math.ceil(data.count / options.max);
+
+			if (!data.pages)
+				data.pages = 1;
+
+			data.page = options.page + 1;
+			callback(data);
+		});
+	});
+
+
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
 
 		// options.id {String}
+
+		if(!(options.email || options.password || options.id)) {
+		    error.push('error-404-user');
+		    return callback();
+		}
 
 		var sql = DB(error);
 
 		sql.select('item', 'tbl_user').make(function(builder) {
 			builder.where('isremoved', false);
 
-			if (options.email)
-				builder.where('email', options.email);
-			if (options.password)
-				builder.where('password', options.password);
-			if (options.id)
-				builder.where('id', options.id);
+			options.email && builder.where('email', options.email);
+			options.password && builder.where('password', options.password);
+			options.id && builder.where('id', options.id);
 
 			builder.first();
 		});
@@ -66,10 +115,13 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.setSave(function(error, model, options, callback) {
 
 		var sql = DB(error);
-		var newbie = model.id ? false : true;
+		var newbie = false;
 
-		if (!model.id)
+		if (!model.id) {
 			model.id = UID();
+			newbie = true;
+			model.datecreated = F.datetime;
+		}
 
 		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(80);
 
@@ -77,20 +129,15 @@ NEWSCHEMA('User').make(function(schema) {
 			builder.set(model);
 			if (newbie)
 				return;
-			builder.set('dateupdated', new Date());
+			builder.set('dateupdated', F.datetime);
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', model.id);
 		});
 
 		sql.exec(function() {
-			// Returns response
 			callback(SUCCESS(true, model.id));
-
-			if (err)
-				return;
-
-			F.emit('users.save', model);
+			!err && F.emit('users.save', model);
 		});
 	});
 
@@ -112,68 +159,6 @@ NEWSCHEMA('User').make(function(schema) {
 		var sql = DB(error);
 		sql.remove('tbl_user');
 		sql.exec(() => callback(SUCCESS(true)));
-	});
-
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
-	// Gets listing
-	schema.setQuery(function(error, options, callback) {
-
-		// options.search {String}
-		// options.page {String or Number}
-		// options.max {String or Number}
-
-		options.page = U.parseInt(options.page) - 1;
-		options.max = U.parseInt(options.max, 20);
-
-		if (options.page < 0)
-			options.page = 0;
-
-		var take = U.parseInt(options.max);
-		var skip = U.parseInt(options.page * options.max);
-
-		var sql = DB(error);
-		var filter = sql.$; // Creates new SQLBuilder
-
-		filter.where('isremoved', false);
-
-		if (options.search)
-			filter.like('search', options.search.keywords(true, true).join(' '), '*');
-
-		sql.select('items', 'tbl_user').make(function(builder) {
-			builder.replace(filter);
-			builder.sort('datecreated', true);
-			builder.skip(skip);
-			builder.take(take);
-		});
-
-		sql.count('count', 'tbl_user', 'id').make(function(builder) {
-			builder.replace(filter);
-		});
-
-		sql.exec(function(err, response) {
-
-			if (err)
-				return callback();
-
-			var data = {};
-			data.count = response.count;
-			data.items = response.items;
-			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (data.pages === 0)
-				data.pages = 1;
-
-			data.page = options.page + 1;
-			callback(data);
-		});
 	});
 
 	schema.addWorkflow('login', function(error, model, options, callback) {

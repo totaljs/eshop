@@ -493,10 +493,7 @@ module.exports.install = function(options) {
 		webcounter.allowXHR = options.xhr === false ? false : true;
 	}
 
-	F.on('service', function(counter) {
-		if (counter % 120 === 0)
-			refresh_hostname();
-	});
+	F.on('service', counter => counter % 120 === 0 && refresh_hostname());
 };
 
 function refresh_hostname() {

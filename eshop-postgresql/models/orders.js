@@ -42,8 +42,6 @@ NEWSCHEMA('Order').make(function(schema) {
 		switch (name) {
 			case 'status':
 				return F.config.custom.defaultorderstatus;
-			case 'datecreated':
-				return new Date();
 		}
 	});
 
@@ -68,49 +66,39 @@ NEWSCHEMA('Order').make(function(schema) {
 		var type = U.parseInt(options.type);
 		var sql = DB(error);
 
-		var filter = sql.$;
-		filter.where('isremoved', false);
+		sql.listing('items', 'tbl_order', 'id').make(function(builder) {
 
-		switch (type) {
-			case 1:
-				// Uncompleted
-				filter.where('iscompleted', false);
-				break;
-			case 2:
-				// Uncompleted and not paid
-				filter.where('iscompleted', false);
-				filter.where('ispaid', false);
-				break;
-			case 3:
-				// Uncompleted and paid
-				filter.where('iscompleted', false);
-				filter.where('ispaid', true);
-				break;
-			case 4:
-				// Completed
-				filter.where('iscompleted', true);
-				break;
-		}
+			builder.where('isremoved', false);
 
-		if (options.delivery)
-			filter.where('delivery', options.delivery);
+			switch (type) {
+				case 1:
+					// Uncompleted
+					builder.where('iscompleted', false);
+					break;
+				case 2:
+					// Uncompleted and not paid
+					builder.where('iscompleted', false);
+					builder.where('ispaid', false);
+					break;
+				case 3:
+					// Uncompleted and paid
+					builder.where('iscompleted', false);
+					builder.where('ispaid', true);
+					break;
+				case 4:
+					// Completed
+					builder.where('iscompleted', true);
+					break;
+			}
 
-		if (options.search)
-			filter.like('search', options.search.keywords(true, true).join(' '), '*');
+			options.delivery && builder.where('delivery', options.delivery);
+			options.search && builder.like('search', options.search.keywords(true, true).join(' '), '*');
+			options.iduser && builder.where('iduser', options.iduser);
 
-		if (options.iduser)
-			filter.where('iduser', options.iduser);
-
-		sql.select('items', 'tbl_order').make(function(builder) {
-			builder.replace(filter);
 			builder.skip(skip);
 			builder.take(take);
 			builder.fields('id', 'iscompleted', 'delivery', 'firstname', 'lastname', 'status', 'count', 'ispaid', 'price', 'datecreated');
 			builder.sort('datecreated', true);
-		});
-
-		sql.count('count', 'tbl_order', 'id').make(function(builder) {
-			builder.replace(filter);
 		});
 
 		sql.exec(function(err, response) {
@@ -119,12 +107,12 @@ NEWSCHEMA('Order').make(function(schema) {
 				return callback();
 
 			var data = {};
-			data.count = response.count;
-			data.items = response.items;
+			data.count = response.items.count;
+			data.items = response.items.items;
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
-			if (data.pages === 0)
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
@@ -157,9 +145,9 @@ NEWSCHEMA('Order').make(function(schema) {
 		}
 
 		// Cleans unnecessary properties
-		delete model.isnewsletter;
-		delete model.isterms;
-		delete model.isemail;
+		model.isnewsletter = undefined;
+		model.isterms = undefined;
+		model.isemail = undefined;
 
 		var sql = DB(error);
 

@@ -36,7 +36,7 @@
 		</div>
 	</div>
 
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	@{import('manager.js')}
 
 	<script>
@@ -50,7 +50,7 @@
 		});
 
 		function doLogin() {
-			if (!$.components.valid('user.*'))
+			if (!jC.valid('user.*'))
 				return;
 			var id = HASH(user.name + ':' + user.password);
 			var dt = new Date();

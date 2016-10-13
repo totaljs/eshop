@@ -62,7 +62,7 @@ function file_read(req, res) {
 	if (!req.query.s || (req.extension !== 'jpg' && req.extension !== 'gif' && req.extension !== 'png')) {
 		// Reads specific file by ID
 		F.exists(req, res, function(next, filename) {
-			DB().readFile(ObjectID.parse(id), function(err, fs, close) {
+			DB().readFile(ObjectID.parse(id), function(err, fs, close, meta, length) {
 
 				if (err) {
 					next();
@@ -72,6 +72,7 @@ function file_read(req, res) {
 				fs.stream(true).on('end', function() {
 					res.file(filename);
 					next();
+					close();
 				}).pipe(require('fs').createWriteStream(filename));
 			});
 		});
@@ -101,14 +102,13 @@ function file_read(req, res) {
 				// Image processing
 				res.image(filename, function(image) {
 					image.output(req.extension);
-					if (req.extension === 'jpg')
-						image.quality(85);
+					req.extension === 'jpg' && image.quality(85);
 					image.resize(req.query.s + '%');
 					image.minify();
 				});
 
-				// Releases F.exists()
 				next();
+				close();
 			}).pipe(require('fs').createWriteStream(filename));
 		});
 	});
@@ -121,7 +121,7 @@ function file_image(req, res) {
 	// Below method checks if the file exists (processed) in temporary directory
 	// More information in total.js documentation
 	F.exists(req, res, 10, function(next, filename) {
-		DB().readFile(ObjectID.parse(req.split[2].replace('.jpg', '')), function(err, fs, close) {
+		DB().readFile(ObjectID.parse(req.split[2].replace('.jpg', '')), function(err, fs, close, meta, length) {
 
 			if (err) {
 				next();
@@ -145,6 +145,7 @@ function file_image(req, res) {
 
 				// Releases F.exists()
 				next();
+				close();
 			}).pipe(require('fs').createWriteStream(filename));
 		});
 	});

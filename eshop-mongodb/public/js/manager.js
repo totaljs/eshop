@@ -35,53 +35,37 @@ if (window.su) {
 		jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
 	});
 
-	if (can('orders')) {
-		jRouting.route(managerurl + '/orders/', function() {
-			SET('common.page', 'orders');
-		});
-	}
+	can('orders') && jRouting.route(managerurl + '/orders/', function() {
+		SET('common.page', 'orders');
+	});
 
-	if (can('posts')) {
-		jRouting.route(managerurl + '/posts/', function() {
-			SET('common.page', 'posts');
-		});
-	}
+	can('posts') && jRouting.route(managerurl + '/posts/', function() {
+		SET('common.page', 'posts');
+	});
 
-	if (can('products')) {
-		jRouting.route(managerurl + '/products/', function() {
-			SET('common.page', 'products');
-		});
-	}
+	can('products') && jRouting.route(managerurl + '/products/', function() {
+		SET('common.page', 'products');
+	});
 
-	if (can('newsletter')) {
-		jRouting.route(managerurl + '/newsletter/', function() {
-			SET('common.page', 'newsletter');
-		});
-	}
+	can('newsletter') && jRouting.route(managerurl + '/newsletter/', function() {
+		SET('common.page', 'newsletter');
+	});
 
-	if (can('settings')) {
-		jRouting.route(managerurl + '/settings/', function() {
-			SET('common.page', 'settings');
-		});
-	}
+	can('settings') && jRouting.route(managerurl + '/settings/', function() {
+		SET('common.page', 'settings');
+	});
 
-	if (can('users')) {
-		jRouting.route(managerurl + '/users/', function() {
-			SET('common.page', 'users');
-		});
-	}
+	can('users') && jRouting.route(managerurl + '/users/', function() {
+		SET('common.page', 'users');
+	});
 
-	if (can('pages')) {
-		jRouting.route(managerurl + '/pages/', function() {
-			SET('common.page', 'pages');
-		});
-	}
+	can('pages') && jRouting.route(managerurl + '/pages/', function() {
+		SET('common.page', 'pages');
+	});
 
-	if (can('system')) {
-		jRouting.route(managerurl + '/system/', function() {
-			SET('common.page', 'system');
-		});
-	}
+	can('system') && jRouting.route(managerurl + '/system/', function() {
+		SET('common.page', 'system');
+	});
 }
 
 jRouting.on('location', function(url) {
@@ -114,27 +98,19 @@ function success() {
 }
 
 function can(name) {
-	if (!su.roles.length)
-		return true;
-	return su.roles.indexOf(name) !== -1;
+	return su.roles.length ? su.roles.indexOf(name) !== -1 : true;
 }
 
 Tangular.register('price', function(value, format) {
-	if (value == null)
-		value = 0;
-	return currency.format(value.format(format));
+	return value == null ? 0 : currency.format(value.format(format));
 });
 
-Tangular.register('join', function(value) {
-	if (value instanceof Array)
-		return value.join(', ');
-	return '';
+Tangular.register('join', function(value, delimiter) {
+	return value instanceof Array ? value.join(delimiter || ', ') : '';
 });
 
 Tangular.register('default', function(value, def) {
-	if (value == null || value === '')
-		return def;
-	return value;
+	return value == null || value === '' ? def : value;
 });
 
 function getSelectionStartNode(context){

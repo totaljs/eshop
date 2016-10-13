@@ -13,22 +13,8 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('linker_manufacturer', 'String(50)');
 	schema.define('datecreated', Date);
 
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
-
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
-
-		// options.search {String}
-		// options.category {String}
-		// options.page {String or Number}
-		// options.max {String or Number}
-		// options.id {String}
 
 		options.page = U.parseInt(options.page) - 1;
 		options.max = U.parseInt(options.max, 20);
@@ -43,22 +29,13 @@ NEWSCHEMA('Product').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var linker_detail = F.sitemap('detail', true);
 		var linker_category = F.sitemap('category', true);
-		var filter = DB('products').find();
+		var filter = NOSQL('products').find();
 
-		if (options.category)
-			filter.like('linker_category', options.category, 'beg');
-
-		if (options.manufacturer)
-			filter.where('manufacturer', options.manufacturer);
-
-		if (options.search)
-			filter.like('search', options.search.keywords(true, true));
-
-		if (options.id)
-			filter.in('id', options.id);
-
-		if (options.skip)
-			filter.where('id', '<>', options.skip);
+		options.category && filter.like('linker_category', options.category, 'beg');
+		options.manufacturer && filter.where('manufacturer', options.manufacturer);
+		options.search && filter.like('search', options.search.keywords(true, true));
+		options.id && filter.in('id', options.id);
+		options.skip && filter.where('id', '<>', options.skip);
 
 		filter.sort('datecreated', true);
 		filter.skip(skip);
@@ -71,7 +48,7 @@ NEWSCHEMA('Product').make(function(schema) {
 					doc.linker = linker_detail.url.format(doc.linker);
 				if (linker_category)
 					doc.linker_category = linker_category.url + doc.linker_category;
-				delete doc.body;
+				doc.body = undefined;
 			}
 
 			var data = {};
@@ -80,7 +57,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max);
 
-			if (data.pages === 0)
+			if (!data.pages)
 				data.pages = 1;
 
 			data.page = options.page + 1;
@@ -91,89 +68,67 @@ NEWSCHEMA('Product').make(function(schema) {
 	// Saves the product into the database
 	schema.setSave(function(error, model, options, callback) {
 
-		var newbie = false;
-		var nosql = DB('products');
+		var newbie = model.id ? false : true;
+		var nosql = NOSQL('products');
 
-		if (!model.id) {
+		if (newbie) {
 			newbie = true;
 			model.id = UID();
+			model.datecreated = F.datetime;
 		}
-
-		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
-		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
 
 		var category = prepare_subcategories(model.category);
 
+		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
+		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
 		model.category = category.name;
 		model.linker_category = category.linker;
 		model.search = (model.name + ' ' + (model.manufacturer || '') + ' ' + (model.reference || '')).keywords(true, true).join(' ').max(500);
 
-		var fn = function() {
-			F.emit('products.save', model);
+		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
 
-			// Returns response
+			F.emit('products.save', model);
 			callback(SUCCESS(true));
 
-			if (options && options.importing)
-				return;
+			model.datebackuped = F.datetime;
+			DB('products_backup').insert(model);
 
-			// Refreshes internal information e.g. categories
-			setTimeout(refresh, 1000);
-		};
+			if (!options || !options.importing)
+				refresh_cache();
+		});
 
-		if (newbie) {
-			nosql.insert(model).callback(fn);
-			return;
-		}
-
-		DB('products_backup').insert(model);
-		nosql.modify(model).where('id', model.id).callback(fn);
 	});
 
 	// Gets a specific product
 	schema.setGet(function(error, model, options, callback) {
 
-		// options.category {String}
-		// options.linker {String}
-		// options.id {String}
-		// Gets a specific document from DB
-		var filter = DB('products').one();
+		var filter = NOSQL('products').one();
 
-		if (options.category)
-			filter.where('linker_category', options.category);
-
-		if (options.linker)
-			filter.where('linker', options.linker);
-
-		if (options.id)
-			filter.where('id', options.id);
+		options.category && filter.where('linker_category', options.category);
+		options.linker && filter.where('linker', options.linker);
+		options.id && filter.where('id', options.id);
 
 		filter.callback(function(err, doc) {
-			if (!doc)
-				error.push('error-404-product');
+			!doc && error.push('error-404-product');
 			callback(doc);
 		});
 	});
 
 	// Removes product
 	schema.setRemove(function(error, id, callback) {
-
-		// Updates database file
-		DB('products').remove().where('id', id).callback(callback);
-
-		// Refreshes internal information e.g. categories
-		setTimeout(refresh, 1000);
+		NOSQL('products').remove().where('id', id).callback(callback);
+		refresh_cache();
 	});
 
 	// Clears product database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		DB('products').remove().callback(refresh);
+		NOSQL('products').remove().callback(refresh_cache);
 		callback(SUCCESS(true));
 	});
 
 	// Refreshes categories
 	schema.addWorkflow('refresh', function(error, model, options, callback) {
-		refresh();
+		refresh_cache();
 		callback(SUCCESS(true));
 	});
 
@@ -192,10 +147,8 @@ NEWSCHEMA('Product').make(function(schema) {
 			return doc;
 		};
 
-		DB('products').update().like('category', category_old.name).callback(function(err, count) {
-			// Refreshes internal information e.g. categories
-			if (count)
-				setTimeout(refresh, 1000);
+		NOSQL('products').update().like('category', category_old.name).callback(function(err, count) {
+			count && refresh_cache();
 			callback(SUCCESS(true));
 		});
 	});
@@ -203,13 +156,12 @@ NEWSCHEMA('Product').make(function(schema) {
 	// Imports CSV
 	schema.addWorkflow('import.csv', function(error, model, filename, callback) {
 		// Reads all id + references (for updating/inserting)
-		DB('products').find().fields('id', 'reference').where('reference', '!=', '').callback(function(err, database) {
+		NOSQL('products').find().fields('id', 'reference').where('reference', '!=', '').callback(function(err, database) {
 			require('fs').readFile(filename, function(err, buffer) {
 
 				if (err) {
 					error.push(err);
-					callback();
-					return;
+					return callback();
 				}
 
 				buffer = buffer.toString('utf8').split('\n');
@@ -257,11 +209,7 @@ NEWSCHEMA('Product').make(function(schema) {
 					});
 
 				}, function() {
-
-					if (count)
-						refresh();
-
-					// Done, returns response
+					refresh_cache();
 					callback(SUCCESS(count > 0));
 				});
 			});
@@ -271,7 +219,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	// Imports XML
 	schema.addWorkflow('import.xml', function(error, model, filename, callback) {
 		// Reads all id + references (for updating/inserting)
-		DB('products').find().fields('id', 'reference', 'pictures').where('reference', '!=', '').callback(function(err, database) {
+		NOSQL('products').find().fields('id', 'reference', 'pictures').where('reference', '!=', '').callback(function(err, database) {
 
 			var products = [];
 			var count = 0;
@@ -314,8 +262,7 @@ NEWSCHEMA('Product').make(function(schema) {
 								return next();
 							count++;
 							model.$save(options, function() {
-								if (tmp && tmp.pictures)
-									tmp.pictures.forEach(id => NOSQL('products').binary.remove(id));
+								tmp && tmp.pictures && tmp.pictures.forEach(id => NOSQL('products').binary.remove(id));
 								next();
 							});
 						});
@@ -355,11 +302,7 @@ NEWSCHEMA('Product').make(function(schema) {
 					}, 3); // 3 threads
 
 				}, function() {
-
-					if (count)
-						refresh();
-
-					// Done, returns response
+					count && refresh_cache();
 					callback(SUCCESS(count > 0));
 				});
 			});
@@ -367,7 +310,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	});
 
 	schema.addWorkflow('export.xml', function(error, model, options, callback) {
-		DB('products').find().callback(function(err, docs, count) {
+		NOSQL('products').find().callback(function(err, docs, count) {
 
 			var xml = [];
 
@@ -440,7 +383,7 @@ function refresh() {
 			db_manufacturers[doc.manufacturer].count++;
 	};
 
-	DB('products').find().prepare(prepare).callback(function() {
+	NOSQL('products').find().prepare(prepare).callback(function() {
 
 		// Prepares categories with their subcategories
 		var keys = Object.keys(db_categories);
@@ -470,9 +413,7 @@ function refresh() {
 			});
 		}
 
-		Object.keys(categories_filter).forEach(function(key) {
-			categories.push(categories_filter[key]);
-		});
+		Object.keys(categories_filter).forEach(key => categories.push(categories_filter[key]));
 
 		categories.sort(function(a, b) {
 			if (a.level > b.level)
@@ -490,7 +431,6 @@ function refresh() {
 		}
 
 		manufacturers.quicksort('name');
-
 		F.global.categories = categories;
 		F.global.manufacturers = manufacturers;
 	});
@@ -509,6 +449,11 @@ function prepare_subcategories(name) {
 	}
 
 	return { linker: builder_link.join('/'), name: builder_text.join(' / ') };
+}
+
+function refresh_cache() {
+	setTimeout2('cache', () => F.cache.removeAll('cache.'), 2000);
+	setTimeout2('products', refresh, 1000);
 }
 
 F.on('settings', refresh);

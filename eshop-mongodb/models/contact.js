@@ -15,7 +15,7 @@ NEWSCHEMA('Contact').make(function(schema) {
 
 		// Default values
 		model.id = UID();
-		model.datecreated = new Date();
+		model.datecreated = F.datetime;
 
 		var nosql = DB(error);
 		nosql.insert('contactforms').set(model);
