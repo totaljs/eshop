@@ -43,7 +43,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
 			F.emit('widgets.save', model);
 			callback(SUCCESS(true));
-			model.datebackuped = F.datetime;
+			model.datebackup = F.datetime;
 			DB('widgets_backup').insert(model);
 			setTimeout2('cache', () => F.cache.removeAll('cache.'), 1000);
 		});

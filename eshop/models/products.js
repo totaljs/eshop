@@ -90,7 +90,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			F.emit('products.save', model);
 			callback(SUCCESS(true));
 
-			model.datebackuped = F.datetime;
+			model.datebackup = F.datetime;
 			DB('products_backup').insert(model);
 
 			if (!options || !options.importing)

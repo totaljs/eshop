@@ -130,7 +130,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			F.emit('pages.save', model);
 			setTimeout2('pages', refresh, 1000);
 			callback(SUCCESS(true));
-			model.datebackuped = F.datetime;
+			model.datebackup = F.datetime;
 			DB('pages_backup').insert(model);
 		});
 	});

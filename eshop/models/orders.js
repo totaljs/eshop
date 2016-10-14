@@ -177,7 +177,7 @@ NEWSCHEMA('Order').make(function(schema) {
 
 			F.emit('orders.save', model);
 
-			model.datebackuped = F.datetime;
+			model.datebackup = F.datetime;
 			DB('orders_backup').insert(model);
 		});
 

@@ -103,7 +103,7 @@ NEWSCHEMA('Post').make(function(schema) {
 			callback(SUCCESS(true));
 			refresh_cache();
 
-			model.datebackuped = F.datetime;
+			model.datebackup = F.datetime;
 			DB('posts_backup').insert(model);
 		});
 
