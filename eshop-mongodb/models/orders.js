@@ -1,12 +1,18 @@
-NEWSCHEMA('OrderItem').make(function(schema) {
+// ====== Supported operations:
+// "dashboard"  - gets stats
 
+// ====== Supported workflows:
+// "create"     - creates an order
+// "paid"       - sets ispaid to true
+// "clear"      - removes all orders
+
+NEWSCHEMA('OrderItem').make(function(schema) {
 	schema.define('id', 'String(20)', true);
 	schema.define('price', Number, true);
 	schema.define('name', 'String(50)', true);
 	schema.define('reference', 'String(20)');
 	schema.define('pictures', '[String]');
 	schema.define('count', Number, true);
-
 });
 
 NEWSCHEMA('Order').make(function(schema) {
@@ -20,13 +26,12 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('email', 'Email', true);
 	schema.define('reference', 'String(10)');
 	schema.define('phone', 'Phone');
-	schema.define('language', 'Lower(3)');
+	schema.define('language', 'Lower(2)');
 	schema.define('address', 'String(1000)', true);
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');
 	schema.define('ip', 'String(80)');
 	schema.define('iscompleted', Boolean);
-	schema.define('datecreated', Date);
 	schema.define('datecompleted', Date);
 	schema.define('datepaid', Date);
 	schema.define('price', Number);
@@ -68,6 +73,7 @@ NEWSCHEMA('Order').make(function(schema) {
 		var nosql = DB(error);
 
 		nosql.listing('orders', 'orders').make(function(builder) {
+
 			builder.where('isremoved', false);
 
 			if (type === 1)
@@ -91,18 +97,12 @@ NEWSCHEMA('Order').make(function(schema) {
 		nosql.exec(function(err, response) {
 
 			var data = {};
-
 			data.count = response.orders.count;
 			data.items = response.orders.items;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (!data.pages)
-				data.pages = 1;
-
+			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
 
-			// Returns data
 			callback(data);
 		});
 	});
@@ -174,7 +174,7 @@ NEWSCHEMA('Order').make(function(schema) {
 	});
 
 	// Saves the order into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
 		var isemail = model.isemail;
 
@@ -199,6 +199,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.set('dateupdated', F.datetime);
+			builder.set('admin_update', controller.user.name);
 			builder.where('id', model.id);
 			builder.first();
 		});

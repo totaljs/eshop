@@ -2,7 +2,7 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 
 	schema.define('email', 'Email', true);
 	schema.define('ip', 'String(80)');
-	schema.define('language', 'Lower(3)');
+	schema.define('language', 'Lower(2)');
 
 	// Saves the model into the database
 	schema.setSave(function(error, model, options, callback) {
@@ -12,7 +12,6 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 		var nosql = DB(error);
 		nosql.insert('newsletter').set(model);
 		nosql.exec(SUCCESS(callback), -1);
-
 		F.emit('newsletter.save', model);
 
 		// Writes stats
@@ -41,7 +40,6 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 	// Performs download
 	schema.addWorkflow('download', function(error, model, controller, callback) {
 		schema.query(function(err, response) {
-			// Returns CSV
 			controller.binary(new Buffer(buffer, 'utf8'), 'text/csv', 'utf8', 'newsletter.csv');
 			callback();
 		});

@@ -143,11 +143,8 @@ NEWSCHEMA('Page').make(function(schema) {
 			return callback();
 		}
 
-		var options = {};
-		options.id = model.parent;
-
 		// Gets parent URL
-		schema.get(options, function(err, response) {
+		schema.get({ id: model.parent }, function(err, response) {
 
 			if (err)
 				model.url = model.title.slug();

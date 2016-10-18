@@ -2,6 +2,7 @@ const Fs = require('fs');
 const filename = F.path.databases('settings.json');
 
 NEWSCHEMA('SuperUser').make(function(schema) {
+	schema.define('name', String, true);
 	schema.define('login', String, true);
 	schema.define('password', String, true);
 	schema.define('roles', '[String]');

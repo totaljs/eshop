@@ -2,8 +2,8 @@
 	<div class="container">
 		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> @(Users)</div>
 		<div class="row">
-			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.filter.search" data-placeholder="@(Search users ...)" data-control-icon="fa-search"></div>
+			<div class="col-md-4 col-sm-6 m">
+				<div data-component="textbox" data-component-path="users.filter.search" data-placeholder="@(Search users ...)" data-component-type="search"></div>
 				<div class="help" data-component="template" data-component-path="users.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
 		</div>

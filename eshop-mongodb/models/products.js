@@ -12,15 +12,6 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('linker', 'String(50)');
 	schema.define('linker_category', 'String(50)');
 	schema.define('linker_manufacturer', 'String(50)');
-	schema.define('datecreated', Date);
-
-	// Sets default values
-	schema.setDefault(function(name) {
-		switch (name) {
-			case 'datecreated':
-				return new Date();
-		}
-	});
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -69,7 +60,8 @@ NEWSCHEMA('Product').make(function(schema) {
 			data.count = response.products.count;
 			data.items = response.products.items;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
+			data.pages = Math.ceil(data.count / options.max) || 1;
+			data.page = options.page + 1;
 
 			var linker_detail = F.sitemap('detail', true);
 			var linker_category = F.sitemap('category', true);
@@ -81,16 +73,12 @@ NEWSCHEMA('Product').make(function(schema) {
 					item.linker_category = linker_category.url + item.linker_category;
 			});
 
-			if (!data.pages)
-				data.pages = 1;
-
-			data.page = options.page + 1;
 			callback(data);
 		});
 	});
 
 	// Saves the product into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
 		var count = 0;
 		var newbie = model.id ? false : true;
@@ -98,8 +86,11 @@ NEWSCHEMA('Product').make(function(schema) {
 		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-		} else
+			model.admin_create = controller.user ? controller.user.name : '';
+		} else {
 			model.dateupdated = F.datetime;
+			model.admin_update = controller.user ? controller.user.name : '';
+		}
 
 		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
 		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
@@ -124,7 +115,6 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		nosql.exec(function(err, response) {
 
-			// Returns response
 			callback(SUCCESS(true));
 
 			if (err)
@@ -132,7 +122,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 			F.emit('products.save', model);
 
-			if (options && options.importing)
+			if (controller && controller.importing)
 				return;
 
 			setTimeout2('products', refresh, 1000);
@@ -563,9 +553,7 @@ function refresh() {
 		});
 
 		categories.sort(function(a, b) {
-			if (a.level > b.level)
-				return 1;
-			return a.level < b.level ? -1 : a.name.localeCompare2(b.name);
+			return a.level > b.level ? 1 : a.level < b.level ? -1 : a.name.localeCompare2(b.name);
 		});
 
 		// Prepares manufacturers

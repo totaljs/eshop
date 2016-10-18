@@ -1,6 +1,6 @@
 <div data-component="form" data-title="@(Select widget)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="600px" data-component-id="cmseditor_widgets">
 	<div class="padding npb">
-		<div data-component="textbox" data-component-path="cmseditor.widgetssearch" data-control-icon="fa-search" data-placeholder="@(Search widgets)"></div>
+		<div data-component="textbox" data-component-path="cmseditor.widgetssearch" data-placeholder="@(Search widgets)" data-component-type="search"></div>
 	</div>
 	<hr class="nmb" />
 	<div class="padding">
@@ -224,15 +224,40 @@
 		var self = this;
 		var target;
 		var iframe;
+		var container;
 		var width;
 		var offsetter = '<span id="cmseditorheight"></span>';
 
 		self.options = { template: 'default' };
 		self.readonly();
 
+		self.released = function(is) {
+			is && iframe.attr('src', 'about:blank');
+		};
+
 		self.make = function() {
-			self.html('<iframe src="about:blank"></iframe>');
+			self.html('<div style="margin:0 auto"><iframe src="about:blank"></iframe></div>');
 			iframe = self.find('iframe');
+			container = self.find('div');
+		};
+
+		self.device = function(type) {
+			switch (type) {
+				case 'md':
+					container.css({ width: '1140px' });
+					break;
+				case 'sm':
+					container.css({ width: '960px' });
+					break;
+				case 'xs':
+					container.css({ width: '400px' });
+					break;
+				case 'lg':
+				default:
+					container.css({ width: 'auto' });
+					break;
+			}
+			return self.resize();
 		};
 
 		self.init = function() {
@@ -302,8 +327,6 @@
 
 		self.refreshWidgets = function() {
 			AJAX('GET {0}/api/widgets/'.format(managerurl), function(response) {
-				if (isError(arguments))
-					return;
 				response.sort(FN('(a,b) => a.name.localeCompare(b.name)'));
 				SET('cmseditor.widgets', response);
 			});
@@ -486,7 +509,7 @@
 			var content = self.getContents();
 			content.find('[contenteditable]').removeAttr('contenteditable');
 			content.find('.CMS_selected').removeClass('CMS_selected');
-			return (content.find('#CMS').html() || '').trim().replace(/&nbsp;/g, ' ').replace(offsetter, '');
+			return cmseditor_prettify((content.find('#CMS').html() || '').trim().replace(/&nbsp;/g, ' ').replace(offsetter, ''));
 		};
 
 		self.getContent = function() {
@@ -599,7 +622,7 @@
 				e.preventDefault();
 				e.stopPropagation();
 				var text = e.originalEvent.clipboardData.getData('text/plain');
-				if (target.hasClass('CMS_singleline'))
+				if (!target.hasClass('CMS_multiline'))
 					text = text.replace(/\n\r/g, ' ');
 				self.getDocument().execCommand('insertText', false, text.trim().replace(/\s{2,}/g, ' ').replace(/\&nbsp;/g, ' '));
 			});
@@ -609,7 +632,7 @@
 				if (!target)
 					return;
 
-				if (e.keyCode === 13 && target.hasClass('CMS_singleline')) {
+				if (e.keyCode === 13 && !target.hasClass('CMS_multiline')) {
 					e.preventDefault();
 					e.stopPropagation();
 					return;
@@ -970,8 +993,6 @@
 
 			SETTER('loading', 'show');
 			AJAX('POST {0}/api/pages/preview/'.format(managerurl), options, function(response) {
-				if (isError(arguments))
-					return;
 				self.write(response.replace('</body>', '<div id="CMS_panel"><div id="CMS_panel_buttons_move"><span class="fa fa-arrow-up" data-name="up" title="@(Move up)"></span><span class="fa fa-arrow-down" data-name="down" title="@(Move down)"></span></div><div id="CMS_panel_info"></div><div class="CMS_panel_buttons"><span class="fa fa-pencil" title="@(Edit)" data-name="edit"></span><span class="fa fa-link" title="@(Change link)" data-name="link"></span><span class="fa fa-quote-left" title="@(Change attributes)" data-name="attribute"></span><span class="fa fa-copy" title="@(Duplicate)" data-name="repeat"></span></span><span class="fa fa-plug" title="@(Add widget)" data-name="widgets"></span><span class="fa fa-trash" title="@(Remove content)" data-name="remove"></span><span class="fa fa-caret-square-o-down" title="@(Hide)" data-name="hide"></span></div></div></body>'));
 				SETTER('loading', 'hide', 500);
 			});
@@ -1007,7 +1028,7 @@
 
 			var after = target.hasClass('CMS_template') || target.hasClass('CMS_widget');
 			if (!is) {
-				var content = '<div class="CMS_widget CMS_remove" data-id="' + id + '">--- <span class="fa fa-plug"></span> ' + el.attr('data-name') + ' ---<pre></pre></div>';
+				var content = '<div class="CMS_widget CMS_remove" data-id="{0}">--- <span class="fa fa-plug"></span> {1} ---<pre></pre></div>'.format(id, el.attr('data-name'));
 				if (after)
 					target.after(content);
 				else
@@ -1019,9 +1040,7 @@
 
 			SETTER('loading', 'show');
 			AJAX('GET {0}/api/widgets/{1}/'.format(managerurl, id), function(response) {
-				if (isError(arguments))
-					return;
-				var content = '<div class="CMS_template CMS_remove">' + response.body + '</div>';
+				var content = '<div class="CMS_template CMS_remove" data-id="{0}">{1}</div>'.format(id, response.body);
 				if (after)
 					target.after(content);
 				else
@@ -1263,6 +1282,63 @@
 		});
 
 		SET('cmseditor.widgets2', arr);
+	}
+
+	function cmseditor_prettify(body) {
+
+		var index = 0;
+		var builder = [];
+		var count = 0;
+		var tmp;
+
+		var pad = function(count) {
+			return '\n'.padRight(count, '\t');
+		};
+
+		while (true) {
+
+			var c = body[index++];
+			var n = body[index];
+
+			if (index > body.length)
+				break;
+
+			if (c === '<' && n === 'd' && body.substring(index, index + 3) === 'div') {
+				tmp = index;
+				index = body.indexOf('>', index + 3) + 1;
+				builder.push(pad(count + 1) + body.substring(tmp - 1, index) + pad(count + 2));
+				count++;
+				continue;
+			}
+
+			if (c === '<' && n === '/' && body.substring(index, index + 4) === '/div') {
+				count--;
+				builder.push(pad(count + 1) + '</div>' + pad(count + 1));
+				index += 5;
+				continue;
+			}
+
+			builder.push(body.substring(index - 1, index));
+		}
+
+		for (var i = 0, length = builder.length; i < length; i++) {
+			var line = builder[i];
+			var next = builder[i + 1];
+			if (!next)
+				break;
+			var a = line.indexOf('>');
+			if (a === -1)
+				continue;
+			var b = next.indexOf('<');
+			if (b === -1)
+				continue;
+			next = next.substring(0, b);
+			if (line.indexOf('\n', a) === -1 || (next.indexOf('\n') === -1))
+				continue;
+			builder[i] = line.substring(0, a + 1) + line.substring(a + 2);
+		}
+
+		return builder.join('').trim();
 	}
 
 	$(document).on('click', '#cmseditoricons .fa', function() {

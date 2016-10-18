@@ -6,9 +6,8 @@ NEWSCHEMA('Contact').make(function(schema) {
 	schema.define('email', 'Email', true);
 	schema.define('message', String, true);
 	schema.define('phone', 'Phone');
-	schema.define('language', 'Lower(3)');
+	schema.define('language', 'Lower(2)');
 	schema.define('ip', 'String(80)');
-	schema.define('datecreated', Date);
 
 	// Saves the model into the database
 	schema.setSave(function(error, model, options, callback) {
@@ -22,8 +21,6 @@ NEWSCHEMA('Contact').make(function(schema) {
 		nosql.exec(SUCCESS(callback), -1);
 
 		F.emit('contact.save', model);
-
-		// Writes stats
 		MODULE('webcounter').increment('contactforms');
 
 		// Sends email

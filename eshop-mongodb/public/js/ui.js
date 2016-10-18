@@ -22,6 +22,19 @@ COMPONENT('click', function() {
 	};
 });
 
+COMPONENT('exec', function() {
+	var self = this;
+	self.readonly();
+	self.blind();
+	self.make = function() {
+		self.element.on('click', self.attr('data-selector') || '.exec', function() {
+			var el = $(this);
+			var attr = el.attr('data-exec');
+			attr && EXEC(attr, el);
+		});
+	};
+});
+
 COMPONENT('visible', function() {
 	var self = this;
 	var condition = self.attr('data-if');
@@ -89,7 +102,7 @@ COMPONENT('message', function() {
 
 	self.content = function(cls, text, icon) {
 		!is && self.html('<div><div class="ui-message-body"><span class="fa fa-warning"></span><div class="ui-center"></div></div><button>' + (self.attr('data-button') || 'Close') + '</button></div>');
-		timer && meout(timer);
+		timer && clearTimeout(timer);
 		visible = true;
 		self.element.find('.ui-message-body').removeClass().addClass('ui-message-body ' + cls);
 		self.element.find('.fa').removeClass().addClass('fa ' + icon);
@@ -337,6 +350,20 @@ COMPONENT('textbox', function() {
 
 		if (!icon2 && self.type === 'date')
 			icon2 = 'fa-calendar';
+		else if (self.type === 'search') {
+			icon2 = 'fa-search ui-textbox-control-icon';
+			self.element.on('click', '.ui-textbox-control-icon', function() {
+				self.$stateremoved = false;
+				$(this).removeClass('fa-times').addClass('fa-search');
+				self.set('');
+			});
+			self.getter2 = function(value) {
+				if (self.$stateremoved && !value)
+					return;
+				self.$stateremoved = value ? false : true;
+				self.find('.ui-textbox-control-icon').toggleClass('fa-times', value ? true : false).toggleClass('fa-search', value ? false : true);
+			};
+		}
 
 		icon2 && builder.push('<div><span class="fa {0}"></span></div>'.format(icon2));
 		increment && !icon2 && builder.push('<div><span class="fa fa-caret-up"></span><span class="fa fa-caret-down"></span></div>');
@@ -676,8 +703,8 @@ COMPONENT('textboxtags', function() {
 				return;
 
 			arr.splice(index, 1);
-			self.reset(true);
 			self.set(isString ? arr.join(', ') : arr);
+			self.change(true);
 		});
 
 		self.element.on('keydown', 'input', function(e) {
@@ -691,8 +718,8 @@ COMPONENT('textboxtags', function() {
 				if (!arr || !(arr instanceof Array) || !arr.length)
 					return;
 				arr.pop();
-				self.reset(true);
 				self.set(isString ? arr.join(', ') : arr);
+				self.change(true);
 				return;
 			}
 
@@ -714,8 +741,8 @@ COMPONENT('textboxtags', function() {
 				return;
 
 			this.value = '';
-			self.reset(true);
 			self.set(isString ? arr.join(', ') : arr);
+			self.change(true);
 		});
 	};
 
@@ -790,7 +817,9 @@ COMPONENT('page', function() {
 
 			reload && self.get(reload)();
 			isProcessed = true;
-			el.toggleClass('hidden', !is);
+			setTimeout(function() {
+				el.toggleClass('hidden', !is);
+			}, 200);
 			SETTER('loading', 'hide', 1000);
 		});
 	};
@@ -826,7 +855,7 @@ COMPONENT('grid', function() {
 		setTimeout(function() {
 			var max = self.attr('data-max');
 			if (max === 'auto')
-				self.max = (Math.floor(($(window).height() - (self.element.offset().top + 110)) / 26));
+				self.max = (Math.floor(($(window).height() - (self.element.offset().top + 250)) / 27));
 			else
 				self.max = parseInt(max);
 			if (self.max < 10)
@@ -972,11 +1001,14 @@ COMPONENT('form', function() {
 		EXEC('$calendar.hide');
 
 		if (isHidden) {
+			self.release(true);
 			self.element.find('.ui-form').removeClass('ui-form-animate');
 			return;
 		}
 
 		self.resize();
+		self.release(false);
+
 		var el = self.element.find('input,select,textarea');
 		el.length > 0 && el.eq(0).focus();
 		window.$$form_level++;
@@ -1242,7 +1274,6 @@ COMPONENT('dropdowncheckbox', function() {
 
 	var self = this;
 	var required = self.attr('data-required') === 'true';
-	var datasource = '';
 	var container;
 	var data = [];
 	var values;
@@ -1690,6 +1721,10 @@ COMPONENT('codemirror', function() {
 		return required ? value && value.length > 0 : true;
 	};
 
+	self.released = function(is) {
+		is && editor.setValue('');
+	};
+
 	self.make = function() {
 
 		var height = self.element.attr('data-height');
@@ -1702,6 +1737,9 @@ COMPONENT('codemirror', function() {
 		height !== 'auto' && editor.setSize('100%', height || '200px');
 
 		editor.on('change', function(a, b) {
+
+			if (self.release())
+				return;
 
 			if (skipB && b.origin !== 'paste') {
 				skipB = false;
@@ -2006,10 +2044,6 @@ COMPONENT('tabmenu', function() {
 	};
 });
 
-/**
- * Disable
- * @version 1.0.0
- */
 COMPONENT('disable', function() {
 	var self = this;
 	var condition = self.attr('data-if');
@@ -2125,10 +2159,6 @@ COMPONENT('loading', function() {
 	};
 });
 
-/**
- * Pagination
- * @version 1.0.0
- */
 COMPONENT('pagination', function() {
 
 	var self = this;
@@ -2255,6 +2285,435 @@ COMPONENT('pagination', function() {
 			self.element.toggleClass('hidden', false);
 		} else
 			self.element.toggleClass('hidden', true);
+	};
+});
+
+COMPONENT('autocomplete', function() {
+	var self = this;
+	var container;
+	var old;
+	var onSearch;
+	var searchtimeout;
+	var searchvalue;
+	var blurtimeout;
+	var onCallback;
+	var datasource;
+	var is = false;
+	var margin = {};
+
+	self.template = Tangular.compile('<li{{ if index === 0 }} class="selected"{{ fi }} data-index="{{ index }}"><span>{{ name | raw }}</span><span>{{ type }}</span></li>');
+	self.readonly();
+	self.singleton();
+
+	self.make = function() {
+		self.element.addClass('ui-autocomplete-container');
+		self.element.html('<div class="ui-autocomplete"><ul></ul></div>');
+		container = self.element.find('ul');
+
+		self.element.on('click', 'li', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			onCallback && onCallback(datasource[+$(this).attr('data-index')], old);
+			self.visible(false);
+		});
+
+		self.element.on('mouseenter mouseleave', 'li', function(e) {
+			$(this).toggleClass('selected', e.type === 'mouseenter');
+		});
+
+		$(document).on('click', function(e) {
+			is && self.visible(false);
+		});
+
+		$(window).on('resize', function() {
+			self.resize();
+		});
+	};
+
+	function keydown(e) {
+		var c = e.keyCode;
+		var input = this;
+
+		if (c !== 38 && c !== 40 && c !== 13) {
+			if (c !== 8 && c < 32)
+				return;
+			clearTimeout(searchtimeout);
+			searchtimeout = setTimeout(function() {
+				var val = input.value;
+				if (!val)
+					return self.render(EMPTYARRAY);
+				if (searchvalue === val)
+					return;
+				searchvalue = val;
+				self.resize();
+				onSearch(val, function(value) { self.render(value); });
+			}, 200);
+			return;
+		}
+
+		var current = self.element.find('.selected');
+
+		if (c === 13) {
+			self.visible(false);
+			if (!current.length)
+				return;
+			onCallback(datasource[+current.attr('data-index')], old);
+			e.preventDefault();
+			e.stopPropagation();
+			return;
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (current.length) {
+			current.removeClass('selected');
+			current = c === 40 ? current.next() : current.prev();
+		}
+
+		if (!current.length)
+			current = self.element.find('li:{0}-child'.format(c === 40 ? 'first' : 'last'));
+		current.addClass('selected');
+	}
+
+	function blur() {
+		clearTimeout(blurtimeout);
+		blurtimeout = setTimeout(function() {
+			self.visible(false);
+		}, 300);
+	}
+
+	self.visible = function(visible) {
+		clearTimeout(blurtimeout);
+		self.element.toggleClass('hidden', !visible);
+		is = visible;
+	};
+
+	self.resize = function() {
+
+		if (!old)
+			return;
+
+		var offset = old.offset();
+		offset.top += old.height();
+		offset.width = old.width();
+
+		if (margin.left)
+			offset.left += margin.left;
+		if (margin.top)
+			offset.top += margin.top;
+		if (margin.width)
+			offset.width += margin.width;
+
+		self.element.css(offset);
+	};
+
+	self.attach = function(input, search, callback, top, left, width) {
+
+		clearTimeout(searchtimeout);
+
+		if (input.setter)
+			input = input.find('input');
+		else
+			input = $(input);
+
+		if (old) {
+			old.removeAttr('autocomplete');
+			old.off('blur', blur);
+			old.off('keydown', keydown);
+		}
+
+		input.on('keydown', keydown);
+		input.on('blur', blur);
+		input.attr({ 'autocomplete': 'off' });
+
+		old = input;
+		margin.left = left;
+		margin.top = top;
+		margin.width = width;
+
+		self.resize();
+		self.refresh();
+		searchvalue = '';
+		onSearch = search;
+		onCallback = callback;
+		self.visible(false);
+	};
+
+	self.render = function(arr) {
+
+		datasource = arr;
+
+		if (!arr || !arr.length) {
+			self.visible(false);
+			return;
+		}
+
+		var builder = [];
+		for (var i = 0, length = arr.length; i < length; i++) {
+			var obj = arr[i];
+			obj.index = i;
+			builder.push(self.template(obj));
+		}
+
+		container.empty().append(builder.join(''));
+		self.visible(true);
+	};
+});
+
+COMPONENT('contextmenu', function() {
+	var self = this;
+	var $window = $(window);
+	var is = false;
+	var timeout;
+	var container;
+	var arrow;
+
+	self.template = Tangular.compile('<div data-value="{{ value }}"{{ if selected }} class="selected"{{ fi }}><i class="fa {{ icon }}"></i><span>{{ name | raw }}</span></div>');
+	self.singleton();
+	self.readonly();
+	self.callback = null;
+
+	self.make = function() {
+
+		self.element.addClass('ui-contextmenu');
+		self.element.append('<span class="ui-contextmenu-arrow fa fa-caret-up"></span><div class="ui-contextmenu-items"></div>');
+		container = self.element.find('.ui-contextmenu-items');
+		arrow = self.element.find('.ui-contextmenu-arrow');
+
+		self.element.on('touchstart mousedown', 'div[data-value]', function(e) {
+			self.callback && self.callback($(this).attr('data-value'), $(self.target));
+			self.hide();
+			e.preventDefault();
+			e.stopPropagation();
+		});
+
+		$(document).on('touchstart mousedown', function(e) {
+			FIND('contextmenu').hide();
+		});
+	};
+
+	self.show = function(orientation, target, items, callback, left, top) {
+
+		if (is) {
+			clearTimeout(timeout);
+			var obj = target instanceof jQuery ? target.get(0) : target;
+			if (self.target === obj) {
+				self.hide(0);
+				return;
+			}
+		}
+
+		target = $(target);
+		var type = typeof(items);
+		var item;
+
+		if (type === 'string')
+			items = self.get(items);
+		else if (type === 'function') {
+			callback = items;
+			items = (target.attr('data-options') || '').split(';');
+			for (var i = 0, length = items.length; i < length; i++) {
+				item = items[i];
+				if (!item)
+					continue;
+				var val = item.split('|');
+				items[i] = { name: val[0], icon: val[1], value: val[2] || val[0] };
+			}
+		}
+
+		if (!items) {
+			self.hide(0);
+			return;
+		}
+
+		self.callback = callback;
+
+		var builder = [];
+		for (var i = 0, length = items.length; i < length; i++) {
+			item = items[i];
+			item.index = i;
+			if (!item.value)
+				item.value = item.name;
+			if (!item.icon)
+				item.icon = 'fa-caret-right';
+			builder.push(self.template(item));
+		}
+
+		self.target = target.get(0);
+		var offset = target.offset();
+
+		container.html(builder);
+
+		switch (orientation) {
+			case 'left':
+				arrow.css({ left: '15px' });
+				break;
+			case 'right':
+				arrow.css({ left: '170px' });
+				break;
+			case 'center':
+				arrow.css({ left: '107px' });
+				break;
+		}
+
+		if (!left)
+			left = 0;
+		if (!top)
+			top = 0;
+
+		var options = { left: orientation === 'center' ? Math.ceil((offset.left - self.element.width() / 2) + (target.innerWidth() / 2) + left) : orientation === 'left' ? offset.left - 8 : (offset.left - self.element.width() + left) + target.innerWidth(), top: offset.top + top + target.innerHeight() + 10 };
+		self.element.css(options);
+
+		if (is)
+			return;
+
+		self.element.show();
+		setTimeout(function() {
+			self.element.addClass('ui-contextmenu-visible');
+            self.emit('contextmenu', true, self, self.target);
+		}, 100);
+
+		is = true;
+	};
+
+	self.hide = function(sleep) {
+		if (!is)
+			return;
+		clearTimeout(timeout);
+		timeout = setTimeout(function() {
+			self.element.hide().removeClass('ui-contextmenu-visible');
+            self.emit('contextmenu', false, self, self.target);
+			self.callback = null;
+			self.target = null;
+			is = false;
+		}, sleep ? sleep : 100);
+	};
+});
+
+COMPONENT('checkboxlist', function() {
+	var self = this;
+	var template = Tangular.compile('<div class="ui-checkboxlist-checkbox {0}" data-search="{{ name }}"><label><input type="checkbox" value="{{ id }}"><span>{{ name }}</span></label></div>'.format(self.attr('data-class')));
+	var datasource;
+	var items;
+	var condition;
+
+	self.make = function() {
+
+		self.element.on('click', 'input', function() {
+			var arr = self.get();
+
+			if (!(arr instanceof Array))
+				arr = [];
+
+			var value = self.parser(this.value);
+			var index = arr.indexOf(value);
+			if (index === -1)
+				arr.push(value);
+			else
+				arr.splice(index, 1);
+
+			self.set(arr);
+			setTimeout2(self.id, function() {
+				self.change(true);
+			}, 400);
+		});
+
+		self.element.on('click', 'a', function() {
+			var arr = [];
+			var inputs = self.element.find('input');
+			var value = self.get();
+
+			if (value && inputs.length === value.length) {
+				self.set(arr);
+				return;
+			}
+
+			inputs.each(function() {
+				arr.push(self.parser(this.value));
+			});
+
+			self.set(arr);
+			setTimeout2(self.id, function() {
+				self.change(true);
+			}, 400);
+		});
+
+		self.make = function() {
+
+			var options = self.attr('data-options');
+			if (!options)
+				return;
+
+			var arr = options.split(';');
+			var datasource = [];
+
+			for (var i = 0, length = arr.length; i < length; i++) {
+				var item = arr[i].split('|');
+				datasource.push({ id: item[1] === undefined ? item[0] : item[1], name: item[0] });
+			}
+
+			self.redraw(datasource);
+		};
+
+		self.setter = function(value) {
+			self.element.find('input').each(function() {
+				this.checked = value && value.indexOf(self.parser(this.value)) !== -1;
+			});
+		};
+
+		self.redraw = function(arr) {
+			var builder = [];
+			var kn = self.attr('data-source-text') || 'name';
+			var kv = self.attr('data-source-value') || 'id';
+
+			for (var i = 0, length = arr.length; i < length; i++) {
+				var item = arr[i];
+
+				if (condition && !condition(item))
+					continue;
+
+				if (typeof(item) === 'string')
+					builder.push(template({ id: item, name: item }));
+				else
+					builder.push(template({ id: item[kv] === undefined ? item[kn] : item[kv], name: item[kn] }));
+			}
+
+			if (!builder.length)
+				return;
+
+			self.attr('data-button') && builder.push('<div class="clearfix"></div><div class="{1}"><div class="ui-checkboxlist-selectall"><a href="javascript:void(0)"><i class="fa fa-check-square mr5"></i>{0}</a></div></div>'.format(self.attr('data-button'), self.attr('data-class')));
+			self.html(builder.join(''));
+			self.setter(self.get());
+			return self;
+		};
+
+		condition = self.attr('data-if');
+		if (condition)
+			condition = FN(condition);
+
+		datasource = self.attr('data-source');
+		datasource && self.watch(datasource, function(path, value) {
+			if (self.release())
+				return;
+			items = value || EMPTYARRAY;
+			self.redraw(value);
+		});
+	};
+
+	self.released = function(is) {
+
+		if (is) {
+			self.empty();
+			items = null;
+			return;
+		}
+
+		var tmp = self.get(datasource) || EMPTYARRAY;
+		if (tmp === items)
+			return;
+		items = tmp;
+		self.redraw(items);
 	};
 });
 // ==========================================================

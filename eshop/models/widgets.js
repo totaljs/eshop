@@ -10,7 +10,6 @@ NEWSCHEMA('Widget').make(function(schema) {
 	schema.define('css', String);
 	schema.define('icon', 'String(20)');
 	schema.define('istemplate', Boolean);
-	schema.define('datecreated', Date);
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -81,10 +80,6 @@ NEWSCHEMA('Widget').make(function(schema) {
 		});
 
 		filter.callback(() => callback(output));
-	});
-
-	schema.addWorkflow('import', function(error, model, base64, callback) {
-
 	});
 });
 

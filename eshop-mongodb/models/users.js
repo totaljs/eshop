@@ -36,7 +36,6 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('name', 'Camelize(50)', true);
 	schema.define('email', 'Email');
 	schema.define('gender', 'String(20)');
-	schema.define('datecreated', Date);
 	schema.define('isblocked', Boolean);
 
 	// Gets a specific user
@@ -69,7 +68,8 @@ NEWSCHEMA('User').make(function(schema) {
 		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-		}
+		} else
+			model.dateupdated = F.datetime;
 
 		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true);
 		model.isremoved = false;
@@ -80,13 +80,11 @@ NEWSCHEMA('User').make(function(schema) {
 				return;
 			builder.rem('id');
 			builder.rem('datecreated');
-			builder.set('dateupdated', new Date());
 			builder.where('id', model.id);
 		});
 
 		nosql.exec(function(err) {
 
-			// Returns response
 			callback(SUCCESS(true, model.id));
 
 			if (err)
@@ -151,12 +149,9 @@ NEWSCHEMA('User').make(function(schema) {
 			data.count = response.users.count;
 			data.items = response.users.items;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (!data.pages)
-				data.pages = 1;
-
+			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
+
 			callback(data);
 		});
 	});
@@ -187,12 +182,10 @@ NEWSCHEMA('User').make(function(schema) {
 		nosql.prepare(function(error, response, resume) {
 
 			if (response.user) {
-				if (response.user[id] !== options.profile[id]) {
-					nosql.update('users').make(function(builder) {
-						builder.set(id, options.profile[id]);
-						builder.where('id', response.user.id);
-					});
-				}
+				response.user[id] !== options.profile[id] && nosql.update('users').make(function(builder) {
+					builder.set(id, options.profile[id]);
+					builder.where('id', response.user.id);
+				});
 			} else {
 				response.user = schema.create();
 				response.user.id = UID();
@@ -358,9 +351,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.datecreated = F.datetime;
 
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
-
-			if (F.config.custom.emailuserform)
-				mail.bcc(F.config.custom.emailuserform);
+			F.config.custom.emailuserform && mail.bcc(F.config.custom.emailuserform);
 
 			user.$save(function(err, response) {
 				if (err)
@@ -413,14 +404,8 @@ F.onAuthorize = function(req, res, flags, callback) {
 	}
 
 	var user = F.decrypt(hash, SECRET, true);
-
-	if (!user)
+	if (!user || user.ip !== req.ip)
 		return removeCookie(res, callback);
-
-	if (user.ip !== req.ip) {
-		removeCookie(res, callback);
-		return;
-	}
 
 	var session = online[user.id];
 	if (session) {

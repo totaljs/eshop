@@ -1,4 +1,5 @@
 NEWSCHEMA('SuperUser').make(function(schema) {
+	schema.define('name', String, true);
 	schema.define('login', String, true);
 	schema.define('password', String, true);
 	schema.define('roles', '[String]');
@@ -20,7 +21,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('posts', '[String]');
 	schema.define('defaultorderstatus', String);
 	schema.define('users', '[SuperUser]');
-	schema.define('languages', '[String(2)]');
+	schema.define('languages', '[Lower(2)]');
 
 	// PayPal account
 	schema.define('paypaluser', String);
@@ -69,12 +70,8 @@ NEWSCHEMA('Settings').make(function(schema) {
 		});
 
 		nosql.exec(function(err, response) {
-
-			// Returns response
 			callback(SUCCESS(true));
-
-			if (!err)
-				F.emit('settings.save', settings);
+			!err && F.emit('settings.save', settings);
 		});
 	});
 
@@ -119,7 +116,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 
 			// Adds an admin (service) account
 			var sa = CONFIG('manager-superadmin').split(':');
-			F.config.custom.users.push({ login: sa[0], password: sa[1], roles: [], sa: true });
+			F.config.custom.users.push({ name: 'Administrator', login: sa[0], password: sa[1], roles: [], sa: true });
 
 			// Optimized for the performance
 			var users = {};

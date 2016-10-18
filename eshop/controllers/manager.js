@@ -151,7 +151,6 @@ function redirect_logoff() {
 
 // Clears all uploaded files
 function json_files_clear() {
-	var Fs = require('fs');
 
 	U.ls(DB('files').binary.directory, function(files) {
 		files.wait((item, next) => Fs.unlink(item, next));
