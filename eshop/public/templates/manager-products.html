@@ -1,21 +1,19 @@
 <div class="filter">
 	<div class="container">
+		<nav class="buttons">
+			<a href="javascript:void(0)" class="exec" data-exec="products_menu"><i class="fa fa-navicon"></i><span>@(Options)</span></a>
+		</nav>
 		<div class="caption"><span class="fa fa-dropbox mr5"></span> @(Products)</div>
 		<div class="row">
-			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="products.filter.search" data-placeholder="@(Search products ...)" data-control-icon="fa-search"></div>
+			<div class="col-md-4 col-sm-4 m">
+				<div data-component="textbox" data-component-path="products.filter.search" data-placeholder="@(Search products ...)" data-component-type="search"></div>
 				<div class="help" data-component="template" data-component-path="products.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
-			<div class="col-md-3 col-sm-6 m">
-				<div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="@(All products)" data-source-value="linker"></div>
-				<a href="javascript:products_export()" class="silver"><span class="fa fa-file-code-o mr5"></span>@(Export products to XML)</a>
+			<div class="col-md-4 col-sm-4 m">
+				<div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="@(All categories)" data-source-value="linker"></div>
 			</div>
-			<div class="col-md-6 m">
-				<div class="row">
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_new"><span class="fa fa-plus-circle"></span>@(Add product)</a></div>
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_import"><span class="fa fa-cloud-upload"></span>@(Import CSV or XML)</a></div>
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_category"><span class="fa fa-folder"></span>@(Replace category)</a></div>
-				</div>
+			<div class="col-md-4 col-sm-4 m">
+				<div data-component="dropdown" data-component-path="products.filter.manufacturer" data-source="products.manufacturers" data-empty="@(All manufacturers)" data-source-value="linker"></div>
 			</div>
 		</div>
 	</div>
@@ -25,7 +23,8 @@
 	<div data-component="grid" data-component-path="products.grid" data-pagination-path="products.filter.page" data-component-id="products.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
 		<script type="text/html">
 		<tr>
-			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ name }}{{ if manufacturer }} <span class="fs11 silver">({{ manufacturer }})</span>{{ fi }}</td>
+			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ name }}</td>
+			<td style="width:200px" class="silver hidden-xs">{{ if manufacturer }}<span class="fa fa-building"></span> {{ manufacturer }}{{ fi }}</td>
 			<td style="width:200px" class="silver hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
 			<td style="width:100px" class="ui-right active">{{ price | price(2) }}</td>
 			<td style="width:80px" class="ui-right">
@@ -191,10 +190,6 @@
 							return;
 						loading.show();
 						AJAX('DELETE {0}/api/products/'.format(managerurl), { id: row.id }, function() {
-
-							if (isError(arguments))
-								return;
-
 							loading.hide(500);
 							products_refresh();
 						});
@@ -235,13 +230,8 @@
 			var loading = FIND('loading');
 			loading.show();
 			AJAX('POST {0}/api/products/'.format(managerurl), products.form, function(response) {
-
-				if (isError(arguments))
-					return;
-
 				loading.hide(500);
 
-				// Error handling
 				SET('products.response', response);
 				if (response instanceof Array)
 					return;
@@ -264,10 +254,6 @@
 			var loading = FIND('loading');
 			loading.show();
 			AJAX('POST {0}/api/products/category/'.format(managerurl), products.category, function(response) {
-
-				if (isError(arguments))
-					return;
-
 				loading.hide(500);
 				setTimeout(function() {
 					setTimeout(products_refresh_codelists, 2000);
@@ -299,13 +285,8 @@
 		var loading = FIND('loading');
 		loading.show();
 		AJAX('GET /api/products/{0}/'.format(id), function(response) {
-
-			if (isError(arguments))
-				return;
-
 			loading.hide(500);
 
-			// Error prevention
 			if (response instanceof Array) {
 				FIND('message').warning(response[0].error);
 				return;
@@ -331,10 +312,6 @@
 	// Method refreshes categories
 	function products_refresh_codelists() {
 		AJAX('GET {0}/api/products/codelists/'.format(managerurl), function(response) {
-
-			if (isError(arguments))
-				return;
-
 			response.categories.sort(FN('(a, b) => a.name.localeCompare(b.name)'));
 			SET('products.categories', response.categories);
 			SET('products.manufacturers', response.manufacturers);
@@ -368,6 +345,19 @@
 				products_edit(hash.substring(1));
 			}, 500);
 		}
+	}
+
+	function products_menu(el) {
+		var items = [];
+
+		items.push({ name: '@(Add product)', value: 'products_new', icon: 'fa-plus-circle' });
+		items.push({ name: '@(Replace category)', value: 'products_category', icon: 'fa-folder' });
+		items.push({ name: '@(Import CSV or XML)', value: 'products_import', icon: 'fa-cloud-upload' });
+		items.push({ name: '@(Export products to XML)', value: 'products_export', icon: 'fa-file-code-o' });
+
+		FIND('contextmenu').show('right', el, items, function(value) {
+			EXEC(value);
+		}, -15, 10);
 	}
 
 </script>

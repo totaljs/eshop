@@ -1,20 +1,22 @@
 <div class="filter">
 	<div class="container">
 		<nav class="buttons">
-			<a href="javascript:void(0)" data-component="click" data-component-path="widgets_new" title="@(Add new widget)"><i class="fa fa-plug"></i><span>@(Add new widget)</span></a>
-			<a href="javascript:void(0)" data-component="click" data-component-path="pages_new" title="@(Add new page)"><i class="fa fa-plus-circle"></i><span>@(Add new page)</span></a>
+			<a href="javascript:void(0)" class="exec" data-exec="pages_menu"><i class="fa fa-navicon"></i><span>@(Options)</span></a>
 		</nav>
 		<div class="caption"><i class="fa fa-file-text"></i>@(Pages)</div>
 		<div class="row">
-			<div class="col-md-4 m">
+			<div class="col-md-3 m">
 				<div data-component="textbox" data-component-path="pages.filter.search" data-placeholder="@(Search pages ...)" data-control-icon="fa-search"></div>
 				<div class="help" data-component="template" data-component-path="pages.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
-			<div class="col-md-4 m">
+			<div class="col-md-3 m">
 				<div data-component="dropdown" data-component-path="pages.filter.navigation" data-source="pages.dependencies.navigations" data-empty="@(All pages)"></div>
 				<div>&nbsp;</div>
 			</div>
-			<div class="col-md-4 m">
+			<div class="col-md-3 m">
+				<div data-component="dropdown" data-component-path="pages.filter.template" data-source="pages.dependencies.templates" data-empty="@(All templates)"></div>
+			</div>
+			<div class="col-md-3 m">
 				<div data-component="dropdown" data-component-path="pages.filter.language" data-source="languages" data-empty="@(All languages)"></div>
 			</div>
 		</div>
@@ -23,10 +25,20 @@
 
 <div class="container">
 
-	<ul class="tabmenu" data-component="tabmenu" data-component-path="pages.tab">
-		<li data-value="pages">@(Pages)</li>
-		<li data-value="widgets">@(Widgets)</li>
-	</ul>
+	<div class="tabmenu" data-component="tabmenu" data-component-path="pages.tab">
+		<div data-component="visible" data-component-path="pages.tab" data-if="value === 'widgets'" class="hidden">
+			<a href="javascript:void(0)" class="exec" data-exec="widgets_import"><i class="fa fa-cloud-upload"></i>@(Import widgets)</a>
+			<a href="javascript:void(0)" class="exec" data-exec="widgets_export"><i class="fa fa-cloud-download"></i>@(Exports widgets)</a>
+			<a href="javascript:void(0)" class="exec" data-exec="widgets_new"><i class="fa fa-plus-circle"></i>@(Add new widget)</a>
+		</div>
+		<div data-component="visible" data-component-path="pages.tab" data-if="value === 'pages'" class="hidden">
+			<a href="javascript:void(0)" class="exec" data-exec="pages_new"><i class="fa fa-plus-circle"></i>@(Add page)</a>
+		</div>
+		<ul>
+			<li data-value="pages">@(Pages)</li>
+			<li data-value="widgets">@(Widgets)</li>
+		</ul>
+	</div>
 
 	<div class="row" data-component="visible" data-component-path="pages.tab" data-if="value === 'pages'">
 		<div class="col-md-12">
@@ -70,7 +82,7 @@
 <div data-component="form" data-title="@(Page form)" data-component-path="common.form" data-if="value === 'pages'" data-width="1300px" data-component-id="pages.form">
 	<div class="padding" style="padding-bottom:10px">
 		<div class="row">
-			<div class="col-md-4 m">
+			<div class="col-md-3 m">
 				<div data-component="textbox" data-component-path="pages.form.title" data-required="true" data-placeholder="@(Page title)">@(Title)</div>
 				<div data-component="template" data-component-path="pages.form" class="fs11 mt5 silver">
 					<script type="text/html">
@@ -78,56 +90,53 @@
 					</script>
 				</div>
 			</div>
-			<div class="col-md-4 m">
+			<div class="col-md-3 m">
 				<div data-component="textbox" data-component-path="pages.form.url" data-required="true" data-placeholder="@(Page relative URL address)" data-icon="fa-globe">@(URL address)</div>
 				<div data-component="checkbox" data-component-path="pages.form.ispartial" class="green mt10">@(Is partial content)</div>
 			</div>
-			<div class="col-md-4 m">
+			<div class="col-md-3 m">
 				<div data-component="dropdown" data-component-path="pages.form.template" data-source="pages.dependencies.templates" data-empty="">@(Template)</div>
-				<div class="mt5 fs11" style="float:left"><a href="javascript:void(0)" data-component="click" data-component-path="pages_new_content"><span class="fa fa-code mr5"></span>@(Create custom content)</a></div>
+				<div class="mt5 fs11" style="float:left"><a href="javascript:void(0)" class="exec" data-exec="pages_new_content"><span class="fa fa-code mr5"></span>@(Create custom content)</a></div>
 				<div class="cl"></div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-component="dropdown" data-component-path="pages.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag" data-source="languages" data-empty="">@(Language)</div>
 			</div>
 		</div>
 	</div>
 	<hr style="margin:0 0 8px" />
-	<div class="help ui-center" style="margin-bottom:8px;padding:0 20px"><b>@(Editor formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L). <a href="javascript:void(0)" data-component="click" data-component-path="pages_sourcecode" class="black"><span class="fa fa-code w18"></span>@(Show source-code)</a></div>
-	<div class="pages-editor" data-component="editor" data-component-path="pages.form.body" data-component-import="/templates/component-editor.html" data-component-id="pages.editor"></div>
-	<div class="padding npb bg-fade">
+	<div class="cmseditor-help">
+		<nav><i class="fa fa-desktop"></i><a href="javascript:pages_device(1)">@(Large)</a><a href="javascript:pages_device(2)">@(Medium)</a><a href="javascript:pages_device(3)">@(Tablet)</a><a href="javascript:pages_device(4)">@(Mobile)</a></nav>
+		<div><b>@(Editor formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L). <a href="javascript:void(0)" data-exec="pages_sourcecode" class="exec black"><span class="fa fa-code w18"></span>@(Show source-code)</a></div>
+	</div>
+	<div class="pages-editor" data-component="editor" data-component-path="pages.form.body" data-component-import="/templates/component-editor.html" data-component-id="pages.editor" data-component-released="true"></div>
+	<div class="padding npb">
 		<br />
 		<div class="row">
-			<div class="col-md-6 m">
-				<div data-component="disable" data-component-path="pages.form.ispartial" data-if="value" data-selector=".ui-dropdowncheckbox">
-					<div data-component="dropdowncheckbox" data-component-path="pages.form.navigations" data-source="pages.dependencies.navigations" data-icon="fa-bars" data-empty="@(Doesn't contain any navigation.)">@(Navigation)</div>
-					<div class="help m">@(Where will be the page shown?)</div>
-					<div data-component="dropdowncheckbox" data-component-path="pages.form.partial" data-source="pages.partial" data-icon="fa-database" data-empty="@(Doesn't contain any partial pages.)">@(Nested partial pages)</div>
-					<div class="help">@(Join other partial pages with this.)</div>
-				</div>
+			<div class="col-md-4 m" data-component="disable" data-component-path="pages.form.ispartial" data-if="value" data-selector=".ui-dropdowncheckbox">
+				<div data-component="dropdowncheckbox" data-component-path="pages.form.navigations" data-source="pages.dependencies.navigations" data-icon="fa-bars" data-empty="@(Doesn't contain any navigation.)">@(Navigation)</div>
+				<div class="help m">@(Where will be the page shown?)</div>
 			</div>
-			<div class="col-md-6 m">
-				<div class="row">
-					<div class="col-md-12 m" data-component="disable" data-component-path="pages.form.ispartial" data-if="value">
-						<div data-component="dropdown" data-component-path="pages.form.parent" data-source="pages.sitemap" data-source-text="name" data-source-value="id" data-empty="" data-icon="fa-sitemap">@(Parent)</div>
-						<div class="help">@(Affects sitemap and breadcrumb.)</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6 m">
-						<div data-component="textbox" data-component-path="pages.form.name" data-maxlenght="50">@(Name)</div>
-						<div class="help">@(Name in sitemap.)</div>
-					</div>
-					<div class="col-md-6">
-						<div data-component="textbox" data-component-path="pages.form.keywords" data-maxlenght="80" data-icon="fa-tags">@(Keywords)</div>
-						<div class="help">@(Meta keywords, maximum 6 words.)</div>
-					</div>
-				</div>
+			<div class="col-md-4 m" data-component="disable" data-component-path="pages.form.ispartial" data-if="value" data-selector=".ui-dropdowncheckbox">
+				<div data-component="dropdowncheckbox" data-component-path="pages.form.partial" data-source="pages.partial" data-icon="fa-database" data-empty="@(Doesn't contain any partial pages.)">@(Nested partial pages)</div>
+				<div class="help">@(Join other partial pages with this.)</div>
+			</div>
+			<div class="col-md-4 m" data-component="disable" data-component-path="pages.form.ispartial" data-if="value">
+				<div data-component="dropdown" data-component-path="pages.form.parent" data-source="pages.sitemap2" data-source-text="name" data-source-value="id" data-empty="" data-icon="fa-sitemap">@(Parent)</div>
+				<div class="help">@(Affects sitemap and breadcrumb.)</div>
 			</div>
 		</div>
 	</div>
 	<hr class="nmt" />
-	<div class="padding">
+	<div class="padding npt">
 		<div class="row">
-			<div class="col-md-6 m">
-				<div data-component="textboxtags" data-component-path="pages.form.tags">@(Internal tags)</div>
+			<div class="col-md-4 m">
+				<div data-component="textbox" data-component-path="pages.form.name" data-maxlenght="50">@(Name)</div>
+				<div class="help">@(Name in sitemap.)</div>
+			</div>
+			<div class="col-md-4">
+				<div data-component="textbox" data-component-path="pages.form.keywords" data-maxlenght="80" data-icon="fa-tags">@(Keywords)</div>
+				<div class="help">@(Meta keywords, maximum 6 words.)</div>
 			</div>
 			<div class="col-md-2 m">
 				<div data-component="textbox" data-component-path="pages.form.icon" data-align="center" data-maxlength="20" data-placeholder="e.g. home" data-icon="fa-camera">@(Icon)</div>
@@ -136,9 +145,6 @@
 			<div class="col-md-2 m">
 				<div data-component="textbox" data-component-path="pages.form.priority" data-align="center" data-component-type="number" data-maxlength="3" data-increment="true" data-icon="fa-sort-amount-desc">@(Priority)</div>
 				<div class="help">@(Affects navigation ordering.)</div>
-			</div>
-			<div class="col-md-2 m">
-				<div data-component="dropdown" data-component-path="pages.form.language" data-align="center" data-maxlength="2" data-icon="fa-flag" data-source="languages" data-empty="">@(Language)</div>
 			</div>
 		</div>
 	</div>
@@ -170,16 +176,25 @@
 		<br />
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="codemirror" data-component-path="widgets.form.body" data-height="350px" class="ui-textarea-code" data-icon="fa-code">@(Body)</div>
+				<div data-component="codemirror" data-component-path="widgets.form.body" data-height="350px" class="ui-textarea-code" data-icon="fa-code" data-component-released="true">@(Body)</div>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-6 m">
+			<div class="col-md-12 m">
+				<div data-component="codemirror" data-component-path="widgets.form.css" data-height="100px" class="ui-textarea-code" data-icon="fa-paint-brush" data-type="text/css" data-component-released="true">@(CSS)</div>
+				<div class="help">@(Widget can contain own CSS classes.)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4 m">
 				<div data-component="textbox" data-component-path="widgets.form.icon" data-placeholder="e.g. home" data-icon="fa-camera">@(Icon)</div>
 				<div class="help"><a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font-Awesome</a> @(without) <code>fa-</code></div>
 			</div>
-			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="widgets.form.category" data-placeholder="e.g. Headers" data-icon="fa-folder">@(Category)</div>
+			<div class="col-md-4 m">
+				<div data-component="dropdown" data-component-path="widgets.form.category" data-source="widgets.categories" data-source-text="name" data-source-value="name" data-icon="fa-folder" data-empty="">@(Existing category)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-component="textbox" data-component-path="widgets.form.category" data-placeholder="e.g. Headers">@(Category)</div>
 			</div>
 		</div>
 	</div>
@@ -199,13 +214,51 @@
 				<div class="silver">@(The form loads template from the server <u>without default content</u> and creates a new content according to <b>HTML</b> editor. The existing content will be replaced.)</div>
 				<hr />
 				<div data-component="dropdown" data-component-path="pages.html.template" data-source="pages.dependencies.templates" class="m" data-empty="" data-required="true">@(Template)</div>
-				<div data-component="codemirror" data-component-path="pages.html.body" data-icon="fa-code" data-height="500px" data-required="true" class="ui-textarea-code">@(HTML)</div>
+				<div data-component="codemirror" data-component-path="pages.html.body" data-icon="fa-code" data-height="500px" data-required="true" class="ui-textarea-code" data-component-released="true">@(HTML)</div>
 			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
 		<div data-component="validation" data-component-path="pages.html">
 			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Exports widgets)" data-component-path="common.form" data-if="value === 'widgets-export'" data-width="500px" data-component-id="widgets.export">
+	<div class="padding npt npb">
+		<p class="silver">@(Please select widgets which want to export. Only templated widgets can be exported.)</p>
+	</div>
+	<hr />
+	<div class="padding npt">
+		<div data-component="visible" data-component-path="widgets.export.panel" data-if="value === 1" class="hidden">
+			<div data-component="textarea" data-component-path="widgets.export.base64" data-height="200px">@(Data)</div>
+			<div class="help">@(Copy the data above and share them with another Total.js CMS.)</div>
+		</div>
+		<div data-component="visible" data-component-path="widgets.export.panel" data-if="!value" class="hidden">
+			<div data-component="textbox" data-component-path="widgets.export.search" data-component-type="search" data-placeholder="@(Search widgets)"></div>
+			<div data-component="search" data-component-path="widgets.export.search" data-selector=".ui-checkboxlist-search" data-class="hidden" class="mt10">
+				<div data-component="checkboxlist" data-component-path="widgets.export.items" data-source="widgets.grid.items" data-source-value="id" data-source-text="name" data-component-released="true" data-button="@(Select all)" data-if="n => n.istemplate" data-class="ui-checkboxlist-search">@(Existing widgets)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="widgets.export">
+			<button name="submit">@(EXPORT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Import widgets)" data-component-path="common.form" data-if="value === 'widgets-import'" data-width="500px" data-component-id="widgets.import">
+	<div class="padding npt">
+		<p class="silver">@(Please paste export of widgets into the field below:)</p>
+		<div data-component="textarea" data-component-path="widgets.import.base64" data-height="200px" data-required="true">@(Data)</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="widgets.import">
+			<button name="submit">@(IMPORT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
 	</div>
@@ -250,10 +303,6 @@
 							return;
 						var loading = FIND('loading').show(true);
 						AJAX('DELETE {0}/api/pages'.format(managerurl), { id: row.id }, function() {
-
-							if (isError(arguments))
-								return;
-
 							loading.hide(500);
 							pages_refresh();
 							setTimeout(pages_refresh_sitemap, 2000);
@@ -267,7 +316,65 @@
 			FIND('#pages.editor').setTemplate(value);
 			type === 2 && SET('pages.form.body', '');
 		});
+
+		FIND('.pages.form.icon', function(component) {
+			component.find('input').on('focus', function() {
+				pages_form_autocomplete_icons(this);
+			});
+		});
+
+		FIND('.widgets.form.icon', function(component) {
+			component.find('input').on('focus', function() {
+				pages_form_autocomplete_icons(this);
+			});
+		});
 	});
+
+	WATCH('pages.sitemap', pages_form_language);
+	WATCH('pages.form.language', pages_form_language);
+
+	function pages_device(type) {
+		var e = FIND('editor');
+		SETTER('loading', 'show')('loading', 'hide', 1000);
+		switch (type) {
+			case 1:
+				e.device('lg');
+				return;
+			case 2:
+				e.device('md');
+				return;
+			case 3:
+				e.device('sm');
+				return;
+			case 4:
+				e.device('xs');
+				return;
+		}
+	}
+
+	function pages_form_language() {
+		var lng = pages.form.language;
+		var arr = [];
+		pages.sitemap.forEach(function(item) {
+			if (!lng || lng === item.language)
+				arr.push(item);
+		});
+		SET('pages.sitemap2', arr);
+	}
+
+	function pages_form_autocomplete_icons(element) {
+		FIND('autocomplete', function(component) {
+			component.attach(element, function(q, render) {
+				var arr = [];
+				cmseditor.icons.forEach(function(icon) {
+					arr.length < 5 && icon.indexOf(q) !== -1 && arr.push({ name: '<i class="fa fa-{0}"></i>{0}'.format(icon), value: icon });
+				});
+				render(arr);
+			}, function(value, input) {
+				input.val(value.value);
+			}, 14, -5, 9);
+		});
+	}
 
 	ON('#pages.form', function(component) {
 		component.submit = function(hide) {
@@ -290,17 +397,10 @@
 				}
 
 				AJAX('POST {0}/api/pages/'.format(managerurl), pages.form, function(response) {
-
-					if (isError(arguments))
-						return;
-
-					// Error handling
 					SET('pages.response', response);
 					loading.hide(500);
-
 					if (response instanceof Array)
 						return;
-
 					hide();
 					success();
 					pages_refresh();
@@ -332,9 +432,6 @@
 		var loading = FIND('loading').show();
 		AJAX('GET {0}/api/pages/{1}/'.format(managerurl, id), function(response) {
 
-			if (isError(arguments))
-				return;
-
 			loading.hide(500);
 
 			// Error prevention
@@ -361,16 +458,9 @@
 		if (reset)
 			pages.filter.page = 1;
 		AJAX('GET {0}/api/pages/'.format(managerurl), pages.filter, function(response) {
-
-			if (isError(arguments))
-				return;
-
 			pages.filter.navigation && response.items.sort(function(a, b) {
-				if (a.priority > b.priority)
-					return -1;
-				return a.priority === b.priority ? 0 : 1;
+				return a.priority > b.priority ? -1 : a.priority === b.priority ? 0 : 1;
 			});
-
 			SET('pages.grid', response);
 			pages.tab !== 'pages' && SET('pages.tab', 'pages');
 		});
@@ -378,11 +468,6 @@
 
 	function pages_refresh_sitemap() {
 		AJAX('GET {0}/api/pages/sitemap/'.format(managerurl), function(response) {
-
-			if (isError(arguments))
-				return;
-
-			// Converts object to Array
 			var keys = Object.keys(response.sitemap);
 			keys.sort();
 			var sitemap = [];
@@ -420,11 +505,31 @@
 		SET('pages.window', 'html');
 	}
 
+	function pages_menu(el) {
+		var items = [];
+
+		items.push({ name: '@(Add new page)', value: 'pages_new', icon: 'fa-font' });
+		items.push({ name: '@(Add new widget)', value: 'widgets_new', icon: 'fa-plug' });
+
+		FIND('contextmenu').show('right', el, items, function(value) {
+			EXEC(value);
+		}, -15, 10);
+	}
+
+	function pages_reload() {
+		var hash = location.hash;
+		hash && hash.length > 1 && setTimeout(function() {
+			pages_edit(hash.substring(1));
+		}, 500);
+	}
+
 	// WIDGETS
 	var widgets = {};
 	widgets.grid = {};
 	widgets.form = {};
 	widgets.response = null;
+	widgets.categories = [];
+	widgets.export = {};
 
 	ON('#widgets.grid', function(component) {
 		widgets_refresh(true);
@@ -434,30 +539,27 @@
 				case 'edit':
 					loading.show();
 					AJAX('GET {0}/api/widgets/{1}/'.format(managerurl, row.id), function(response) {
-
-						if (isError(arguments))
-							return;
-
 						// Error prevention
 						if (response instanceof Array)
 							response = {};
-
 						SET('widgets.response', null);
-						SET('widgets.form', $.extend({ $index: index }, response), true);
+						var model = $.extend({ $index: index }, response);
+
+						if (model.body)
+							model.body = cmseditor_prettify(model.body);
+
+						SET('widgets.form', model, true);
 						SET('common.form', 'widgets');
 						loading.hide();
 					});
 					break;
+
 				case 'remove':
 					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
 						if (index)
 							return;
 						loading.show();
 						AJAX('DELETE {0}/api/widgets/'.format(managerurl), { id: row.id }, function() {
-
-							if (isError(arguments))
-								return;
-
 							widgets_refresh();
 							loading.hide(500);
 						});
@@ -472,20 +574,13 @@
 		component.submit = function(hide) {
 			var loading = FIND('loading').show();
 			AJAX('POST {0}/api/widgets/'.format(managerurl), widgets.form, function(response) {
-
-				if (isError(arguments))
-					return;
-
 				loading.hide(500);
-
-				// Error handling
 				SET('widgets.response', response);
+
 				if (response instanceof Array)
 					return;
 
-				if (pages.tab !== 'widgets')
-					SET('pages.tab', 'widgets');
-
+				pages.tab !== 'widgets' && SET('pages.tab', 'widgets');
 				hide();
 				success();
 				widgets_refresh();
@@ -496,9 +591,29 @@
 	// Method refreshes grid
 	function widgets_refresh() {
 		AJAX('GET {0}/api/widgets/'.format(managerurl), function(response) {
-			if (isError(arguments))
-				return;
+
+			var category = {};
+			var arr = [];
+
+			response.forEach(function(item) {
+				if (!item.category)
+					return;
+				if (category[item.category])
+					category[item.category]++;
+				else
+					category[item.category] = 1;
+			});
+
+			Object.keys(category).forEach(function(key) {
+				arr.push({ name: key, count: category[key], search: key.toLowerCase() });
+			});
+
+			arr.sort(function(a, b) {
+				return a.name.toLowerCase().removeDiacritics().localeCompare(b.name.toLowerCase().removeDiacritics());
+			});
+
 			SET('widgets.grid', { items: response, page: 1, pages: 1, count: response.length, limit: 1000 });
+			SET('widgets.categories', arr);
 		});
 	}
 
@@ -508,12 +623,68 @@
 		SET('common.form', 'widgets');
 	}
 
-	function pages_reload() {
-		var hash = location.hash;
-		if (hash && hash.length > 1) {
-			setTimeout(function() {
-				pages_edit(hash.substring(1));
-			}, 500);
-		}
+	function widgets_export() {
+		SET('widgets.export', {}, true);
+		SET('common.form', 'widgets-export');
 	}
+
+	function widgets_import() {
+		SET('widgets.import', {}, true);
+		SET('common.form', 'widgets-import');
+	}
+
+	ON('#widgets.export', function(component) {
+		component.submit = function(hide) {
+
+			if (widgets.export.panel)
+				return hide();
+
+			var builder = [];
+
+			widgets.grid.items.forEach(function(item) {
+				widgets.export.items.indexOf(item.id) !== -1 && builder.push(item);
+			});
+
+			SET('widgets.export.base64', btoa(JSON.stringify(builder)));
+			SET('widgets.export.panel', 1);
+			setTimeout(function() {
+				component.find('textarea').focus().select();
+			}, 100);
+		};
+	});
+
+	ON('#widgets.import', function(component) {
+		component.submit = function(hide) {
+
+			var items;
+
+			try {
+				items = JSON.parse(atob(widgets.import.base64));
+			} catch (e) {
+				SETTER('message', 'warning', '@(The system can\'t deserialize data.)');
+				return;
+			}
+
+			SETTER('loading', 'show');
+			var are = false;
+
+			items.waitFor(function(item, next) {
+				var widget = widgets.grid.items.findItem('id', item.id);
+				if (!widget)
+					item.id = undefined;
+				AJAX('POST {0}/api/widgets/'.format(managerurl), item, function(response) {
+					if (response.success)
+						are = true;
+					next();
+				});
+
+			}, function() {
+				SETTER('loading', 'hide');
+				success();
+				are && widgets_refresh();
+				hide();
+			});
+		};
+	});
+
 </script>

@@ -2,11 +2,11 @@
 	<div class="container">
 		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> @(Orders)</div>
 		<div class="row">
-			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="orders.filter.search" data-placeholder="@(Search orders ...)" data-control-icon="fa-search"></div>
+			<div class="col-md-4 col-sm-6 m">
+				<div data-component="textbox" data-component-path="orders.filter.search" data-placeholder="@(Search orders ...)" data-component-type="search"></div>
 				<div class="help" data-component="template" data-component-path="orders.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
-			<div class="col-md-3 col-sm-6 m">
+			<div class="col-md-4 col-sm-6 m">
 				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(All orders)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>
 			</div>
 		</div>

@@ -32,7 +32,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		var filter = NOSQL('products').find();
 
 		options.category && filter.like('linker_category', options.category, 'beg');
-		options.manufacturer && filter.where('manufacturer', options.manufacturer);
+		options.manufacturer && filter.where('linker_manufacturer', options.manufacturer);
 		options.search && filter.like('search', options.search.keywords(true, true));
 		options.id && filter.in('id', options.id);
 		options.skip && filter.where('id', '<>', options.skip);

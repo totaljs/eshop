@@ -5,6 +5,7 @@ NEWSCHEMA('Post').make(function(schema) {
 	schema.define('template', 'String(30)', true);
 	schema.define('language', 'Lower(3)');
 	schema.define('name', 'String(80)', true);
+	schema.define('author', 'String(30)');
 	schema.define('perex', 'String(500)');
 	schema.define('template', 'String(50)');
 	schema.define('keywords', 'String(200)');
@@ -68,6 +69,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		options.linker && filter.where('linker', options.linker);
 		options.id && filter.where('id', options.id);
 		options.language && filter.where('language', options.language);
+		options.template && filter.where('template', options.template);
 
 		filter.callback(callback, 'error-404-post');
 	});
@@ -96,6 +98,9 @@ NEWSCHEMA('Post').make(function(schema) {
 			model.category_linker = category.linker;
 
 		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ').max(1000);
+
+		if (model.body)
+			model.body = U.minifyHTML(model.body);
 
 		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
 

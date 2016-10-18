@@ -55,6 +55,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		options.language && filter.where('language', options.language);
 		options.navigation && filter.in('navigations', options.navigation);
 		options.search && filter.like('search', options.search);
+		options.template && filter.where('template', options.template);
 
 		filter.take(take);
 		filter.skip(skip);
@@ -116,6 +117,9 @@ NEWSCHEMA('Page').make(function(schema) {
 			model.id = UID();
 			model.datecreated = F.datetime;
 		}
+
+		if (model.body)
+			model.body = U.minifyHTML(model.body);
 
 		model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).keywords(true, true).join(' ').max(1000);
 
@@ -490,11 +494,12 @@ function clean(body) {
 	var end;
 	var index = 0;
 	var count = 0;
-	var a = '<div class="CMS_template CMS_remove">';
+	var a = '<div class="CMS_template CMS_remove"';
 	var b = ' data-themes="';
 	var c = 'CMS_unwrap';
 	var tag;
 	var tagend;
+	var tmp = 0;
 
 	body = U.minifyHTML(body);
 
@@ -503,11 +508,13 @@ function clean(body) {
 		if (beg === -1)
 			break;
 
-		index = beg + a.length;
+		tmp = body.indexOf('>', beg + a.length);
+		index = beg + tmp;
 		count = 0;
 
 		while (true) {
 			var str = body.substring(index++, index + 3);
+
 			if (index >= body.length) {
 				beg = body.length;
 				break;
@@ -520,7 +527,7 @@ function clean(body) {
 					continue;
 				}
 
-				body = body.substring(0, beg) + body.substring(beg + a.length, index - 1) + body.substring(index + 5);
+				body = body.substring(0, beg) + body.substring(beg + tmp, index - 1) + body.substring(index + 5);
 				beg -= a.length;
 				break;
 			}
@@ -539,8 +546,6 @@ function clean(body) {
 			break;
 		body = body.substring(0, beg) + body.substring(index + 1);
 	}
-
-	var tmp = 0;
 
 	while (true) {
 		beg = body.indexOf(c, beg);
@@ -609,4 +614,5 @@ function clean(body) {
 	});
 }
 
+exports.clean = clean;
 F.on('settings', refresh);
