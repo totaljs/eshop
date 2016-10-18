@@ -62,10 +62,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 
 		// Writes settings into the file
 		Fs.writeFile(filename, JSON.stringify(settings), function() {
-
 			F.emit('settings.save', settings);
-
-			// Returns response
 			callback(SUCCESS(true));
 		});
 	});
@@ -73,18 +70,10 @@ NEWSCHEMA('Settings').make(function(schema) {
 	// Gets settings
 	schema.setGet(function(error, model, options, callback) {
 		Fs.readFile(filename, function(err, data) {
-			var settings = {};
-
-			if (!err) {
-				settings = JSON.parse(data.toString('utf8'));
-				callback(settings);
-				return;
-			}
-
-			settings['manager-superadmin'] = 'admin:admin';
-			settings.currency = 'EUR';
-			settings.currency_entity = '&euro;';
-
+			if (err)
+				settings = { 'manager-superadmin': 'admin:admin', currency: 'EUR', currency_entity: '&euro;' };
+			else
+				settings = data.toString('utf8').parseJSON();
 			callback(settings);
 		});
 	});
@@ -101,7 +90,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 
 			// Adds an admin (service) account
 			var sa = CONFIG('manager-superadmin').split(':');
-			F.config.custom.users.push({ login: sa[0], password: sa[1], roles: [], sa: true });
+			F.config.custom.users.push({ name: 'Administrator', login: sa[0], password: sa[1], roles: [], sa: true });
 
 			// Optimized for the performance
 			var users = {};
@@ -146,8 +135,6 @@ NEWSCHEMA('Settings').make(function(schema) {
 			}
 
 			F.emit('settings', settings);
-
-			// Returns response
 			callback(SUCCESS(true));
 		});
 	});

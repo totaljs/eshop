@@ -34,7 +34,6 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('lastname', 'Camelize(50)');
 	schema.define('email', 'Email');
 	schema.define('gender', 'String(20)');
-	schema.define('datecreated', Date);
 	schema.define('isblocked', Boolean);
 
 	// Gets a specific user
@@ -49,11 +48,9 @@ NEWSCHEMA('User').make(function(schema) {
 		filter.callback(callback, 'error-404-user');
 	});
 
-	schema.setSave(function(error, model, options, callback) {
-		// Update the user in database
+	schema.setSave(function(error, model, controller, callback) {
 		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
 		NOSQL('users').modify(model).where('id', model.id).callback(function(count) {
-			// Returns response
 			callback(SUCCESS(true));
 			count && F.emit('users.save', model);
 		});
@@ -81,7 +78,6 @@ NEWSCHEMA('User').make(function(schema) {
 
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
-
 		var filter = NOSQL('users').find();
 
 		options.search && filter.like('search', options.search.keywords(true, true));
@@ -89,20 +85,15 @@ NEWSCHEMA('User').make(function(schema) {
 		filter.take(take);
 		filter.skip(skip);
 		filter.sort('datecreated');
+
 		filter.callback(function(err, docs, count) {
 			var data = {};
-
 			data.count = count;
 			data.items = docs;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (!data.pages)
-				data.pages = 1;
-
+			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
 
-			// Returns data
 			callback(data);
 		});
 	});
@@ -122,9 +113,15 @@ NEWSCHEMA('User').make(function(schema) {
 			builder.end();
 		}).callback(function(err, doc) {
 
-			if (!doc) {
-
-				// new user
+			if (doc) {
+				if (doc[id] !== options.profile[id]) {
+					NOSQL('users').update(function(user) {
+						if (user.id === doc.id)
+							user[id] = options.profile[id];
+						return user;
+					});
+				}
+			} else {
 				doc = schema.create();
 				doc.id = UID();
 				doc.name = options.profile.name;
@@ -140,15 +137,6 @@ NEWSCHEMA('User').make(function(schema) {
 
 				// Writes stats
 				MODULE('webcounter').increment('users');
-
-			} else {
-				if (doc[id] !== options.profile[id]) {
-					NOSQL('users').update(function(user) {
-						if (user.id === doc.id)
-							user[id] = options.profile[id];
-						return user;
-					});
-				}
 			}
 
 			exports.login(options.controller.req, options.controller.res, doc.id);
@@ -282,9 +270,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
 
-			if (F.config.custom.emailuserform)
-				mail.bcc(F.config.custom.emailuserform);
-
+			F.config.custom.emailuserform && mail.bcc(F.config.custom.emailuserform);
 			NOSQL('users').insert(user, F.error());
 
 			// Login user
@@ -305,9 +291,8 @@ F.on('service', function(counter) {
 
 	for (var i = 0, length = users.length; i < length; i++) {
 		var user = online[users[i]];
-		if (user.ticks >= ticks)
-			continue;
-		delete online[users[i]];
+		if (user.ticks < ticks)
+			delete online[users[i]];
 	}
 });
 
@@ -316,7 +301,7 @@ exports.usage = function() {
 };
 
 function removeCookie(res, callback) {
-	res.cookie(COOKIE, '', new Date().add('-1 day'));
+	res.cookie(COOKIE, '', F.datetime.add('-1 day'));
 	callback(false);
 }
 
@@ -330,14 +315,8 @@ F.onAuthorize = function(req, res, flags, callback) {
 	}
 
 	var user = F.decrypt(hash, SECRET, true);
-
-	if (!user)
+	if (!user || user.ip !== req.ip)
 		return removeCookie(res, callback);
-
-	if (user.ip !== req.ip) {
-		removeCookie(res, callback);
-		return;
-	}
 
 	var session = online[user.id];
 	if (session) {
