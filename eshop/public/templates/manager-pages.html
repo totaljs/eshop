@@ -6,7 +6,7 @@
 		<div class="caption"><i class="fa fa-file-text"></i>@(Pages)</div>
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data-component="textbox" data-component-path="pages.filter.search" data-placeholder="@(Search pages ...)" data-control-icon="fa-search"></div>
+				<div data-component="textbox" data-component-path="pages.filter.search" data-placeholder="@(Search pages ...)" data-component-type="search"></div>
 				<div class="help" data-component="template" data-component-path="pages.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
 			<div class="col-md-3 m">

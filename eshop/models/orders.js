@@ -1,10 +1,10 @@
-// Supported operations:
-// "dashboard" gets stats
+// ====== Supported operations:
+// "dashboard"  - gets stats
 
-// Supported workflows
-// "create" creates an order
-// "paid" sets ispaid
-// "clear" removes all orders
+// ====== Supported workflows:
+// "create"     - creates an order
+// "paid"       - sets ispaid to true
+// "clear"      - removes all orders
 
 NEWSCHEMA('OrderItem').make(function(schema) {
 	schema.define('id', 'String(20)', true);
@@ -28,13 +28,10 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('address', 'String(1000)', true);
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');
-	schema.define('language', 'Lower(3)');
+	schema.define('language', 'Lower(2)');
 	schema.define('reference', 'String(10)');
 	schema.define('ip', 'String(80)');
 	schema.define('iscompleted', Boolean);
-	schema.define('datecreated', Date);
-	schema.define('datecompleted', Date);
-	schema.define('datepaid', Date);
 	schema.define('price', Number);
 	schema.define('count', Number);
 	schema.define('products', '[OrderItem]', true);
@@ -85,19 +82,14 @@ NEWSCHEMA('Order').make(function(schema) {
 		filter.take(take);
 		filter.sort('datecreated');
 		filter.callback(function(err, docs, count) {
-			var data = {};
 
+			var data = {};
 			data.count = count;
 			data.items = docs;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (!data.pages)
-				data.pages = 1;
-
+			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
 
-			// Returns data
 			callback(data);
 		});
 	});
@@ -150,7 +142,7 @@ NEWSCHEMA('Order').make(function(schema) {
 	});
 
 	// Saves the order into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
 		var isemail = model.isemail;
 
@@ -165,9 +157,11 @@ NEWSCHEMA('Order').make(function(schema) {
 			model.datepaid = F.datetime;
 
 		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(500);
+		model.admin_update = controller.user.name;
+		model.dateupdated = F.datetime;
 
 		// Update order in database
-		NOSQL('orders').update(model).where('id', model.id).callback(function(err, count) {
+		NOSQL('orders').modify(model).where('id', model.id).callback(function(err, count) {
 
 			// Returns response
 			callback(SUCCESS(true));
@@ -176,7 +170,6 @@ NEWSCHEMA('Order').make(function(schema) {
 				return;
 
 			F.emit('orders.save', model);
-
 			model.datebackup = F.datetime;
 			DB('orders_backup').insert(model);
 		});

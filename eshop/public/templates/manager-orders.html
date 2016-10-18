@@ -91,7 +91,7 @@
 			</div>
 			<div class="col-md-3">
 				<div data-component="textbox" data-component-path="orders.form.reference" data-maxlength="10" data-align="center">@(Custom number)</div>
-				<div class="help">For pairing invoices or payments.</div>
+				<div class="help">@(For pairing invoices or payments.)</div>
 			</div>
 		</div>
 	</div>
@@ -187,16 +187,9 @@
 							return;
 						loading.show();
 						AJAX('DELETE {0}/api/orders'.format(managerurl), { id: row.id }, function() {
-
-							if (isError(arguments))
-								return;
-
 							loading.hide();
 							orders_refresh();
-
-							// Refresh dashboard informations
-							if (window.dashboard_refresh)
-								window.dashboard_refresh();
+							EXEC('dashboard_refresh');
 						});
 					});
 					break;
@@ -228,24 +221,14 @@
 			loading.show();
 
 			AJAX('PUT {0}/api/orders/'.format(managerurl), orders.form, function(response) {
-
-				if (isError(arguments))
-					return;
-
 				loading.hide(500);
-
-				// Error handling
 				SET('orders.response', response);
 				if (response instanceof Array)
 					return;
-
 				hide();
 				orders_refresh();
 				success();
-
-				// Refreshes dashboard informations
-				if (window.dashboard_refresh)
-					window.dashboard_refresh();
+				EXEC('dashboard_refresh');
 			});
 		};
 
@@ -291,18 +274,11 @@
 		var loading = FIND('loading');
 		loading.show();
 		AJAX('GET {0}/api/orders/{1}/'.format(managerurl, id), function(response, err) {
-
-			if (isError(arguments))
-				return;
-
 			loading.hide(500);
-
-			// Error prevention
 			if (response instanceof Array) {
 				FIND('message').warning(response[0].error);
 				return;
 			}
-
 			orders.ispaid = response.ispaid;
 			SET('orders.form', $.extend({}, response), true);
 			SET('orders.response', null);
@@ -324,9 +300,7 @@
 
 	// Watchs changes in order filter
 	WATCH('orders.filter.*', function(path, value) {
-		if (NOTMODIFIED('orders.filter', orders.filter))
-			return;
-		orders_refresh(path !== 'orders.filter.page');
+		!NOTMODIFIED('orders.filter', orders.filter) && orders_refresh(path !== 'orders.filter.page');
 	});
 
 	// Method finds ordered item by its id
@@ -358,11 +332,9 @@
 
 	function orders_reload() {
 		var hash = location.hash;
-		if (hash && hash.length > 1) {
-			setTimeout(function() {
-				orders_edit(hash.substring(1));
-			}, 500);
-		}
+		hash && hash.length > 1 && setTimeout(function() {
+			orders_edit(hash.substring(1));
+		}, 500);
 	}
 
 	Tangular.register('sum', function(value, format) {
@@ -370,8 +342,7 @@
 	});
 
 	SCHEDULE('#orders.grid', 'manually', '3 minutes', function() {
-		if (orders.filter.page === 1)
-			orders_refresh();
+		orders.filter.page === 1 && orders_refresh();
 	});
 
 </script>

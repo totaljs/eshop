@@ -1,4 +1,5 @@
 NEWSCHEMA('Product').make(function(schema) {
+
 	schema.define('id', 'String(20)');
 	schema.define('pictures', '[String]');
 	schema.define('reference', 'String(20)');
@@ -11,7 +12,6 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('linker', 'String(50)');
 	schema.define('linker_category', 'String(50)');
 	schema.define('linker_manufacturer', 'String(50)');
-	schema.define('datecreated', Date);
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -55,18 +55,15 @@ NEWSCHEMA('Product').make(function(schema) {
 			data.count = count;
 			data.items = docs;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (!data.pages)
-				data.pages = 1;
-
+			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
+
 			callback(data);
 		});
 	});
 
 	// Saves the product into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
 		var newbie = model.id ? false : true;
 		var nosql = NOSQL('products');
@@ -75,6 +72,10 @@ NEWSCHEMA('Product').make(function(schema) {
 			newbie = true;
 			model.id = UID();
 			model.datecreated = F.datetime;
+			model.admin_create = controller.user.name;
+		} else {
+			model.admin_update = controller.user.name;
+			model.dateupdated = F.datetime;
 		}
 
 		var category = prepare_subcategories(model.category);
@@ -369,18 +370,18 @@ function refresh() {
 	var db_manufacturers = {};
 
 	var prepare = function(doc) {
-		if (db_categories[doc.category] === undefined)
-			db_categories[doc.category] = { count: 1, linker: doc.linker_category, path: doc.linker_category.split('/'), names: doc.category.split('/').trim() };
-		else
+		if (db_categories[doc.category])
 			db_categories[doc.category].count++;
+		else
+			db_categories[doc.category] = { count: 1, linker: doc.linker_category, path: doc.linker_category.split('/'), names: doc.category.split('/').trim() };
 
 		if (!doc.manufacturer)
 			return;
 
-		if (db_manufacturers[doc.manufacturer] === undefined)
-			db_manufacturers[doc.manufacturer] = { count: 1, linker: doc.linker_manufacturer };
-		else
+		if (db_manufacturers[doc.manufacturer])
 			db_manufacturers[doc.manufacturer].count++;
+		else
+			db_manufacturers[doc.manufacturer] = { count: 1, linker: doc.linker_manufacturer };
 	};
 
 	NOSQL('products').find().prepare(prepare).callback(function() {
@@ -415,11 +416,7 @@ function refresh() {
 
 		Object.keys(categories_filter).forEach(key => categories.push(categories_filter[key]));
 
-		categories.sort(function(a, b) {
-			if (a.level > b.level)
-				return 1;
-			return a.level < b.level ? -1 : a.name.localeCompare2(b.name);
-		});
+		categories.sort((a, b) => a.level > b.level ? 1 : a.level < b.level ? -1 : a.name.localeCompare2(b.name));
 
 		// Prepares manufacturers
 		keys = Object.keys(db_manufacturers);

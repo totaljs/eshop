@@ -35,7 +35,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 	});
 
 	// Saves the widget into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
 		var newbie = model.id ? false : true;
 		var nosql = NOSQL('widgets');
@@ -43,6 +43,10 @@ NEWSCHEMA('Widget').make(function(schema) {
 		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
+			model.admin_create = controller.user.name;
+		} else {
+			model.admin_update = controller.user.name;
+			model.dateupdated = F.datetime;
 		}
 
 		if (model.body)
