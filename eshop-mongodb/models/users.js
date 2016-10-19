@@ -9,11 +9,11 @@ exports.login = function(req, res, id) {
 
 exports.logoff = function(req, res, user) {
 	delete online[user.id];
-	res.cookie(COOKIE, '', new Date().add('-1 day'));
+	res.cookie(COOKIE, '', F.datetime.add('-1 day'));
 };
 
 exports.createSession = function(profile) {
-	online[profile.id] = { id: profile.id, name: profile.name, firstname: profile.firstname, lastname: profile.lastname, email: profile.email, ticks: new Date().add('30 minutes').getTime() };
+	online[profile.id] = { id: profile.id, name: profile.name, firstname: profile.firstname, lastname: profile.lastname, email: profile.email, ticks: F.datetime.add('30 minutes').getTime() };
 	return online[profile.id];
 };
 
@@ -31,11 +31,11 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('idlive', 'String(30)');
 	schema.define('ip', 'String(80)');
 	schema.define('search', 'String(80)');
-	schema.define('firstname', 'Camelize(50)');
-	schema.define('lastname', 'Camelize(50)');
-	schema.define('name', 'Camelize(50)', true);
+	schema.define('firstname', 'Capitalize(50)');
+	schema.define('lastname', 'Capitalize(50)');
+	schema.define('name', 'Capitalize(50)', true);
 	schema.define('email', 'Email');
-	schema.define('gender', 'String(20)');
+	schema.define('gender', 'Lower(20)');
 	schema.define('isblocked', Boolean);
 
 	// Gets a specific user
@@ -223,9 +223,9 @@ NEWSCHEMA('User').make(function(schema) {
 
 NEWSCHEMA('UserSettings').make(function(schema) {
 	schema.define('id', 'String(20)');
-	schema.define('firstname', 'String(50)', true);
-	schema.define('lastname', 'String(50)', true);
-	schema.define('email', 'String(200)', true);
+	schema.define('firstname', 'Capitalize(50)', true);
+	schema.define('lastname', 'Capitalize(50)', true);
+	schema.define('email', 'Email', true);
 	schema.define('password', 'String(20)', true);
 
 	schema.setSave(function(error, model, options, callback) {
@@ -259,8 +259,8 @@ NEWSCHEMA('UserSettings').make(function(schema) {
 
 NEWSCHEMA('UserLogin').make(function(schema) {
 
-	schema.define('email', 'String(200)', true);
-	schema.define('password', 'String(30)', true);
+	schema.define('email', 'Email', true);
+	schema.define('password', 'String(20)', true);
 
 	schema.setPrepare(function(name, value) {
 		if (name === 'email')
@@ -293,7 +293,7 @@ NEWSCHEMA('UserLogin').make(function(schema) {
 });
 
 NEWSCHEMA('UserPassword').make(function(schema) {
-	schema.define('email', 'String(200)', true);
+	schema.define('email', 'Email', true);
 	schema.addWorkflow('exec', function(error, model, options, callback) {
 
 		// options.controller
@@ -310,7 +310,7 @@ NEWSCHEMA('UserPassword').make(function(schema) {
 				return callback();
 			}
 
-			response.hash = F.encrypt({ id: response.id, expire: new Date().add('2 days').getTime() });
+			response.hash = F.encrypt({ id: response.id, expire: F.datetime.add('2 days').getTime() });
 			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response, options.controller.language || '');
 			callback(SUCCESS(true));
 		});
@@ -318,10 +318,10 @@ NEWSCHEMA('UserPassword').make(function(schema) {
 });
 
 NEWSCHEMA('UserRegistration').make(function(schema) {
-	schema.define('firstname', 'String(50)', true);
-	schema.define('lastname', 'String(50)', true);
-	schema.define('gender', 'String(20)');
-	schema.define('email', 'String(200)', true);
+	schema.define('firstname', 'Capitalize(50)', true);
+	schema.define('lastname', 'Capitalize(50)', true);
+	schema.define('gender', 'Lower(20)');
+	schema.define('email', 'Email', true);
 	schema.define('password', 'String(20)', true);
 
 	schema.addWorkflow('exec', function(error, model, options, callback) {
@@ -375,7 +375,7 @@ F.on('service', function(counter) {
 		return;
 
 	var users = Object.keys(online);
-	var ticks = new Date().getTime();
+	var ticks = F.datetime.getTime();
 
 	for (var i = 0, length = users.length; i < length; i++) {
 		var user = online[users[i]];
@@ -390,7 +390,7 @@ exports.usage = function() {
 };
 
 function removeCookie(res, callback) {
-	res.cookie(COOKIE, '', new Date().add('-1 day'));
+	res.cookie(COOKIE, '', F.datetime.add('-1 day'));
 	callback(false);
 }
 
@@ -410,7 +410,7 @@ F.onAuthorize = function(req, res, flags, callback) {
 	var session = online[user.id];
 	if (session) {
 		req.user = session;
-		session.ticks = new Date().add('30 minutes').getTime();
+		session.ticks = F.datetime.add('30 minutes').getTime();
 		callback(true);
 		return;
 	}
@@ -427,7 +427,7 @@ F.onAuthorize = function(req, res, flags, callback) {
 
 		nosql.update('users').make(function(builder) {
 			builder.inc('countlogin');
-			builder.set('datelogged', new Date());
+			builder.set('datelogged', F.datetime);
 			builder.where('id', response.id);
 		});
 

@@ -31,12 +31,11 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('idlive', 'String(30)');
 	schema.define('ip', 'String(80)');
 	schema.define('search', 'String(80)');
-	schema.define('firstname', 'String(50)');
-	schema.define('lastname', 'String(50)');
-	schema.define('name', 'String(50)', true);
-	schema.define('email', 'String(200)');
+	schema.define('firstname', 'Capitalize(50)');
+	schema.define('lastname', 'Capitalize(50)');
+	schema.define('name', 'Capitalize(50)', true);
+	schema.define('email', 'Email');
 	schema.define('gender', 'String(20)');
-	schema.define('datecreated', Date);
 	schema.define('isblocked', Boolean);
 
 	schema.setQuery(function(error, options, callback) {
@@ -75,12 +74,9 @@ NEWSCHEMA('User').make(function(schema) {
 			data.count = response.items.count;
 			data.items = response.items.items;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (!data.pages)
-				data.pages = 1;
-
+			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
+
 			callback(data);
 		});
 	});
@@ -89,9 +85,7 @@ NEWSCHEMA('User').make(function(schema) {
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
 
-		// options.id {String}
-
-		if(!(options.email || options.password || options.id)) {
+		if (!(options.email || options.password || options.id)) {
 		    error.push('error-404-user');
 		    return callback();
 		}
@@ -112,16 +106,17 @@ NEWSCHEMA('User').make(function(schema) {
 		sql.exec(callback, 'item');
 	});
 
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
 		var sql = DB(error);
-		var newbie = false;
+		var newbie = model.id ? false : true;
 
-		if (!model.id) {
+		if (newbie) {
 			model.id = UID();
 			newbie = true;
 			model.datecreated = F.datetime;
-		}
+		} else
+			model.dateupdated = F.datetime;
 
 		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(80);
 
@@ -129,7 +124,6 @@ NEWSCHEMA('User').make(function(schema) {
 			builder.set(model);
 			if (newbie)
 				return;
-			builder.set('dateupdated', F.datetime);
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', model.id);
@@ -227,9 +221,9 @@ NEWSCHEMA('User').make(function(schema) {
 
 NEWSCHEMA('UserSettings').make(function(schema) {
 	schema.define('id', 'String(20)');
-	schema.define('firstname', 'String(50)', true);
-	schema.define('lastname', 'String(50)', true);
-	schema.define('email', 'String(200)', true);
+	schema.define('firstname', 'Capitalize(50)', true);
+	schema.define('lastname', 'Capitalize(50)', true);
+	schema.define('email', 'Email', true);
 	schema.define('password', 'String(20)', true);
 
 	schema.setSave(function(error, model, options, callback) {
@@ -262,8 +256,8 @@ NEWSCHEMA('UserSettings').make(function(schema) {
 
 NEWSCHEMA('UserLogin').make(function(schema) {
 
-	schema.define('email', 'String(200)', true);
-	schema.define('password', 'String(30)', true);
+	schema.define('email', 'Email', true);
+	schema.define('password', 'String(20)', true);
 
 	schema.setPrepare(function(name, value) {
 		if (name === 'email')
@@ -296,7 +290,7 @@ NEWSCHEMA('UserLogin').make(function(schema) {
 });
 
 NEWSCHEMA('UserPassword').make(function(schema) {
-	schema.define('email', 'String(200)', true);
+	schema.define('email', 'Email', true);
 	schema.addWorkflow('exec', function(error, model, options, callback) {
 
 		// options.controller
@@ -321,10 +315,10 @@ NEWSCHEMA('UserPassword').make(function(schema) {
 });
 
 NEWSCHEMA('UserRegistration').make(function(schema) {
-	schema.define('firstname', 'String(50)', true);
-	schema.define('lastname', 'String(50)', true);
-	schema.define('gender', 'String(20)');
-	schema.define('email', 'String(200)', true);
+	schema.define('firstname', 'Capitalize(50)', true);
+	schema.define('lastname', 'Capitalize(50)', true);
+	schema.define('gender', 'Lower(20)');
+	schema.define('email', 'Email', true);
 	schema.define('password', 'String(20)', true);
 
 	schema.addWorkflow('exec', function(error, model, options, callback) {
@@ -380,13 +374,12 @@ F.on('service', function(counter) {
 		return;
 
 	var users = Object.keys(online);
-	var ticks = new Date().getTime();
+	var ticks = F.datetime;
 
 	for (var i = 0, length = users.length; i < length; i++) {
 		var user = online[users[i]];
-		if (user.ticks >= ticks)
-			continue;
-		delete online[users[i]];
+		if (user.ticks < ticks)
+			delete online[users[i]];
 	}
 });
 
@@ -409,11 +402,7 @@ F.onAuthorize = function(req, res, flags, callback) {
 	}
 
 	var user = F.decrypt(hash, SECRET, true);
-
-	if (!user)
-		return removeCookie(res, callback);
-
-	if (user.ip !== req.ip) {
+	if (!user || user.ip !== req.ip) {
 		removeCookie(res, callback);
 		return;
 	}
@@ -438,7 +427,7 @@ F.onAuthorize = function(req, res, flags, callback) {
 
 		sql.update('tbl_user').make(function(builder) {
 			builder.inc('countlogin');
-			builder.set('datelogged', new Date());
+			builder.set('datelogged', F.datetime);
 			builder.where('id', response.id);
 		});
 

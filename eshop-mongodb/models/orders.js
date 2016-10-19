@@ -199,7 +199,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.set('dateupdated', F.datetime);
-			builder.set('admin_update', controller.user.name);
+			builder.set('adminupdated', controller.user.name);
 			builder.where('id', model.id);
 			builder.first();
 		});

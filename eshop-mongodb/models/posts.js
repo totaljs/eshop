@@ -121,14 +121,15 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-			model.admin_create = controller.user.name;
+			model.admincreated = controller.user.name;
 		} else {
-			model.admin_update = controller.user.name;
+			model.adminupdated = controller.user.name;
 			model.dateupdated = F.datetime;
 		}
 
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
 		model.isremoved = false;
+		model.body = U.minifyHTML(model.body);
 
 		var category = F.global.posts.find('name', model.category);
 		if (category)

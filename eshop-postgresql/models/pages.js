@@ -1,37 +1,35 @@
-// Supported operations:
-// "render" renders page
-// "render-multiple" renders multiple pages (uses "render")
-// "breadcrumb" creates bredcrumb (uses "render")
-// "clear" clears database
+// ====== Supported operations:
+// "render"            - renders page
+// "render-multiple"   - renders multiple pages (uses "render")
+// "breadcrumb"        - creates bredcrumb (uses "render")
+// "clear"             - clears database
 
-// Supported workflows
-// "create-url"
+// ====== Supported workflows:
+// "url"               - creates URL
 
 const REGEXP_HTML_CLASS = /(\s)class\=\".*?\"/g;
 
 NEWSCHEMA('Page').make(function(schema) {
 
 	schema.define('id', 'String(20)');
-	schema.define('parent', 'String(20)');
-	schema.define('template', 'String(30)');
-	schema.define('language', 'Lower(3)');
-	schema.define('url', 'String(200)');
-	schema.define('keywords', 'String(200)');
-	schema.define('icon', 'String(20)');
-	schema.define('navigations', '[String]');
-	schema.define('partial', '[String]');      // A partial content
-	schema.define('widgets', '[String]');      // Widgets lists, contains Array of ID widget
-	schema.define('settings', '[String]');     // Widget settings (according to widgets array index)
-	schema.define('tags', '[String]');
-	schema.define('pictures', '[String]')      // URL addresses for first 5 pictures
-	schema.define('name', 'String(50)');
-	schema.define('perex', 'String(500)');
-	schema.define('search', 'String(2000)');
-	schema.define('title', 'String(100)', true);
-	schema.define('priority', Number);
-	schema.define('ispartial', Boolean);
-	schema.define('body', String);
-	schema.define('datecreated', Date);
+	schema.define('body', String);                      // RAW html
+	schema.define('icon', 'String(20)');                // Font-Awesome icon name
+	schema.define('ispartial', Boolean);                // Is only partial page (the page will be shown in another page)
+	schema.define('keywords', 'String(200)');           // Meta keywords
+	schema.define('language', 'Lower(2)');              // For which language is the page targeted?
+	schema.define('name', 'String(50)');                // Name in manager
+	schema.define('navigations', '[String]');           // In which navigation will be the page?
+	schema.define('parent', 'String(20)');              // Parent page for breadcrumb
+	schema.define('partial', '[String]');               // A partial content
+	schema.define('perex', 'String(500)');              // Short page description generated according to the "CMS_perex" class in CMS editor
+	schema.define('pictures', '[String]')               // URL addresses for first 5 pictures
+	schema.define('priority', Number);                  // Sorting in navigation
+	schema.define('search', 'String(1000)');            // Search pharses
+	schema.define('settings', '[String]');              // Widget settings (according to widgets array index)
+	schema.define('template', 'String(30)');            // Render template views/cms/*.html
+	schema.define('title', 'String(100)', true);        // Meta title
+	schema.define('url', 'String(200)');                // URL (can be realive for showing content or absolute for redirects)
+	schema.define('widgets', '[String]');               // Widgets lists, contains Array of ID widget
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -66,6 +64,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			options.language && builder.where('language', options.language);
 			options.navigation && builder.like('navigations', options.navigation, '*');
 			options.search && builder.like('search', options.search, '*');
+			options.template && builder.where('template', options.template);
 
 			builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
 			builder.sort('name');
@@ -103,12 +102,9 @@ NEWSCHEMA('Page').make(function(schema) {
 			data.count = response.items.count;
 			data.items = items;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (!data.pages)
-				data.pages = 1;
-
+			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
+
 			callback(data);
 		});
 	});
@@ -181,10 +177,7 @@ NEWSCHEMA('Page').make(function(schema) {
 	});
 
 	// Saves the page into the database
-	schema.setSave(function(error, model, options, callback) {
-
-		// options.id {String}
-		// options.url {String}
+	schema.setSave(function(error, model, controller, callback) {
 
 		if (!model.name)
 			model.name = model.title;
@@ -192,9 +185,13 @@ NEWSCHEMA('Page').make(function(schema) {
 		var count = 0;
 		var newbie = model.id ? false : true;
 
-		if (!model.id) {
+		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
+			model.admincreated = controller.user.name;
+		} else {
+			model.dateupdated = F.datetime;
+			model.adminupdated = controller.user.name;
 		}
 
 		// Sanitizes URL
@@ -211,6 +208,7 @@ NEWSCHEMA('Page').make(function(schema) {
 		clean.tags = clean.tags.join(';');
 		clean.partial = clean.partial.join(';');
 		clean.navigations = clean.navigations.join(';');
+		clean.body = U.minifyHTML(clean.body);
 
 		if (clean.search)
 			clean.search = ((clean.title || '') + ' ' + (clean.keywords || '') + ' ' + clean.search).keywords(true, true).join(' ').max(2000);
@@ -229,7 +227,6 @@ NEWSCHEMA('Page').make(function(schema) {
 			if (newbie)
 				return;
 
-			builder.set('dateupdated', F.datetime);
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', clean.id);
@@ -249,7 +246,6 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		sql.exec(function(err) {
 
-			// Returns response
 			callback(SUCCESS(true));
 
 			if (err)
@@ -260,26 +256,16 @@ NEWSCHEMA('Page').make(function(schema) {
 		});
 	});
 
-	schema.addWorkflow('create-url', function(error, model, options, callback) {
+	schema.addWorkflow('url', function(error, model, options, callback) {
 
 		if (!model.parent) {
 			model.url = model.title.slug();
 			return callback();
 		}
 
-		var options = {};
-		options.id = model.parent;
-
-		// Gets Parent
-		schema.get(options, function(err, response) {
-
-			if (err) {
-				model.url = model.title.slug();
-				return callback();
-			}
-
-			// Gets parent URL and adds current page title
-			model.url = response.url + model.title.slug() + '/';
+		// Gets parent URL
+		schema.get({ id: model.parent }, function(err, response) {
+			model.url = err ? model.title.slug() : response.url + model.title.slug() + '/';
 			callback();
 		});
 	});
@@ -359,7 +345,7 @@ NEWSCHEMA('Page').make(function(schema) {
 						if (response.language)
 							response.body = F.translator(response.language, response.body);
 
-						response.body = clean(response.body);
+						response.body = response.body.tidyCMS();
 
 						if (response.partial && response.partial.length) {
 							schema.operation2('render-multiple', { id: response.partial }, function(err, partial) {
@@ -376,7 +362,7 @@ NEWSCHEMA('Page').make(function(schema) {
 								response.partial = arr;
 								callback(response);
 							});
-							return
+							return;
 						}
 
 						callback(response);
@@ -428,9 +414,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			}
 		}
 
-		pending.async(function() {
-			callback(output);
-		});
+		pending.async(() => callback(output));
 	});
 
 	// Loads breadcrumb according to URL
@@ -515,11 +499,7 @@ function refresh() {
 
 		// Sorts navigation according to priority
 		Object.keys(navigation).forEach(function(name) {
-			navigation[name].sort(function(a, b) {
-				if (a.priority > b.priority)
-					return -1;
-				return a.priority < b.priority ? 1 : 0;
-			});
+			navigation[name].sort((a, b) => a.priority > b.priority ? -1 : a.priority < b.priority ? 1 : 0);
 		});
 
 		partial.sort((a, b) => a.priority > b.priority ? -1 : a.priority === b.priority ? 0 : 1);
@@ -601,7 +581,6 @@ F.eval(function() {
 		self.memorize('cache.' + url, '1 minute', DEBUG || cache !== true, function() {
 
 			var options = {};
-
 			options.url = self.url;
 			options.language = self.language;
 			options.controller = self;
@@ -620,11 +599,7 @@ F.eval(function() {
 
 				self.sitemap(response.breadcrumb);
 				self.title(response.title);
-
-				if (!view)
-					view = '/cms/' + response.template;
-
-				self.view(view, model);
+				self.view(view || '/cms/' + response.template, model);
 			});
 		});
 
@@ -632,64 +607,21 @@ F.eval(function() {
 	};
 });
 
-// Renders page and stores into the repository
-F.middleware('page', function(req, res, next, options, controller) {
+// Cleans CMS markup
+String.prototype.tidyCMS = function() {
 
-	if (!controller) {
-		res.throw404();
-		return;
-	}
-
-	controller.memorize('cache.' + controller.url, '1 minute', DEBUG, function() {
-		controller.page(controller.url);
-	});
-});
-
-function clean(body) {
-
+	var body = this;
 	var beg;
 	var end;
 	var index = 0;
 	var count = 0;
-	var a = '<div class="CMS_template CMS_remove">';
 	var b = ' data-themes="';
 	var c = 'CMS_unwrap';
 	var tag;
 	var tagend;
+	var tmp = 0;
 
-	body = U.minifyHTML(body);
-
-	while (true) {
-		beg = body.indexOf(a, beg);
-		if (beg === -1)
-			break;
-
-		index = beg + a.length;
-		count = 0;
-
-		while (true) {
-			var str = body.substring(index++, index + 3);
-			if (index >= body.length) {
-				beg = body.length;
-				break;
-			}
-
-			if (str === '</di') {
-
-				if (count) {
-					count--;
-					continue;
-				}
-
-				body = body.substring(0, beg) + body.substring(beg + a.length, index - 1) + body.substring(index + 5);
-				beg -= a.length;
-				break;
-			}
-
-			if (str === '<div')
-				count++;
-		}
-	}
+	body = U.minifyHTML(body).replace(/\sclass=\"CMS_template CMS_remove\"/gi, '');
 
 	while (true) {
 		beg = body.indexOf(b, beg);
@@ -700,8 +632,6 @@ function clean(body) {
 			break;
 		body = body.substring(0, beg) + body.substring(index + 1);
 	}
-
-	var tmp = 0;
 
 	while (true) {
 		beg = body.indexOf(c, beg);
@@ -768,6 +698,6 @@ function clean(body) {
 
 		return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
 	});
-}
+};
 
 F.on('settings', refresh);

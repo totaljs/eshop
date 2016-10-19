@@ -12,7 +12,6 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('linker', 'String(50)');
 	schema.define('linker_category', 'String(300)');
 	schema.define('linker_manufacturer', 'String(50)');
-	schema.define('datecreated', Date);
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -95,7 +94,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	});
 
 	// Saves the product into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
 		// Default values
 		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug().max(300);
@@ -117,6 +116,10 @@ NEWSCHEMA('Product').make(function(schema) {
 		if (newbie) {
 			model.id = clean.id = UID();
 			model.datecreated = clean.datecreated = F.datetime;
+			clean.admincreated = controller.user.name;
+		} else {
+			clean.dateupdated = F.datetime;
+			clean.adminupdated = controller.user.name;
 		}
 
 		sql.save('item', 'tbl_product', newbie, function(builder) {
@@ -125,7 +128,6 @@ NEWSCHEMA('Product').make(function(schema) {
 			if (newbie)
 				return;
 
-			builder.set('dateupdated', F.datetime);
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.where('id', clean.id);
@@ -133,7 +135,6 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		sql.exec(function(err) {
 
-			// Returns response
 			callback(SUCCESS(true));
 
 			if (err)
@@ -141,10 +142,8 @@ NEWSCHEMA('Product').make(function(schema) {
 
 			F.emit('products.save', model);
 
-			if (options && options.importing)
-				return;
-
-			setTimeout2('products', refresh, 1000);
+			if (!controller || !controller.importing)
+				setTimeout2('products', refresh, 1000);
 		});
 	});
 
@@ -270,8 +269,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 				if (err) {
 					error.push(err);
-					callback();
-					return;
+					return callback();
 				}
 
 				buffer = buffer.toString('utf8').split('\n');
@@ -319,11 +317,7 @@ NEWSCHEMA('Product').make(function(schema) {
 						model.$save(options, next);
 					});
 				}, function() {
-
-					if (count)
-						refresh();
-
-					// Done, returns response
+					count && refresh();
 					callback(SUCCESS(count > 0));
 				});
 			});
@@ -535,12 +529,7 @@ function refresh() {
 		}
 
 		Object.keys(categories_filter).forEach(key => categories.push(categories_filter[key]));
-
-		categories.sort(function(a, b) {
-			if (a.level > b.level)
-				return 1;
-			return a.level < b.level ? -1 : a.name.localeCompare2(b.name);
-		});
+		categories.sort((a, b) => a.level > b.level ? 1 : a.level < b.level ? -1 : a.name.localeCompare2(b.name));
 
 		F.global.categories = categories;
 		F.global.manufacturers = response.manufacturers;

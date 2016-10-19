@@ -27,9 +27,9 @@ h2 b { font-weight: 700; }
 .success-animation { transform: scale(2) translate(10px, 10px); }
 
 .buttons { float: right; }
-.buttons a { float: left; height: 30px; background-color: #F0F0F0; width: 34px; text-align: center; font-size: 14px; padding: 5px 0 0 0; border-radius: 4px; color: #A0A0A0; margin-left: 5px; text-shadow: 1px 1px 1px white; }
-.buttons a:hover { background-color: #E0E0E0; color: black; }
-.buttons a span { display: none; }
+.buttons a { float: left; height: 30px; background-color: white; text-align: center; font-size: 12px; padding: 6px 10px 0; border-radius: 4px; color: #A0A0A0; margin-left: 5px; text-shadow: 1px 1px 1px white; border: 1px solid #E0E0E0; }
+.buttons a:hover { background-color: #E0E0E0; color: black; text-decoration: none; }
+.buttons .fa { margin-right: 5px; color: black; }
 
 .padding { padding: 20px; }
 .m { margin-bottom: 20px; }
@@ -96,11 +96,16 @@ canvas { display: block; }
 .w18 { width: 18px; }
 .ui-error { margin: 0 20px 20px !important; }
 
-.tabmenu { border-bottom: 1px solid #E0E0E0; padding: 0; margin: 0; display: block; position: relative; font-size: 12px; margin-bottom: 20px; }
+.tabmenu { border-bottom: 1px solid #E0E0E0; margin-bottom: 20px; }
+.tabmenu ul { padding: 0; margin: 0; display: inline-block; position: relative; font-size: 12px; }
 .tabmenu li { position: relative; display: inline-block; border: 1px solid white; border-bottom: 0; margin: 0 0 0 10px; padding: 0; border-radius: 3px 3px 0 0; background-color: #F8F8F8; text-align: center; padding: 8px 10px; color: gray; cursor: pointer; min-width: 120px; }
 .tabmenu li:first-child { margin-left: 0; }
 .tabmenu .selected { background-color: white; top: 1px; border-color: #E0E0E0; color: black; }
 .tabmenu .fa { margin-right: 8px; }
+.tabmenu > div { float: right; margin: 5px 0 0 0; }
+.tabmenu > div a { font-size: 11px; color: gray; margin-left: 10px; border-left: 1px solid #E0E0E0; padding-left: 10px; position: relative; display: inline-block; }
+.tabmenu > div .fa { margin-right: 5px; color: #404040; }
+.tabmenu > div a:first-child { margin-left: 0; padding-left: 0; border-left: 0; }
 
 .mainmenu { display: none; height: 40px; }
 .mainmenu > div { float: left; margin-top: 13px; font-size: 12px; color: gray; text-shadow: 1px 1px 1px white; background-color: white; border-radius: 10px; padding: 1px 12px; }
@@ -114,6 +119,12 @@ canvas { display: block; }
 .oauth2callback { font-size: 11px; white-space: pre-wrap; margin-bottom: 15px; color: silver; }
 .oauth2callback input { width: 100%; color: #505050; padding: 5px; cursor: text; background: #F8F8F8; border: 0; }
 .oauth2callback div { margin-bottom: 3px; }
+
+.cmseditor-help { font-size: 11px; color: #AAB2BD; margin-top: 7px; line-height: 13px; margin-bottom: 8px; padding: 5px 20px 0; height: 20px; }
+.cmseditor-help nav { float: left; }
+.cmseditor-help nav a { margin-right: 8px; padding-right: 8px; border-right: 1px solid #E0E0E0; }
+.cmseditor-help > div { float: right; }
+.cmseditor-help nav .fa { margin-right: 8px; }
 
 @media(max-width: 996px) {
 	header .photo { display: none; }
@@ -133,6 +144,7 @@ canvas { display: block; }
 @media(max-width: 767px) {
 	header nav a { min-width: 33% !important; height: 55px; padding-top: 12px; border-right: 0; background-color: white; border-left: 1px solid #F0F0F0; position: relative; display: inline-block; }
 	.ui-form-buttons button[name="submit"] { width: 140px; }
+	.tabmenu > div { display: none; }
 	.table-xs thead { display: none; }
 	.table-xs tbody { margin-top: 15px; display: block; }
 	.table-xs td { display: block; }

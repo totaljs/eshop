@@ -157,7 +157,7 @@ NEWSCHEMA('Order').make(function(schema) {
 			model.datepaid = F.datetime;
 
 		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(500);
-		model.admin_update = controller.user.name;
+		model.adminupdated = controller.user.name;
 		model.dateupdated = F.datetime;
 
 		// Update order in database

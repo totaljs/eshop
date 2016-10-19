@@ -1,12 +1,18 @@
-NEWSCHEMA('OrderItem').make(function(schema) {
+// ====== Supported operations:
+// "dashboard"  - gets stats
 
+// ====== Supported workflows:
+// "create"     - creates an order
+// "paid"       - sets ispaid to true
+// "clear"      - removes all orders
+
+NEWSCHEMA('OrderItem').make(function(schema) {
 	schema.define('id', 'String(20)', true);
 	schema.define('price', Number, true);
 	schema.define('name', 'String(50)', true);
 	schema.define('reference', 'String(20)');
 	schema.define('pictures', '[String]');
 	schema.define('count', Number, true);
-
 });
 
 NEWSCHEMA('Order').make(function(schema) {
@@ -18,15 +24,14 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('firstname', 'Camelize(40)', true);
 	schema.define('lastname', 'Camelize(40)', true);
 	schema.define('email', 'Email', true);
-	schema.define('phone', 'Phone');
-	schema.define('address', 'String(1000)', true);
-	schema.define('language', 'Lower(3)');
 	schema.define('reference', 'String(10)');
+	schema.define('phone', 'Phone');
+	schema.define('language', 'Lower(2)');
+	schema.define('address', 'String(1000)', true);
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');
 	schema.define('ip', 'String(80)');
 	schema.define('iscompleted', Boolean);
-	schema.define('datecreated', Date);
 	schema.define('datecompleted', Date);
 	schema.define('datepaid', Date);
 	schema.define('price', Number);
@@ -110,12 +115,9 @@ NEWSCHEMA('Order').make(function(schema) {
 			data.count = response.items.count;
 			data.items = response.items.items;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (!data.pages)
-				data.pages = 1;
-
+			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
+
 			callback(data);
 		});
 	});
@@ -216,21 +218,24 @@ NEWSCHEMA('Order').make(function(schema) {
 	});
 
 	// Saves the order into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
 		var isemail = model.isemail;
 
 		// Cleans unnecessary properties
-		delete model.isnewsletter;
-		delete model.isterms;
-		delete model.isemail;
+		model.isnewsletter = undefined;
+		model.isterms = undefined;
+		model.isemail = undefined;
 
 		model.search = ((model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(80);
 
 		if (model.datecompleted)
 			model.datecompleted = model.datecompleted;
 		else if (model.iscompleted && !model.datecompleted)
-			model.datecompleted = new Date();
+			model.datecompleted = F.datetime;
+
+		model.adminupdated = controller.user.name;
+		model.dateupdated = F.datetime;
 
 		var sql = DB(error);
 
@@ -239,7 +244,6 @@ NEWSCHEMA('Order').make(function(schema) {
 			builder.rem('id');
 			builder.rem('datecreated');
 			builder.rem('products');
-			builder.set('dateupdated', new Date());
 			builder.where('id', model.id);
 		});
 
@@ -260,13 +264,8 @@ NEWSCHEMA('Order').make(function(schema) {
 		}
 
 		sql.exec(function(err) {
-			// Returns response
 			callback(SUCCESS(true));
-
-			if (err)
-				return;
-
-			F.emit('orders.save', model);
+			!err && F.emit('orders.save', model);
 		});
 
 		if (!isemail)
@@ -307,13 +306,11 @@ NEWSCHEMA('Order').make(function(schema) {
 		sql.exec(function(err, response) {
 
 			var stats = {};
-
 			stats.completed = response.completed.count;
 			stats.completed_price = response.completed.price || 0;
 			stats.pending = response.pending.count;
 			stats.pending_price = response.pending.price || 0;
 
-			// Returns stats for dashboard
 			callback(stats);
 		});
 	});

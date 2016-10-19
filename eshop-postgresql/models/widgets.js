@@ -1,12 +1,15 @@
+const Fs = require('fs');
+const CSS = 'widgets.css';
+
 NEWSCHEMA('Widget').make(function(schema) {
 
 	schema.define('id', 'String(20)');
 	schema.define('name', 'String(50)', true);
 	schema.define('category', 'String(50)');
 	schema.define('body', String);
+	schema.define('css', String);
 	schema.define('icon', 'String(20)');
 	schema.define('istemplate', Boolean);
-	schema.define('datecreated', Date);
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -54,19 +57,21 @@ NEWSCHEMA('Widget').make(function(schema) {
 	});
 
 	// Saves the widget into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
-		// options.id {String}
-		// options.url {String}
-
-		var newbie = false;
+		var newbie = model.id ? false : true;
 		var sql = DB();
 
-		if (!model.id) {
+		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-			newbie = true;
+			model.admincreated = controller.user.name;
+		} else {
+			model.dateupdated = F.datetime;
+			model.adminupdated = controller.user.name;
 		}
+
+		model.body = U.minifyHTML(model.body);
 
 		sql.save('item', 'tbl_widget', newbie, function(builder) {
 			builder.set(model);
@@ -80,7 +85,10 @@ NEWSCHEMA('Widget').make(function(schema) {
 
 		sql.exec(function(err) {
 			callback(SUCCESS(true));
-			!err && F.emit('widgets.save', model);
+			if (err)
+				return;
+			F.emit('widgets.save', model);
+			refresh();
 		});
 	});
 
@@ -124,4 +132,30 @@ NEWSCHEMA('Widget').make(function(schema) {
 		});
 	});
 
+});
+
+function refresh() {
+	var nosql = DB();
+
+	nosql.select('items', 'widgets').make(function(builder) {
+		builder.where('isremoved', false);
+		builder.fields('css');
+	})
+
+	nosql.exec(function(err, response) {
+
+		if (err)
+			return;
+
+		var builder = [];
+		var docs = response.items;
+		docs.forEach(item => item.css && builder.push(item.css));
+		Fs.writeFile(F.path.temp(CSS), U.minifyStyle(builder.join('\n')), NOOP);
+		F.touch('/' + CSS);
+		F.global.css = '/' + CSS + '?ts=' + U.GUID(5);
+	});
+}
+
+F.file('/' + CSS, function(req, res) {
+	res.file(F.path.temp(CSS));
 });

@@ -2,7 +2,7 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 
 	schema.define('email', 'Email', true);
 	schema.define('ip', 'String(80)');
-	schema.define('language', 'Lower(3)');
+	schema.define('language', 'Lower(2)');
 
 	// Saves the model into the database
 	schema.setSave(function(error, model, options, callback) {
@@ -24,13 +24,11 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 		sql.insert('tbl_newsletter').set(model).primary('email');
 		sql.exec(F.error());
 
+		callback(SUCCESS(true));
 		F.emit('newsletter.save', model);
 
 		// Writes stats
 		MODULE('webcounter').increment('newsletter');
-
-		// Returns response
-		callback(SUCCESS(true));
 	});
 
 	// Gets listing

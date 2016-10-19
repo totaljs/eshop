@@ -109,10 +109,10 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-			model.admin_create = controller.user.name;
+			model.admincreated = controller.user.name;
 		} else {
-			model.admin_update = controller.user.name;
 			model.dateupdated = F.datetime;
+			model.adminupdated = controller.user.name;
 		}
 
 		if (model.body)
@@ -215,12 +215,11 @@ NEWSCHEMA('Page').make(function(schema) {
 						// Executes transform
 						Widget.transform(key, widgets[key], custom, function(err, content) {
 
-							if (err) {
+							if (err)
 								F.error(err, 'Widget: ' + widgets[key].name + ' - ' + key + ' (page: ' + response.name + ')', response.url);
-								return next();
-							}
+							else
+								response.body = response.body.replace('data-id="' + key + '">', '>' + content);
 
-							response.body = response.body.replace('data-id="' + key + '">', '>' + content);
 							next();
 						}, true);
 
@@ -247,7 +246,7 @@ NEWSCHEMA('Page').make(function(schema) {
 								response.partial = arr;
 								callback(response);
 							});
-							return
+							return;
 						}
 
 						callback(response);

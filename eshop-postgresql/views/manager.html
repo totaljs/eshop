@@ -11,9 +11,8 @@
 	<meta name="robots" content="all,follow" />
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/codemirror.min.css" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/codemirror.min.css" />
 	@{import('head', 'manager.css', 'favicon.ico')}
-	@{place('manager-head')}
 	<script>
 		var managerurl="@{!CONFIG('manager-url')}";
 		var currency='@{!config.custom.currency_entity}';
@@ -21,12 +20,15 @@
 		var languages='@{config.custom.languages.join(';')}'.split(';');
 	</script>
 </head>
-<body>
+<body data-component="exec">
 
 	<div id="success"><span class="fa fa-check-circle"></span></div>
-	<div data-component="message" data-button="@(Close)"></div>
-	<div data-component="confirm"></div>
+	<div data-component="calendar" data-days="@(SU,MO,TU,WE,TH,FR,SO)" data-months="@(January,February,March,April,May,Juny,July,August,September,October,November,December)" data-today="@(Set date to today)" data-firstday="0"></div>
 	<div data-component="loading" class="ui-loading"></div>
+	<div data-component="message" data-button="@(Close)"></div>
+	<div data-component="autocomplete"></div>
+	<div data-component="contextmenu"></div>
+	<div data-component="confirm"></div>
 
 	<header>
 		<div class="mainmenu">
@@ -39,43 +41,36 @@
 			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/orders/" title="@(Orders)" data-role="orders"><span class="fa fa-shopping-cart"></span></a>
 			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/products/" title="@(Products)" data-role="products"><span class="fa fa-dropbox"></span></a>
 			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/pages/" title="@(Pages)" data-role="pages"><span class="fa fa-file-text"></span></a>
-			@{place('manager-menu-middle')}
 			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/posts/" title="@(Posts)" data-role="posts"><span class="fa fa-hashtag"></span></a>
 			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/users/" title="@(Users)" data-role="users"><span class="fa fa-users"></span></a>
 			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
 			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/settings/" title="@(Settings)" data-role="settings"><span class="fa fa-cogs"></span></a>
 			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/system/" title="@(System)" data-role="system"><span class="fa fa-database"></span></a>
-			@{place('manager-menu-last')}
 			<a class="logoff" href="@{CONFIG('manager-url')}/logoff/" title="@(Sign out)"><span class="fa fa-sign-out"></span></a>
 		</nav>
 	</header>
 
 	<div id="body">
-		<div data-component="page" data-component-path="common.page" data-if="dashboard" data-template="/templates/manager-dashboard.html"></div>
-		<div data-component="page" data-component-path="common.page" data-if="orders" data-template="/templates/manager-orders.html" data-reload="orders_reload"></div>
-		<div data-component="page" data-component-path="common.page" data-if="products" data-template="/templates/manager-products.html" data-reload="products_reload"></div>
-		<div data-component="page" data-component-path="common.page" data-if="users" data-template="/templates/manager-users.html" data-reload="users_reload"></div>
-		<div data-component="page" data-component-path="common.page" data-if="pages" data-template="/templates/manager-pages.html" data-reload="pages_reload"></div>
-		<div data-component="page" data-component-path="common.page" data-if="posts" data-template="/templates/manager-posts.html" data-reload="posts_reload"></div>
-		<div data-component="page" data-component-path="common.page" data-if="newsletter" data-template="/templates/manager-newsletter.html"></div>
-		<div data-component="page" data-component-path="common.page" data-if="settings" data-template="/templates/manager-settings.html"></div>
-		<div data-component="page" data-component-path="common.page" data-if="system" data-template="/templates/manager-system.html"></div>
-		@{place('manager-page')}
+		<div data-component="page" class="hidden" data-component-path="common.page" data-if="dashboard" data-template="/templates/manager-dashboard.html"></div>
+		<div data-component="page" class="hidden" data-component-path="common.page" data-if="orders" data-template="/templates/manager-orders.html" data-reload="orders_reload"></div>
+		<div data-component="page" class="hidden" data-component-path="common.page" data-if="products" data-template="/templates/manager-products.html" data-reload="products_reload"></div>
+		<div data-component="page" class="hidden" data-component-path="common.page" data-if="users" data-template="/templates/manager-users.html" data-reload="users_reload"></div>
+		<div data-component="page" class="hidden" data-component-path="common.page" data-if="pages" data-template="/templates/manager-pages.html" data-reload="pages_reload"></div>
+		<div data-component="page" class="hidden" data-component-path="common.page" data-if="posts" data-template="/templates/manager-posts.html" data-reload="posts_reload"></div>
+		<div data-component="page" class="hidden" data-component-path="common.page" data-if="newsletter" data-template="/templates/manager-newsletter.html"></div>
+		<div data-component="page" class="hidden" data-component-path="common.page" data-if="settings" data-template="/templates/manager-settings.html"></div>
+		<div data-component="page" class="hidden" data-component-path="common.page" data-if="system" data-template="/templates/manager-system.html"></div>
 	</div>
 
-	<div data-component="calendar" data-days="@(SU,MO,TU,WE,TH,FR,SO)" data-months="@(January,February,March,April,May,Juny,July,August,September,October,November,December)" data-today="@(Set date to today)" data-firstday="0"></div>
-	@{place('manager-components')}
-
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/codemirror.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/mode/javascript/javascript.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/mode/htmlmixed/htmlmixed.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/mode/xml/xml.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/mode/css/css.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/codemirror.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/mode/javascript/javascript.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/mode/htmlmixed/htmlmixed.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/mode/xml/xml.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/mode/css/css.min.js"></script>
 
 	@{import('manager.js')}
-	@{place('manager-script')}
 	@{section('script')}
 
 </body>

@@ -86,10 +86,10 @@ NEWSCHEMA('Product').make(function(schema) {
 		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-			model.admin_create = controller.user ? controller.user.name : '';
+			model.admincreated = controller.user ? controller.user.name : '';
 		} else {
 			model.dateupdated = F.datetime;
-			model.admin_update = controller.user ? controller.user.name : '';
+			model.adminupdated = controller.user ? controller.user.name : '';
 		}
 
 		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
@@ -122,10 +122,8 @@ NEWSCHEMA('Product').make(function(schema) {
 
 			F.emit('products.save', model);
 
-			if (controller && controller.importing)
-				return;
-
-			setTimeout2('products', refresh, 1000);
+			if (!controller || !controller.importing)
+				setTimeout2('products', refresh, 1000);
 		});
 	});
 

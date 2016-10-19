@@ -36,7 +36,7 @@
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
 				<h3><span class="fa fa-facebook blue"></span> Facebook</h3>
-				<div class="fs11"><a href="https://developers.facebook.com/apps/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div class="fs11"><a href="https://developers.facebook.com/apps/" target="_blank"><span class="fa fa-plus mr5"></span>@(Create interface)</a></div>
 				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">facebook</div>
 				<div data-component="textbox" data-component-path="settings.form.oauth2_facebook_key">@(Facebook key)</div>
 				<br />
@@ -44,7 +44,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<h3><span class="fa fa-google blue"></span> Google</h3>
-				<div class="fs11"><a href="https://console.developers.google.com/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div class="fs11"><a href="https://console.developers.google.com/" target="_blank"><span class="fa fa-plus mr5"></span>@(Create interface)</a></div>
 				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">google</div>
 				<div data-component="textbox" data-component-path="settings.form.oauth2_google_key">@(Google key)</div>
 				<br />
@@ -52,7 +52,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<h3><span class="fa fa-instagram blue"></span> Instagram</h3>
-				<div class="fs11"><a href="https://instagram.com/developer/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div class="fs11"><a href="https://instagram.com/developer/" target="_blank"><span class="fa fa-plus mr5"></span>@(Create interface)</a></div>
 				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">instagram</div>
 				<div data-component="textbox" data-component-path="settings.form.oauth2_instagram_key">@(Instagram key)</div>
 				<br />
@@ -60,7 +60,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<h3><span class="fa fa-yahoo blue"></span> Yahoo</h3>
-				<div class="fs11"><a href="https://developer.yahoo.com" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div class="fs11"><a href="https://developer.yahoo.com" target="_blank"><span class="fa fa-plus mr5"></span>@(Create interface)</a></div>
 				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">yahoo</div>
 				<div data-component="textbox" data-component-path="settings.form.oauth2_yahoo_key">@(Yahoo key)</div>
 				<br />
@@ -68,7 +68,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<h3><span class="fa fa-windows blue"></span> Windows Live</h3>
-				<div class="fs11"><a href="https://account.live.com/developers/applications/" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div class="fs11"><a href="https://account.live.com/developers/applications/" target="_blank"><span class="fa fa-plus mr5"></span>@(Create interface)</a></div>
 				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">live</div>
 				<div data-component="textbox" data-component-path="settings.form.oauth2_live_key">@(Windows Live key)</div>
 				<br />
@@ -76,7 +76,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<h3><span class="fa fa-dropbox blue"></span> Dropbox</h3>
-				<div class="fs11"><a href="https://www.dropbox.com/developers/apps" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div class="fs11"><a href="https://www.dropbox.com/developers/apps" target="_blank"><span class="fa fa-plus mr5"></span>@(Create interface)</a></div>
 				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">dropbox</div>
 				<div data-component="textbox" data-component-path="settings.form.oauth2_dropbox_key">@(Dropbox key)</div>
 				<br />
@@ -84,7 +84,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<h3><span class="fa fa-vk blue"></span> VKontakte</h3>
-				<div class="fs11"><a href="https://developer.yahoo.com" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div class="fs11"><a href="https://developer.yahoo.com" target="_blank"><span class="fa fa-plus mr5"></span>@(Create interface)</a></div>
 				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">vk</div>
 				<div data-component="textbox" data-component-path="settings.form.oauth2_vk_key">@(VKontakte key)</div>
 				<br />
@@ -92,7 +92,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<h3><span class="fa fa-linkedin blue"></span> LinkedIn</h3>
-				<div class="fs11"><a href="https://www.linkedin.com/secure/developer" target="_blank"><span class="fa fa-plus mr5"></span>Create interface</a></div>
+				<div class="fs11"><a href="https://www.linkedin.com/secure/developer" target="_blank"><span class="fa fa-plus mr5"></span>@(Create interface)</a></div>
 				<div data-component="oauth2callback" data-component-path="settings.form.url" class="mt5">linkedin</div>
 				<div data-component="textbox" data-component-path="settings.form.oauth2_linkedin_key">@(LinkedIn key)</div>
 				<br />
@@ -181,7 +181,7 @@
 	<div data-component="grid" data-component-path="settings.form.users" data-max="1000000" data-component-id="settings.users">
 		<script type="text/html">
 		<tr>
-			<td><span class="fa fa-user"></span> {{ login }}</td>
+			<td><span class="fa fa-user"></span> {{ name }}</td>
 			<td style="width:400px" class="ui-center active hidden-xs">{{ roles | roles(', ') }}</td>
 			<td style="width:80px" class="ui-right">
 				<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
@@ -204,6 +204,11 @@
 
 <div data-component="form" data-title="@(User form)" data-component-path="common.form" data-if="value === 'settings'" data-width="500px" data-component-id="settings.formuser">
 	<div class="padding npb">
+		<div class="row">
+			<div class="col-md-12 m">
+				<div data-component="textbox" data-component-path="settings.formuser.name" data-required="true" data-placeholder="@(Peter Sirka)">@(User name)</div>
+			</div>
+		</div>
 		<div class="row">
 			<div class="col-md-12 m">
 				<div data-component="textbox" data-component-path="settings.formuser.login" data-required="true">@(Login name)</div>
@@ -230,140 +235,130 @@
 </div>
 
 <script>
-var settings = {};
-settings.form = {};
-settings.cache = {};
 
-function settings_refresh() {
-	AJAX('GET {0}/api/settings/'.format(managerurl), function(response) {
+	var settings = {};
+	settings.form = {};
+	settings.cache = {};
 
-		if (isError(arguments))
-			return;
+	function settings_refresh() {
+		AJAX('GET {0}/api/settings/'.format(managerurl), function(response) {
+			if (response.users)
+				response.users = { items: response.users, page: 1, count: response.users.length, pages: 1, limit: 100 };
+			else
+				response.users = settings_users_default();
 
-		if (response.users)
-			response.users = { items: response.users, page: 1, count: response.users.length, pages: 1, limit: 100 };
-		else
-			response.users = settings_users_default();
+			SET('settings.form', response);
 
-		SET('settings.form', response);
+			// If the user changes a currency then we must reload the website.
+			settings.cache.currency = response.currency;
+		});
+	}
 
-		// If the user changes a currency then we must reload the website.
-		settings.cache.currency = response.currency;
+	function settings_save() {
+
+		// Prepare users
+		var tmp = settings.form.users;
+		settings.form.users = settings.form.users.items;
+
+		var loading = FIND('loading').show();
+		AJAX('PUT {0}/api/settings/'.format(managerurl), settings.form, function() {
+
+			success(true);
+			RESET('settings.form.*');
+			EXEC('pages_refresh_dependencies');
+			EXEC('posts_refresh_codelists');
+
+			// Restore users list
+			settings.form.users = tmp;
+
+			if (settings.cache.currency === settings.form.currency) {
+				loading.hide(500);
+				return;
+			}
+
+			// Refresh settings
+			setTimeout(function() {
+				location.reload();
+			}, 3000);
+		});
+	}
+
+	function settings_users_add() {
+		SET('settings.formuser', {}, true);
+		SET('common.form', 'settings');
+	}
+
+	Tangular.register('roles', function(value, separator) {
+		if (!(value instanceof Array) || !value.length)
+			return '<em>@(super admin)</em>';
+		return value.join(separator);
 	});
-}
 
-function settings_save() {
+	// Users grid
+	ON('#settings.users', function(component) {
+		component.click = function(index, row, button) {
+			switch($(button).attr('name')) {
 
-	// Prepare users
-	var tmp = settings.form.users;
-	settings.form.users = settings.form.users.items;
+				case 'edit':
+					var form = $.extend({}, row);
+					form.$index = index;
+					SET('settings.formuser', form, true);
+					SET('common.form', 'settings');
+					break;
 
-	var loading = FIND('loading').show();
-	AJAX('PUT {0}/api/settings/'.format(managerurl), settings.form, function() {
-
-		if (isError(arguments))
-			return;
-
-		success(true);
-		RESET('settings.form.*');
-
-		if (window.pages_refresh_dependencies)
-			window.pages_refresh_dependencies();
-
-		if (window.posts_refresh_codelists)
-			window.posts_refresh_codelists();
-
-		// Restore users list
-		settings.form.users = tmp;
-
-		if (settings.cache.currency === settings.form.currency) {
-			loading.hide(500);
-			return;
-		}
-
-		// Refresh settings
-		setTimeout(function() {
-			location.reload();
-		}, 3000);
+				case 'remove':
+					settings.form.users.items.splice(index, 1);
+					settings.form.users.count = settings.form.users.items.length;
+					UPDATE('settings.form.users');
+					CHANGE('settings.form.*', true);
+					break;
+			}
+		};
 	});
-}
 
-function settings_users_add() {
-	SET('settings.formuser', {}, true);
-	SET('common.form', 'settings');
-}
+	// Users form
+	ON('#settings.formuser', function(component) {
+		component.submit = function(hide) {
 
-Tangular.register('roles', function(value, separator) {
-	if (!(value instanceof Array) || !value.length)
-		return '<em>@(super admin)</em>';
-	return value.join(separator);
-});
+			if (!settings.form.users)
+				settings.form.users = settings_users_default();
 
-// Users grid
-ON('#settings.users', function(component) {
-	component.click = function(index, row, button) {
-		switch($(button).attr('name')) {
+			var users = settings.form.users.items;
+			var is = false;
 
-			case 'edit':
-				var form = $.extend({}, row);
-				form.$index = index;
-				SET('settings.formuser', form, true);
-				SET('common.form', 'settings');
-				break;
+			if (settings.formuser.$index !== undefined) {
+				users[settings.formuser.$index].login = settings.formuser.login.trim();
+				users[settings.formuser.$index].password = settings.formuser.password.trim();
+				users[settings.formuser.$index].roles = settings.formuser.roles;
+			} else
+				users.push({ login: settings.formuser.login.trim(), password: settings.formuser.password.trim(), roles: settings.formuser.roles });
 
-			case 'remove':
-				settings.form.users.items.splice(index, 1);
-				settings.form.users.count = settings.form.users.items.length;
-				UPDATE('settings.form.users');
-				CHANGE('settings.form.*', true);
-				break;
-		}
-	};
-});
+			settings.form.users.count = users.length;
 
-// Users form
-ON('#settings.formuser', function(component) {
-	component.submit = function(hide) {
+			UPDATE('settings.form.users');
+			CHANGE('settings.form.*', true);
+			hide();
+		};
+	});
 
-		if (!settings.form.users)
-			settings.form.users = settings_users_default();
+	function settings_users_default() {
+		return { items: [], page: 1, pages: 1, count: 0, limit: 100 };
+	}
 
-		var users = settings.form.users.items;
-		var is = false;
+	COMPONENT('oauth2callback', function() {
+		var self = this;
+		var name;
 
-		if (settings.formuser.$index !== undefined) {
-			users[settings.formuser.$index].login = settings.formuser.login.trim();
-			users[settings.formuser.$index].password = settings.formuser.password.trim();
-			users[settings.formuser.$index].roles = settings.formuser.roles;
-		} else
-			users.push({ login: settings.formuser.login.trim(), password: settings.formuser.password.trim(), roles: settings.formuser.roles });
+		self.make = function() {
+			name = self.html();
+			self.element.addClass('oauth2callback');
+			self.element.html('<div>@(Authorize Callback URL)</div><input type="text" readonly="readonly" />')
+		};
 
-		settings.form.users.count = users.length;
+		self.setter = function(value) {
+			self.find('input').val('{0}/oauth2/{1}/callback/'.format(value, name));
+		};
+	});
 
-		UPDATE('settings.form.users');
-		CHANGE('settings.form.*', true);
-		hide();
-	};
-});
-
-function settings_users_default() {
-	return { items: [], page: 1, pages: 1, count: 0, limit: 100 };
-}
-
-COMPONENT('oauth2callback', function() {
-	var self = this;
-	var name;
-
-	self.make = function() {
-		name = self.html();
-		self.element.addClass('oauth2callback');
-		self.element.html('<div>@(Authorize Callback URL)</div><input type="text" readonly="readonly" />')
-	};
-
-	self.setter = function(value) {
-		self.find('input').val('{0}/oauth2/{1}/callback/'.format(value, name));
-	};
-});
-
-settings_refresh();
+	settings_refresh();
 </script>

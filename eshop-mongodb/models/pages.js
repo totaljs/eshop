@@ -128,10 +128,10 @@ NEWSCHEMA('Page').make(function(schema) {
 		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-			model.admin_create = controller.user.name;
+			model.admincreated = controller.user.name;
 		} else {
 			model.dateupdated = F.datetime;
-			model.admin_update = controller.user.name;
+			model.adminupdated = controller.user.name;
 		}
 
 		if (model.body)
@@ -181,12 +181,7 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		// Gets parent URL
 		schema.get({ id: model.parent }, function(err, response) {
-
-			if (err)
-				model.url = model.title.slug();
-			else
-				model.url = response.url + model.title.slug() + '/';
-
+			model.url = err ? model.title.slug() : response.url + model.title.slug() + '/';
 			callback();
 		});
 	});
@@ -334,9 +329,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			}
 		}
 
-		pending.async(function() {
-			callback(output);
-		});
+		pending.async(() => callback(output));
 	});
 
 	// Loads breadcrumb according to URL
@@ -448,10 +441,11 @@ F.eval(function() {
 		var key = (self.language ? self.language + ':' : '') + url;
 		var page = F.global.sitemap[key];
 
-		if (!page)
-			return self.throw404();
+		if (page)
+			self.page(self.url, view, model, cache);
+		else
+			self.throw404();
 
-		self.page(self.url, view, model, cache);
 		return self;
 	};
 
@@ -464,10 +458,7 @@ F.eval(function() {
 			return;
 		}
 
-		var options = {};
-		options.id = page.id;
-
-		GETSCHEMA('Page').operation('render', options, callback);
+		GETSCHEMA('Page').operation('render', { id: page.id }, callback);
 		return self;
 	};
 
@@ -532,17 +523,6 @@ F.eval(function() {
 
 		return self;
 	};
-});
-
-// Renders page and stores into the repository
-F.middleware('page', function(req, res, next, options, controller) {
-
-	if (!controller)
-		return res.throw404();
-
-	controller.memorize('cache.' + controller.url, '1 minute', DEBUG, function() {
-		controller.page(controller.url);
-	});
 });
 
 // Cleans CMS markup

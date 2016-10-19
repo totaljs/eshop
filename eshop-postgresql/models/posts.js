@@ -3,7 +3,7 @@ NEWSCHEMA('Post').make(function(schema) {
 	schema.define('id', 'String(20)');
 	schema.define('category', 'String(50)');
 	schema.define('template', 'String(30)', true);
-	schema.define('language', 'Lower(3)');
+	schema.define('language', 'Lower(2)');
 	schema.define('name', 'String(80)', true);
 	schema.define('perex', 'String(500)');
 	schema.define('keywords', 'String(200)');
@@ -11,7 +11,6 @@ NEWSCHEMA('Post').make(function(schema) {
 	schema.define('search', 'String(1000)');
 	schema.define('pictures', '[String]');  		// URL addresses for first 5 pictures
 	schema.define('body', String);
-	schema.define('datecreated', Date);
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -40,9 +39,10 @@ NEWSCHEMA('Post').make(function(schema) {
 
 			builder.where('isremoved', false);
 
-			options.searc && builder.like('search', options.search, '*');
+			options.search && builder.like('search', options.search, '*');
 			options.language && builder.where('language', options.language);
 			options.category && builder.where('category_linker', options.category.slug());
+			options.template && builder.where('template', options.template);
 
 			builder.fields('id', 'name', 'category', 'language', 'datecreated', 'linker', 'category_linker', 'pictures', 'perex', 'tags');
 			builder.sort('datecreated', true);
@@ -59,12 +59,9 @@ NEWSCHEMA('Post').make(function(schema) {
 			data.count = response.items.count;
 			data.items = response.items.items;
 			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max);
-
-			if (!data.pages)
-				data.pages = 1;
-
+			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
+
 			callback(data);
 		});
 	});
@@ -96,8 +93,6 @@ NEWSCHEMA('Post').make(function(schema) {
 		sql.validate('post', 'error-404-post');
 
 		sql.exec(function(err, response) {
-			if (err)
-				return callback();
 			callback(response.post);
 		});
 	});
@@ -118,14 +113,18 @@ NEWSCHEMA('Post').make(function(schema) {
 	});
 
 	// Saves post into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, controller, callback) {
 
-		var newbie = false;
+		var newbie = model.id ? false : true;
 
-		if (!model.id) {
+		if (newbie) {
 			newbie = true;
 			model.id = UID();
 			model.datecreated = F.datetime;
+			model.admincreated = controller.user.name;
+		} else {
+			model.adminupdated = controller.user.name;
+			model.dateupdated = F.datetime;
 		}
 
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
@@ -137,6 +136,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ').max(1000);
 		model.tags = model.tags.join(';');
 		model.pictures = model.pictures.join(';');
+		model.body = U.minifyHTML(model.body);
 
 		var sql = DB(error);
 
@@ -146,13 +146,11 @@ NEWSCHEMA('Post').make(function(schema) {
 				return;
 			builder.rem('datecreated');
 			builder.rem('id');
-			builder.set('dateupdated', F.datetime);
 			builder.where('id', model.id);
 		});
 
 		sql.exec(function(err, response) {
 
-			// Returns response
 			callback(SUCCESS(true));
 
 			if (err)
@@ -169,9 +167,7 @@ NEWSCHEMA('Post').make(function(schema) {
 		sql.remove('tbl_post');
 		sql.exec(function(err) {
 			callback();
-			if (err)
-				return;
-			setTimeout2('posts', refresh, 1000);
+			!err && setTimeout2('posts', refresh, 1000);
 		});
 	});
 });
@@ -180,9 +176,7 @@ NEWSCHEMA('Post').make(function(schema) {
 function refresh() {
 
 	var categories = {};
-
-	if (F.config.custom.posts)
-		F.config.custom.posts.forEach(item => categories[item] = { name: item, linker: item.slug(), count: 0 });
+	F.config.custom.posts && F.config.custom.posts.forEach(item => categories[item] = { name: item, linker: item.slug(), count: 0 });
 
 	var sql = DB();
 
@@ -201,10 +195,7 @@ function refresh() {
 				category.count += item.count;
 		});
 
-		Object.keys(categories).forEach(function(key) {
-			output.push({ name: key, linker: key.slug(), count: categories[key] });
-		});
-
+		Object.keys(categories).forEach(key => output.push({ name: key, linker: key.slug(), count: categories[key] }));
 		F.global.posts = output;
 	});
 }

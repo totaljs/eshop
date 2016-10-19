@@ -72,10 +72,10 @@ NEWSCHEMA('Product').make(function(schema) {
 			newbie = true;
 			model.id = UID();
 			model.datecreated = F.datetime;
-			model.admin_create = controller.user.name;
+			model.admincreated = controller.user.name;
 		} else {
-			model.admin_update = controller.user.name;
 			model.dateupdated = F.datetime;
+			model.adminupdated = controller.user.name;
 		}
 
 		var category = prepare_subcategories(model.category);

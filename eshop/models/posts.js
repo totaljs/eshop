@@ -85,10 +85,10 @@ NEWSCHEMA('Post').make(function(schema) {
 		if (newbie) {
 			model.id = UID();
 			model.datecreated = F.datetime;
-			model.admin_create = controller.user.name;
+			model.admincreated = controller.user.name;
 		} else {
-			model.admin_update = controller.user.name;
 			model.dateupdated = F.datetime;
+			model.adminupdated = controller.user.name;
 		}
 
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
