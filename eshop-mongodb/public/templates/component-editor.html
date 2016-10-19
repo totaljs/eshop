@@ -82,16 +82,9 @@
 		</div>
 	</div>
 
-	<div data-component="visible" data-component-path="cmseditor.attribute.isiframe" data-if="value === true">
-		<hr />
-		<div class="padding npt">
-			<div data-component="textbox" data-component-path="cmseditor.attribute.src" class="m">@(URL)</div>
-		</div>
-	</div>
-
 	<div data-component="visible" data-component-path="cmseditor.attribute.isimage" data-if="value === true">
 		<hr />
-		<div class="padding npt">
+		<div class="padding npt npb">
 			<div class="help m"><span class="fa fa-photo"></span> @(Image settings)</div>
 
 			<div class="row">
@@ -111,6 +104,12 @@
 					<div data-component="textbox" data-component-path="cmseditor.attribute.datasize" class="m" data-maxlenght="4" data-placeholder="0%" data-align="center">@(Percentage)</div>
 				</div>
 			</div>
+		</div>
+	</div>
+	<div data-component="visible" data-component-path="cmseditor.attribute.isnone" data-if="value !== true">
+		<hr />
+		<div class="padding npt">
+			<div data-component="textbox" data-component-path="cmseditor.attribute.src" data-icon="fa-globe">@(Source URL)</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
@@ -767,6 +766,7 @@
 						var tag = target.get(0).nodeName;
 						cmseditor.attribute.isimage = tag === 'IMG';
 						cmseditor.attribute.isiframe = tag === 'IFRAME';
+						cmseditor.attribute.isnone = !cmseditor.attribute.isimage && !cmseditor.attribute.isiframe;
 						cmseditor.attribute.id = target.attr('id') || '';
 						cmseditor.attribute.cls = arr.join(' ');
 						cmseditor.attribute.css = target.attr('style') || '';
@@ -790,8 +790,7 @@
 							cmseditor.attribute.theme = selected;
 						}
 
-						if (cmseditor.attribute.isiframe)
-							cmseditor.attribute.src = target.attr('src') || '';
+						cmseditor.attribute.src = target.attr('src') || '';
 
 						if (cmseditor.attribute.isimage) {
 
@@ -1157,7 +1156,7 @@
 			else
 				target.removeAttr('title');
 
-			if (cmseditor.attribute.isiframe)
+			if (cmseditor.attribute.isiframe || cmseditor.attribute.isimage)
 				target.attr('src', cmseditor.attribute.src.trim());
 
 			if (cmseditor.attribute.isimage) {
