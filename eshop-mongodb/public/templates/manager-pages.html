@@ -639,17 +639,26 @@
 			if (widgets.export.panel)
 				return hide();
 
+			SETTER('loading', 'show');
 			var builder = [];
 
 			widgets.grid.items.forEach(function(item) {
-				widgets.export.items.indexOf(item.id) !== -1 && builder.push(item);
+				widgets.export.items.indexOf(item) !== -1 && builder.push(item);
 			});
 
-			SET('widgets.export.base64', btoa(JSON.stringify(builder)));
-			SET('widgets.export.panel', 1);
-			setTimeout(function() {
-				component.find('textarea').focus().select();
-			}, 100);
+			widgets.export.items.waitFor(function(item, next) {
+				AJAX('GET {0}/api/widgets/{1}/'.format(managerurl, item), function(response) {
+					response && builder.push(response);
+					setTimeout(next, 100);
+				});
+			}, function() {
+				SET('widgets.export.base64', btoa(JSON.stringify(builder)));
+				SET('widgets.export.panel', 1);
+				SETTER('loading', 'hide');
+				setTimeout(function() {
+					component.find('textarea').focus().select();
+				}, 100);
+			});
 		};
 	});
 
