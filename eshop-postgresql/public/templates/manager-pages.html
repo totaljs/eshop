@@ -652,7 +652,7 @@
 					setTimeout(next, 100);
 				});
 			}, function() {
-				SET('widgets.export.base64', btoa(JSON.stringify(builder)));
+				SET('widgets.export.base64', btoa(encodeURIComponent(JSON.stringify(builder))));
 				SET('widgets.export.panel', 1);
 				SETTER('loading', 'hide');
 				setTimeout(function() {
@@ -668,7 +668,7 @@
 			var items;
 
 			try {
-				items = JSON.parse(atob(widgets.import.base64));
+				items = JSON.parse(decodeURIComponent(atob(widgets.import.base64)));
 			} catch (e) {
 				SETTER('message', 'warning', '@(The system can\'t deserialize data.)');
 				return;
