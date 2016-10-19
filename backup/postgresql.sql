@@ -62,6 +62,8 @@ CREATE TABLE public.tbl_order
   datecompleted timestamp without time zone,
   datepaid timestamp without time zone,
   datecreated timestamp without time zone DEFAULT now(),
+  dateupdated timestamp without time zone,
+  adminupdate character varying(30),
   CONSTRAINT tbl_order_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -105,6 +107,8 @@ CREATE TABLE public.tbl_page
   isremoved boolean DEFAULT false,
   datecreated timestamp without time zone DEFAULT now(),
   dateupdated timestamp without time zone,
+  admincreate character varying(30),
+  adminupdate character varying(30),
   CONSTRAINT tbl_page_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -144,6 +148,8 @@ CREATE TABLE public.tbl_post
   isremoved boolean DEFAULT false,
   datecreated timestamp without time zone DEFAULT now(),
   dateupdated timestamp without time zone,
+  admincreate character varying(30),
+  adminupdate character varying(30),
   CONSTRAINT tbl_post_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -168,6 +174,8 @@ CREATE TABLE public.tbl_product
   isremoved boolean DEFAULT false,
   datecreated timestamp without time zone DEFAULT now(),
   dateupdated timestamp without time zone,
+  admincreate character varying(30),
+  adminupdate character varying(30),
   CONSTRAINT tbl_product_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -249,10 +257,13 @@ CREATE TABLE public.tbl_widget
   icon character varying(20),
   category character varying(50),
   body text,
-  istemplate boolean,
+  css text,
+  istemplate boolean DEFAULT true,
   isremoved boolean DEFAULT false,
   datecreated timestamp without time zone DEFAULT now(),
   dateupdated timestamp without time zone,
+  admincreate character varying(30),
+  adminupdate character varying(30),
   CONSTRAINT tbl_widget_pkey PRIMARY KEY (id)
 )
 WITH (
