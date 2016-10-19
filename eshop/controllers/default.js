@@ -111,8 +111,7 @@ function file_read(req, res) {
 				// Image processing
 				res.image(filename, function(image) {
 					image.output(req.extension);
-					if (req.extension === 'jpg')
-						image.quality(85);
+					req.extension === 'jpg' && image.quality(85);
 					image.resize(req.query.s + '%');
 					image.minify();
 				});
