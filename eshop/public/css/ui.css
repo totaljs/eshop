@@ -100,7 +100,8 @@ button { outline: 0; }
 
 .ui-crop { text-align: center; padding: 30px 0 60px; background-color: #F8F8F8; position: relative; width: 100%; }
 .ui-crop canvas { cursor: pointer; cursor: pointer; border: 1px solid #6298F3; margin: 0 auto; }
-.ui-crop div { padding: 15px 0 0 0; font-size: 11px; }
+.ui-crop div { padding: 0 0 10px 0; font-size: 11px; }
+.ui-crop div span { background-color: #E9573F; color: white; border-radius: 4px; padding: 2px 5px; position: relative; display: inline-block; }
 .ui-crop-dragdrop canvas { border: 1px dashed red !important; }
 .ui-crop ul { position:absolute; list-style-type: none; margin: 0; padding: 0; left: 50%; margin-left: -60px; bottom: 25px; width: 120px; color: white; text-align: center; }
 .ui-crop ul li { font-size: 12px; padding: 3px 0; width: 25px; margin-left: 5px; position: relative; display: inline-block; cursor: pointer; text-align: center; background-color: #6498F0; line-height: 20px; border-radius: 4px; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }

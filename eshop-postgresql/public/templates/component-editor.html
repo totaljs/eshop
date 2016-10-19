@@ -526,6 +526,12 @@
 			return (content.find('#CMS').html() || '').trim().replace(offsetter, '');
 		};
 
+		self.check = function(el) {
+			var type = el.get(0).nodeName;
+			if (type === 'DIV' || type === 'P' || type === 'B' || type.substring(0, 1) === 'H')
+				!el.html() && el.html('&nbsp;');
+		};
+
 		self.setEvents = function() {
 
 			var body = self.getContents();
@@ -538,6 +544,7 @@
 				var el = $(this);
 
 				if (target && this !== target.get(0)) {
+					self.check(target);
 					target.removeClass('CMS_selected');
 					target.removeAttr('contenteditable');
 					target = null;
@@ -736,6 +743,7 @@
 						body.find('#CMS_panel').find('[data-name="hide"]').trigger('click');
 						self.change(true);
 						break;
+
 					case 'down':
 						tmp = cmseditor.wrap.next();
 						tmp.length && tmp.after(cmseditor.wrap);
@@ -745,6 +753,7 @@
 
 					case 'hide':
 						self.getToolbar().hide();
+						self.check(target);
 						target.removeAttr('contentEditable');
 						target.removeClass('CMS_selected');
 						body.find('.CMS_selected_template').removeClass('CMS_selected_template');

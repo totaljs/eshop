@@ -1529,6 +1529,7 @@ COMPONENT('crop', function() {
 		height = h;
 		canvas.width = w;
 		canvas.height = h;
+		self.find('div').html('<span><b>{0}</b>x<b>{1}</b>px</span>'.format(w, h));
 	};
 
 	self.output = function(type) {
@@ -1545,7 +1546,7 @@ COMPONENT('crop', function() {
 		width = parseInt(self.attr('data-width') || 0);
 		height = parseInt(self.attr('data-height') || 0);
 		self.element.addClass('ui-crop');
-		self.append('<input type="file" style="display:none" accept="image/*" /><ul><li data-type="upload"><span class="fa fa-folder"></span></li><li data-type="plus"><span class="fa fa-plus"></span></li><li data-type="refresh"><span class="fa fa-refresh"></span></li><li data-type="minus"><span class="fa fa-minus"></span></li></ul>');
+		self.append('<input type="file" style="display:none" accept="image/*" /><ul><li data-type="upload"><span class="fa fa-folder"></span></li><li data-type="plus"><span class="fa fa-plus"></span></li><li data-type="refresh"><span class="fa fa-refresh"></span></li><li data-type="minus"><span class="fa fa-minus"></span></li></ul><div><span><b>{0}</b>x<b>{1}</b>px</span></div>'.format(width, height));
 		self.append(Tangular.render('<canvas width="{{ width }}" height="{{ height }}"></canvas>', { width: width, height: height }));
 		canvas = self.find('canvas').get(0);
 		context = canvas.getContext('2d');
