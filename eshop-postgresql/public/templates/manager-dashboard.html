@@ -189,10 +189,8 @@
 	function dashboard_refresh() {
 		AJAX('GET {0}/api/dashboard/'.format(managerurl), function(response, err) {
 
-			if (isError(arguments))
-				return;
-
 			SET('dashboard.data', response);
+
 			if (dashboard.cache.processed)
 				return;
 
@@ -208,9 +206,7 @@
 			options.type = 'doughnut';
 			options.data = { labels: labels, datasets: [data], display: false };
 
-			if (dashboard.cache.online)
-				dashboard.cache.online.destroy();
-
+			dashboard.cache.online && dashboard.cache.online.destroy();
 			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'), options);
 			dashboard.year = (new Date()).getFullYear();
 			dashboard.years = [];
@@ -223,8 +219,7 @@
 				stats_mobile += stats.mobile;
 				stats_desktop += stats.desktop;
 				var year = key.substring(key.indexOf('-') + 1).parseInt();
-				if (dashboard.years.indexOf(year) === -1)
-					dashboard.years.push(year);
+				dashboard.years.indexOf(year) === -1 && dashboard.years.push(year);
 			});
 
 			dashboard.years.sort();
@@ -276,9 +271,7 @@
 		options.type = 'bar';
 		options.data = { labels: window.$calendar.months_short, datasets: data };
 
-		if (dashboard.cache.visitors)
-			dashboard.cache.visitors.destroy();
-
+		dashboard.cache.visitors && dashboard.cache.visitors.destroy();
 		el = $('#dashboard-monthly-visitors');
 		dashboard.cache.visitors = new Chart(el.get(0).getContext('2d'), options);
 
@@ -288,9 +281,7 @@
 		options.type = 'bar';
 		options.data = { labels: window.$calendar.months_short, datasets: data };
 
-		if (dashboard.cache.orders)
-			dashboard.cache.orders.destroy();
-
+		dashboard.cache.orders && dashboard.cache.orders.destroy();
 		el = $('#dashboard-monthly-orders');
 		dashboard.cache.orders = new Chart(el.get(0).getContext('2d'), options);
 
@@ -299,9 +290,7 @@
 		data.push(dashboard_charts_bar_items('#AC92EC', dashboard.data.webcounter.stats, 'hits', year));
 		options.type = 'bar';
 		options.data = { labels: window.$calendar.months_short, datasets: data };
-
-		if (dashboard.cache.hits)
-			dashboard.cache.hits.destroy();
+		dashboard.cache.hits && dashboard.cache.hits.destroy();
 
 		el = $('#dashboard-monthly-hits');
 		dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'), options);
@@ -316,11 +305,7 @@
 
 	function dashboard_refresh_online() {
 		AJAX('GET {0}/api/dashboard/online/'.format(managerurl), function(response) {
-			if (isError(arguments))
-				return;
-			if (NOTMODIFIED('dashboard.online', response))
-				return;
-			SET('dashboard.online', response);
+			!NOTMODIFIED('dashboard.online', response) && SET('dashboard.online', response);
 		});
 	}
 

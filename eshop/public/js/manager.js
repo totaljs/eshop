@@ -19,10 +19,6 @@ $(document).ready(function() {
 	resizer();
 });
 
-function isError(arguments) {
-	return false;
-}
-
 // Because of login form
 if (window.su) {
 	jRouting.route(managerurl + '/', function() {

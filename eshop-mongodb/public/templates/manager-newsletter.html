@@ -49,19 +49,13 @@
 
 	function newsletter_refresh() {
 		AJAX('GET {0}/api/newsletter/'.format(managerurl), function(response) {
-
-			if (isError(arguments))
-				return;
-
 			var csv = response.split('\n');
 			var arr = [];
 			csv.reverse();
 
 			for (var i = 0, length = csv.length; i < length; i++) {
 				var line = csv[i].split(';');
-				if (!line[1])
-					continue;
-				arr.push({ email: line[0], ip: line[1], datecreated: line[3] });
+				line[1] && arr.push({ email: line[0], ip: line[1], datecreated: line[3] });
 			}
 
 			SET('newsletter.grid', { items: arr, page: 1, pages: 1, count: arr.length, limit: 10000 });

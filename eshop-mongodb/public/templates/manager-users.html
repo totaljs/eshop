@@ -138,8 +138,6 @@
 							return;
 						var loading = FIND('loading').show();
 						AJAX('DELETE {0}/api/users'.format(managerurl), { id: row.id }, function() {
-							if (isError(arguments))
-								return;
 							users_refresh();
 							loading.hide(500);
 						});
@@ -154,10 +152,6 @@
 		component.submit = function(hide) {
 			var loading = FIND('loading').show();
 			AJAX('PUT {0}/api/users/'.format(managerurl), users.form, function(response) {
-
-				if (isError(arguments))
-					return;
-
 				loading.hide(500);
 
 				// Error handling
@@ -175,10 +169,6 @@
 	function users_edit(id) {
 		var loading = FIND('loading').show();
 		AJAX('GET {0}/api/users/{1}'.format(managerurl, id), function(response) {
-
-			if (isError(arguments))
-				return;
-
 			loading.hide(500);
 
 			// Error prevention
@@ -202,9 +192,7 @@
 
 	// Watchs changes in user filter
 	WATCH('users.filter.*', function(path, value) {
-		if (NOTMODIFIED('users.filter', users.filter))
-			return;
-		users_refresh(path !== 'users.filter.page');
+		!NOTMODIFIED('users.filter', users.filter) && users_refresh(path !== 'users.filter.page');
 	});
 
 	Tangular.register('oauth2', function() {
@@ -232,11 +220,9 @@
 
 	function users_reload() {
 		var hash = location.hash;
-		if (hash && hash.length > 1) {
-			setTimeout(function() {
-				users_edit(hash.substring(1));
-			}, 500);
-		}
+		hash && hash.length > 1 && setTimeout(function() {
+			users_edit(hash.substring(1));
+		}, 500);
 	}
 
 </script>
