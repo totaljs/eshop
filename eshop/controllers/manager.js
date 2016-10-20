@@ -49,7 +49,7 @@ exports.install = function() {
 
 	// POSTS
 	F.route(url + '/api/posts/',               json_query,  ['*Post']);
-	F.route(url + '/api/posts/',               json_save,   ['post', '*Post']);
+	F.route(url + '/api/posts/',               json_save,   ['post', '*Post'], 512);
 	F.route(url + '/api/posts/{id}/',          json_read,   ['*Post']);
 	F.route(url + '/api/posts/',               json_remove, ['delete', '*Post']);
 	F.route(url + '/api/posts/clear/',         json_clear,  ['*Post']);
@@ -60,8 +60,8 @@ exports.install = function() {
 	F.route(url + '/api/pages/',               json_remove, ['delete', '*Page']);
 	F.route(url + '/api/pages/{id}/',          json_read,   ['*Page']);
 	F.route(url + '/api/pages/clear/',         json_clear,  ['*Page']);
-	F.route(url + '/api/pages/',               json_pages_save, ['post', '*Page']);
-	F.route(url + '/api/pages/preview/',       view_pages_preview, ['json']);
+	F.route(url + '/api/pages/',               json_pages_save, ['post', '*Page'], 512);
+	F.route(url + '/api/pages/preview/',       view_pages_preview, ['json'], 512);
 	F.route(url + '/api/pages/dependencies/',  json_pages_dependencies);
 	F.route(url + '/api/pages/sitemap/',       json_pages_sitemap);
 
