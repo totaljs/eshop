@@ -327,11 +327,12 @@
 			var is = false;
 
 			if (settings.formuser.$index !== undefined) {
+				users[settings.formuser.$index].name = settings.formuser.name.trim();
 				users[settings.formuser.$index].login = settings.formuser.login.trim();
 				users[settings.formuser.$index].password = settings.formuser.password.trim();
 				users[settings.formuser.$index].roles = settings.formuser.roles;
 			} else
-				users.push({ login: settings.formuser.login.trim(), password: settings.formuser.password.trim(), roles: settings.formuser.roles });
+				users.push({ name: settings.formuser.name.trim(), login: settings.formuser.login.trim(), password: settings.formuser.password.trim(), roles: settings.formuser.roles });
 
 			settings.form.users.count = users.length;
 
