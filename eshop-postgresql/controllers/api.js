@@ -18,7 +18,7 @@ exports.install = function() {
 	// PRODUCTS
 	F.route('/api/products/',             json_products_query, ['*Product']);
 	F.route('/api/products/{id}/',        json_products_read, ['*Product']);
-	F.route('/api/products/categories/',  json_products_categories, ['*Product']);
+	F.route('/api/products/categories/',  json_products_categories);
 
 	// NEWSLETTER
 	F.route('/api/newsletter/',           json_newsletter, ['post', '*Newsletter']);
