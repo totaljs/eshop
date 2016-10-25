@@ -1,79 +1,84 @@
+const SITEMAP = {}
+const Fs = require('fs');
+
 exports.install = function() {
+	var url = CONFIG('manager-url');
+
 	// Auto-localize static HTML templates
 	F.localize('/templates/*.html', ['compress']);
 
 	// COMMON
-	F.route(CONFIG('manager-url') + '/*', '~manager');
-	F.route(CONFIG('manager-url') + '/upload/',                  upload,        ['post', 'upload', 10000], 3084); // 3 MB
-	F.route(CONFIG('manager-url') + '/upload/base64/',           upload_base64, ['post', 10000], 2048); // 2 MB
-	F.route(CONFIG('manager-url') + '/logoff/',                  redirect_logoff);
+	F.route(url + '/*', '~manager');
+	F.route(url + '/upload/',                  upload,        ['post', 'upload', 10000], 3084); // 3 MB
+	F.route(url + '/upload/base64/',           upload_base64, ['post', 10000], 2048); // 2 MB
+	F.route(url + '/logoff/',                  redirect_logoff);
 
 	// FILES
-	F.route(CONFIG('manager-url') + '/api/files/clear/',         json_files_clear);
+	F.route(url + '/api/files/clear/',         json_files_clear);
 
 	// DASHBOARD
-	F.route(CONFIG('manager-url') + '/api/dashboard/',           json_dashboard);
-	F.route(CONFIG('manager-url') + '/api/dashboard/online/',    json_dashboard_online);
-	F.route(CONFIG('manager-url') + '/api/dashboard/clear/',     json_dashboard_clear);
+	F.route(url + '/api/dashboard/',           json_dashboard);
+	F.route(url + '/api/dashboard/online/',    json_dashboard_online);
+	F.route(url + '/api/dashboard/clear/',     json_dashboard_clear);
 
 	// ORDERS
-	F.route(CONFIG('manager-url') + '/api/orders/',              json_query,  ['*Order']);
-	F.route(CONFIG('manager-url') + '/api/orders/{id}/',         json_read,   ['*Order']);
-	F.route(CONFIG('manager-url') + '/api/orders/',              json_save,   ['put', '*Order']);
-	F.route(CONFIG('manager-url') + '/api/orders/',              json_remove, ['delete', '*Order']);
-	F.route(CONFIG('manager-url') + '/api/orders/clear/',        json_clear,  ['*Order']);
+	F.route(url + '/api/orders/',              json_query,  ['*Order']);
+	F.route(url + '/api/orders/{id}/',         json_read,   ['*Order']);
+	F.route(url + '/api/orders/',              json_save,   ['put', '*Order']);
+	F.route(url + '/api/orders/',              json_remove, ['delete', '*Order']);
+	F.route(url + '/api/orders/clear/',        json_clear,  ['*Order']);
 
 	// USERS
-	F.route(CONFIG('manager-url') + '/api/users/',               json_query,  ['*User']);
-	F.route(CONFIG('manager-url') + '/api/users/{id}/',          json_read,   ['*User']);
-	F.route(CONFIG('manager-url') + '/api/users/',               json_save,   ['put', '*User']);
-	F.route(CONFIG('manager-url') + '/api/users/',               json_remove, ['delete', '*User']);
-	F.route(CONFIG('manager-url') + '/api/users/clear/',         json_clear,  ['*User']);
+	F.route(url + '/api/users/',               json_query,  ['*User']);
+	F.route(url + '/api/users/{id}/',          json_read,   ['*User']);
+	F.route(url + '/api/users/',               json_save,   ['put', '*User']);
+	F.route(url + '/api/users/',               json_remove, ['delete', '*User']);
+	F.route(url + '/api/users/clear/',         json_clear,  ['*User']);
 
 	// PRODUCTS
-	F.route(CONFIG('manager-url') + '/api/products/',            json_query,  ['*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/',            json_save,   ['post', '*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/{id}/',       json_read,   ['*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/',            json_remove, ['delete', '*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/clear/',      json_clear,  ['*Product']);
-	F.route(CONFIG('manager-url') + '/api/products/import/',     json_products_import, ['upload', 1000 * 60 * 5], 1024);
-	F.route(CONFIG('manager-url') + '/api/products/export/',     json_products_export, ['*Product', 10000]);
-	F.route(CONFIG('manager-url') + '/api/products/codelists/',  json_products_codelists);
-	F.route(CONFIG('manager-url') + '/api/products/category/',   json_products_category_replace, ['post']);
+	F.route(url + '/api/products/',            json_query,  ['*Product']);
+	F.route(url + '/api/products/',            json_save,   ['post', '*Product']);
+	F.route(url + '/api/products/{id}/',       json_read,   ['*Product']);
+	F.route(url + '/api/products/',            json_remove, ['delete', '*Product']);
+	F.route(url + '/api/products/clear/',      json_clear,  ['*Product']);
+	F.route(url + '/api/products/import/',     json_products_import, ['upload', 1000 * 60 * 5], 1024);
+	F.route(url + '/api/products/export/',     json_products_export, ['*Product', 10000]);
+	F.route(url + '/api/products/codelists/',  json_products_codelists);
+	F.route(url + '/api/products/category/',   json_products_category_replace, ['post']);
 
 	// POSTS
-	F.route(CONFIG('manager-url') + '/api/posts/',               json_query,  ['*Post']);
-	F.route(CONFIG('manager-url') + '/api/posts/',               json_save,   ['post', '*Post'], 512);
-	F.route(CONFIG('manager-url') + '/api/posts/{id}/',          json_read,   ['*Post']);
-	F.route(CONFIG('manager-url') + '/api/posts/',               json_remove, ['delete', '*Post']);
-	F.route(CONFIG('manager-url') + '/api/posts/clear/',         json_clear,  ['*Post']);
-	F.route(CONFIG('manager-url') + '/api/posts/codelists/',     json_posts_codelists);
+	F.route(url + '/api/posts/',               json_query,  ['*Post']);
+	F.route(url + '/api/posts/',               json_save,   ['post', '*Post'], 512);
+	F.route(url + '/api/posts/{id}/',          json_read,   ['*Post']);
+	F.route(url + '/api/posts/',               json_remove, ['delete', '*Post']);
+	F.route(url + '/api/posts/clear/',         json_clear,  ['*Post']);
+	F.route(url + '/api/posts/codelists/',     json_posts_codelists);
 
 	// PAGES
-	F.route(CONFIG('manager-url') + '/api/pages/',               json_query,  ['*Page']);
-	F.route(CONFIG('manager-url') + '/api/pages/',               json_remove, ['delete', '*Page']);
-	F.route(CONFIG('manager-url') + '/api/pages/{id}/',          json_read,   ['*Page']);
-	F.route(CONFIG('manager-url') + '/api/pages/clear/',         json_clear,  ['*Page']);
-	F.route(CONFIG('manager-url') + '/api/pages/',               json_pages_save, ['post', '*Page'], 512);
-	F.route(CONFIG('manager-url') + '/api/pages/preview/',       view_pages_preview, ['json'], 512);
-	F.route(CONFIG('manager-url') + '/api/pages/dependencies/',  json_pages_dependencies);
-	F.route(CONFIG('manager-url') + '/api/pages/sitemap/',       json_pages_sitemap);
+	F.route(url + '/api/pages/',               json_query,  ['*Page']);
+	F.route(url + '/api/pages/',               json_remove, ['delete', '*Page']);
+	F.route(url + '/api/pages/{id}/',          json_read,   ['*Page']);
+	F.route(url + '/api/pages/clear/',         json_clear,  ['*Page']);
+	F.route(url + '/api/pages/',               json_pages_save, ['post', '*Page'], 512);
+	F.route(url + '/api/pages/preview/',       view_pages_preview, ['json'], 512);
+	F.route(url + '/api/pages/dependencies/',  json_pages_dependencies);
+	F.route(url + '/api/pages/sitemap/',       json_pages_sitemap);
 
 	// WIDGETS
-	F.route(CONFIG('manager-url') + '/api/widgets/',             json_query,  ['*Widget']);
-	F.route(CONFIG('manager-url') + '/api/widgets/',             json_save,   ['post', '*Widget']);
-	F.route(CONFIG('manager-url') + '/api/widgets/',             json_remove, ['delete', '*Widget']);
-	F.route(CONFIG('manager-url') + '/api/widgets/{id}/',        json_read,   ['*Widget']);
-	F.route(CONFIG('manager-url') + '/api/widgets/clear/',       json_clear,  ['*Widget']);
+	F.route(url + '/api/widgets/',             json_query,  ['*Widget']);
+	F.route(url + '/api/widgets/',             json_save,   ['post', '*Widget']);
+	F.route(url + '/api/widgets/',             json_remove, ['delete', '*Widget']);
+	F.route(url + '/api/widgets/{id}/',        json_read,   ['*Widget']);
+	F.route(url + '/api/widgets/clear/',       json_clear,  ['*Widget']);
 
 	// NEWSLETTER
-	F.route(CONFIG('manager-url') + '/api/newsletter/',          json_query,  ['*Newsletter']);
-	F.route(CONFIG('manager-url') + '/api/newsletter/clear/',    json_clear,  ['*Newsletter']);
-	F.route(CONFIG('manager-url') + '/api/newsletter/csv/',      file_newsletter, ['*Newsletter']);
+	F.route(url + '/api/newsletter/',          json_query,  ['*Newsletter']);
+	F.route(url + '/api/newsletter/clear/',    json_clear,  ['*Newsletter']);
+	F.route(url + '/api/newsletter/csv/',      file_newsletter, ['*Newsletter']);
 
 	// SETTINGS
-	F.route(CONFIG('manager-url') + '/api/settings/',            json_settings, ['*Settings']);
-	F.route(CONFIG('manager-url') + '/api/settings/',            json_settings_save, ['put', '*Settings']);
+	F.route(url + '/api/settings/',            json_settings, ['*Settings']);
+	F.route(url + '/api/settings/',            json_settings_save, ['put', '*Settings']);
 };
 
 // ==========================================================================
@@ -289,9 +294,8 @@ function json_dashboard_clear() {
 	var self = this;
 	var instance = MODULE('webcounter').instance;
 
-	var fs = require('fs');
-	fs.unlink('databases/webcounter.nosql', NOOP);
-	fs.unlink('databases/webcounter.cache', NOOP);
+	Fs.unlink('databases/webcounter.nosql', NOOP);
+	Fs.unlink('databases/webcounter.cache', NOOP);
 
 	Object.keys(instance.stats).forEach(function(key) {
 		instance.stats[key] = 0;
@@ -389,7 +393,9 @@ function json_pages_save() {
 }
 
 function json_pages_sitemap() {
-	this.json({ sitemap: F.global.sitemap, partial: F.global.partial });
+	SITEMAP.sitemap = F.global.sitemap;
+	SITEMAP.partial = F.global.partial;
+	this.json(SITEMAP);
 }
 
 // ==========================================================================
