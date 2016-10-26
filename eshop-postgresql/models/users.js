@@ -129,7 +129,7 @@ NEWSCHEMA('User').make(function(schema) {
 			builder.where('id', model.id);
 		});
 
-		sql.exec(function() {
+		sql.exec(function(err) {
 			callback(SUCCESS(true, model.id));
 			!err && F.emit('users.save', model);
 		});
