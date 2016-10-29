@@ -80,7 +80,6 @@ function file_read(req, res) {
 	}
 
 	// Custom image resizing
-
 	var size;
 
 	// Small hack for the file cache.
