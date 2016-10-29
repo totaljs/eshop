@@ -83,11 +83,14 @@ function file_read(req, res) {
 	}
 
 	// Custom image resizing
+	var size;
 
 	// Small hack for the file cache.
 	// F.exists() uses req.uri.pathname for creating temp identificator and skips all query strings by creating (because this hack).
-	if (req.query.s)
-		req.uri.pathname = req.uri.pathname.replace('.', req.query.s + '.');
+	if (req.query.s) {
+		size = req.query.s.parseInt();
+		req.uri.pathname = req.uri.pathname.replace('.', size + '.');
+	}
 
 	// Below method checks if the file exists (processed) in temporary directory
 	// More information in total.js documentation
@@ -111,9 +114,8 @@ function file_read(req, res) {
 				// Image processing
 				res.image(filename, function(image) {
 					image.output(req.extension);
-					if (req.extension === 'jpg')
-						image.quality(85);
-					image.resize(req.query.s + '%');
+					req.extension === 'jpg' && image.quality(85);
+					size && image.resize(size + '%');
 					image.minify();
 				});
 			});
