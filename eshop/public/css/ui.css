@@ -60,6 +60,7 @@ button { outline: 0; }
 .ui-form-buttons button[name="cancel"] { color: gray; }
 .ui-form-buttons div { position: relative; display: inline-block; vertical-align: middle; }
 .ui-form-buttons label { float: right; margin: 12px 0 0 0; font-size: 11px; }
+.noscroll { overflow: hidden; }
 
 .ui-dropdowncheckbox-container { display: block; text-align: left; position: relative; }
 .ui-dropdowncheckbox { border: 2px solid #E0E0E0; padding: 0 8px; border-radius: 2px; outline: 0; overflow: hidden; width: 100%; background-color: white; height: 34px; cursor: pointer; }
