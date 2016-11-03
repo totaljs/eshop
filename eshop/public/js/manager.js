@@ -1,3 +1,6 @@
+// Trims empty fields
+langauges = langauges.trim();
+
 var common = {};
 
 // Current page
