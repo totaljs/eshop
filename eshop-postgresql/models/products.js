@@ -254,7 +254,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		var sql = DB(error);
 
-		sql.select('products').make(function(builder) {
+		sql.select('tbl_product').make(function(builder) {
 			builder.where('isremoved', false);
 			builder.where('reference', '!=', '');
 			builder.fields('id', 'reference');
@@ -329,7 +329,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		var sql = DB(error);
 
-		sql.select('products').make(function(builder) {
+		sql.select('tbl_product').make(function(builder) {
 			builder.where('isremoved', false);
 			builder.where('reference', '!=', '');
 			builder.fields('id', 'reference', 'pictures');
