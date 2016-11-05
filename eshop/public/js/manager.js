@@ -1,5 +1,5 @@
 // Trims empty fields
-langauges = langauges.trim();
+languages = languages.trim();
 
 var common = {};
 
