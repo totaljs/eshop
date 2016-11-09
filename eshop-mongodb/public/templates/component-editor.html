@@ -225,7 +225,7 @@
 		var iframe;
 		var container;
 		var width;
-		var offsetter = '<span id="cmseditorheight"></span>';
+		var offsetter = '<span id="cmseditorheight"></span><script>window.parent.cmseditor_iframeloaded();<\/script>';
 
 		self.options = { template: 'default' };
 		self.readonly();
@@ -293,13 +293,14 @@
 				return;
 			}
 
+			window.cmseditor_iframeloaded = function(){ self.setEvents(); };
+
 			frm.document.write(content.replace('</body>', offsetter + '</body>'));
 			frm.document.close();
 			frm.$cmseditor = true;
 			iframe.css({ height: 'auto' });
 
 			setTimeout(function() {
-				self.setEvents();
 				self.resize(10);
 			}, 500);
 
