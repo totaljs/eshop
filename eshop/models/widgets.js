@@ -48,8 +48,7 @@ NEWSCHEMA('Widget').make(function(schema) {
 			model.adminupdated = controller.user.name;
 		}
 
-		if (model.body)
-			model.body = U.minifyHTML(model.body);
+		model.body = U.minifyHTML(model.body);
 
 		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
 			F.emit('widgets.save', model);

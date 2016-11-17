@@ -24,7 +24,5 @@ F.helpers.sitemap_category = function(url, category) {
 // Helper for formatting number with currency
 // Eshop uses this helper
 F.helpers.currency = function(value, decimals) {
-	if (typeof(value) === 'string')
-		return F.config.custom.currency_entity.format(value);
-	return F.config.custom.currency_entity.format(value.format(decimals || 2));
+	return typeof(value) === 'string' ? F.config.custom.currency_entity.format(value) : F.config.custom.currency_entity.format(value.format(decimals || 2));
 };

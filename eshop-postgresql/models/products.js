@@ -316,6 +316,7 @@ NEWSCHEMA('Product').make(function(schema) {
 						count++;
 						model.$save(options, next);
 					});
+
 				}, function() {
 					count && refresh();
 					callback(SUCCESS(count > 0));
@@ -368,8 +369,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 					if (!product.id && product.reference) {
 						tmp = database.findItem('reference', product.reference);
-						if (tmp)
-							product.id = tmp.id;
+						tmp && (product.id = tmp.id);
 					}
 
 					var fn = function() {

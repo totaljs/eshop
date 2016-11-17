@@ -3,17 +3,17 @@
 		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> @(Orders)</div>
 		<div class="row">
 			<div class="col-md-4 col-sm-6 m">
-				<div data-component="textbox" data-component-path="orders.filter.search" data-placeholder="@(Search orders ...)" data-component-type="search"></div>
-				<div class="help" data-component="template" data-component-path="orders.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
+				<div data-jc="textbox" data-jc-path="orders.filter.search" data-placeholder="@(Search orders ...)" data-jc-type="search"></div>
+				<div class="help" data-jc="template" data-jc-path="orders.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
 			<div class="col-md-4 col-sm-6 m">
-				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(All orders)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>
+				<div data-jc="dropdown" data-jc-path="orders.filter.type" data-options="@(All orders)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-jc-type="number"></div>
 			</div>
 		</div>
 	</div>
 </div>
 <div class="container">
-	<div data-component="grid" data-component-path="orders.grid" data-pagination-path="orders.filter.page" data-component-id="orders.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
+	<div data-jc="grid" data-jc-path="orders.grid" data-pagination-path="orders.filter.page" data-jc-id="orders.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
 		<script type="text/html">
 		<tr{{ if iscompleted }} class="order-completed"{{ fi }}>
 			<td style="width:150px" class="silver hidden-xs"><span class="fa fa-truck"></span> {{ delivery }}</td>
@@ -30,9 +30,9 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Order form)" data-component-path="common.form" data-if="value === 'orders'" data-width="900px" data-component-id="orders.form">
+<div data-jc="form" data-title="@(Order form)" data-jc-path="common.form" data-if="value === 'orders'" data-width="900px" data-jc-id="orders.form" class="hidden">
 	<br />
-	<div data-component="template" data-component-path="orders.form" class="padding">
+	<div data-jc="template" data-jc-path="orders.form" class="padding">
 		<script type="text/html">
 		<table class="table table-bordered" border="0">
 			<tbody>
@@ -76,21 +76,21 @@
 	<div class="padding bg-smoke">
 		<div class="row">
 			<div class="col-md-12">
-				<div data-component="textbox" data-component-path="orders.form.status" class="b" data-required="true">@(Order status)</div>
+				<div data-jc="textbox" data-jc-path="orders.form.status" class="b" data-required="true">@(Order status)</div>
 				<br />
-				<div data-component="checkbox" data-component-path="orders.form.iscompleted" class="b red">@(Order is processed and closed)</div>
-				<div data-component="checkbox" data-component-path="orders.form.isemail">@(Send email to user about the order status)</div>
-				<div data-component="checkbox" data-component-path="orders.form.ispaid">@(Order is paid)</div>
+				<div data-jc="checkbox" data-jc-path="orders.form.iscompleted" class="b red">@(Order is processed and closed)</div>
+				<div data-jc="checkbox" data-jc-path="orders.form.isemail">@(Send email to user about the order status)</div>
+				<div data-jc="checkbox" data-jc-path="orders.form.ispaid">@(Order is paid)</div>
 			</div>
 		</div>
 	</div>
 	<div class="padding" style="padding-bottom:10px">
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="textbox" data-component-path="orders.form.delivery" data-required="true" data-icon="fa fa-truck">@(Delivery type)</div>
+				<div data-jc="textbox" data-jc-path="orders.form.delivery" data-required="true" data-icon="fa fa-truck">@(Delivery type)</div>
 			</div>
 			<div class="col-md-3">
-				<div data-component="textbox" data-component-path="orders.form.reference" data-maxlength="10" data-align="center">@(Custom number)</div>
+				<div data-jc="textbox" data-jc-path="orders.form.reference" data-maxlength="10" data-align="center">@(Custom number)</div>
 				<div class="help">@(For pairing invoices or payments.)</div>
 			</div>
 		</div>
@@ -99,33 +99,33 @@
 	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="orders.form.firstname" data-required="true">@(First name)</div>
+				<div data-jc="textbox" data-jc-path="orders.form.firstname" data-required="true">@(First name)</div>
 			</div>
 			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="orders.form.lastname" data-required="true">@(Last name)</div>
+				<div data-jc="textbox" data-jc-path="orders.form.lastname" data-required="true">@(Last name)</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="textarea" data-component-path="orders.form.address" data-required="true" data-height="100px">@(Delivery address)</div>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="orders.form.email" data-required="true" data-icon="fa-envelope">@(Email address)</div>
-			</div>
-			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="orders.form.phone">@(Phone number)</div>
+				<div data-jc="textarea" data-jc-path="orders.form.address" data-required="true" data-height="100px">@(Delivery address)</div>
 			</div>
 		</div>
 
 		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.email" data-required="true" data-icon="fa-envelope">@(Email address)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.phone">@(Phone number)</div>
+			</div>
+		</div>
+
+		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="textarea" data-component-path="orders.form.message">@(Message)</div>
+				<div data-jc="textarea" data-jc-path="orders.form.message">@(Message)</div>
 			</div>
 			<div class="col-md-12 m">
-				<div data-component="textbox" data-component-path="orders.form.note" data-placeholder="@(Internal note only for you)">@(Internal note)</div>
+				<div data-jc="textbox" data-jc-path="orders.form.note" data-placeholder="@(Internal note only for you)">@(Internal note)</div>
 			</div>
 		</div>
 	</div>
@@ -134,7 +134,7 @@
 		<div class="silver"><span class="fa fa-shopping-cart"></span> <strong>@(Ordered items)</strong>:</div>
 		<br />
 		<table class="table table-bordered checkoutlist" border="0">
-			<tbody data-component="repeater" data-component-path="orders.form.products">
+			<tbody data-jc="repeater" data-jc-path="orders.form.products">
 				<script type="text/html">
 					<tr>
 						<td class="col-xs-2 hidden-xs"><input style="width:100%" type="text" class="ui-center" value="{{ reference }}" data-name="reference" data-id="{{ id }}" placeholder="@(Item code)" /></td>
@@ -146,11 +146,11 @@
 				</script>
 			</tbody>
 		</table>
-		<div><a href="javascript:void(0)" data-component="click" data-component-path="orders_form_add"><span class="fa fa-plus-circle mr5"></span>@(Add new item)</a></div>
+		<div><a href="javascript:void(0)" data-jc="click" data-jc-path="orders_form_add"><span class="fa fa-plus-circle mr5"></span>@(Add new item)</a></div>
 	</div>
-	<div data-component="error" data-component-path="orders.response"></div>
+	<div data-jc="error" data-jc-path="orders.response"></div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="orders.form" data-if="orders.form.products.length > 0">
+		<div data-jc="validation" data-jc-path="orders.form" data-if="orders.form.products.length > 0">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>

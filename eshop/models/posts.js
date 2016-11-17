@@ -84,7 +84,6 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		if (newbie) {
 			model.id = UID();
-			model.datecreated = F.datetime;
 			model.admincreated = controller.user.name;
 		} else {
 			model.dateupdated = F.datetime;
@@ -98,9 +97,7 @@ NEWSCHEMA('Post').make(function(schema) {
 			model.category_linker = category.linker;
 
 		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ').max(1000);
-
-		if (model.body)
-			model.body = U.minifyHTML(model.body);
+		model.body = U.minifyHTML(model.body);
 
 		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
 

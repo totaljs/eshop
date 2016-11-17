@@ -6,25 +6,25 @@
 		<div class="caption"><span class="fa fa-hashtag mr5"></span> @(Posts)</div>
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data-component="textbox" data-component-path="posts.filter.search" data-placeholder="@(Search posts ...)" data-component-type="search"></div>
-				<div class="help" data-component="template" data-component-path="posts.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
+				<div data-jc="textbox" data-jc-path="posts.filter.search" data-placeholder="@(Search posts ...)" data-jc-type="search"></div>
+				<div class="help" data-jc="template" data-jc-path="posts.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
 			<div class="col-md-3 m">
-				<div data-component="dropdown" data-component-path="posts.filter.category" data-source="posts.categories" data-empty="@(All posts)" data-source-value="name"></div>
+				<div data-jc="dropdown" data-jc-path="posts.filter.category" data-source="posts.categories" data-empty="@(All posts)" data-source-value="name"></div>
 				<div>&nbsp;</div>
 			</div>
 			<div class="col-md-3 m">
-				<div data-component="dropdown" data-component-path="posts.filter.template" data-source="posts.templates" data-empty="@(All templates)"></div>
+				<div data-jc="dropdown" data-jc-path="posts.filter.template" data-source="posts.templates" data-empty="@(All templates)"></div>
 			</div>
 			<div class="col-md-3 m">
-				<div data-component="dropdown" data-component-path="posts.filter.language" data-source="languages" data-empty="@(All languages)"></div>
+				<div data-jc="dropdown" data-jc-path="posts.filter.language" data-source="languages" data-empty="@(All languages)"></div>
 			</div>
 		</div>
 	</div>
 </div>
 
 <div class="container">
-	<div data-component="grid" data-component-path="posts.grid" data-pagination-path="posts.filter.page" data-component-id="posts.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
+	<div data-jc="grid" data-jc-path="posts.grid" data-pagination-path="posts.filter.page" data-jc-id="posts.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
 		<script type="text/html">
 		<tr>
 			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ name }}</td>
@@ -39,20 +39,20 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Post form)" data-component-path="common.form" data-if="value === 'posts'" data-width="1300px" data-component-id="posts.form">
+<div data-jc="form" data-title="@(Post form)" data-jc-path="common.form" data-if="value === 'posts'" data-width="1300px" data-jc-id="posts.form" class="hidden">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data-component="textbox" data-component-path="posts.form.name" data-required="true" data-placeholder="@(Post name)">@(Name)</div>
+				<div data-jc="textbox" data-jc-path="posts.form.name" data-required="true" data-placeholder="@(Post name)">@(Name)</div>
 			</div>
 			<div class="col-md-3 m">
-				<div data-component="dropdown" data-component-path="posts.form.category" data-source="posts.categories" data-empty="" data-source-value="name" data-required="true">@(Category)</div>
+				<div data-jc="dropdown" data-jc-path="posts.form.category" data-source="posts.categories" data-empty="" data-source-value="name" data-required="true">@(Category)</div>
 			</div>
 			<div class="col-md-3 m">
-				<div data-component="dropdown" data-component-path="posts.form.template" data-source="posts.templates" data-empty="" data-required="true">@(Template)</div>
+				<div data-jc="dropdown" data-jc-path="posts.form.template" data-source="posts.templates" data-empty="" data-required="true">@(Template)</div>
 			</div>
 			<div class="col-md-3 m">
-				<div data-component="textbox" data-component-path="posts.form.author" data-maxlength="30" data-icon="fa-user" data-required="true">@(Author)</div>
+				<div data-jc="textbox" data-jc-path="posts.form.author" data-maxlength="30" data-icon="fa-user" data-required="true">@(Author)</div>
 			</div>
 		</div>
 	</div>
@@ -61,24 +61,24 @@
 		<nav><i class="fa fa-desktop"></i><a href="javascript:posts_device(1)">@(Large)</a><a href="javascript:posts_device(2)">@(Medium)</a><a href="javascript:posts_device(3)">@(Tablet)</a><a href="javascript:posts_device(4)">@(Mobile)</a></nav>
 		<div><b>@(Editor formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L). <a href="javascript:void(0)" data-exec="posts_sourcecode" class="exec black"><span class="fa fa-code w18"></span>@(Show source-code)</a></div>
 	</div>
-	<div class="pages-editor" data-component="editor" data-component-path="posts.form.body" data-component-import="/templates/component-editor.html" data-component-id="posts.editor"></div>
+	<div class="pages-editor" data-jc="editor" data-jc-path="posts.form.body" data-jc-import="/templates/component-editor.html" data-jc-id="posts.editor"></div>
 	<br />
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-component="textboxtags" data-component-path="posts.form.tags">@(Tags)</div>
+				<div data-jc="textboxtags" data-jc-path="posts.form.tags">@(Tags)</div>
 			</div>
 			<div class="col-md-2 m">
-				<div data-component="textbox" data-component-path="posts.form.datecreated" data-align="center" data-maxlength="10" data-icon="fa-calendar" data-component-type="date" data-component-format="@(yyyy-MM-dd)">@(Created)</div>
+				<div data-jc="textbox" data-jc-path="posts.form.datecreated" data-align="center" data-maxlength="10" data-icon="fa-calendar" data-jc-type="date" data-jc-format="@(yyyy-MM-dd)">@(Created)</div>
 			</div>
 			<div class="col-md-2 m">
-				<div data-component="dropdown" data-component-path="posts.form.language" data-align="center" data-source="languages" data-empty="" data-icon="fa-flag">@(Language)</div>
+				<div data-jc="dropdown" data-jc-path="posts.form.language" data-align="center" data-source="languages" data-empty="" data-icon="fa-flag">@(Language)</div>
 			</div>
 		</div>
 	</div>
-	<div data-component="error" data-component-path="posts.response"></div>
+	<div data-jc="error" data-jc-path="posts.response"></div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="posts.form">
+		<div data-jc="validation" data-jc-path="posts.form">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
@@ -149,7 +149,6 @@
 			posts.form.search = editor.getKeywords();
 
 			AJAX('POST {0}/api/posts/'.format(managerurl), posts.form, function(response) {
-
 				loading.hide(500);
 
 				// Error handling

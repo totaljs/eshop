@@ -10,12 +10,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<meta name="robots" content="all,follow" />
 	@{head}
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
 	@{import('manager.css', 'favicon.ico')}
 </head>
 <body>
-	<div data-component="loading" class="ui-loading"></div>
+	<div data-jc="loading" class="ui-loading"></div>
 	<br />
 	<br />
 	<div class="ui-center">
@@ -25,13 +25,13 @@
 	<br />
 	<div class="container">
 		<div class="col-md-4 col-md-offset-4 enter">
-			<div data-component="textbox" data-component-path="user.name" class="m" data-maxlength="80" data-required="true" data-placeholder="@(Enter your login name)" data-autofocus="true">@(Login name)</div>
-			<div data-component="textbox" data-component-path="user.password" data-component-type="password" data-required="true" class="m" data-maxlength="30" data-placeholder="@(Enter your password)">@(Password)</div>
+			<div data-jc="textbox" data-jc-path="user.name" class="m" data-maxlength="80" data-required="true" data-placeholder="@(Enter your login name)" data-autofocus="true">@(Login name)</div>
+			<div data-jc="textbox" data-jc-path="user.password" data-jc-type="password" data-required="true" class="m" data-maxlength="30" data-placeholder="@(Enter your password)">@(Password)</div>
 			<div class="row">
-				<div data-component="error" data-component-path="user.error"></div>
+				<div data-jc="error" data-jc-path="user.error"></div>
 			</div>
-			<div data-component="validation" data-component-path="user">
-				<button class="button button-small b" data-component="click" data-component-path="doLogin" data-enter=".enter"><span class="fa fa-lock"></span> @(Sign in)</button>
+			<div data-jc="validation" data-jc-path="user">
+				<button class="button button-small b" data-jc="click" data-jc-path="doLogin" data-enter=".enter"><span class="fa fa-lock"></span> @(Sign in)</button>
 			</div>
 		</div>
 	</div>
@@ -50,7 +50,7 @@
 		});
 
 		function doLogin() {
-			if (!jC.valid('user.*'))
+			if (!$.components.valid('user.*'))
 				return;
 			var id = HASH(user.name + ':' + user.password);
 			var dt = new Date();

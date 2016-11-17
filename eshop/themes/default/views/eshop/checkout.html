@@ -5,7 +5,7 @@
 
 	<h1>@{title}</h1>
 
-	<div data-component="visible" data-component-path="datasource" data-if="!value || !value.length" class="hidden">
+	<div data-jc="visible" data-jc-path="datasource" data-if="!value || !value.length" class="hidden">
 		<div class="row">
 			<div class="col-md-8 col-md-offset-2 ui-center">
 				<hr />
@@ -22,7 +22,7 @@
 		</div>
 	</div>
 
-	<div data-component="visible" data-component-path="datasource" data-if="value && value.length > 0" class="hidden">
+	<div data-jc="visible" data-jc-path="datasource" data-if="value && value.length > 0" class="hidden">
 		<div class="row">
 			<div class="col-md-1"></div>
 			<div class="col-md-10">
@@ -35,7 +35,7 @@
 							<th class="ui-center">@(Total)</th>
 						</tr>
 					</thead>
-					<tbody data-component="repeater" data-component-path="datasource">
+					<tbody data-jc="repeater" data-jc-path="datasource">
 						<script type="text/html">
 							<tr>
 								<td><a href="{{ linker }}">{{ name }}</a><div class="visible-xs fs11 mt10">@(One piece:) @{currency('{{ price | format(2) }}')}</div></td>
@@ -45,7 +45,7 @@
 							</tr>
 						</script>
 					</tbody>
-					<tfoot data-component="template" data-component-path="summarize" class="hidden-xs">
+					<tfoot data-jc="template" data-jc-path="summarize" class="hidden-xs">
 						<script type="text/html">
 							<tr class="active">
 								<td class="b black">@(Summarize)</td>
@@ -88,18 +88,18 @@
 				<br />
 				<div class="row">
 					<div class="col-md-6 m">
-						<div data-component="textbox" data-component-path="form.firstname" data-required="true" data-maxlength="30">@(First name)</div>
+						<div data-jc="textbox" data-jc-path="form.firstname" data-required="true" data-maxlength="30">@(First name)</div>
 					</div>
 					<div class="col-md-6 m">
-						<div data-component="textbox" data-component-path="form.lastname" data-required="true" data-maxlength="30">@(Last name)</div>
+						<div data-jc="textbox" data-jc-path="form.lastname" data-required="true" data-maxlength="30">@(Last name)</div>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-6 m">
-						<div data-component="textbox" data-component-path="form.email" data-required="true" data-maxlength="200" data-component-type="email">@(Email address)</div>
+						<div data-jc="textbox" data-jc-path="form.email" data-required="true" data-maxlength="200" data-jc-type="email">@(Email address)</div>
 					</div>
 					<div class="col-md-6 m">
-						<div data-component="textbox" data-component-path="form.phone" data-maxlength="30">@(Phone number)</div>
+						<div data-jc="textbox" data-jc-path="form.phone" data-maxlength="30">@(Phone number)</div>
 					</div>
 				</div>
 			</div>
@@ -110,12 +110,12 @@
 			<div class="col-md-8 col-md-offset-2">
 				<div class="row">
 					<div class="col-md-12 m">
-						<div data-component="dropdown" data-component-path="form.delivery" data-source="common.deliverytypes" data-empty="" data-required="true">@(Delivery type)</div>
+						<div data-jc="dropdown" data-jc-path="form.delivery" data-source="common.deliverytypes" data-empty="" data-required="true">@(Delivery type)</div>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-12 m">
-						<div data-component="textarea" data-component-path="form.address" data-required="true" data-height="100px" data-maxlength="1000" data-placeholder="@(Street, ZIP, City, Country, State)">@(Delivery address)</div>
+						<div data-jc="textarea" data-jc-path="form.address" data-required="true" data-height="100px" data-maxlength="1000" data-placeholder="@(Street, ZIP, City, Country, State)">@(Delivery address)</div>
 					</div>
 				</div>
 			</div>
@@ -125,17 +125,17 @@
 		<div class="row">
 			<div class="col-md-8 col-md-offset-2">
 				<br />
-				<div data-component="textarea" data-component-path="form.message" data-height="50px" data-maxlength="1000">@(Note)</div>
+				<div data-jc="textarea" data-jc-path="form.message" data-height="50px" data-maxlength="1000">@(Note)</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-8 col-md-offset-2">
 				<br />
-				<div data-component="checkbox" data-component-path="form.isnewsletter">@(I want to receive a newsletter)</div>
-				<div data-component="checkbox" data-component-path="form.isterms" class="b" style="color:red">@(I agree with terms and conditions)</div>
-				<div data-component="error" data-component-path="common.success" style="margin-top:20px"></div>
-				<div data-component="validation" data-component-path="form" data-if="form.isterms === true">
-					<button class="button" disabled="disabled" data-component="click" data-component-path="#submit">@(SUBMIT ORDER)</button>
+				<div data-jc="checkbox" data-jc-path="form.isnewsletter">@(I want to receive a newsletter)</div>
+				<div data-jc="checkbox" data-jc-path="form.isterms" class="b" style="color:red">@(I agree with terms and conditions)</div>
+				<div data-jc="error" data-jc-path="common.success" style="margin-top:20px"></div>
+				<div data-jc="validation" data-jc-path="form" data-if="form.isterms === true">
+					<button class="button" disabled="disabled" data-jc="click" data-jc-path="#submit">@(SUBMIT ORDER)</button>
 				</div>
 			</div>
 		</div>
@@ -187,9 +187,7 @@
 				datasource.push({ id: item.id, name: item.name, price: item.price, linker: item.linker, linker_category: item.linker_category, pictures: item.pictures, reference: item.reference });
 			}
 
-			if (!datasource.length)
-				FIND('checkout').clear();
-
+			!datasource.length && SETTER('checkout', 'clear');
 			refresh(true);
 		});
 
@@ -249,8 +247,7 @@
 			count += product.count;
 		}
 
-		if (redraw)
-			UPDATE('datasource');
+		redraw && UPDATE('datasource');
 		SET('summarize', { count: count, price: price });
 	}
 
@@ -271,7 +268,7 @@
 				return;
 			}
 
-			FIND('checkout').clear();
+			SETTER('checkout', 'clear');
 			location.href = jRouting.path(location.pathname) + response.value + '/?success=1';
 		});
 	});

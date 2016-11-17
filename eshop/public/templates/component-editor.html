@@ -1,11 +1,11 @@
-<div data-component="form" data-title="@(Select widget)" data-component-path="cmseditor.window" data-if="value === 'widgets'" data-width="600px" data-component-id="cmseditor_widgets">
+<div data-jc="form" data-title="@(Select widget)" data-jc-path="cmseditor.window" data-if="value === 'widgets'" data-width="600px" data-jc-id="cmseditor_widgets" class="hidden">
 	<div class="padding npb">
-		<div data-component="textbox" data-component-path="cmseditor.widgetssearch" data-placeholder="@(Search widgets)" data-component-type="search"></div>
+		<div data-jc="textbox" data-jc-path="cmseditor.widgetssearch" data-placeholder="@(Search widgets)" data-jc-type="search"></div>
 	</div>
 	<hr class="nmb" />
 	<div class="padding">
-		<div data-component="search" data-component-path="cmseditor.widgetssearch" data-selector=".inline-search" data-class="hidden">
-			<div data-component="repeater-group" data-component-path="cmseditor.widgets2" data-group="category">
+		<div data-jc="search" data-jc-path="cmseditor.widgetssearch" data-selector=".inline-search" data-class="hidden">
+			<div data-jc="repeater-group" data-jc-path="cmseditor.widgets2" data-group="category">
 				<script type="text/html">
 					<div class="pages-editor-widget inline-search" data-id="{{ id }}" data-template="{{ istemplate }}" data-name="{{ name }}" data-search="{{ name }}"><span class="fa fa-{{ if icon }}{{ icon }}{{ else if istemplate }}code{{ else }}plug{{ fi }} w18"></span> {{ name }}</div>
 				</script>
@@ -23,93 +23,93 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Picture editor)" data-component-path="cmseditor.window" data-if="value === 'picture'" data-width="1100px" data-component-id="cmseditor_picture">
+<div data-jc="form" data-title="@(Picture editor)" data-jc-path="cmseditor.window" data-if="value === 'picture'" data-width="1100px" data-jc-id="cmseditor_picture" class="hidden">
 	<div class="padding">
-		<div data-component="crop" data-component-path="cmseditor.crop.url" data-width="700" data-height="500" data-component-id="cmseditor.crop"></div>
+		<div data-jc="crop" data-jc-path="cmseditor.crop.url" data-width="700" data-height="500" data-jc-id="cmseditor.crop"></div>
 		<div class="row">
 			<br />
 			<div class="col-md-12 m">
-				<div data-component="textbox" data-component-path="cmseditor.crop.alt" data-required="true">@(Picture description)</div>
+				<div data-jc="textbox" data-jc-path="cmseditor.crop.alt" data-required="true">@(Picture description)</div>
 			</div>
-			<div class="col-md-12" data-component="visible" data-component-path="cmseditor.crop.href" data-if="value && value.length > 0">
-				<div data-component="dropdown" data-component-path="cmseditor.crop.href" class="m" data-icon="fa-sitemap" data-source="pages.sitemap" data-source-key="name" data-source-value="url" data-empty="">@(URL according to the sitemap)</div>
-				<div data-component="textbox" data-component-path="cmseditor.crop.href">@(URL address)</div>
+			<div class="col-md-12" data-jc="visible" data-jc-path="cmseditor.crop.href" data-if="value && value.length > 0">
+				<div data-jc="dropdown" data-jc-path="cmseditor.crop.href" class="m" data-icon="fa-sitemap" data-source="pages.sitemap" data-source-key="name" data-source-value="url" data-empty="">@(URL according to the sitemap)</div>
+				<div data-jc="textbox" data-jc-path="cmseditor.crop.href">@(URL address)</div>
 			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="cmseditor.crop">
+		<div data-jc="validation" data-jc-path="cmseditor.crop">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Link editor)" data-component-path="cmseditor.window" data-if="value === 'link'" data-width="500px" data-component-id="cmseditor_link">
+<div data-jc="form" data-title="@(Link editor)" data-jc-path="cmseditor.window" data-if="value === 'link'" data-width="500px" data-jc-id="cmseditor_link" class="hidden">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="silver"><span class="fa fa-link"></span> @(<b>Change the target URL address</b> and other settings for the selected link.)</div>
 				<hr />
-				<div data-component="fileupload" data-component-path="cmseditor.link.file" data-placeholder="@(Browse device)" data-error-large="@(The uploaded file is too large.)" data-icon="fa-file" class="m" data-singlefile="true">@(Upload file)</div>
-				<div data-component="dropdown" data-component-path="cmseditor.link.href" class="m" data-icon="fa-sitemap" data-source="pages.sitemap" data-source-key="name" data-source-value="url" data-empty="">@(URL according to the sitemap)</div>
-				<div data-component="textbox" data-component-path="cmseditor.link.href" data-required="true" class="m" data-icon="fa-globe">@(URL address)</div>
-				<div data-component="dropdown" data-component-path="cmseditor.link.target" data-required="true" data-options="@(Current tab or window)|_self;@(New tab or window)|_blank" class="m">@(Target)</div>
-				<div data-component="textbox" data-component-path="cmseditor.link.title" data-icon="fa-info-circle">@(Title)</div>
+				<div data-jc="fileupload" data-jc-path="cmseditor.link.file" data-placeholder="@(Browse device)" data-error-large="@(The uploaded file is too large.)" data-icon="fa-file" class="m" data-singlefile="true">@(Upload file)</div>
+				<div data-jc="dropdown" data-jc-path="cmseditor.link.href" class="m" data-icon="fa-sitemap" data-source="pages.sitemap" data-source-key="name" data-source-value="url" data-empty="">@(URL according to the sitemap)</div>
+				<div data-jc="textbox" data-jc-path="cmseditor.link.href" data-required="true" class="m" data-icon="fa-globe">@(URL address)</div>
+				<div data-jc="dropdown" data-jc-path="cmseditor.link.target" data-required="true" data-options="@(Current tab or window)|_self;@(New tab or window)|_blank" class="m">@(Target)</div>
+				<div data-jc="textbox" data-jc-path="cmseditor.link.title" data-icon="fa-info-circle">@(Title)</div>
 			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="cmseditor.link">
+		<div data-jc="validation" data-jc-path="cmseditor.link">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Attributes editor)" data-component-path="cmseditor.window" data-if="value === 'attribute'" data-width="500px" data-component-id="cmseditor_attribute">
+<div data-jc="form" data-title="@(Attributes editor)" data-jc-path="cmseditor.window" data-if="value === 'attribute'" data-width="500px" data-jc-id="cmseditor_attribute" class="hidden">
 	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12">
-				<div data-component="textbox" data-component-path="cmseditor.attribute.title" class="m">@(Title)</div>
-				<div data-component="textbox" data-component-path="cmseditor.attribute.id" class="m">@(ID)</div>
-				<div data-component="visible" data-component-path="cmseditor.attribute.themes" data-if="value && value.length">
-					<div data-component="dropdown" data-component-path="cmseditor.attribute.theme" class="m b" data-source="cmseditor.attribute.themes" data-icon="fa-paint-brush">@(Theme)</div>
+				<div data-jc="textbox" data-jc-path="cmseditor.attribute.title" class="m">@(Title)</div>
+				<div data-jc="textbox" data-jc-path="cmseditor.attribute.id" class="m">@(ID)</div>
+				<div data-jc="visible" data-jc-path="cmseditor.attribute.themes" data-if="value && value.length">
+					<div data-jc="dropdown" data-jc-path="cmseditor.attribute.theme" class="m b" data-source="cmseditor.attribute.themes" data-icon="fa-paint-brush">@(Theme)</div>
 				</div>
-				<div data-component="textbox" data-component-path="cmseditor.attribute.cls" class="m">@(Class name)</div>
-				<div data-component="textbox" data-component-path="cmseditor.attribute.css" class="m">@(Custom styles)</div>
+				<div data-jc="textbox" data-jc-path="cmseditor.attribute.cls" class="m">@(Class name)</div>
+				<div data-jc="textbox" data-jc-path="cmseditor.attribute.css" class="m">@(Custom styles)</div>
 			</div>
 		</div>
 	</div>
 
-	<div data-component="visible" data-component-path="cmseditor.attribute.isimage" data-if="value === true">
+	<div data-jc="visible" data-jc-path="cmseditor.attribute.isimage" data-if="value === true">
 		<hr />
 		<div class="padding npt npb">
 			<div class="help m"><span class="fa fa-photo"></span> @(Image settings)</div>
 
 			<div class="row">
 				<div class="col-md-12">
-					<div data-component="textbox" data-component-path="cmseditor.attribute.alt" class="m">@(Alternate text)</div>
+					<div data-jc="textbox" data-jc-path="cmseditor.attribute.alt" class="m">@(Alternate text)</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="col-md-4">
-					<div data-component="textbox" data-component-path="cmseditor.attribute.datawidth" class="m" data-maxlenght="4" data-placeholder="120" data-align="center">@(Width)</div>
+					<div data-jc="textbox" data-jc-path="cmseditor.attribute.datawidth" class="m" data-maxlenght="4" data-placeholder="120" data-align="center">@(Width)</div>
 				</div>
 				<div class="col-md-4">
-					<div data-component="textbox" data-component-path="cmseditor.attribute.dataheight" class="m" data-maxlenght="4" data-placeholder="120" data-align="center">@(Height)</div>
+					<div data-jc="textbox" data-jc-path="cmseditor.attribute.dataheight" class="m" data-maxlenght="4" data-placeholder="120" data-align="center">@(Height)</div>
 				</div>
-				<div class="col-md-4" data-component="visible" data-component-path="cmseditor.attribute.imgdefined" data-if="value">
-					<div data-component="textbox" data-component-path="cmseditor.attribute.datasize" class="m" data-maxlenght="4" data-placeholder="0%" data-align="center">@(Percentage)</div>
+				<div class="col-md-4" data-jc="visible" data-jc-path="cmseditor.attribute.imgdefined" data-if="value">
+					<div data-jc="textbox" data-jc-path="cmseditor.attribute.datasize" class="m" data-maxlenght="4" data-placeholder="0%" data-align="center">@(Percentage)</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div data-component="visible" data-component-path="cmseditor.attribute.isnone" data-if="value !== true">
+	<div data-jc="visible" data-jc-path="cmseditor.attribute.isnone" data-if="value !== true">
 		<hr />
 		<div class="padding npt">
-			<div data-component="textbox" data-component-path="cmseditor.attribute.src" data-icon="fa-globe">@(Source URL)</div>
+			<div data-jc="textbox" data-jc-path="cmseditor.attribute.src" data-icon="fa-globe">@(Source URL)</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
@@ -118,7 +118,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Icon editor)" data-component-path="cmseditor.window" data-if="value === 'icon'" data-width="700px" data-component-id="cmseditor_icon">
+<div data-jc="form" data-title="@(Icon editor)" data-jc-path="cmseditor.window" data-if="value === 'icon'" data-width="700px" data-jc-id="cmseditor_icon" class="hidden">
 	<div class="padding">
 		<div class="row font-awesome-editor" id="cmseditoricons"></div>
 	</div>
@@ -127,34 +127,34 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Widget settings)" data-component-path="cmseditor.window" data-if="value === 'widget'" data-width="500px" data-component-id="cmseditor_widget">
+<div data-jc="form" data-title="@(Widget settings)" data-jc-path="cmseditor.window" data-if="value === 'widget'" data-width="500px" data-jc-id="cmseditor_widget" class="hidden">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="silver"><span class="fa fa-plug"></span> @(Add a custom settings for the selected widget. The setting affects behavior of the widget.)</div>
 				<hr />
-				<div data-component="textarea" data-component-path="cmseditor.widget.settings" data-icon="fa-cog" data-height="150px" class="ui-textarea-code">@(Settings)</div>
+				<div data-jc="textarea" data-jc-path="cmseditor.widget.settings" data-icon="fa-cog" data-height="150px" class="ui-textarea-code">@(Settings)</div>
 			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="cmseditor.widget">
+		<div data-jc="validation" data-jc-path="cmseditor.widget">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Source code editor)" data-component-path="cmseditor.window" data-if="value === 'source'" data-width="1100px" data-component-id="cmseditor_source">
+<div data-jc="form" data-title="@(Source code editor)" data-jc-path="cmseditor.window" data-if="value === 'source'" data-width="1100px" data-jc-id="cmseditor_source" class="hidden">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
-				<div data-component="codemirror" data-component-path="cmseditor.source" data-icon="fa-code" data-height="500px" data-required="true" class="ui-textarea-code">@(HTML)</div>
+				<div data-jc="codemirror" data-jc-path="cmseditor.source" data-icon="fa-code" data-height="500px" data-required="true" class="ui-textarea-code">@(HTML)</div>
 			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="cmseditor.source">
+		<div data-jc="validation" data-jc-path="cmseditor.source">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
@@ -293,7 +293,7 @@
 				return;
 			}
 
-			window.cmseditor_iframeloaded = function(){ self.setEvents(); };
+			window.cmseditor_iframeloaded = self.setEvents;
 
 			frm.document.write(content.replace('</body>', offsetter + '</body>'));
 			frm.document.close();
@@ -423,7 +423,8 @@
 		};
 
 		self.getPerex = function() {
-			return self.doFind('.CMS_perex').html();
+			var el = self.doFind('.CMS_perex');
+			return el.length ? el.html().replace(/<\/?[^>]+(>|$)/g, '') : '';
 		};
 
 		self.getKeywords = function() {

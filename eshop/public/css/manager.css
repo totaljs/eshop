@@ -21,6 +21,10 @@ h1 b { font-weight: 400; }
 h2 { font-weight: 200; font-family: 'Source Sans Pro'; margin: 0 0 8px 0; padding: 0; color: gray; font-size: 24px; }
 h2 b { font-weight: 700; }
 
+h3 { font-weight: 400; font-family: 'Source Sans Pro'; margin: 0 0 20px 0; padding: 0; color: #A0A0A0; font-size: 20px; }
+h3 b { font-weight: 700; }
+h3 .fa { margin-right: 8px; }
+
 #loading { background: rgba(255,255,255,0.9) url(../img/preloader.gif) no-repeat 90% 90%; position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 15; }
 #success { height: 40px; top: 5px; left: 5px; width: 40px; background-color: #66B258; font-size: 25px; line-height: 0; position: fixed; z-index: 20; color: white; text-align: center; padding: 8px 0 0 1px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: none; transition: all 0.4s; z-index: 1000; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
 #body { margin: 0 40px 0 80px; }
@@ -72,6 +76,11 @@ table td { vertical-align: middle !important;}
 
 hr { border-color: #E0E0E0; }
 canvas { display: block; }
+
+.section { font-size: 12px; text-transform: uppercase; margin-bottom: 20px; font-weight: bold; color: black; height: 20px; position: relative; width: 100%; }
+.section .fa { margin-right: 6px; }
+.section span { position: relative; z-index: 2; background-color: white; padding-right: 8px; }
+.section hr { position: absolute; width: 100%; margin: 8px 0 0 0; z-index: 1; border-style: dashed; }
 
 .dashboard-online-counter { position: relative; display: block; }
 .dashboard-online-counter span { position: absolute; width: 100px; text-align: center; font-size: 40px; color: #AAB2BD; left: 50%; margin-left: -50px; top: 50%; margin-top: -10px; }

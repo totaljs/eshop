@@ -17,21 +17,18 @@ $(document).ready(function() {
 		el.toggleClass('hidden', su.roles.length && su.roles.indexOf(el.attr('data-role')) === -1);
 	});
 
-	FIND('loading', FN('() => this.hide(500)'));
+	FIND('loading', FN('() => this.hide(800)'));
 	$(window).on('resize', resizer);
 	resizer();
 });
 
 // Because of login form
 if (window.su) {
-	jRouting.route(managerurl + '/', function() {
-
-		if (can('dashboard')) {
+	jR.route(managerurl + '/', function() {
+		if (can('dashboard'))
 			SET('common.page', 'dashboard');
-			return;
-		}
-
-		jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
+		else
+			jR.redirect('{0}/{1}/'.format(managerurl, su.roles[0]));
 	});
 
 	can('orders') && jRouting.route(managerurl + '/orders/', function() {
@@ -67,7 +64,7 @@ if (window.su) {
 	});
 }
 
-jRouting.on('location', function(url) {
+jR.on('location', function(url) {
 	url = url.split('/');
 	var nav = $('header nav');
 	nav.find('.selected').removeClass('selected');
@@ -101,7 +98,7 @@ function can(name) {
 }
 
 Tangular.register('price', function(value, format) {
-	return value == null ? 0 : currency.format(value.format(format));
+	return currency.format((value || 0).format(format));
 });
 
 Tangular.register('join', function(value, delimiter) {
@@ -124,6 +121,6 @@ function mainmenu() {
 	$('header nav').toggleClass('mainmenu-visible');
 }
 
-jRouting.on('location', function() {
+jR.on('location', function() {
 	$('header nav').removeClass('mainmenu-visible');
 });

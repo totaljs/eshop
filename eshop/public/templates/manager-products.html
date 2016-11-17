@@ -6,21 +6,21 @@
 		<div class="caption"><span class="fa fa-dropbox mr5"></span> @(Products)</div>
 		<div class="row">
 			<div class="col-md-4 col-sm-4 m">
-				<div data-component="textbox" data-component-path="products.filter.search" data-placeholder="@(Search products ...)" data-component-type="search"></div>
-				<div class="help" data-component="template" data-component-path="products.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
+				<div data-jc="textbox" data-jc-path="products.filter.search" data-placeholder="@(Search products ...)" data-jc-type="search"></div>
+				<div class="help" data-jc="template" data-jc-path="products.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
 			<div class="col-md-4 col-sm-4 m">
-				<div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="@(All categories)" data-source-value="linker"></div>
+				<div data-jc="dropdown" data-jc-path="products.filter.category" data-source="products.categories" data-empty="@(All categories)" data-source-value="linker"></div>
 			</div>
 			<div class="col-md-4 col-sm-4 m">
-				<div data-component="dropdown" data-component-path="products.filter.manufacturer" data-source="products.manufacturers" data-empty="@(All manufacturers)" data-source-value="linker"></div>
+				<div data-jc="dropdown" data-jc-path="products.filter.manufacturer" data-source="products.manufacturers" data-empty="@(All manufacturers)" data-source-value="linker"></div>
 			</div>
 		</div>
 	</div>
 </div>
 
 <div class="container">
-	<div data-component="grid" data-component-path="products.grid" data-pagination-path="products.filter.page" data-component-id="products.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
+	<div data-jc="grid" data-jc-path="products.grid" data-pagination-path="products.filter.page" data-jc-id="products.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
 		<script type="text/html">
 		<tr>
 			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ name }}</td>
@@ -36,9 +36,9 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Product form)" data-component-path="common.form" data-if="value === 'products'" data-width="900px" data-component-id="products.form" data-autocenter="false">
-	<div data-component="visible" data-component-path="products.form.id">
-		<div data-component="template" data-component-path="products.form" class="padding npb">
+<div data-jc="form" data-title="@(Product form)" data-jc-path="common.form" data-if="value === 'products'" data-width="900px" data-jc-id="products.form" class="hidden">
+	<div data-jc="visible" data-jc-path="products.form.id">
+		<div data-jc="template" data-jc-path="products.form" class="padding npb">
 			<script type="text/html">
 			<table class="table table-bordered" border="0">
 				<tbody>
@@ -59,8 +59,8 @@
 	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12">
-				<div data-component="textbox" data-component-path="products.form.name" data-required="true">@(Name)</div>
-				<div data-component="checkbox" data-component-path="products.form.istop" style="margin-top:10px" class="red">@(Mark as <b>top product</b>)</div>
+				<div data-jc="textbox" data-jc-path="products.form.name" data-required="true">@(Name)</div>
+				<div data-jc="checkbox" data-jc-path="products.form.istop" style="margin-top:10px" class="red">@(Mark as <b>top product</b>)</div>
 			</div>
 		</div>
 	</div>
@@ -68,84 +68,84 @@
 	<div class="padding bg-smoke">
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-component="dropdown" data-component-path="products.form.category" data-source="products.categories" data-empty="" data-source-value="name">@(Existing category)</div>
+				<div data-jc="dropdown" data-jc-path="products.form.category" data-source="products.categories" data-empty="" data-source-value="name">@(Existing category)</div>
 			</div>
 			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="products.form.category" data-required="true">@(Category)</div>
-				<div class="fs11 mt5"><a href="javascript:void(0)" data-component="click" data-component-path="products_subcategory"><span class="fa fa-plus mr5"></span>@(Add new category)</a></div>
+				<div data-jc="textbox" data-jc-path="products.form.category" data-required="true">@(Category)</div>
+				<div class="fs11 mt5"><a href="javascript:void(0)" data-jc="click" data-jc-path="products_subcategory"><span class="fa fa-plus mr5"></span>@(Add new category)</a></div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-component="dropdown" data-component-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="" data-source-value="name">@(Existing manufacturer)</div>
+				<div data-jc="dropdown" data-jc-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="" data-source-value="name">@(Existing manufacturer)</div>
 			</div>
 			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="products.form.manufacturer">@(Manufacturer)</div>
+				<div data-jc="textbox" data-jc-path="products.form.manufacturer">@(Manufacturer)</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="textarea" data-component-path="products.form.body" data-required="true" data-height="100px">@(Description)</div>
+				<div data-jc="textarea" data-jc-path="products.form.body" data-required="true" data-height="100px">@(Description)</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="products.form.price" data-required="true" data-align="center" data-component-type="currency" data-increment="true" data-icon="fa-shopping-cart">@(Price)</div>
+				<div data-jc="textbox" data-jc-path="products.form.price" data-required="true" data-align="center" data-jc-type="currency" data-increment="true" data-icon="fa-shopping-cart">@(Price)</div>
 			</div>
 			<div class="col-md-3 col-sm-6">
-				<div data-component="textbox" data-component-path="products.form.reference" data-align="center">@(Custom product code)</div>
+				<div data-jc="textbox" data-jc-path="products.form.reference" data-align="center">@(Custom product code)</div>
 			</div>
 		</div>
 	</div>
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-component="fileupload" data-component-path="products.form.pictures" data-placeholder="@(Browse device)" data-error-large="@(The uploaded file is too large.)" data-accept="image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(Pictures)</div>
+				<div data-jc="fileupload" data-jc-path="products.form.pictures" data-placeholder="@(Browse device)" data-error-large="@(The uploaded file is too large.)" data-accept="image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(Pictures)</div>
 			</div>
 		</div>
 		<br />
 		<div class="row">
-			<div data-component="pictures" data-component-path="products.form.pictures"></div>
+			<div data-jc="pictures" data-jc-path="products.form.pictures"></div>
 		</div>
 	</div>
-	<div data-component="error" data-component-path="products.response"></div>
+	<div data-jc="error" data-jc-path="products.response"></div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="products.form">
+		<div data-jc="validation" data-jc-path="products.form">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Category replacer)" data-component-path="common.form" data-if="value === 'products.category'" data-width="450px" data-component-id="products.category">
+<div data-jc="form" data-title="@(Category replacer)" data-jc-path="common.form" data-if="value === 'products.category'" data-width="450px" data-jc-id="products.category" class="hidden">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="silver">@(Replace old category with new category name in all products which have old category.)</div>
 				<hr />
-				<div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="" data-source-value="name" class="m">@(Existing category)</div>
-				<div data-component="textbox" data-component-path="products.category.category_new" data-required="true" class="m">@(New name)</div>
+				<div data-jc="dropdown" data-jc-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="" data-source-value="name" class="m">@(Existing category)</div>
+				<div data-jc="textbox" data-jc-path="products.category.category_new" data-required="true" class="m">@(New name)</div>
 			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="products.category">
+		<div data-jc="validation" data-jc-path="products.category">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Add new category)" data-component-path="products.subcategory.visible" data-if="value === true" data-width="450px" data-component-id="products.subcategory" data-enter="true">
+<div data-jc="form" data-title="@(Add new category)" data-jc-path="products.subcategory.visible" data-if="value === true" data-width="450px" data-jc-id="products.subcategory" data-enter="true" class="hidden">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
-				<div data-component="textbox" data-component-path="products.subcategory.name" data-required="true" class="m">@(New category name)</div>
+				<div data-jc="textbox" data-jc-path="products.subcategory.name" data-required="true" class="m">@(New category name)</div>
 			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="products.subcategory">
+		<div data-jc="validation" data-jc-path="products.subcategory">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>

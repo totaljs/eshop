@@ -16,26 +16,26 @@
 			<br />
 			<div class="row">
 				<div class="col-md-12 m">
-					<div data-required="true" data-component="textbox" data-component-path="account.firstname" data-component-value="''">@(First name)</div>
+					<div data-required="true" data-jc="textbox" data-jc-path="account.firstname" data-jc-value="''">@(First name)</div>
 				</div>
 				<div class="col-md-12 m">
-					<div data-required="true" data-component="textbox" data-component-path="account.lastname" data-component-value="''">@(Last name)</div>
+					<div data-required="true" data-jc="textbox" data-jc-path="account.lastname" data-jc-value="''">@(Last name)</div>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-12 m">
-					<div data-required="true" data-component="textbox" data-component-path="account.email" data-component-type="email" data-component-value="'@'">@(E-mail address)</div>
+					<div data-required="true" data-jc="textbox" data-jc-path="account.email" data-jc-type="email" data-jc-value="'@'">@(E-mail address)</div>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-12 m">
-					<div data-required="true" data-component="textbox" data-component-path="account.password" data-component-type="password" data-component-value="''">@(Password)</div>
+					<div data-required="true" data-jc="textbox" data-jc-path="account.password" data-jc-type="password" data-jc-value="''">@(Password)</div>
 				</div>
 			</div>
-			<div data-component="error" data-component-path="account.response" style="margin-top:10px"></div>
+			<div data-jc="error" data-jc-path="account.response" style="margin-top:10px"></div>
 			<div class="row">
-				<div data-component="validation" data-component-path="account" data-if="value" class="col-md-12 m">
-					<button class="button button-small" disabled="disabled" data-component="click" data-component-path="#doUpdate">@(SUBMIT)</button>
+				<div data-jc="validation" data-jc-path="account" data-if="value" class="col-md-12 m">
+					<button class="button button-small" disabled="disabled" data-jc="click" data-jc-path="#doUpdate">@(SUBMIT)</button>
 				</div>
 			</div>
 			<br />
@@ -50,15 +50,12 @@
 	account.password = '*************';
 
 	OPERATION('doUpdate', function() {
-		if (!jC.valid('account.*'))
-			return;
-		if (BLOCKED('create', 1000))
+		if (!jC.valid('account.*') || BLOCKED('create', 1000))
 			return;
 		RESET('account.*');
 		AJAX('PUT /api/users/settings/', account, function(response) {
 			SET('account.response', response);
-			if (response.success)
-				FIND('message').success('Your account information has been saved successfully.');
+			response.success &&  SETTER('message', 'success', 'Your account information has been saved successfully.');
 		});
 	});
 </script>

@@ -17,7 +17,7 @@
 		<div class="col-md-8 col-md-offset-2">
 			<br />
 
-			<div data-component="visible" data-component-path="datasource.items" data-if="value.length === 0" class="hidden">
+			<div data-jc="visible" data-jc-path="datasource.items" data-if="value.length === 0" class="hidden">
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 ui-center">
 						<hr />
@@ -32,11 +32,11 @@
 				</div>
 			</div>
 
-			<div data-component="visible" data-component-path="datasource.items" data-if="value.length > 0" class="hidden">
+			<div data-jc="visible" data-jc-path="datasource.items" data-if="value.length > 0" class="hidden">
 				<div class="row">
 					<h3>@(My orders:)</h3>
 				</div>
-				<div data-component="repeater" data-component-path="datasource.items" class="orders">
+				<div data-jc="repeater" data-jc-path="datasource.items" class="orders">
 					<script type="text/html">
 						<div class="row">
 							<div class="col-sm-5">

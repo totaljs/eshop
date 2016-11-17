@@ -7,7 +7,7 @@
 	</div>
 	<div class="row">
 		<div class="col-md-4 m">
-			<div data-component="template" data-component-path="dashboard.data">
+			<div data-jc="template" data-jc-path="dashboard.data">
 				<script type="text/html">
 					<br />
 					<table class="table">
@@ -34,7 +34,7 @@
 					</table>
 				</script>
 			</div>
-			<div data-component="template" data-component-path="dashboard.online">
+			<div data-jc="template" data-jc-path="dashboard.online">
 				<script type="text/html">
 					<div class="fs11 silver ui-center">@(Memory usage) <b>{{ memoryused }}</b> @(from) <b>{{ memorytotal }}</b></div>
 				</script>
@@ -44,18 +44,20 @@
 			<hr />
 			<div class="fs11 silver ui-center">@(Online visitors)</div>
 			<div class="dashboard-online-counter">
-				<div data-component="template" data-component-path="dashboard.online">
+				<div data-jc="template" data-jc-path="dashboard.online">
 					<script type="text/html">
 						<span>{{ visitors }}</span>
 						<div class="ui-center">@(Last visitor:) <b>{{ if last }}{{ last | format('@(yyyy-MM-dd HH:mm)') }}{{ else }}............{{ fi }}</b></div>
 					</script>
 				</div>
 				<br />
-				<canvas id="dashboard-online"></canvas>
+				<div style="max-width:230px;margin:0 auto">
+					<canvas id="dashboard-online"></canvas>
+				</div>
 			</div>
 		</div>
 		<div class="col-md-4 m">
-			<div data-component="template" data-component-path="dashboard.online">
+			<div data-jc="template" data-jc-path="dashboard.online">
 				<script type="text/html">
 					<br />
 					<table class="table">
@@ -89,7 +91,7 @@
 <br />
 <div class="bg-smoke">
 	<br />
-	<div class="container" data-component="template" data-component-path="dashboard.data.Order">
+	<div class="container" data-jc="template" data-jc-path="dashboard.data.Order">
 		<script type="text/html">
 			<div class="row">
 				<div class="col-md-3 m red">
@@ -132,8 +134,8 @@
 <br />
 <div class="container">
 	<br />
-	<ul class="tabmenu" data-component="tabmenu" data-component-path="dashboard.year" data-component-type="number">
-		<script type="text/html" data-component="repeater" data-component-path="dashboard.years">
+	<ul class="tabmenu" data-jc="tabmenu" data-jc-path="dashboard.year" data-jc-type="number">
+		<script type="text/html" data-jc="repeater" data-jc-path="dashboard.years">
 			<li data-value="{{}}">{{}}</li>
 		</script>
 	</ul>
@@ -204,7 +206,7 @@
 			data.backgroundColor = ['#61E727', '#479AD0', '#E22926', '#FFEE32', '#585858'];
 
 			options.type = 'doughnut';
-			options.data = { labels: labels, datasets: [data], display: false };
+			options.data = { labels: labels, datasets: [data], display: true };
 
 			dashboard.cache.online && dashboard.cache.online.destroy();
 			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'), options);

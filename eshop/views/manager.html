@@ -9,9 +9,9 @@
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<meta name="robots" content="all,follow" />
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/codemirror.min.css" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/codemirror.min.css" />
 	@{import('head', 'manager.css', 'favicon.ico')}
 	<script>
 		var managerurl="@{!CONFIG('manager-url')}";
@@ -20,15 +20,15 @@
 		var languages='@{config.custom.languages.join(';')}'.split(';');
 	</script>
 </head>
-<body data-component="exec">
+<body data-jc="exec">
 
 	<div id="success"><span class="fa fa-check-circle"></span></div>
-	<div data-component="calendar" data-days="@(SU,MO,TU,WE,TH,FR,SO)" data-months="@(January,February,March,April,May,Juny,July,August,September,October,November,December)" data-today="@(Set date to today)" data-firstday="0"></div>
-	<div data-component="loading" class="ui-loading"></div>
-	<div data-component="message" data-button="@(Close)"></div>
-	<div data-component="autocomplete"></div>
-	<div data-component="contextmenu"></div>
-	<div data-component="confirm"></div>
+	<div data-jc="calendar" data-days="@(SU,MO,TU,WE,TH,FR,SO)" data-months="@(January,February,March,April,May,Juny,July,August,September,October,November,December)" data-today="@(Set date to today)" data-firstday="0"></div>
+	<div data-jc="loading" class="ui-loading"></div>
+	<div data-jc="message" data-button="@(Close)"></div>
+	<div data-jc="autocomplete"></div>
+	<div data-jc="contextmenu"></div>
+	<div data-jc="confirm"></div>
 
 	<header>
 		<div class="mainmenu">
@@ -51,24 +51,24 @@
 	</header>
 
 	<div id="body">
-		<div data-component="page" class="hidden" data-component-path="common.page" data-if="dashboard" data-template="/templates/manager-dashboard.html"></div>
-		<div data-component="page" class="hidden" data-component-path="common.page" data-if="orders" data-template="/templates/manager-orders.html" data-reload="orders_reload"></div>
-		<div data-component="page" class="hidden" data-component-path="common.page" data-if="products" data-template="/templates/manager-products.html" data-reload="products_reload"></div>
-		<div data-component="page" class="hidden" data-component-path="common.page" data-if="users" data-template="/templates/manager-users.html" data-reload="users_reload"></div>
-		<div data-component="page" class="hidden" data-component-path="common.page" data-if="pages" data-template="/templates/manager-pages.html" data-reload="pages_reload"></div>
-		<div data-component="page" class="hidden" data-component-path="common.page" data-if="posts" data-template="/templates/manager-posts.html" data-reload="posts_reload"></div>
-		<div data-component="page" class="hidden" data-component-path="common.page" data-if="newsletter" data-template="/templates/manager-newsletter.html"></div>
-		<div data-component="page" class="hidden" data-component-path="common.page" data-if="settings" data-template="/templates/manager-settings.html"></div>
-		<div data-component="page" class="hidden" data-component-path="common.page" data-if="system" data-template="/templates/manager-system.html"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="dashboard" data-template="/templates/manager-dashboard.html"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="orders" data-template="/templates/manager-orders.html" data-reload="orders_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="products" data-template="/templates/manager-products.html" data-reload="products_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="users" data-template="/templates/manager-users.html" data-reload="users_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="pages" data-template="/templates/manager-pages.html" data-reload="pages_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="posts" data-template="/templates/manager-posts.html" data-reload="posts_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="newsletter" data-template="/templates/manager-newsletter.html"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="settings" data-template="/templates/manager-settings.html"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="system" data-template="/templates/manager-system.html"></div>
 	</div>
 
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/codemirror.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/mode/javascript/javascript.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/mode/htmlmixed/htmlmixed.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/mode/xml/xml.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.19.0/mode/css/css.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/codemirror.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/javascript/javascript.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/htmlmixed/htmlmixed.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/xml/xml.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/css/css.min.js"></script>
 
 	@{import('manager.js')}
 	@{section('script')}
