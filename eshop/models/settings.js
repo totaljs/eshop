@@ -22,6 +22,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('posts', '[String]');
 	schema.define('navigations', '[String]');
 	schema.define('deliverytypes', '[String]');
+	schema.define('paymenttypes', '[String]');
 	schema.define('defaultorderstatus', String);
 	schema.define('users', '[SuperUser]');
 	schema.define('languages', '[Lower(2)]');
@@ -134,6 +135,12 @@ NEWSCHEMA('Settings').make(function(schema) {
 					F.config.custom.currency_entity = '{0} ' + F.config.custom.currency;
 					break;
 			}
+
+			if (!F.config.custom.paymenttypes)
+				F.config.custom.paymenttypes = [];
+
+			if (!F.config.custom.deliverytypes)
+				F.config.custom.deliverytypes = [];
 
 			F.emit('settings', settings);
 			callback(SUCCESS(true));

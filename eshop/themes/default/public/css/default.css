@@ -60,7 +60,9 @@ header { padding: 40px 25px; }
 .padding-container { padding: 25px 0; }
 .padding { padding: 25px; }
 
-h1, h2 { font-weight: 200; font-family: $font; margin: 0 0 30px 0; padding: 0; color: #A4A4A4; text-align: center; font-size: 40px; }
+h1, h2.large { font-weight: 200; font-family: $font; margin: 0 0 30px 0; padding: 0; color: #A4A4A4; text-align: center; font-size: 40px; }
+h2 { font-size: 24px; font-family: $font; font-weight: 400; margin: 0 0 20px 0; padding: 0; color: black; }
+h2 .fa { margin-right: 10px; }
 
 .product { margin-bottom: 20px; padding-bottom: 20px; }
 .product-picture { text-align: center; display: block; padding: 10px 0; }
@@ -84,6 +86,7 @@ h1, h2 { font-weight: 200; font-family: $font; margin: 0 0 30px 0; padding: 0; c
 .m { margin-bottom: 15px; }
 .mr5 { margin-right: 5px; }
 .mr15 { margin-right: 15px; }
+.mt10 { margin-top: 10px; }
 p { margin: 0; }
 .b { font-weight: bold; }
 .cl { clear: both; }
@@ -96,7 +99,7 @@ p { margin: 0; }
 
 .links > div { margin: 0; border-left: 1px solid #F0F0F0; border-top: 1px solid #E0E0E0; border-bottom: 1px solid #E0E0E0; padding: 0; }
 .links > div:first-child { border-left: 0; }
-.links a { display: block; text-align: center; padding: 20px 0; color: gray; background-color: white; font-size: 18px; font-family: $font; font-weight: 200; text-transform: uppercase; }
+.links a { display: block; text-align: center; padding: 20px 0; color: gray; background-color: white; font-size: 16px; font-family: $font; font-weight: 400; text-transform: uppercase; }
 .links a:hover { text-decoration: none; background-color: #E0E0E0; }
 .links span { display: block; font-size: 12px; font-family: Arial; text-transform: none; }
 
@@ -129,7 +132,7 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .pagination nav a { position: relative; display: inline-block; width: 30px; padding: 5px 0; text-align: center; font-size: 16px; border-radius: 3px; }
 .pagination nav .selected { background-color: #F0F0F0; color: silver; }
 
-.linkbutton { display: block; border: 1px solid #E0E0E0; color: #9F9F9F; padding: 15px 0; text-align: center; text-transform: uppercase; font-size: 20px; font-family: $font; }
+.linkbutton { display: block; border: 1px solid #E0E0E0; color: #9F9F9F; padding: 15px 0; text-align: center; text-transform: uppercase; font-size: 20px; font-family: $font; border-radius: 4px; }
 .linkbutton:hover { border-color: silver; text-decoration: none; color: black; }
 .linkbutton .fa { margin-right: 5px; }
 .linkbutton img { vertical-align: middle; margin: 1px 10px 0 0; }
@@ -160,6 +163,11 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 #loading { background: rgba(255,255,255,0.9) url(../img/preloader.gif) no-repeat 50% 50%; position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 10; }
 .fs11 { font-size: 11px; line-height: 14px; }
 .table-repsonsive-label { float: left; display: none; }
+
+.ui-isopen {}
+.ui-isopen span { font-size: 10px; padding: 2px 5px; border-radius: 4px; text-transform: uppercase; color: white; float: left; margin: 1px 5px 0 0; }
+.ui-isopen .open { background-color: #8CC152; }
+.ui-isopen .closed { background-color: #DA4453; }
 
 @media(max-width: 767px) {
 	.xs-center { text-align: center !important; }

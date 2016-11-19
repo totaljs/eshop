@@ -20,24 +20,44 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('id', 'String(20)');
 	schema.define('iduser', 'String(20)');
 	schema.define('status', 'String(100)');
-	schema.define('delivery', 'String(30)', true);
-	schema.define('firstname', 'Camelize(40)', true);
-	schema.define('lastname', 'Camelize(40)', true);
+	schema.define('delivery', 'String(50)', true);
+	schema.define('payment', 'String(50)', true);
+	schema.define('firstname', 'Capitalize(40)', true);
+	schema.define('lastname', 'Capitalize(40)', true);
 	schema.define('email', 'Email', true);
 	schema.define('phone', 'Phone');
-	schema.define('address', 'String(1000)', true);
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');
 	schema.define('language', 'Lower(2)');
 	schema.define('reference', 'String(10)');
-	schema.define('ip', 'String(80)');
-	schema.define('iscompleted', Boolean);
 	schema.define('price', Number);
 	schema.define('count', Number);
 	schema.define('products', '[OrderItem]', true);
-	schema.define('isnewsletter', Boolean);
+
+	schema.define('company', 'String(40)');
+	schema.define('companyid', 'String(15)');
+	schema.define('companyvat', 'String(30)');
+
+	schema.define('billingstreet', 'String(30)', true);
+	schema.define('billingnumber', 'String(15)', true);
+	schema.define('billingzip', 'Zip', true);
+	schema.define('billingcity', 'String(30)', true);
+	schema.define('billingcountry', 'String(30)', true);
+
+	schema.define('deliveryfirstname', 'String(30)');
+	schema.define('deliverylastname', 'String(30)');
+	schema.define('deliverystreet', 'String(30)');
+	schema.define('deliverynumber', 'String(15)');
+	schema.define('deliveryzip', 'Zip');
+	schema.define('deliverycity', 'String(30)');
+	schema.define('deliverycountry', 'String(30)');
+	schema.define('deliveryphone', 'Phone');
+
 	schema.define('ispaid', Boolean);
+	schema.define('iscompany', Boolean);
 	schema.define('isemail', Boolean);
+	schema.define('iscompleted', Boolean);
+	schema.define('isnewsletter', Boolean);
 
 	// Sets default values
 	schema.setDefault(function(name) {

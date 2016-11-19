@@ -34,69 +34,80 @@
 	<br />
 	<div data-jc="template" data-jc-path="orders.form" class="padding">
 		<script type="text/html">
-		<table class="table table-bordered" border="0">
-			<tbody>
-				<tr>
-					<td class="col-xs-5 active">@(# id)</td>
-					<td><a href="/checkout/{{ id }}/">{{ id }}</a></td>
-				</tr>
-				{{ if iduser }}
-				<tr>
-					<td class="col-xs-5 active">@(User #)</td>
-					<td><a href="../users/#{{ iduser }}" class="jrouting">{{ iduser }}</a></td>
-				</tr>
-				{{ fi }}
-				<tr>
-					<td class="col-xs-5 active">@(Created)</td>
-					<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
-				</tr>
-				{{ if ispaid && datepaid }}
-				<tr>
-					<td class="col-xs-5 active">@(Paid)</td>
-					<td>{{ datepaid | format('@(yyyy-MM-dd)') }}</td>
-				</tr>
-				{{ fi }}
-				<tr>
-					<td class="col-x5-3 active">@(IP address)</td>
-					<td>{{ ip }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-5 active">@(Total price)</td>
-					<td>{{ price | price(2) }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-5 active">@(Ordered items)</td>
-					<td>{{ count }}x</td>
-				</tr>
-			</tbody>
-		</table>
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<table class="table table-bordered nmb" border="0">
+					<tbody>
+						<tr>
+							<td class="col-xs-5 active">@(# id)</td>
+							<td><a href="/checkout/{{ id }}/">{{ id }}</a></td>
+						</tr>
+						{{ if iduser }}
+						<tr>
+							<td class="col-xs-5 active">@(User #)</td>
+							<td><a href="../users/#{{ iduser }}" class="jrouting">{{ iduser }}</a></td>
+						</tr>
+						{{ fi }}
+						<tr>
+							<td class="col-xs-5 active">@(Created)</td>
+							<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
+						</tr>
+						{{ if ispaid && datepaid }}
+						<tr>
+							<td class="col-xs-5 active">@(Paid)</td>
+							<td>{{ datepaid | format('@(yyyy-MM-dd)') }}</td>
+						</tr>
+						{{ fi }}
+						<tr>
+							<td class="col-x5-3 active">@(IP address)</td>
+							<td>{{ ip }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-5 active">@(Total price)</td>
+							<td>{{ price | price(2) }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-5 active">@(Ordered items)</td>
+							<td>{{ count }}x</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 		</script>
 	</div>
-
-	<div class="padding bg-smoke">
+	<hr />
+	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
 				<div data-jc="textbox" data-jc-path="orders.form.status" class="b" data-required="true">@(Order status)</div>
 				<br />
 				<div data-jc="checkbox" data-jc-path="orders.form.iscompleted" class="b red">@(Order is processed and closed)</div>
+				<div data-jc="checkbox" data-jc-path="orders.form.ispaid" class="b green">@(Order is paid)</div>
 				<div data-jc="checkbox" data-jc-path="orders.form.isemail">@(Send email to user about the order status)</div>
-				<div data-jc="checkbox" data-jc-path="orders.form.ispaid">@(Order is paid)</div>
 			</div>
 		</div>
 	</div>
-	<div class="padding" style="padding-bottom:10px">
+	<hr class="nmt" />
+	<div class="padding">
 		<div class="row">
-			<div class="col-md-12 m">
+			<div class="col-md-6 m">
 				<div data-jc="textbox" data-jc-path="orders.form.delivery" data-required="true" data-icon="fa fa-truck">@(Delivery type)</div>
 			</div>
-			<div class="col-md-3">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.payment" data-required="true" data-icon="fa fa-credit-card">@(Payment type)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3 m">
 				<div data-jc="textbox" data-jc-path="orders.form.reference" data-maxlength="10" data-align="center">@(Custom number)</div>
 				<div class="help">@(For pairing invoices or payments.)</div>
 			</div>
 		</div>
 	</div>
-	<hr />
-	<div class="padding npb">
+	<div class="padding bg-smoke">
+		<h3>@(Billing information)</h3>
+
 		<div class="row">
 			<div class="col-md-6 m">
 				<div data-jc="textbox" data-jc-path="orders.form.firstname" data-required="true">@(First name)</div>
@@ -105,31 +116,92 @@
 				<div data-jc="textbox" data-jc-path="orders.form.lastname" data-required="true">@(Last name)</div>
 			</div>
 		</div>
+
 		<div class="row">
-			<div class="col-md-12 m">
-				<div data-jc="textarea" data-jc-path="orders.form.address" data-required="true" data-height="100px">@(Delivery address)</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.billingstreet" data-maxlength="30" data-required="true">@(Street)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.billingnumber" data-maxlength="15" data-required="true">@(Number)</div>
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-jc="textbox" data-jc-path="orders.form.email" data-required="true" data-icon="fa-envelope">@(Email address)</div>
+				<div data-jc="textbox" data-jc-path="orders.form.billingcity" data-maxlength="30" data-required="true">@(City)</div>
 			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.billingzip" data-maxlength="12" data-required="true">@(ZIP)</div>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-md-6 m">
-				<div data-jc="textbox" data-jc-path="orders.form.phone">@(Phone number)</div>
+				<div data-jc="textbox" data-jc-path="orders.form.billingcountry" data-maxlength="30" data-jc-value="'Slovakia'" data-required="true">@(Country)</div>
 			</div>
 		</div>
 
+		<div data-jc="checkbox" data-jc-path="orders.form.iscompany" class="m">@(Billing to company)</div>
+
+		<div data-jc="disable" data-jc-path="orders.form.iscompany" data-if="!value">
+			<div class="row">
+				<div class="col-md-6 m">
+					<div data-jc="textbox" data-jc-path="orders.form.company" data-maxlength="40">@(Company)</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data-jc="textbox" data-jc-path="orders.form.companyid" data-maxlength="15">@(Company ID)</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data-jc="textbox" data-jc-path="orders.form.companyvat" data-maxlength="30">@(VAT number)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding">
+		<h3>@(Delivery address)</h3>
+
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliveryfirstname" data-maxlength="30">@(First name)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliverylastname" data-maxlength="30">@(Last name)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliveryphone" data-maxlength="30">@(Phone number)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliverystreet" data-maxlength="30">@(Street)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliverynumber" data-maxlength="15">@(Number)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliverycity" data-maxlength="30">@(City)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliveryzip" data-maxlength="12">@(ZIP)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliverycountry" data-maxlength="30" data-jc-value="'Slovakia'">@(Country)</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding bg-smoke">
 		<div class="row">
 			<div class="col-md-12 m">
 				<div data-jc="textarea" data-jc-path="orders.form.message">@(Message)</div>
 			</div>
-			<div class="col-md-12 m">
+			<div class="col-md-12">
 				<div data-jc="textbox" data-jc-path="orders.form.note" data-placeholder="@(Internal note only for you)">@(Internal note)</div>
 			</div>
 		</div>
 	</div>
-	<hr />
 	<div class="padding">
 		<div class="silver"><span class="fa fa-shopping-cart"></span> <strong>@(Ordered items)</strong>:</div>
 		<br />

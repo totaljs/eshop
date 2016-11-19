@@ -82,10 +82,9 @@
 		@{fi}
 
 		<div class="row">
-			<div class="col-md-8 col-md-offset-2">
+			<div class="col-md-10 col-md-offset-1">
 
-				<div><strong>@(Order informations)</strong>:</div>
-				<br />
+				<h2>@(Order form)</h2>
 				<div class="row">
 					<div class="col-md-6 m">
 						<div data-jc="textbox" data-jc-path="form.firstname" data-required="true" data-maxlength="30">@(First name)</div>
@@ -99,44 +98,130 @@
 						<div data-jc="textbox" data-jc-path="form.email" data-required="true" data-maxlength="200" data-jc-type="email">@(Email address)</div>
 					</div>
 					<div class="col-md-6 m">
-						<div data-jc="textbox" data-jc-path="form.phone" data-maxlength="30">@(Phone number)</div>
+						<div data-jc="textbox" data-jc-path="form.phone" data-maxlength="30" data-required="true" data-placeholder="+421903163301">@(Phone number)</div>
 					</div>
 				</div>
-			</div>
-		</div>
-		<hr />
-		<br />
-		<div class="row">
-			<div class="col-md-8 col-md-offset-2">
+				<br />
+				<div class="b m"><i class="fa fa-credit-card"></i> @(Billing address)</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="form.billingstreet" data-required="true" data-maxlength="30">@(Street)</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data-jc="textbox" data-jc-path="form.billingnumber" data-required="true" data-maxlength="15">@(Number)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="form.billingcity" data-required="true" data-maxlength="30">@(City)</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data-jc="textbox" data-jc-path="form.billingzip" data-required="true" data-maxlength="12">@(ZIP)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div data-jc="textbox" data-jc-path="form.billingcountry" data-required="true" data-maxlength="30" data-jc-value="'Slovakia'">@(Country)</div>
+					</div>
+				</div>
+				<br />
+				<div data-jc="checkbox" data-jc-path="form.iscompany" class="b blue m">@(I want to create the order to company)</div>
+
+				<div data-jc="visible" data-jc-path="form.iscompany" class="padding2 bg-white">
+					<br />
+					<div data-jc="disable" data-jc-path="form.iscompany" data-if="!value" data-validate="form.company,form.companyid,form.companyvat">
+						<div class="row">
+							<div class="col-md-6 m">
+								<div data-jc="textbox" data-jc-path="form.company" data-required="true" data-maxlength="40">@(Company)</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6 m">
+								<div data-jc="textbox" data-jc-path="form.companyid" data-required="true" data-maxlength="15">@(Company ID)</div>
+							</div>
+							<div class="col-md-6 m">
+								<div data-jc="textbox" data-jc-path="form.companyvat" data-required="true" data-maxlength="30">@(VAT number)</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr />
+				<br />
+				<div class="row">
+					<div class="col-md-12">
+						<div data-jc="dropdown" data-jc-path="form.delivery" data-source="common.deliverytypes" data-empty="" data-required="true" class="b">@(Delivery)</div>
+					</div>
+				</div>
+				<br />
+				<br />
+				<div>
+					<div class="row">
+						<div class="col-xs-7 b"><h2><i class="fa fa-truck"></i>@(Delivery address)</h2></div>
+						<div class="col-xs-5 ui-right fs11 mt10">
+							<a href="javascript:void(0)" data-jc="click" data-jc-path="copyaddress"><i class="fa fa-copy mr5"></i>@(Address is same as billing address)</a>
+						</div>
+					</div>
+					<br />
+					<div class="row">
+						<div class="col-md-6 m">
+							<div data-jc="textbox" data-jc-path="form.deliveryfirstname" data-required="true" data-maxlength="30">@(First name)</div>
+						</div>
+						<div class="col-md-6 m">
+							<div data-jc="textbox" data-jc-path="form.deliverylastname" data-required="true" data-maxlength="30">@(Last name)</div>
+						</div>
+						<div class="col-md-6 m">
+							<div data-jc="textbox" data-jc-path="form.deliveryphone" data-required="true" data-maxlength="30">@(Phone number)</div>
+						</div>
+					</div>
+					<br />
+					<div class="row">
+						<div class="col-md-6 m">
+							<div data-jc="textbox" data-jc-path="form.deliverystreet" data-required="true" data-maxlength="30">@(Street)</div>
+						</div>
+						<div class="col-md-3 m">
+							<div data-jc="textbox" data-jc-path="form.deliverynumber" data-required="true" data-maxlength="15">@(Number)</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6 m">
+							<div data-jc="textbox" data-jc-path="form.deliverycity" data-required="true" data-maxlength="30">@(City)</div>
+						</div>
+						<div class="col-md-3 m">
+							<div data-jc="textbox" data-jc-path="form.deliveryzip" data-required="true" data-maxlength="12">@(ZIP)</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6 m">
+							<div data-jc="textbox" data-jc-path="form.deliverycountry" data-required="true" data-maxlength="30" data-jc-value="'Slovakia'">@(Country)</div>
+						</div>
+					</div>
+				</div>
+				<br />
+				<hr />
+				<br />
+				<div class="row">
+					<div class="col-md-12">
+						<div class="b"><i class="fa fa-credit-card mr5"></i>@(Choose a type of payment)</div>
+						<br />
+						<div data-jc="dropdown" data-jc-path="form.payment" data-source="common.paymenttypes" data-required="true" data-empty="">@(Payment)</div>
+					</div>
+				</div>
+				<br />
+				<hr />
+				<br />
+				<div data-jc="textarea" data-jc-path="form.message" data-height="50px" data-maxlength="1000">@(Notes)</div>
 				<div class="row">
 					<div class="col-md-12 m">
-						<div data-jc="dropdown" data-jc-path="form.delivery" data-source="common.deliverytypes" data-empty="" data-required="true">@(Delivery type)</div>
+						<br />
+						<div data-jc="checkbox" data-jc-path="form.isnewsletter">@(I want be notified about discounts and news)</div>
+						<div data-jc="checkbox" data-jc-path="form.isterms" class="b" style="color:red">@(I agree with terms and conditions)</div>
+						<div data-jc="error" data-jc-path="common.success" style="margin-top:20px"></div>
+						<div data-jc="validation" data-jc-path="form" data-if="form.isterms === true">
+							<button class="button" disabled="disabled" data-jc="click" data-jc-path="#submit">@(SUBMIT ORDER)</button>
+						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-md-12 m">
-						<div data-jc="textarea" data-jc-path="form.address" data-required="true" data-height="100px" data-maxlength="1000" data-placeholder="@(Street, ZIP, City, Country, State)">@(Delivery address)</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<br />
-		<hr />
-		<div class="row">
-			<div class="col-md-8 col-md-offset-2">
-				<br />
-				<div data-jc="textarea" data-jc-path="form.message" data-height="50px" data-maxlength="1000">@(Note)</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-8 col-md-offset-2">
-				<br />
-				<div data-jc="checkbox" data-jc-path="form.isnewsletter">@(I want to receive a newsletter)</div>
-				<div data-jc="checkbox" data-jc-path="form.isterms" class="b" style="color:red">@(I agree with terms and conditions)</div>
-				<div data-jc="error" data-jc-path="common.success" style="margin-top:20px"></div>
-				<div data-jc="validation" data-jc-path="form" data-if="form.isterms === true">
-					<button class="button" disabled="disabled" data-jc="click" data-jc-path="#submit">@(SUBMIT ORDER)</button>
-				</div>
+
 			</div>
 		</div>
 	</div>
@@ -155,6 +240,7 @@
 
 	// Reads delivery types from the eshop configuration
 	SET('common.deliverytypes', '@{config.custom.deliverytypes.join(",")}'.split(','));
+	SET('common.paymenttypes', '@{config.custom.paymenttypes.join(",")}'.split(','));
 
 	form.email = '@';
 	form.address = '';
@@ -272,6 +358,18 @@
 			location.href = jRouting.path(location.pathname) + response.value + '/?success=1';
 		});
 	});
+
+	function copyaddress() {
+		form.deliveryfirstname = form.firstname;
+		form.deliverylastname = form.lastname;
+		form.deliverystreet = form.billingstreet;
+		form.deliverynumber = form.billingnumber;
+		form.deliverycountry = form.billingcountry;
+		form.deliveryphone = form.phone;
+		form.deliveryzip = form.billingzip;
+		form.deliverycity = form.billingcity;
+		UPDATE('form');
+	}
 
 </script>
 @{end}

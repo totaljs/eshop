@@ -209,6 +209,16 @@ label span { vertical-align: middle; }
 .ui-checkboxlist-selectall { margin: 10px 0 0 6px; font-size: 12px; display: block; border-bottom: 0 !important; }
 .ui-checkboxlist-selectall a { color: #A0A0A0; }
 .ui-checkboxlist-selectall .fa { margin-right: 5px; color: gray; }
+
+.ui-textboxlist-label { margin-bottom: 10px; font-size: 12px; }
+.ui-textboxlist-label .fa { margin-right: 5px; }
+.ui-textboxlist-item { height: 30px; background-color: #F8F8F8; margin-bottom: 1px; border-radius: 3px; }
+.ui-textboxlist-item > div:first-child { float: right; width: 25px; text-align: center; color: #DA4453; font-size: 14px; margin: 4px 0 0; }
+.ui-textboxlist-item > div:last-child { padding: 4px 0 0 0; margin-right: 25px; }
+.ui-textboxlist-item .fa { cursor: pointer; position: relative; display: inline-block; }
+.ui-textboxlist-item .fa:active { margin-top: 1px; }
+.ui-textboxlist-item input { width: 100%; background-color: transparent; border: 0; padding: 3px 10px 0; border-radius: 4px; outline: 0; font-size: 12px; color: black; }
+.ui-textboxlist-base .fa { display: none; }
 /* ==========================================================
  * @{end}
  * ========================================================== */
