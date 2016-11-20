@@ -291,9 +291,7 @@
 	}
 
 	Tangular.register('roles', function(value, separator) {
-		if (!(value instanceof Array) || !value.length)
-			return '<em>@(super admin)</em>';
-		return value.join(separator);
+		return (!(value instanceof Array) || !value.length) ? '<em>@(super admin)</em>' : value.join(separator);
 	});
 
 	// Users grid

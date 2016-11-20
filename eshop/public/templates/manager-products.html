@@ -66,7 +66,7 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div data-jc="textbox" data-jc-path="products.form.name" data-required="true" class="m">@(Name)</div>
-				<div data-jc="checkbox" data-jc-path="products.form.istop" class="red">@(Mark as <b>top product</b>)</div>
+				<div data-jc="checkbox" data-jc-path="products.form.istop" class="red">@(Mark as <b>TOP product</b>)</div>
 				<div data-jc="checkbox" data-jc-path="products.form.isnewbie" class="blue">@(Newbie in store)</div>
 			</div>
 		</div>
@@ -227,9 +227,7 @@
 
 	// Watch for changes in product filter
 	WATCH('products.filter.*', function(path, value) {
-		if (NOTMODIFIED('products.filter', products.filter))
-			return;
-		products_refresh(path !== 'products.filter.page');
+		!NOTMODIFIED('products.filter', products.filter) && products_refresh(path !== 'products.filter.page');
 	});
 
 	ON('#products.form', function(component) {
@@ -278,8 +276,7 @@
 
 			for (var i = 0, length = arr.length; i < length; i++) {
 				var category = arr[i].trim();
-				if (category)
-					clean.push(category);
+				category && clean.push(category);
 			}
 
 			clean.push(products.subcategory.name);
@@ -347,11 +344,9 @@
 
 	function products_reload() {
 		var hash = location.hash;
-		if (hash && hash.length > 1) {
-			setTimeout(function() {
-				products_edit(hash.substring(1));
-			}, 500);
-		}
+		hash && hash.length > 1 && setTimeout(function() {
+			products_edit(hash.substring(1));
+		}, 500);
 	}
 
 	function products_menu(el) {
