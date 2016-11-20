@@ -36,25 +36,25 @@
 		<script type="text/html">
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1">
-				<table class="table table-bordered nmb" border="0">
+				<table class="table table-bordered" border="0">
 					<tbody>
 						<tr>
-							<td class="col-xs-5 active">@(# id)</td>
+							<td class="col-xs-4 active">@(# id)</td>
 							<td><a href="/checkout/{{ id }}/">{{ id }}</a></td>
 						</tr>
 						{{ if iduser }}
 						<tr>
-							<td class="col-xs-5 active">@(User #)</td>
+							<td class="col-xs-4 active">@(User #)</td>
 							<td><a href="../users/#{{ iduser }}" class="jrouting">{{ iduser }}</a></td>
 						</tr>
 						{{ fi }}
 						<tr>
-							<td class="col-xs-5 active">@(Created)</td>
+							<td class="col-xs-4 active">@(Created)</td>
 							<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
 						</tr>
 						{{ if ispaid && datepaid }}
 						<tr>
-							<td class="col-xs-5 active">@(Paid)</td>
+							<td class="col-xs-4 active">@(Paid)</td>
 							<td>{{ datepaid | format('@(yyyy-MM-dd)') }}</td>
 						</tr>
 						{{ fi }}
@@ -63,11 +63,11 @@
 							<td>{{ ip }}</td>
 						</tr>
 						<tr>
-							<td class="col-xs-5 active">@(Total price)</td>
+							<td class="col-xs-4 active">@(Total price)</td>
 							<td>{{ price | price(2) }}</td>
 						</tr>
 						<tr>
-							<td class="col-xs-5 active">@(Ordered items)</td>
+							<td class="col-xs-4 active">@(Ordered items)</td>
 							<td>{{ count }}x</td>
 						</tr>
 					</tbody>
@@ -76,8 +76,7 @@
 		</div>
 		</script>
 	</div>
-	<hr />
-	<div class="padding">
+	<div class="padding bg-smoke">
 		<div class="row">
 			<div class="col-md-12">
 				<div data-jc="textbox" data-jc-path="orders.form.status" class="b" data-required="true">@(Order status)</div>
@@ -88,7 +87,6 @@
 			</div>
 		</div>
 	</div>
-	<hr class="nmt" />
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6 m">

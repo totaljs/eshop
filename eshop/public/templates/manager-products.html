@@ -23,9 +23,9 @@
 	<div data-jc="grid" data-jc-path="products.grid" data-pagination-path="products.filter.page" data-jc-id="products.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
 		<script type="text/html">
 		<tr>
-			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ name }}</td>
+			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ if isnewbie }}<b class="badge badge-blue mr5">@(NEWBIE)</b>{{ fi }}{{ name }}</td>
 			<td style="width:200px" class="silver hidden-xs">{{ if manufacturer }}<span class="fa fa-building"></span> {{ manufacturer }}{{ fi }}</td>
-			<td style="width:200px" class="silver hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
+			<td style="width:250px" class="silver hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
 			<td style="width:100px" class="ui-right active">{{ price | price(2) }}</td>
 			<td style="width:80px" class="ui-right">
 				<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
@@ -38,20 +38,26 @@
 
 <div data-jc="form" data-title="@(Product form)" data-jc-path="common.form" data-if="value === 'products'" data-width="900px" data-jc-id="products.form" class="hidden">
 	<div data-jc="visible" data-jc-path="products.form.id">
-		<div data-jc="template" data-jc-path="products.form" class="padding npb">
+		<br /><br />
+		<div data-jc="template" data-jc-path="products.form">
 			<script type="text/html">
-			<table class="table table-bordered" border="0">
-				<tbody>
-					<tr>
-						<td class="col-xs-5 active">@(# id)</td>
-						<td>{{ id }}</td>
-					</tr>
-					<tr>
-						<td class="col-xs-5 active">@(Created)</td>
-						<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
-					</tr>
-				</tbody>
-			</table>
+				<div class="row">
+					<div class="col-md-10 col-md-offset-1">
+						<table class="table table-bordered" border="0">
+							<tbody>
+								<tr>
+									<td class="col-xs-4 active">@(# id)</td>
+									<td>{{ id }}</td>
+								</tr>
+								<tr>
+									<td class="active">@(Created)</td>
+									<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<hr />
 			</script>
 		</div>
 	</div>
@@ -59,8 +65,9 @@
 	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12">
-				<div data-jc="textbox" data-jc-path="products.form.name" data-required="true">@(Name)</div>
-				<div data-jc="checkbox" data-jc-path="products.form.istop" style="margin-top:10px" class="red">@(Mark as <b>top product</b>)</div>
+				<div data-jc="textbox" data-jc-path="products.form.name" data-required="true" class="m">@(Name)</div>
+				<div data-jc="checkbox" data-jc-path="products.form.istop" class="red">@(Mark as <b>top product</b>)</div>
+				<div data-jc="checkbox" data-jc-path="products.form.isnewbie" class="blue">@(Newbie in store)</div>
 			</div>
 		</div>
 	</div>

@@ -60,7 +60,7 @@ header { padding: 40px 25px; }
 .padding-container { padding: 25px 0; }
 .padding { padding: 25px; }
 
-h1, h2.large { font-weight: 200; font-family: $font; margin: 0 0 30px 0; padding: 0; color: #A4A4A4; text-align: center; font-size: 40px; }
+h1, h2.large { font-weight: 200; font-family: $font; margin: 5px 0 30px 0; padding: 0; color: #A4A4A4; text-align: center; font-size: 40px; }
 h2 { font-size: 24px; font-family: $font; font-weight: 400; margin: 0 0 20px 0; padding: 0; color: black; }
 h2 .fa { margin-right: 10px; }
 
@@ -162,12 +162,23 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 
 #loading { background: rgba(255,255,255,0.9) url(../img/preloader.gif) no-repeat 50% 50%; position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 10; }
 .fs11 { font-size: 11px; line-height: 14px; }
+
 .table-repsonsive-label { float: left; display: none; }
 
 .ui-isopen {}
 .ui-isopen span { font-size: 10px; padding: 2px 5px; border-radius: 4px; text-transform: uppercase; color: white; float: left; margin: 1px 5px 0 0; }
 .ui-isopen .open { background-color: #8CC152; }
 .ui-isopen .closed { background-color: #DA4453; }
+
+.tabs { text-align: center; margin: 15px 0 40px; }
+.tabs a { position: relative; display: inline-block; background-color: white; border: 1px solid #E0E0E0; border-left: 0; padding: 5px 10px; color: gray; text-decoration: none; font-size: 11px; min-width: 100px; text-align: center; }
+.tabs a:first-child { border-left: 1px solid #E0E0E0; border-radius: 20px 0 0 20px; }
+.tabs a:last-child { border-radius: 0 20px 20px 0; }
+.tabs .selected { background: #53B5F9 linear-gradient(#53B5F9, #48A5F8); color: white; }
+
+.quicknavigation a { border-left: 1px solid #F0F0F0; padding: 5px 15px; font-size: 12px; }
+.quicknavigation a:first-child { border-left: 0; }
+.quicknavigation .fa { margin-right: 5px; }
 
 @media(max-width: 767px) {
 	.xs-center { text-align: center !important; }
@@ -205,7 +216,3 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	td.hidden-xs { display: none !important; }
 	.product { border-bottom: 1px solid #F0F0F0; }
 }
-
-.quicknavigation a { border-left: 1px solid #F0F0F0; padding: 5px 15px; font-size: 12px; }
-.quicknavigation a:first-child { border-left: 0; }
-.quicknavigation .fa { margin-right: 5px; }
