@@ -9,9 +9,8 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('price', Number, true);
 	schema.define('body', String, true);
 	schema.define('istop', Boolean);
+	schema.define('isnewbie', Boolean);
 	schema.define('linker', 'String(50)');
-	schema.define('linker_category', 'String(50)');
-	schema.define('linker_manufacturer', 'String(50)');
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
@@ -37,7 +36,16 @@ NEWSCHEMA('Product').make(function(schema) {
 		options.id && filter.in('id', options.id);
 		options.skip && filter.where('id', '<>', options.skip);
 
-		filter.sort('datecreated', true);
+		switch (options.sort) {
+			case '1':
+			case '2':
+				filter.sort('price', options.sort === '2');
+				break;
+			default:
+				filter.sort('datecreated', true);
+				break;
+		}
+
 		filter.skip(skip);
 		filter.take(take);
 		filter.callback(function(err, docs, count) {
@@ -63,7 +71,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	});
 
 	// Saves the product into the database
-	schema.setSave(function(error, model, controller, callback) {
+	schema.setSave(function(error, model, options, callback, controller) {
 
 		var newbie = model.id ? false : true;
 		var nosql = NOSQL('products');
@@ -82,8 +90,8 @@ NEWSCHEMA('Product').make(function(schema) {
 
 		model.linker = ((model.reference ? model.reference + '-' : '') + model.name).slug();
 		model.linker_manufacturer = model.manufacturer ? model.manufacturer.slug() : '';
-		model.category = category.name;
 		model.linker_category = category.linker;
+		model.category = category.name;
 		model.search = (model.name + ' ' + (model.manufacturer || '') + ' ' + (model.reference || '')).keywords(true, true).join(' ').max(500);
 
 		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {

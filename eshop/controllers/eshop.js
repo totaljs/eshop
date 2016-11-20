@@ -33,16 +33,10 @@ exports.install = function() {
 // Gets products
 function view_products() {
 	var self = this;
-	var options = {};
-
-	if (self.query.q)
-		options.search = self.query.q;
-
-	if (self.query.page)
-		options.page = self.query.page;
+	var options = self.query;
 
 	// Increases the performance (1 minute cache)
-	self.memorize('cache.' + options.page + (self.query.q ? self.query.q : ''), '1 minute', DEBUG || options.search !== undefined, function() {
+	self.memorize('cache.' + options.page + (self.query.q || '') + '.' + (options.sort || ''), '1 minute', DEBUG || options.search !== undefined, function() {
 		self.$query(options, self.callback('products-all'));
 	});
 }
@@ -50,7 +44,7 @@ function view_products() {
 // Gets products by category
 function view_products_category() {
 	var self = this;
-	var options = {};
+	var options = self.query;
 
 	options.category = self.req.path.slice(1).join('/');
 
@@ -58,13 +52,10 @@ function view_products_category() {
 	if (!category)
 		return self.throw404();
 
-	if (self.query.page)
-		options.page = self.query.page;
-
 	self.repository.category = category;
 
 	// Increases the performance (1 minute cache)
-	self.memorize('cache.' + options.category + '.' + options.page, '1 minute', DEBUG, function() {
+	self.memorize('cache.' + options.category + '.' + options.page + '.' + options.sort || '', '1 minute', DEBUG, function() {
 		self.$query(options, function(err, data) {
 
 			if (!data.items.length)
