@@ -35,10 +35,11 @@ function view_products() {
 	var self = this;
 	var options = self.query;
 
-	// Increases the performance (1 minute cache)
-	self.memorize('cache.' + options.page + (self.query.q || '') + '.' + (options.sort || ''), '1 minute', DEBUG || options.search !== undefined, function() {
-		self.$query(options, self.callback('products-all'));
-	});
+	// Total.js monitoring fulltext stats
+	self.query.search && MODULE('webcounter').inc('fulltext');
+
+	// DB
+	self.$query(options, self.callback('products-all'));
 }
 
 // Gets products by category
@@ -54,17 +55,14 @@ function view_products_category() {
 
 	self.repository.category = category;
 
-	// Increases the performance (1 minute cache)
-	self.memorize('cache.' + options.category + '.' + options.page + '.' + options.sort || '', '1 minute', DEBUG, function() {
-		self.$query(options, function(err, data) {
+	self.$query(options, function(err, data) {
 
-			if (!data.items.length)
-				return self.throw404();
+		if (!data.items.length)
+			return self.throw404();
 
-			self.repository.subcategories = F.global.categories.where('parent', options.category);
-			self.title(category.name);
-			self.view('products-category', data);
-		});
+		self.repository.subcategories = F.global.categories.where('parent', options.category);
+		self.title(category.name);
+		self.view('products-category', data);
 	});
 }
 
@@ -76,23 +74,21 @@ function view_products_detail(linker) {
 	options.linker = linker;
 
 	// Increases the performance (1 minute cache)
-	self.memorize('cache.product.' + linker, '1 minute', DEBUG, function() {
-		self.$get(options, function(err, data) {
+	self.$read(options, function(err, data) {
 
-			if (!data || err)
-				return self.throw404();
+		if (!data || err)
+			return self.throw404();
 
-			self.repository.category = F.global.categories.find('linker', data.linker_category);
+		self.repository.category = F.global.categories.find('linker', data.linker_category);
 
-			if (!self.repository.category)
-				return self.throw404();
+		if (!self.repository.category)
+			return self.throw404();
 
-			self.repository.subcategories = F.global.categories.where('parent', data.linker_category);
-			self.repository.linker = linker;
-			self.repository.name = data.name;
+		self.repository.subcategories = F.global.categories.where('parent', data.linker_category);
+		self.repository.linker = linker;
+		self.repository.name = data.name;
 
-			self.view('products-detail', data);
-		});
+		self.view('products-detail', data);
 	});
 }
 
@@ -150,10 +146,10 @@ function process_payment_paypal(linker) {
 				break;
 		}
 
-		if (!success)
-			return self.view('checkout-error');
-
-		self.$workflow('paid', linker, () => self.redirect('../?success=1'));
+		if (success)
+			self.$workflow('paid', linker, () => self.redirect('../?success=1'));
+		else
+			self.view('checkout-error');
 	});
 }
 
@@ -203,15 +199,8 @@ function redirect_account_logoff() {
 
 function view_blogs() {
 	var self = this;
-	var options = {};
+	var options = self.query;
 	options.category = 'Blogs';
-
-	if (self.query.q)
-		options.search = self.query.q;
-
-	if (self.query.page)
-		options.page = self.query.page;
-
 	self.$query(options, self.callback('blogs-all'));
 }
 
