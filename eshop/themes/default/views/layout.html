@@ -98,15 +98,12 @@
 			</div>
 
 			<br />
-			<div class="content">
-				<div class="links">
-					@{if global.navigations.footer}
-						@{foreach m in global.navigations.footer}
-						<div class="col-md-4"><a href="@{m.url}">@{m.title}</a></div>
-						@{end}
-					@{fi}
-				</div>
-				<div class="cl"></div>
+			<div class="row footerlinks">
+				@{if global.navigations.footer}
+					@{foreach m in global.navigations.footer}
+					<div class="col-md-4"><a href="@{m.url}">@{m.title}</a></div>
+					@{end}
+				@{fi}
 			</div>
 
 			<footer>

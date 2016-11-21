@@ -11,7 +11,7 @@ form { padding: 0; margin: 0; }
 .developer { background-color: #D0D0D0; font-size: 11px; text-align: center; padding: 5px 0; display: block; color: gray; }
 .developer:hover { text-decoration: none; background-color: #F0F0F0; }
 
-.content { background-color: white; }
+.content { background-color: white; border-radius: 4px; }
 
 .header-container { background: #E0E0E0 linear-gradient(#F0F0F0,#E0E0E0); padding: 20px 20px 15px; position: relative; }
 .header-container hr { border-color: #D0D0D0; }
@@ -25,14 +25,14 @@ form { padding: 0; margin: 0; }
 
 header { padding: 40px 25px; }
 
-.search { border: 2px solid #E0E0E0; background-color: white; padding: 13px 5px; }
+.search { border: 2px solid #E0E0E0; background-color: white; padding: 13px 5px; border-radius: 4px; }
 .search input { border: 0; padding: 0; background-color: white; border: 0; outline: 0; width: 100%; font-size: 16px; }
 .search-icon { float: left; text-align: center; width: 30px; font-size: 16px; }
 .search-input { margin-left: 35px; }
 
 .categories-toggle { display: block !important; }
 .categories { padding: 0 0 8px; }
-.categories a { display: block; line-height: 16px; padding: 8px 0; background-color: white; text-align: center; color: gray; font-size: 14px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 15px; }
+.categories a { display: block; line-height: 16px; padding: 8px 0; background-color: white; text-align: center; color: gray; font-size: 14px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 15px; border-radius: 4px; font-family: $font; }
 .categories a:hover { background-color: #303030; color: white; text-decoration: none; }
 .categories span { margin-left: 5px; }
 .categories .selected { background-color: black !important; color: white; }
@@ -64,24 +64,31 @@ h1, h2.large { font-weight: 200; font-family: $font; margin: 5px 0 30px 0; paddi
 h2 { font-size: 24px; font-family: $font; font-weight: 400; margin: 0 0 20px 0; padding: 0; color: black; }
 h2 .fa { margin-right: 10px; }
 
-.product { margin-bottom: 20px; padding-bottom: 20px; }
+.product { margin-bottom: 20px; padding-bottom: 20px; position: relative; }
 .product-picture { text-align: center; display: block; padding: 10px 0; }
 .product-picture img { margin: 0 auto; }
 .product-name { text-align: center; font-size: 16px; font-family: $font; display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 .product-category { font-size: 12px; color: gray; text-align: center; display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-.product-price { width: 120px; margin: 20px auto; background-color: #F8F8F8; border-radius: 4px; text-align: center; font-size: 22px; font-family: $font; font-weight: 200; padding: 10px 0; color: black; }
+.product-price { width: 130px; margin: 10px auto; border-top: 2px solid #E0E0E0; text-align: center; font-size: 22px; font-family: $font; font-weight: 400; padding: 0 0 10px; color: black; }
 .product-top { position: absolute; right: 10%; }
 .product-manufacturer { height: 17px; text-align: center; font-size: 11px; color: #AAB2BD; margin-top: 3px; }
 .product:last-child { border-bottom: 0; margin-bottom: 0; }
 
-.detail-buy { font-size: 30px; font-weight: 200; font-family: $font; border: 1px solid silver; background-color: white; padding: 0; height: 74px; color: gray; width: 100%; }
+.flags { position: absolute; right: 20px; }
+.flags div { margin-bottom: 5px; width: 60px; text-align: center; padding: 2px 0; border-radius: 4px; color: white; font-size: 11px; font-weight: bold; font-family: $font; }
+.flags .newbie { background-color: #62C8FA; }
+.flags .top { background-color: #C23540; }
+
+.detail-buy { font-size: 30px; font-weight: 200; font-family: $font; border: 1px solid silver; background-color: white; padding: 0; height: 74px; color: gray; width: 100%; border-radius: 4px; }
 .detail-buy b { font-weight: 400; }
 .detail-buy:hover { border: 1px solid black; color: black; }
 .detail-buy:active { box-shadow: inset 0 0 10px #D0D0D0; }
-.detail-category { color: silver; }
+.detail-category { color: #A0A0A0; }
 .detail-checkout { display: none; background-color: #FCF8E4; padding: 25px; font-size: 14px; color: #B5AE84; line-height: 20px; margin: 10px 0; }
 .detail-checkout a { color: #9E9873; }
-.detail-reference { color: silver; }
+.detail-reference { color: #A0A0A0; }
+.detail .flags { position: relative; margin: 0 0 10px 20px; }
+.detail .flags div { position: relative; display: inline-block; }
 
 .m { margin-bottom: 15px; }
 .mr5 { margin-right: 5px; }
@@ -102,6 +109,10 @@ p { margin: 0; }
 .links a { display: block; text-align: center; padding: 20px 0; color: gray; background-color: white; font-size: 16px; font-family: $font; font-weight: 400; text-transform: uppercase; }
 .links a:hover { text-decoration: none; background-color: #E0E0E0; }
 .links span { display: block; font-size: 12px; font-family: Arial; text-transform: none; }
+
+.footerlinks a { display: block; text-align: center; padding: 20px 0; color: gray; background-color: white; font-size: 16px; font-family: $font; font-weight: 400; text-transform: uppercase; border-radius: 4px; margin-bottom: 20px; }
+.footerlinks a:hover { text-decoration: none; background-color: #E0E0E0; }
+.footerlinks span { display: block; font-size: 12px; font-family: Arial; text-transform: none; }
 
 footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .social a { font-size: 20px; color: silver; width: 30px; text-align: center; position: relative; display: inline-block; }

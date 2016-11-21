@@ -33,7 +33,7 @@ exports.install = function() {
 // Gets products
 function view_products() {
 	var self = this;
-	var options = self.query;
+	var options = U.clone(self.query);
 
 	// Total.js monitoring fulltext stats
 	self.query.search && MODULE('webcounter').inc('fulltext');
@@ -45,7 +45,7 @@ function view_products() {
 // Gets products by category
 function view_products_category() {
 	var self = this;
-	var options = self.query;
+	var options = U.clone(self.query);
 
 	options.category = self.req.path.slice(1).join('/');
 
