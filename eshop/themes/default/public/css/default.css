@@ -118,11 +118,11 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .social a { font-size: 20px; color: silver; width: 30px; text-align: center; position: relative; display: inline-block; }
 .social a:hover { color: black; }
 
-.newsletter { background-color: #F0F0F0; }
-.newsletter-input { margin-right: 120px; padding: 0 20px; background-color: #F0F0F0; }
+.newsletter { background-color: #F0F0F0; border-radius: 4px; }
+.newsletter-input { margin-right: 120px; padding: 0 20px; background-color: #F0F0F0; border-radius: 4px 0 0 4px; }
 .newsletter-input input { width: 100%; background-color: transparent; border: 0; font-size: 16px; height: 40px; outline: 0; color: black; }
 .newsletter-button { width: 120px; float: right; margin: 0; padding: 0; }
-.newsletter-button button { width: 100%; background-color: #D0D0D0; border: 0; height: 40px; }
+.newsletter-button button { width: 100%; background-color: #D0D0D0; border: 0; height: 40px; border-radius: 0 4px 4px 0; }
 .newsletter-button button:hover { background-color: black; color: white; }
 .newsletter-button .fa { margin-right: 8px; font-size: 16px; }
 .newsletter-success { color: #7B9B46 !important; }
@@ -199,7 +199,9 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	.header-padding { padding: 0; }
 	.header-links-container { display: none; }
 	.links > div { border-bottom: 0; }
-	h1, h2 { font-size: 25px; }
+	h1, h2 { font-size: 25px; font-weight: 400; margin-bottom: 10px; text-align: left; }
+	.homepage h1 { text-align: center; }
+	.large { font-size: 25px; }
 	.orders .col-sm-4 { border-bottom: 1px solid #E0E0E0; text-align: left !important; padding: 10px 0; }
 	.orders .col-sm-4:last-child { border-bottom: 0; }
 	.checkoutbutton-container { float: left; }
@@ -226,4 +228,5 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	.table-repsonsive-label { display: block; }
 	td.hidden-xs { display: none !important; }
 	.product { border-bottom: 1px solid #F0F0F0; }
+	.tabs a { min-width: 70px; }
 }
