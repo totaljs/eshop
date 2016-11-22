@@ -88,6 +88,10 @@ function view_products_detail(linker) {
 		self.repository.linker = linker;
 		self.repository.name = data.name;
 
+		// Writes stats
+		DB('products').counter.hit(data.id);
+
+		// Renders view
 		self.view('products-detail', data);
 	});
 }
@@ -100,9 +104,10 @@ function view_products_detail(linker) {
 function view_checkout(linker) {
 	var self = this;
 	var options = {};
+
 	options.id = linker;
 
-	self.$get(options, function(err, data) {
+	self.$read(options, function(err, data) {
 
 		if (err || !data)
 			return self.throw404();
@@ -209,5 +214,5 @@ function view_blogs_detail(linker) {
 	var options = {};
 	options.category = 'Blogs';
 	options.linker = linker;
-	self.$get(options, self.callback('blogs-detail'));
+	self.$read(options, self.callback('blogs-detail'));
 }
