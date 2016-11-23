@@ -38,10 +38,12 @@
 	<div>@{currency(model.price)}</div>
 </div>
 <br />
+@{if model.deliverystreet}
 <div style="border:2px solid #F0F0F0;padding:20px;border-radius:4px">
-	<div style="margin-bottom:5px;color:#A0A0A0;font-size:11px;text-transform:uppercase">@(Your address):</div>
-	<div>@{!model.address.encode().replace(/\n/g, '<br />')}</div>
+	<div style="margin-bottom:5px;color:#A0A0A0;font-size:11px;text-transform:uppercase">@(Delivery address:)</div>
+	<div>@{model.deliveryfirstname} @{model.deliverylastname}<br />@{model.deliverystreet} @{model.deliverynumber}<br />@{model.deliveryzip} @{model.deliverycity}<br />@{model.deliverycountry}</div>
 </div>
+@{fi}
 <div style="margin:25px 0 10px;font-size:16px;text-transform:uppercase;color:black;"><strong>@(Ordered items) (@{model.count})</strong></div>
 @{foreach m in model.products}
 <div style="background-color:#F8F8F8;padding:7px 10px;margin-bottom:1px;border-radius:4px">
