@@ -20,7 +20,7 @@
 		var languages='@{config.custom.languages.join(';')}'.split(';');
 	</script>
 </head>
-<body data-jc="exec">
+<body data-jc="exec,binder">
 
 	<div id="success"><span class="fa fa-check-circle"></span></div>
 	<div data-jc="calendar" data-days="@(SU,MO,TU,WE,TH,FR,SO)" data-months="@(January,February,March,April,May,Juny,July,August,September,October,November,December)" data-today="@(Set date to today)" data-firstday="0"></div>
@@ -70,6 +70,43 @@
 
 	@{import('manager.js')}
 	@{section('script')}
+
+	<script>
+		Tangular.register('time', function(value) {
+
+			if (!value)
+				return;
+
+			var diff = Date.now() - value.parseDate().getTime();
+			var minutes = ((diff / 1000) / 60) >> 0;
+
+			if (minutes < 60) {
+				if (minutes < 3)
+					return '@(now)';
+				return @(minutes + ' minutes ago');
+			}
+
+			var hours = (minutes / 60) >> 0;
+			if (hours < 24)
+				return @(hours + ' ' + Tangular.helpers.pluralize(hours, 'hours', 'hour', 'hours', 'hours') + ' ago');
+
+			var days = (hours / 24) >> 0;
+			if (days < 30)
+				return @(days + ' ' + Tangular.helpers.pluralize(days, 'days', 'day', 'days', 'days') + ' ago');
+
+			var months = (days / 29) >> 0;
+			if (months < 12)
+				return @(months + ' ' + Tangular.helpers.pluralize(months, 'months', 'month', 'months', 'months') + ' ago');
+
+			var years = (months / 12) >> 0;
+			return @(years + ' ' + Tangular.helpers.pluralize(years, 'years', 'year', 'years', 'years') + ' ago');
+		});
+
+		Tangular.register('month', function(value) {
+			var months = [@('january', 'february', 'march', 'april', 'may', 'juny', 'july', 'august', 'september', 'october', 'november', 'december')];
+			return months[value - 1];
+		});
+	</script>
 
 </body>
 </html>

@@ -40,25 +40,28 @@
 	<div data-jc="visible" data-jc-path="products.form.id">
 		<br /><br />
 		<div data-jc="template" data-jc-path="products.form">
-			<script type="text/html">
+			<div class="padding npb">
 				<div class="row">
-					<div class="col-md-10 col-md-offset-1">
-						<table class="table table-bordered" border="0">
-							<tbody>
-								<tr>
-									<td class="col-xs-4 active">@(# id)</td>
-									<td>{{ id }}</td>
-								</tr>
-								<tr>
-									<td class="active">@(Created)</td>
-									<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
-								</tr>
-							</tbody>
-						</table>
+					<div class="col-md-3 m">
+						<div class="keyvalue">
+							<div class="key">@(# Id)</div>
+							<div class="value">{{ id }}</div>
+						</div>
+					</div>
+					<div class="col-md-3 m">
+						<div class="keyvalue">
+							<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
+							<div class="value">{{ datecreated | time }}</div>
+						</div>
+					</div>
+					<div class="col-md-3 m">
+						<div class="keyvalue">
+							<div class="key"><i class="fa fa-calendar"></i>@(Updated)</div>
+							<div class="value">{{ dateupdated | time }}</div>
+						</div>
 					</div>
 				</div>
-				<hr />
-			</script>
+			</div>
 		</div>
 	</div>
 
@@ -75,19 +78,19 @@
 	<div class="padding bg-smoke">
 		<div class="row">
 			<div class="col-md-6 m">
+				<div data-jc="dropdown" data-jc-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="" data-source-value="name">@(Existing manufacturer)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="products.form.manufacturer">@(Manufacturer)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
 				<div data-jc="dropdown" data-jc-path="products.form.category" data-source="products.categories" data-empty="" data-source-value="name">@(Existing category)</div>
 			</div>
 			<div class="col-md-6 m">
 				<div data-jc="textbox" data-jc-path="products.form.category" data-required="true">@(Category)</div>
 				<div class="fs11 mt5"><a href="javascript:void(0)" data-jc="click" data-jc-path="products_subcategory"><span class="fa fa-plus mr5"></span>@(Add new category)</a></div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-6 m">
-				<div data-jc="dropdown" data-jc-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="" data-source-value="name">@(Existing manufacturer)</div>
-			</div>
-			<div class="col-md-6 m">
-				<div data-jc="textbox" data-jc-path="products.form.manufacturer">@(Manufacturer)</div>
 			</div>
 		</div>
 		<div class="row">

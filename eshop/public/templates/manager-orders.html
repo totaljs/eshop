@@ -31,47 +31,49 @@
 </div>
 
 <div data-jc="form" data-title="@(Order form)" data-jc-path="common.form" data-if="value === 'orders'" data-width="900px" data-jc-id="orders.form" class="hidden">
-	<br />
 	<div data-jc="template" data-jc-path="orders.form" class="padding">
 		<script type="text/html">
-		<div class="row">
-			<div class="col-md-10 col-md-offset-1">
-				<table class="table table-bordered" border="0">
-					<tbody>
-						<tr>
-							<td class="col-xs-4 active">@(# id)</td>
-							<td><a href="/checkout/{{ id }}/">{{ id }}</a></td>
-						</tr>
-						{{ if iduser }}
-						<tr>
-							<td class="col-xs-4 active">@(User #)</td>
-							<td><a href="../users/#{{ iduser }}" class="jrouting">{{ iduser }}</a></td>
-						</tr>
-						{{ fi }}
-						<tr>
-							<td class="col-xs-4 active">@(Created)</td>
-							<td>{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
-						</tr>
-						{{ if ispaid && datepaid }}
-						<tr>
-							<td class="col-xs-4 active">@(Paid)</td>
-							<td>{{ datepaid | format('@(yyyy-MM-dd)') }}</td>
-						</tr>
-						{{ fi }}
-						<tr>
-							<td class="col-x5-3 active">@(IP address)</td>
-							<td>{{ ip }}</td>
-						</tr>
-						<tr>
-							<td class="col-xs-4 active">@(Total price)</td>
-							<td>{{ price | price(2) }}</td>
-						</tr>
-						<tr>
-							<td class="col-xs-4 active">@(Ordered items)</td>
-							<td>{{ count }}x</td>
-						</tr>
-					</tbody>
-				</table>
+		<div class="padding npb">
+			<div class="row">
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key">@(# Id)</div>
+						<div class="value"><a href="/checkout/{{ id }}/">{{ id }}</a></div>
+					</div>
+				</div>
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-destkop"></i>@(Price)</div>
+						<div class="value">{{ price | price(2) }}</div>
+					</div>
+				</div>
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-destkop"></i>@(Ordered items)</div>
+						<div class="value">{{ count }}x</div>
+					</div>
+				</div>
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
+						<div class="value">{{ datecreated | time }}</div>
+					</div>
+				</div>
+				{{ if ispaid && datepaid }}
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-credit-card"></i>@(Paid)</div>
+						<div class="value">{{ datepaid | format('@(yyyy-MM-dd)') }}</div>
+					</div>
+				</div>
+				{{ fi }}
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-destkop"></i>@(IP address)</div>
+						<div class="value">{{ ip }}</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 		</script>

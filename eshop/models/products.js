@@ -7,7 +7,9 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('manufacturer', 'String(50)');
 	schema.define('name', 'String(50)', true);
 	schema.define('price', Number, true);
-	schema.define('body', String, true);
+	schema.define('description', String);
+	schema.define('template', 'String(30)');
+	schema.define('body', String);
 	schema.define('istop', Boolean);
 	schema.define('isnewbie', Boolean);
 	schema.define('linker', 'String(50)');

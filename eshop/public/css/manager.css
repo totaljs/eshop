@@ -160,3 +160,9 @@ canvas { display: block; }
 	.table-xs td:before { content: attr(data-label); font-weight: bold; border-right: 1px solid #E0E0E0; width: 100px; float: left; margin-right: 10px; }
 	.table-xs tr { margin-bottom: 20px; display: block; }
 }
+
+.keyvalue { border-bottom: 1px dashed #D0D0D0; padding: 10px 0 5px; }
+.keyvalue .key { font-size: 10px; text-transform: uppercase; font-weight: bold; color: black; }
+.keyvalue .key:after { content: ':'; }
+.keyvalue .key .fa { margin-right: 4px; }
+.keyvalue .value { font-size: 14px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
