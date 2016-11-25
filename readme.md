@@ -8,7 +8,7 @@ Please do not change the code, just create a new issues. I solve all problems as
 
 __IMPORTANT: PLEASE DON'T CHANGE DATA IN MONGODB AND POSTGRESQL DATABASES. CREATE YOUR OWN BACKUP AND RESTORE IT ON YOU SERVERS OR CLOUD.__
 
-- New version: `v7.0.0` (works only with __Total.js v2.1.0__)
+- New version: `v8.0.0` (works only with __Total.js v2.3.0__)
 - [__HelpDesk with professional support__](https://helpdesk.totaljs.com)
 
 ---
