@@ -1,0 +1,9 @@
+@{if repository.preview}
+	<br />
+	<div id="CMS">
+		<div class="CMS_widgets"></div>
+	</div>
+	<br />
+@{else}
+	@{!model.body.tidyCMS()}
+@{fi}

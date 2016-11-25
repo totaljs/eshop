@@ -311,6 +311,7 @@ function json_products_codelists() {
 	var obj = {};
 	obj.manufacturers = F.global.manufacturers;
 	obj.categories = F.global.categories;
+	obj.templates = F.config.custom.templatesproducts;
 	self.json(obj);
 }
 
@@ -327,7 +328,7 @@ function json_products_category_replace() {
 // Reads all post categories and manufacturers
 function json_posts_codelists() {
 	var self = this;
-	self.json({ categories: F.global.posts, templates: F.config.custom.templates });
+	self.json({ categories: F.global.posts, templates: F.config.custom.templatesposts });
 }
 
 // ==========================================================================

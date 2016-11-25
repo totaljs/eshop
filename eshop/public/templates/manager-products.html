@@ -5,15 +5,18 @@
 		</nav>
 		<div class="caption"><span class="fa fa-dropbox mr5"></span> @(Products)</div>
 		<div class="row">
-			<div class="col-md-4 col-sm-4 m">
+			<div class="col-md-3 col-sm-6 m">
 				<div data-jc="textbox" data-jc-path="products.filter.search" data-placeholder="@(Search products ...)" data-jc-type="search"></div>
 				<div class="help" data-jc="template" data-jc-path="products.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
-			<div class="col-md-4 col-sm-4 m">
+			<div class="col-md-3 col-sm-6 m">
 				<div data-jc="dropdown" data-jc-path="products.filter.category" data-source="products.categories" data-empty="@(All categories)" data-source-value="linker"></div>
 			</div>
-			<div class="col-md-4 col-sm-4 m">
+			<div class="col-md-3 col-sm-6 m">
 				<div data-jc="dropdown" data-jc-path="products.filter.manufacturer" data-source="products.manufacturers" data-empty="@(All manufacturers)" data-source-value="linker"></div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-jc="dropdowncheckbox" data-jc-path="products.filter.type" data-placeholder="@(All products)" data-options="@(News)|1;@(Top)|2"></div>
 			</div>
 		</div>
 	</div>
@@ -23,7 +26,7 @@
 	<div data-jc="grid" data-jc-path="products.grid" data-pagination-path="products.filter.page" data-jc-id="products.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
 		<script type="text/html">
 		<tr>
-			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ if isnewbie }}<b class="badge badge-blue mr5">@(NEWBIE)</b>{{ fi }}{{ name }}</td>
+			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ if isnews }}<b class="badge badge-blue mr5">@(NEWS)</b>{{ fi }}{{ name }}</td>
 			<td style="width:200px" class="silver hidden-xs">{{ if manufacturer }}<span class="fa fa-building"></span> {{ manufacturer }}{{ fi }}</td>
 			<td style="width:250px" class="silver hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
 			<td style="width:100px" class="ui-right active">{{ price | price(2) }}</td>
@@ -36,80 +39,108 @@
 	</div>
 </div>
 
-<div data-jc="form" data-title="@(Product form)" data-jc-path="common.form" data-if="value === 'products'" data-width="900px" data-jc-id="products.form" class="hidden">
-	<div data-jc="visible" data-jc-path="products.form.id">
-		<br /><br />
-		<div data-jc="template" data-jc-path="products.form">
-			<div class="padding npb">
+<div data-jc="form" data-title="@(Product form)" data-jc-path="common.form" data-if="value === 'products'" data-width="1300px" data-jc-id="products.form" class="hidden">
+	<div data-jc="visible" data-jc-path="products.form.id" data-if="value && value.length">
+		<div data-jc="template" data-jc-path="products.form" class="padding npb">
+			<script type="text/html">
 				<div class="row">
-					<div class="col-md-3 m">
+					<div class="col-lg-2 col-md-3 m">
 						<div class="keyvalue">
 							<div class="key">@(# Id)</div>
 							<div class="value">{{ id }}</div>
 						</div>
 					</div>
-					<div class="col-md-3 m">
+					<div class="col-lg-2 col-md-3 m">
 						<div class="keyvalue">
 							<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
 							<div class="value">{{ datecreated | time }}</div>
 						</div>
 					</div>
-					<div class="col-md-3 m">
+					{{ if dateupdated }}
+					<div class="col-lg-2 col-md-3 m">
 						<div class="keyvalue">
 							<div class="key"><i class="fa fa-calendar"></i>@(Updated)</div>
 							<div class="value">{{ dateupdated | time }}</div>
 						</div>
 					</div>
+					{{ fi }}
 				</div>
-			</div>
+			</script>
 		</div>
 	</div>
 
 	<div class="padding npb">
 		<div class="row">
-			<div class="col-md-12">
-				<div data-jc="textbox" data-jc-path="products.form.name" data-required="true" class="m">@(Name)</div>
-				<div data-jc="checkbox" data-jc-path="products.form.istop" class="red">@(Mark as <b>TOP product</b>)</div>
-				<div data-jc="checkbox" data-jc-path="products.form.isnewbie" class="blue">@(Newbie in store)</div>
+			<div class="col-md-6">
+				<div data-jc="textbox" data-jc-path="products.form.name" data-required="true" class="m" data-maxlength="50">@(Name)</div>
+				<div class="relative mr15">
+					<div data-jc="checkbox" data-jc-path="products.form.istop" class="red">@(Mark as <b>TOP product</b>)</div>
+				</div>
+				<div class="relative">
+					<div data-jc="checkbox" data-jc-path="products.form.isnews" class="blue">@(News in store)</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="dropdown" data-jc-path="products.form.template" data-source="products.templates" data-empty="" data-icon="fa-paint-brush">@(Template)</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	<br />
+	<hr data-binder="products.form.template" data-binder-visible="n => n ? false : true" class="nmb" />
+	<div data-binder="products.form.template" data-binder-visible="n => n ? true : false">
+		<hr style="margin-bottom:8px" />
+		<div class="cmseditor-help">
+			<nav><i class="fa fa-desktop"></i><a href="javascript:products_device(1)">@(Large)</a><a href="javascript:products_device(2)">@(Medium)</a><a href="javascript:products_device(3)">@(Tablet)</a><a href="javascript:products_device(4)">@(Mobile)</a></nav>
+			<div><b>@(Editor formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L). <a href="javascript:void(0)" data-exec="products_sourcecode" class="exec black"><span class="fa fa-code w18"></span>@(Show source-code)</a></div>
+		</div>
+		<div class="pages-editor" data-jc="editor" data-jc-path="products.form.body" data-jc-import="/templates/component-editor.html" data-jc-id="products.editor"></div>
+	</div>
+	<div class="padding nmb">
+		<div class="row mt10">
+			<div class="col-md-6 m">
+				<div data-jc="dropdown" data-jc-path="products.form.category" data-source="products.categories" data-empty="" data-source-value="name" class="m" data-icon="fa-folder">@(Existing category)</div>
+			</div>
+			<div class="col-md-6">
+				<div data-jc="textbox" data-jc-path="products.form.category" data-required="true" data-icon="fa-folder-o" data-maxlength="300" data-placeholder="@(Type a category)">@(Category)</div>
+				<div class="fs11 mt10"><a href="javascript:void(0)" data-jc="click" data-jc-path="products_subcategory"><span class="fa fa-plus mr5"></span>@(Add a new sub-category)</a></div>
+			</div>
+		</div>
+	</div>
 	<div class="padding bg-smoke">
+		<br />
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-jc="dropdown" data-jc-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="" data-source-value="name">@(Existing manufacturer)</div>
+				<div class="row">
+					<div class="col-md-4 col-sm-6 m">
+						<div data-jc="textbox" data-jc-path="products.form.price" data-required="true" data-align="center" data-jc-type="currency" data-increment="true" data-icon="fa-credit-card" data-maxlength="8">@(Price)</div>
+					</div>
+					<div class="col-md-4 col-sm-6 m">
+						<div data-jc="textbox" data-jc-path="products.form.reference" data-align="center" data-maxlength="20" data-icon="fa-braille">@(Custom code)</div>
+					</div>
+					<div class="col-md-4 col-sm-6 m">
+						<div data-jc="textbox" data-jc-path="products.form.availability" data-align="center" data-icon="fa-truck" data-maxlength="40" data-placeholder="@(In stock)">@(Availability)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="dropdown" data-jc-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="" data-source-value="name">@(Existing manufacturer)</div>
+					</div>
+					<div class="col-md-6">
+						<div data-jc="textbox" data-jc-path="products.form.manufacturer" data-maxlength="50" data-placeholder="@(Type a manufacturer)">@(Manufacturer)</div>
+					</div>
+				</div>
 			</div>
 			<div class="col-md-6 m">
-				<div data-jc="textbox" data-jc-path="products.form.manufacturer">@(Manufacturer)</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-6 m">
-				<div data-jc="dropdown" data-jc-path="products.form.category" data-source="products.categories" data-empty="" data-source-value="name">@(Existing category)</div>
-			</div>
-			<div class="col-md-6 m">
-				<div data-jc="textbox" data-jc-path="products.form.category" data-required="true">@(Category)</div>
-				<div class="fs11 mt5"><a href="javascript:void(0)" data-jc="click" data-jc-path="products_subcategory"><span class="fa fa-plus mr5"></span>@(Add new category)</a></div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12 m">
-				<div data-jc="textarea" data-jc-path="products.form.body" data-required="true" data-height="100px">@(Description)</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-3 col-sm-6 m">
-				<div data-jc="textbox" data-jc-path="products.form.price" data-required="true" data-align="center" data-jc-type="currency" data-increment="true" data-icon="fa-shopping-cart">@(Price)</div>
-			</div>
-			<div class="col-md-3 col-sm-6">
-				<div data-jc="textbox" data-jc-path="products.form.reference" data-align="center">@(Custom product code)</div>
+				<div data-jc="textarea" data-jc-path="products.form.description" data-required="true" data-height="94px">@(Description)</div>
 			</div>
 		</div>
 	</div>
 	<div class="padding">
-		<div class="row">
-			<div class="col-md-12 m">
+		<div class="row mt10">
+			<div class="col-md-6 m">
 				<div data-jc="fileupload" data-jc-path="products.form.pictures" data-placeholder="@(Browse device)" data-error-large="@(The uploaded file is too large.)" data-accept="image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(Pictures)</div>
 			</div>
 		</div>
@@ -226,6 +257,11 @@
 				setTimeout(products_refresh_codelists, 2000);
 			});
 		});
+
+		WATCH('products.form.template', function(path, value, type) {
+			FIND('#products.editor').setTemplate(value);
+			type === 2 && SET('products.form.body', '');
+		});
 	});
 
 	// Watch for changes in product filter
@@ -236,7 +272,13 @@
 	ON('#products.form', function(component) {
 		component.submit = function(hide) {
 			var loading = FIND('loading');
+			var editor = FIND('#products.editor');
 			loading.show();
+
+
+			products.form.body = editor.getContent();
+			products.form.pictures2 = editor.getPictures();
+
 			AJAX('POST {0}/api/products/'.format(managerurl), products.form, function(response) {
 				loading.hide(500);
 
@@ -299,9 +341,13 @@
 				return;
 			}
 
+			SETTER('#products.editor', 'setTemplate', response.template);
 			SET('products.form', $.extend({ $index: index }, response), true);
 			SET('products.response', null);
 			SET('common.form', 'products');
+
+			// /templates/component-editor.html:
+			cmseditor_widgets(false);
 		});
 	}
 
@@ -309,6 +355,9 @@
 		SET('products.form', {}, true);
 		SET('products.response', null);
 		SET('common.form', 'products');
+
+		// /templates/component-editor.html:
+		cmseditor_widgets(false);
 	}
 
 	function products_category() {
@@ -321,6 +370,7 @@
 		AJAX('GET {0}/api/products/codelists/'.format(managerurl), function(response) {
 			response.categories.sort(FN('(a, b) => a.name.localeCompare(b.name)'));
 			SET('products.categories', response.categories);
+			SET('products.templates', response.templates);
 			SET('products.manufacturers', response.manufacturers);
 		});
 	}
@@ -350,6 +400,29 @@
 		hash && hash.length > 1 && setTimeout(function() {
 			products_edit(hash.substring(1));
 		}, 500);
+	}
+
+	function products_sourcecode() {
+		SETTER('#products.editor', 'showSourceCode');
+	}
+
+	function products_device(type) {
+		var e = FIND('editor');
+		SETTER('loading', 'show')('loading', 'hide', 1000);
+		switch (type) {
+			case 1:
+				e.device('lg');
+				return;
+			case 2:
+				e.device('md');
+				return;
+			case 3:
+				e.device('sm');
+				return;
+			case 4:
+				e.device('xs');
+				return;
+		}
 	}
 
 	function products_menu(el) {

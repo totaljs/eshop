@@ -7,6 +7,8 @@ exports.install = function() {
 
 	// PRODUCTS
 	F.route('#products',         view_products, ['*Product']);
+	F.route('#news',             view_products_news, ['*Product']);
+	F.route('#top',              view_products_top, ['*Product']);
 	F.route('#category',         view_products_category, ['*Product']);
 	F.route('#detail',           view_products_detail, ['*Product']);
 
@@ -66,6 +68,24 @@ function view_products_category() {
 	});
 }
 
+// Gets news products
+function view_products_news() {
+	var self = this;
+	var options = U.clone(self.query);
+	options.type = '1';
+	self.sitemap('news');
+	self.$query(options, self.callback('products-special'));
+}
+
+// Gets top products
+function view_products_top() {
+	var self = this;
+	var options = U.clone(self.query);
+	options.type = '2';
+	self.sitemap('top');
+	self.$query(options, self.callback('products-special'));
+}
+
 // Gets product detail
 function view_products_detail(linker) {
 	var self = this;
@@ -91,8 +111,20 @@ function view_products_detail(linker) {
 		// Writes stats
 		DB('products').counter.hit(data.id);
 
+		var template = data.template;
+		if (template)
+			template = '~cms/' + template;
+		else
+			template = 'products-detail';
+
+
+		self.title(data.name);
+		self.sitemap('detail');
+		self.sitemap_change('detail', 'url', data.linker);
+		self.sitemap_change('detail', 'name', data.name);
+
 		// Renders view
-		self.view('products-detail', data);
+		self.view(template, data);
 	});
 }
 

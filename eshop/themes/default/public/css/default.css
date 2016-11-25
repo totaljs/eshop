@@ -13,7 +13,7 @@ form { padding: 0; margin: 0; }
 
 .content { background-color: white; border-radius: 4px; }
 
-.header-container { background: #E0E0E0 linear-gradient(#F0F0F0,#E0E0E0); padding: 20px 20px 15px; position: relative; }
+.header-container { background: #E0E0E0 linear-gradient(#F0F0F0,#E0E0E0); padding: 15px 20px 10px; position: relative; }
 .header-container hr { border-color: #D0D0D0; }
 .header-padding { margin-top: 20px; }
 .header-links-container { position: relative; }
@@ -23,9 +23,7 @@ form { padding: 0; margin: 0; }
 .header-menu-button:hover { text-decoration: none; }
 .header-menu-button:active { color: black; }
 
-header { padding: 40px 25px; }
-
-.search { border: 2px solid #E0E0E0; background-color: white; padding: 13px 5px; border-radius: 4px; }
+.search { border: 2px solid #E0E0E0; background-color: white; padding: 8px 5px; border-radius: 4px; }
 .search input { border: 0; padding: 0; background-color: white; border: 0; outline: 0; width: 100%; font-size: 16px; }
 .search-icon { float: left; text-align: center; width: 30px; font-size: 16px; }
 .search-input { margin-left: 35px; }
@@ -40,8 +38,14 @@ header { padding: 40px 25px; }
 .categories-hide { display: none; }
 .categories-button { margin-bottom: 18px; color: black; font-weight: bold; font-family: $font; text-transform: uppercase; }
 
+.recommendation { margin-bottom: 20px; }
+.recommendation a { font-family: $font; font-size: 12px; margin-right: 20px; color: #505050; text-transform: uppercase; font-weight: bold; }
+.recommendation a:hover { text-decoration: none; opacity: 0.8; }
+.recommendation .fa { margin-right: 5px; }
+.recommendation b { padding: 1px 3px; border-radius: 4px; position: relative; display: inline-block; }
+
 .subcategories { padding: 0; margin-top: 10px; }
-.subcategories a { display: block; line-height: 16px; padding: 8px 0; background-color: #F0F0F0; text-align: center; color: gray; font-size: 14px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 15px; }
+.subcategories a { display: block; line-height: 16px; padding: 8px 0; background-color: #F0F0F0; text-align: center; color: gray; font-size: 14px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 15px; border-radius: 4px; }
 .subcategories a:hover { background-color: #303030; color: white; text-decoration: none; }
 .subcategories span { margin-left: 5px; }
 .subcategories .selected { background-color: black !important; color: white; }
@@ -76,7 +80,7 @@ h2 .fa { margin-right: 10px; }
 
 .flags { position: absolute; right: 20px; }
 .flags div { margin-bottom: 5px; width: 60px; text-align: center; padding: 2px 0; border-radius: 4px; color: white; font-size: 11px; font-weight: bold; font-family: $font; }
-.flags .newbie { background-color: #62C8FA; }
+.flags .news { background-color: #62C8FA; }
 .flags .top { background-color: #C23540; }
 
 .detail-buy { font-size: 30px; font-weight: 200; font-family: $font; border: 1px solid silver; background-color: white; padding: 0; height: 74px; color: gray; width: 100%; border-radius: 4px; }
@@ -99,6 +103,7 @@ p { margin: 0; }
 .cl { clear: both; }
 .center { text-align: center; margin: 0 auto; }
 .red { color: #D63B32; }
+.blue { color: #4EAEF8 !important; }
 .npt { padding-top: 0; }
 .npb { padding-bottom: 0; }
 .nmt { margin-top: 0; }
@@ -127,10 +132,10 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 .newsletter-button .fa { margin-right: 8px; font-size: 16px; }
 .newsletter-success { color: #7B9B46 !important; }
 
-.checkoutbutton-label { color: gray; display: block; }
-.checkoutbutton-label .fa { margin-right: 5px; }
-.checkoutbutton { font-size: 25px; color: black; display: block; padding: 5px 0; font-family: $font; line-height: 20px; }
+.checkoutbutton { font-size: 25px; color: black; display: block; padding: 2px 0 4px; font-family: $font; line-height: 20px; font-weight: bold; }
 .checkoutbutton:hover { text-decoration: none; border-color: silver; color: black; }
+.checkoutbutton-label { color: gray; display: block; font-size: 12px; }
+.checkoutbutton-label .fa { margin-right: 5px; }
 
 .checkoutlist input { border: 0; background-color: white; text-align: center; width: 100%; outline: 0; margin: 0; font-size: 16px; border: 2px solid #E0E0E0; }
 .checkoutlist td { vertical-align: middle !important; }

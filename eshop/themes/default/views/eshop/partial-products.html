@@ -4,7 +4,7 @@
 		@{if m.istop || m.isnewbie}
 			<div class="flags">
 			@{if m.istop}<div class="top">@(TOP)</div>@{fi}
-			@{if m.isnewbie}<div class="newbie">@(NEWBIE)</div>@{fi}
+			@{if m.isnews}<div class="news">@(NEWS)</div>@{fi}
 			</div>
 		@{fi}
 		<a href="@{m.linker}" class="product-picture"><img src="@{if !m.pictures || !m.pictures.length}/img/empty.png@{else}/images/small/@{m.pictures[0]}.jpg@{fi}" class="img-responsive" alt="@{m.name}" border="0" /></a>

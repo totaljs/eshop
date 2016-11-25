@@ -7,11 +7,13 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('manufacturer', 'String(50)');
 	schema.define('name', 'String(50)', true);
 	schema.define('price', Number, true);
-	schema.define('description', String);
+	schema.define('description', String, true);
+	schema.define('availability', 'String(40)');
 	schema.define('template', 'String(30)');
 	schema.define('body', String);
+	schema.define('pictures2', '[String]');
 	schema.define('istop', Boolean);
-	schema.define('isnewbie', Boolean);
+	schema.define('isnews', Boolean);
 	schema.define('linker', 'String(50)');
 
 	// Gets listing
@@ -37,6 +39,21 @@ NEWSCHEMA('Product').make(function(schema) {
 		options.search && filter.like('search', options.search.keywords(true, true));
 		options.id && filter.in('id', options.id);
 		options.skip && filter.where('id', '<>', options.skip);
+
+		if (options.type) {
+			 if ((options.type instanceof Array))
+			 	options.type = [options.type];
+			 for (var i = 0, length = options.type.length; i < length; i++) {
+			 	switch (options.type[i]) {
+			 		case '1':
+			 			filter.where('isnews', true);
+			 			break;
+			 		case '2':
+			 			filter.where('istop', true);
+			 			break;
+			 	}
+			 }
+		}
 
 		switch (options.sort) {
 			case '1':
@@ -95,6 +112,7 @@ NEWSCHEMA('Product').make(function(schema) {
 		model.linker_category = category.linker;
 		model.category = category.name;
 		model.search = (model.name + ' ' + (model.manufacturer || '') + ' ' + (model.reference || '')).keywords(true, true).join(' ').max(500);
+		model.body = U.minifyHTML(model.body);
 
 		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
 

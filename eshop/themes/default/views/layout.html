@@ -8,6 +8,7 @@
 	<meta name="robots" content="all,follow" />
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
+	<link rel="stylesheet" href="@{global.css}" />
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	@{import('meta', 'head', 'default.css', 'default.js', 'favicon.ico')}
 </head>
@@ -35,7 +36,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-5 m xs-center">
-					<a href="/"><img src="/img/logo.png" border="0" alt="Eshop" height="70" /></a>
+					<a href="/"><img src="/img/logo.png" border="0" alt="Eshop" height="60" /></a>
 				</div>
 				<div class="col-sm-3 m ui-right header-padding">
 					<hr class="visible-xs" />
@@ -69,11 +70,15 @@
 					<div class="row">
 						@{foreach m in global.categories}
 							@{if m.count > 0 && !m.level}
-							<div class="col-sm-4 col-md-4"><a href="@{sitemap_url('products')}@{m.linker}/">@{m.name}</a></div>
+							<div class="col-sm-4"><a href="@{sitemap_url('products')}@{m.linker}/">@{m.name}</a></div>
 							@{fi}
 						@{end}
 					</div>
 				</div>
+				<nav class="recommendation">
+					<a href="@{sitemap_url('news')}" class="blue"><i class="fa fa-caret-right"></i>@(News in the store)</a>
+					<a href="@{sitemap_url('top')}"><i class="fa fa-caret-right"></i>@(Top products)</a>
+				</nav>
 			</div>
 
 			<div class="content">

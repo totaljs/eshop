@@ -42,10 +42,10 @@ COMPONENT('visible', function() {
 	self.setter = function(value) {
 		var is = true;
 		if (condition)
-			is = EVALUATE(self.path, condition);
+			is = EVALUATE(self.path, condition) ? true : false;
 		else
 			is = value ? true : false;
-		self.element.toggleClass('hidden', !is);
+		self.toggle('hidden', !is);
 	};
 });
 
@@ -996,7 +996,7 @@ COMPONENT('form', function() {
 		});
 
 		enter === 'true' && self.element.on('keydown', 'input', function(e) {
-			e.keyCode === 13 && self.element.find('button[name="submit"]').get(0).disabled && self.submit(hide);
+			e.keyCode === 13 && !self.element.find('button[name="submit"]').get(0).disabled && self.submit(hide);
 		});
 	};
 

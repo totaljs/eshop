@@ -112,7 +112,7 @@
 			<br />
 			<div class="row">
 				<div class="col-md-4">
-					<div data-jc="textbox" data-jc-path="settings.form.currency" data-required="true" data-align="center" data-maxlenght="10">@(Currency)</div>
+					<div data-jc="textbox" data-jc-path="settings.form.currency" data-required="true" data-align="center" data-maxlength="10">@(Currency)</div>
 					<div class="help">@(The currency affects PayPal.)</div>
 				</div>
 			</div>
@@ -127,22 +127,33 @@
 <div class="hidden" data-jc="visible" data-jc-path="user" data-if="su.sa === true">
 	<hr class="nmt" />
 	<div class="container">
-		<h2>@(Developer's CMS settings)</h2>
+		<h2>@(Internal settings only for <b>Super Admin</b>)</h2>
 		<br />
 		<div class="row">
-			<div class="col-md-6 m">
-				<div data-jc="textboxtags" data-jc-path="settings.form.templates">@(Registered templates)</div>
-				<div class="help">@(Templates must be created manually in <code>/views/cms/</code> directory.)</div>
+			<div class="col-md-4 m">
+				<div data-jc="textboxlist" data-jc-path="settings.form.templates" class="m" data-icon="fa-object-ungroup" data-placeholder="@(Type a name of template and press enter)">@(Pages templates)</div>
 			</div>
-			<div class="col-md-6 m">
+			<div class="col-md-4 m">
+				<div data-jc="textboxlist" data-jc-path="settings.form.templatesposts" class="m" data-icon="fa-object-ungroup" data-placeholder="@(Type a name of template and press enter)">@(Post templates)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="textboxlist" data-jc-path="settings.form.templatesproducts" class="m" data-icon="fa-object-ungroup" data-placeholder="@(Type a name of template and press enter)">@(Product templates)</div>
+			</div>
+		</div>
+		<div class="help nmt"><i class="fa fa-warning"></i>@(All templates has to be created manually in <code>/views/cms/</code> directory.)</div>
+		<hr />
+		<br />
+		<div class="row">
+			<div class="col-md-4 m">
 				<div data-jc="textboxtags" data-jc-path="settings.form.navigations">@(Registered navigations)</div>
-				<div class="help">@(Navigations must be rendered manually in the layout or view. For render use: <code>F.global.navigation.NAME</code>)</div>
+				<div class="help">@(Storage: <code>F.global.navigation.NAME</code>)</div>
 			</div>
-			<div class="col-md-6 m">
+
+			<div class="col-md-4 m">
 				<div data-jc="textboxtags" data-jc-path="settings.form.posts">@(Posts categories)</div>
-				<div class="help">@(Posts must be rendered manually in the layout or view. Categories: <code>F.global.posts</code>)</div>
+				<div class="help">@(Storage: <code>F.global.posts</code>)</div>
 			</div>
-			<div class="col-md-6 m">
+			<div class="col-md-4 m">
 				<div data-jc="textboxtags" data-jc-path="settings.form.languages">@(Supported languages)</div>
 				<div class="help">@(E.g. <code>en</code> <code>sk</code> <code>ru</code>)</div>
 			</div>
@@ -223,7 +234,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-jc="dropdowncheckbox" data-jc-path="settings.formuser.roles" data-options="@(dashboard)|dashboard;@(orders)|orders;@(products)|products;@(pages)|pages;@(posts)|posts;@(newsletter)|newsletter;@(users)|users;@(settings)|settings;@(system)|system">@(Roles)</div>
+				<div data-jc="dropdowncheckbox" data-jc-path="settings.formuser.roles" data-options="@(dashboard)|dashboard;@(orders)|orders;@(products)|products;@(pages)|pages;@(posts)|posts;@(newsletter)|newsletter;@(users)|users;@(settings)|settings">@(Roles)</div>
 				<div class="help">@(If the user roles will be empty then the user will be access to all functionality.)</div>
 			</div>
 		</div>

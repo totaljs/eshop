@@ -143,7 +143,6 @@
 
 			posts.form.pictures = editor.getPictures();
 			posts.form.body = editor.getContent();
-			posts.form.pictures = editor.getPictures();
 			posts.form.perex = editor.getPerex();
 			posts.form.body = editor.getContent().replace(/\n[\s\t]+\n/g, '\n');
 			posts.form.search = editor.getKeywords();
@@ -186,9 +185,12 @@
 	}
 
 	function posts_new() {
+		var template =  posts.templates.length === 1 ? posts.templates[0] : '';
 		SET('posts.form', { author: su.name }, true);
 		SET('posts.response', null);
 		SET('common.form', 'posts');
+
+		template && SET('posts.form.template', template, null, 2);
 
 		// /templates/component-editor.html:
 		cmseditor_widgets(false);

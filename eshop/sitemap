@@ -1,7 +1,9 @@
 // ID : Title ---> URL --> [Parent]
 homepage                 : @(Homepage)               --> /
 contact                  : @(Contact)                --> /contact/                    --> homepage
-products                 : @(Shop)                   --> /shop/                       --> homepage
+products                 : @(All products)           --> /shop/                       --> homepage
+news                     : @(News in the store)      --> /shop/news/                  --> products
+top                      : @(Top products)           --> /shop/top/                   --> products
 checkout                 : @(Checkout)               --> /checkout/                   --> homepage
 order                    : @(Order)                  --> /checkout/{0}/               --> checkout
 payment                  : @(Checkout Payment)       --> /checkout/{0}/{1}/           --> checkout

@@ -57,6 +57,7 @@ h3 .fa { margin-right: 8px; }
 .blue { color: #377BB5; }
 .black { color: black; }
 .green { color: #68B25B !important; }
+.relative { position: relative; display: inline-block; }
 
 footer { border-top: 1px solid #E0E0E0; padding: 30px 0 0; text-align: center; font-size: 12px; background-color: #F8F8F8; height: 100px; }
 table td { vertical-align: middle !important;}
@@ -68,7 +69,8 @@ table td { vertical-align: middle !important;}
 .fs10 { font-size: 10px !important; }
 .fs11 { font-size: 11px !important; }
 .help { font-size: 11px; color: #AAB2BD; margin-top: 7px; line-height: 13px; }
-.help code { font: normal normal 11px Arial; background-color: #F0F0F0; padding: 2px 5px; border-radius: 4px; }
+.help code { font: normal normal 11px Arial; background-color: #F0F0F0; padding: 1px 5px; border-radius: 4px; }
+.help .fa { margin-right: 5px; }
 
 .legend { margin-bottom: 10px; }
 .legend .fa { width: 14px; vertical-align: middle; margin-right: 5px; }
