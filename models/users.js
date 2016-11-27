@@ -176,15 +176,12 @@ NEWSCHEMA('UserSettings').make(function(schema) {
 
 NEWSCHEMA('UserLogin').make(function(schema) {
 
-	schema.define('email', 'Emai', true);
+	schema.define('email', 'Email', true);
 	schema.define('password', 'String(20)', true);
 
 	schema.setPrepare(function(name, value) {
-		if (name === 'email')
-			return value.toLowerCase();
 		if (name === 'password')
 			return value.hash('sha1');
-		return value;
 	});
 
 	schema.addWorkflow('exec', function(error, model, options, callback) {
