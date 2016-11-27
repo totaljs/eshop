@@ -2,9 +2,16 @@
 	<div class="container">
 		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> @(Users)</div>
 		<div class="row">
-			<div class="col-md-4 col-sm-6 m">
+			<div class="col-md-3 m">
 				<div data-jc="textbox" data-jc-path="users.filter.search" data-placeholder="@(Search users ...)" data-jc-type="search"></div>
 				<div class="help" data-jc="template" data-jc-path="users.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdown" data-jc-path="users.filter.gender" data-options="@(All users)|;@(Male)|male;@(Female)|female"></div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="nosqlcounter" data-jc-path="users.stats" style="height:48px" data-count="16"></div>
+				<div class="help"><i class="fa fa-bar-chart"></i>@(Stats for last 16 months)</div>
 			</div>
 		</div>
 	</div>
@@ -223,6 +230,7 @@
 		hash && hash.length > 1 && setTimeout(function() {
 			users_edit(hash.substring(1));
 		}, 500);
+		AJAX('GET {0}/api/users/stats/'.format(managerurl), 'users.stats');
 	}
 
 </script>

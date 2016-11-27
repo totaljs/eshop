@@ -5,12 +5,16 @@
 		</nav>
 		<div class="caption"><span class="fa fa-envelope mr5"></span> @(Newsletter)</div>
 		<div class="row">
-			<div class="col-md-4 m">
+			<div class="col-md-3 m">
 				<div data-jc="textbox" data-jc-path="newsletter.filter.search" data-placeholder="@(Search newsletter ...)" data-jc-type="search"></div>
 				<div class="help" data-jc="template" data-jc-path="newsletter.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
-			<div class="col-md-4 m">
+			<div class="col-md-3 m">
 				<div data-jc="dropdown" data-jc-path="newsletter.filter.language" data-source="languages" data-empty="@(All languages)"></div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="nosqlcounter" data-jc-path="newsletter.stats" style="height:48px" data-count="16"></div>
+				<div class="help"><i class="fa fa-bar-chart"></i>@(Stats for last 16 months)</div>
 			</div>
 		</div>
 	</div>
@@ -55,6 +59,7 @@
 		AJAX('GET {0}/api/newsletter/'.format(managerurl), newsletter.filter, 'newsletter.grid');
 	}
 
+	AJAX('GET {0}/api/newsletter/stats/'.format(managerurl), 'newsletter.stats');
 	$('.csvexport').attr('href', '{0}/newsletter/export/'.format(managerurl));
 
 </script>

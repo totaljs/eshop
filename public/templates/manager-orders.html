@@ -2,12 +2,16 @@
 	<div class="container">
 		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> @(Orders)</div>
 		<div class="row">
-			<div class="col-md-4 col-sm-6 m">
+			<div class="col-md-3 m">
 				<div data-jc="textbox" data-jc-path="orders.filter.search" data-placeholder="@(Search orders ...)" data-jc-type="search"></div>
 				<div class="help" data-jc="template" data-jc-path="orders.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
 			</div>
-			<div class="col-md-4 col-sm-6 m">
+			<div class="col-md-3 m">
 				<div data-jc="dropdown" data-jc-path="orders.filter.type" data-options="@(All orders)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-jc-type="number"></div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="nosqlcounter" data-jc-path="orders.stats" style="height:48px" data-count="16"></div>
+				<div class="help"><i class="fa fa-bar-chart"></i>@(Stats for last 16 months)</div>
 			</div>
 		</div>
 	</div>
@@ -415,6 +419,7 @@
 		hash && hash.length > 1 && setTimeout(function() {
 			orders_edit(hash.substring(1));
 		}, 500);
+		AJAX('GET {0}/api/orders/stats/'.format(managerurl), 'orders.stats');
 	}
 
 	Tangular.register('sum', function(value, format) {

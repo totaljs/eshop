@@ -126,7 +126,7 @@ function view_products_detail(linker) {
 		self.repository.name = data.name;
 
 		// Writes stats
-		DB('products').counter.hit(data.id);
+		NOSQL('products').counter.hit(data.id);
 
 		self.title(data.name);
 		self.sitemap('detail');
@@ -258,5 +258,10 @@ function view_blogs_detail(linker) {
 	var options = {};
 	options.category = 'Blogs';
 	options.linker = linker;
-	self.$read(options, self.callback('blogs-detail'));
+	self.$read(options, function(err, response) {
+		if (err)
+			return self.throw404(err);
+		NOSQL('posts').counter.hit(response.id);
+		self.view('blogs-detail', response);
+	});
 }
