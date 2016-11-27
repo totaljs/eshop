@@ -217,6 +217,18 @@ NEWSCHEMA('Product').make(function(schema) {
 		});
 	});
 
+	// Stats
+	schema.addWorkflow('stats', function(error, model, options, callback) {
+		NOSQL('products').counter.monthly(options.id, function(err, views) {
+			NOSQL('orders').counter.monthly(options.id, function(err, orders) {
+				var item = SINGLETON('products.stats');
+				item.views = views;
+				item.orders = orders;
+				callback(item);
+			});
+		});
+	});
+
 	// Imports CSV
 	schema.addWorkflow('import.csv', function(error, model, filename, callback) {
 		// Reads all id + references (for updating/inserting)

@@ -133,7 +133,13 @@ NEWSCHEMA('User').make(function(schema) {
 				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ').max(500);
 				doc.datecreated = F.datetime;
 				doc[id] = options.profile[id];
-				NOSQL('users').insert(doc.$clean(), F.error());
+
+				var db = NOSQL('users');
+				db.insert(doc.$clean(), F.error());
+				db.counter.hit('all');
+				db.counter.hit('oauth2');
+				db.counter.hit(options.type);
+				options.profile.gender && db.counter.hit(options.profile.gender);
 
 				// Writes stats
 				MODULE('webcounter').increment('users');
@@ -143,6 +149,11 @@ NEWSCHEMA('User').make(function(schema) {
 			options.controller.req.user = exports.createSession(doc);
 			callback(doc);
 		});
+	});
+
+	// Stats
+	schema.addWorkflow('stats', function(error, model, options, callback) {
+		NOSQL('users').counter.monthly('all', callback);
 	});
 });
 
@@ -268,7 +279,10 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
 
 			F.config.custom.emailuserform && mail.bcc(F.config.custom.emailuserform);
-			NOSQL('users').insert(user, F.error());
+			var db = NOSQL('users');
+			db.insert(user, F.error());
+			db.counter.hit('all');
+			model.gender && db.counter.hit(model.gender);
 
 			// Login user
 			exports.login(options.controller.req, options.controller.res, user.id);

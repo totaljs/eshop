@@ -137,6 +137,8 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.datecreated = F.datetime;
 		model.numbering = db.meta('numbering');
 
+		counter.hit('all');
+
 		if (model.numbering) {
 			var year = model.numbering.toString().substring(0, 4);
 
@@ -231,6 +233,11 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.addWorkflow('clear', function(error, model, options, callback) {
 		NOSQL('orders').remove(F.path.databases('orders_removed.nosql'));
 		callback(SUCCESS(true));
+	});
+
+	// Stats
+	schema.addWorkflow('stats', function(error, model, options, callback) {
+		NOSQL('orders').counter.monthly('all', callback);
 	});
 
 	// Gets some stats from orders for Dashboard

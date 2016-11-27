@@ -74,4 +74,8 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 		NOSQL('newsletter').remove(F.path.databases('newsletter_removed.nosql')).callback(refresh_cache);
 		callback(SUCCESS(true));
 	});
+
+	schema.addWorkflow('stats', function(error, model, options, callback) {
+		NOSQL('newsletter').counter.monthly('all', callback);
+	});
 });

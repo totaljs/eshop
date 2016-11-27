@@ -119,6 +119,11 @@ NEWSCHEMA('Post').make(function(schema) {
 		NOSQL('posts').remove().callback(refresh_cache);
 		callback(SUCCESS(true));
 	});
+
+	// Stats
+	schema.addWorkflow('stats', function(error, model, options, callback) {
+		NOSQL('posts').counter.monthly(options.id, callback);
+	});
 });
 
 // Refreshes internal informations (sitemap and navigations)

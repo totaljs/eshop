@@ -28,6 +28,7 @@ exports.install = function() {
 	F.route(url + '/api/orders/',              json_save,   ['put', '*Order']);
 	F.route(url + '/api/orders/',              json_remove, ['delete', '*Order']);
 	F.route(url + '/api/orders/clear/',        json_clear,  ['*Order']);
+	F.route(url + '/api/orders/stats/',        json_stats,  ['*Order']);
 
 	// USERS
 	F.route(url + '/api/users/',               json_query,  ['*User']);
@@ -35,6 +36,7 @@ exports.install = function() {
 	F.route(url + '/api/users/',               json_save,   ['put', '*User']);
 	F.route(url + '/api/users/',               json_remove, ['delete', '*User']);
 	F.route(url + '/api/users/clear/',         json_clear,  ['*User']);
+	F.route(url + '/api/users/stats/',         json_stats, ['*User']);
 
 	// PRODUCTS
 	F.route(url + '/api/products/',            json_query,  ['*Product']);
@@ -42,31 +44,31 @@ exports.install = function() {
 	F.route(url + '/api/products/{id}/',       json_read,   ['*Product']);
 	F.route(url + '/api/products/',            json_remove, ['delete', '*Product']);
 	F.route(url + '/api/products/clear/',      json_clear,  ['*Product']);
+	F.route(url + '/api/products/{id}/stats/', json_stats, ['*Product']);
 	F.route(url + '/api/products/import/',     json_products_import, ['upload', 1000 * 60 * 5], 1024);
 	F.route(url + '/api/products/export/',     json_products_export, ['*Product', 10000]);
 	F.route(url + '/api/products/codelists/',  json_products_codelists);
 	F.route(url + '/api/products/category/',   json_products_category_replace, ['post']);
-	F.route(url + '/api/products/{id}/stats/', json_products_stats, ['*Product']);
 
 	// POSTS
 	F.route(url + '/api/posts/',               json_query,  ['*Post']);
 	F.route(url + '/api/posts/',               json_save,   ['post', '*Post'], 512);
 	F.route(url + '/api/posts/{id}/',          json_read,   ['*Post']);
 	F.route(url + '/api/posts/',               json_remove, ['delete', '*Post']);
+	F.route(url + '/api/posts/{id}/stats/',    json_stats,  ['*Post']);
 	F.route(url + '/api/posts/clear/',         json_clear,  ['*Post']);
 	F.route(url + '/api/posts/codelists/',     json_posts_codelists);
-	F.route(url + '/api/posts/{id}/stats/',    json_posts_stats, ['*Post']);
 
 	// PAGES
 	F.route(url + '/api/pages/',               json_query,  ['*Page']);
 	F.route(url + '/api/pages/',               json_remove, ['delete', '*Page']);
 	F.route(url + '/api/pages/{id}/',          json_read,   ['*Page']);
 	F.route(url + '/api/pages/clear/',         json_clear,  ['*Page']);
+	F.route(url + '/api/pages/{id}/stats/',    json_stats,  ['*Page']);
 	F.route(url + '/api/pages/',               json_pages_save, ['post', '*Page'], 512);
 	F.route(url + '/api/pages/preview/',       view_pages_preview, ['json'], 512);
 	F.route(url + '/api/pages/dependencies/',  json_pages_dependencies);
 	F.route(url + '/api/pages/sitemap/',       json_pages_sitemap);
-	F.route(url + '/api/pages/{id}/stats/',    json_pages_stats, ['*Page']);
 
 	// WIDGETS
 	F.route(url + '/api/widgets/',             json_query,  ['*Widget']);
@@ -78,6 +80,7 @@ exports.install = function() {
 	// NEWSLETTER
 	F.route(url + '/api/newsletter/',          json_query,  ['*Newsletter']);
 	F.route(url + '/api/newsletter/clear/',    json_clear,  ['*Newsletter']);
+	F.route(url + '/api/newsletter/stats/',    json_stats,  ['*Newsletter']);
 	F.route(url + '/newsletter/export/',       file_newsletter, ['*Newsletter']);
 
 	// SETTINGS
@@ -196,6 +199,12 @@ function json_read(id) {
 	var options = {};
 	options.id = id;
 	self.$get(options, self.callback());
+}
+
+function json_stats(id) {
+	var self = this;
+	self.id = id;
+	self.$workflow('stats', self, self.callback());
 }
 
 // ==========================================================================
@@ -324,18 +333,6 @@ function json_products_category_replace() {
 	GETSCHEMA('Product').workflow2('category', self.body, self.callback());
 }
 
-function json_products_stats(id) {
-	var self = this;
-	NOSQL('products').counter.monthly(id, function(err, views) {
-		NOSQL('orders').counter.monthly(id, function(err, orders) {
-			var model = SINGLETON('products.stats');
-			model.views = views;
-			model.orders = orders;
-			self.json(model);
-		});
-	});
-}
-
 // ==========================================================================
 // POSTS
 // ==========================================================================
@@ -344,15 +341,6 @@ function json_products_stats(id) {
 function json_posts_codelists() {
 	var self = this;
 	self.json({ categories: F.global.posts, templates: F.config.custom.templatesposts });
-}
-
-function json_posts_stats(id) {
-	var self = this;
-	NOSQL('posts').counter.monthly(id, function(err, views) {
-		var model = SINGLETON('posts.stats');
-		model.views = views;
-		self.json(model);
-	});
 }
 
 // ==========================================================================
@@ -392,15 +380,6 @@ function json_pages_sitemap() {
 	SITEMAP.sitemap = F.global.sitemap;
 	SITEMAP.partial = F.global.partial;
 	this.json(SITEMAP);
-}
-
-function json_pages_stats(id) {
-	var self = this;
-	NOSQL('pages').counter.monthly(id, function(err, views) {
-		var model = SINGLETON('pages.stats');
-		model.views = views;
-		self.json(model);
-	});
 }
 
 // ==========================================================================

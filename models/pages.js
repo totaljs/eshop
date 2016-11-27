@@ -154,6 +154,11 @@ NEWSCHEMA('Page').make(function(schema) {
 		});
 	});
 
+	// Stats
+	schema.addWorkflow('stats', function(error, model, options, callback) {
+		NOSQL('pages').counter.monthly(options.id, callback);
+	});
+
 	// Renders page
 	schema.addOperation('render', function(error, model, options, callback) {
 
