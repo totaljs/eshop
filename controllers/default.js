@@ -38,7 +38,7 @@ function view_homepage() {
 // Contact with contact form
 function view_contact() {
 	var self = this;
-	self.render(self.url, 'contact');
+	self.render(self.url);
 }
 
 // ==========================================================================
