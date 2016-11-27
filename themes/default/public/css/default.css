@@ -223,8 +223,8 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	.categories-hide { display: block; }
 	.header-padding { padding: 0; }
 	.header-links-container { display: none; }
-	.links > div { border-bottom: 0; }
-	h1, h2 { font-size: 25px; font-weight: 400; margin-bottom: 10px; text-align: left; }
+	.links > div { border-top: 0; }
+	h1, h2 { font-size: 25px; font-weight: 400; margin-bottom: 10px; }
 	.homepage h1 { text-align: center; }
 	.large { font-size: 25px; }
 	.orders .col-sm-4 { border-bottom: 1px solid #E0E0E0; text-align: left !important; padding: 10px 0; }
