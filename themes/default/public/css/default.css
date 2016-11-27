@@ -254,4 +254,16 @@ footer { text-align: center; font-size: 12px; padding: 20px 0; color: gray; }
 	td.hidden-xs { display: none !important; }
 	.product { border-bottom: 1px solid #F0F0F0; }
 	.tabs a { min-width: 70px; }
+
+	.recommendation a { display: block; margin-bottom: 3px; }
+	.manufacturers a { width: 46%; }
+
+	.content-specification-keyvalue { height: auto; }
+	.content-specification-keyvalue .key { float: none; border-right: 0; height: auto; }
+	.content-specification-keyvalue .value { float: none; margin: 0; padding: 1px 0 5px 10px; }
+
+	.content-textleft .col-md-6 div { margin: 0 20px; }
+	.content-textright .col-md-6 div { margin: 0 20px 20px 0; }
+	.content-textcenter .col-md-6 div { margin: 0 20px 0; }
+	.content-textcenter h2 { text-align: center !important; }
 }
