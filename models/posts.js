@@ -90,6 +90,9 @@ NEWSCHEMA('Post').make(function(schema) {
 			model.adminupdated = controller.user.name;
 		}
 
+		if (!model.datecreated)
+			model.datecreated = F.datetime;
+
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
 
 		var category = F.global.posts.find('name', model.category);
