@@ -8,7 +8,7 @@ COMPONENT('click', function() {
 		if (typeof(value) === 'string')
 			self.set(self.parser(value));
 		else
-			self.get(self.attr('data-component-path'))(self);
+			self.get(self.attr('data-jc-path'))(self);
 	};
 
 	self.make = function() {
@@ -243,7 +243,7 @@ COMPONENT('dropdown', function() {
 		self.element.addClass('ui-dropdown-container');
 
 		var label = self.html();
-		var html = '<div class="ui-dropdown"><span class="fa fa-sort"></span><select data-component-bind="">{0}</select></div>'.format(options.join(''));
+		var html = '<div class="ui-dropdown"><span class="fa fa-sort"></span><select data-jc-bind="">{0}</select></div>'.format(options.join(''));
 		var builder = [];
 
 		if (label.length) {
@@ -333,9 +333,9 @@ COMPONENT('textbox', function() {
 		attrs.attr('type', self.type === 'password' ? self.type : 'text');
 		attrs.attr('placeholder', self.attr('data-placeholder'));
 		attrs.attr('maxlength', self.attr('data-maxlength'));
-		attrs.attr('data-component-keypress', self.attr('data-component-keypress'));
-		attrs.attr('data-component-keypress-delay', self.attr('data-component-keypress-delay'));
-		attrs.attr('data-component-bind', '');
+		attrs.attr('data-jc-keypress', self.attr('data-jc-keypress'));
+		attrs.attr('data-jc-keypress-delay', self.attr('data-jc-keypress-delay'));
+		attrs.attr('data-jc-bind', '');
 
 		tmp = self.attr('data-align');
 		tmp && attrs.attr('class', 'ui-' + tmp);
@@ -455,7 +455,7 @@ COMPONENT('textarea', function() {
 
 		attrs.attr('placeholder', self.attr('data-placeholder'));
 		attrs.attr('maxlength', self.attr('data-maxlength'));
-		attrs.attr('data-component-bind', '');
+		attrs.attr('data-jc-bind', '');
 
 		tmp = self.attr('data-height');
 		tmp && attrs.attr('style', 'height:' + tmp);
@@ -550,7 +550,7 @@ COMPONENT('repeater', function() {
 		var html = element.html();
 		element.remove();
 		self.template = Tangular.compile(html);
-		recompile = html.indexOf('data-component="') !== -1;
+		recompile = html.indexOf('data-jc="') !== -1;
 	};
 
 	self.setter = function(value) {
@@ -1054,28 +1054,27 @@ COMPONENT('pictures', function() {
 		if (typeof(value) === 'string')
 			value = value.split(',');
 
-		if (this.skip) {
-			this.skip = false;
+		if (self.skip) {
+			self.skip = false;
 			return;
 		}
 
-		this.element.find('.fa').unbind('click');
-		this.element.find('img').unbind('click');
-		this.element.empty();
+		self.find('.fa,img').unbind('click');
 
-		if (!(value instanceof Array) || !value.length)
+		if (!(value instanceof Array) || !value.length) {
+			self.empty();
 			return;
+		}
 
 		var count = 0;
 		var builder = [];
 
 		for (var i = 0, length = value.length; i < length; i++) {
 			var id = value[i];
-			id && builder.push('<div data-id="' + id + '" class="col-xs-3 col-lg-2 m"><span class="fa fa-times"></span><img src="/images/small/{0}.jpg" class="img-responsive" alt="" /></div>'.format(id));
+			id && builder.push('<div data-id="{0}" class="col-xs-3 col-lg-2 m"><span class="fa fa-times"></span><img src="/images/small/{0}.jpg" class="img-responsive" alt="" /></div>'.format(id));
 		}
 
 		self.html(builder);
-		setTimeout(FN('() => $(window).trigger("resize");'), 500);
 
 		this.element.find('.fa').bind('click', function(e) {
 
@@ -1100,8 +1099,10 @@ COMPONENT('pictures', function() {
 			if (!selected.length)
 				return;
 
-			var id1 = el.parent().attr('data-id');
-			var id2 = selected.parent().attr('data-id');
+			var parent1 = el.parent();
+			var parent2 = selected.parent();
+			var id1 = parent1.attr('data-id');
+			var id2 = parent2.attr('data-id');
 			var arr = self.get();
 
 			var index1 = arr.indexOf(id1);
@@ -1110,10 +1111,23 @@ COMPONENT('pictures', function() {
 			arr[index1] = id2;
 			arr[index2] = id1;
 
+			parent1.attr('data-id', id2);
+			parent2.attr('data-id', id1);
+
+			var img1 = parent1.find('img');
+			var img2 = parent2.find('img');
+			var src1 = img1.attr('src');
+
+			img1.attr('src', img2.attr('src'));
+			img2.attr('src', src1);
+
 			setTimeout(function() {
+				self.skip = true;
+				img1.removeClass('selected');
+				img2.removeClass('selected');
 				self.change();
 				self.set(arr);
-			}, 500);
+			}, 200);
 		});
 	};
 });
