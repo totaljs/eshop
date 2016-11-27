@@ -50,7 +50,7 @@
 		});
 
 		function doLogin() {
-			if (!$.components.valid('user.*'))
+			if (!jC.valid('user.*'))
 				return;
 			var id = HASH(user.name + ':' + user.password);
 			var dt = new Date();
