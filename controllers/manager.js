@@ -404,6 +404,16 @@ function json_pages_stats(id) {
 }
 
 // ==========================================================================
+// NEWSLETTER
+// ==========================================================================
+
+// Downloads all email address as CSV
+function file_newsletter() {
+	var self = this;
+	self.$workflow('download', self);
+}
+
+// ==========================================================================
 // SETTINGS
 // ==========================================================================
 
@@ -417,14 +427,4 @@ function json_settings() {
 function json_settings_save() {
 	var self = this;
 	self.body.$async(self.callback(), 0).$save(self).$workflow('load');
-}
-
-// ==========================================================================
-// NEWSLETTER
-// ==========================================================================
-
-// Downloads all email address as CSV
-function file_newsletter() {
-	var self = this;
-	self.$workflow('download', self);
 }
