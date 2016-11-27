@@ -1,8 +1,4 @@
-cms/databases/
-cms/tmp/
-eshop/databases/
-eshop/tmp/
-eshop-postgresql/tmp/
-eshop-mongodb/tmp/
+tmp/
 *.pid
 .DS_store
+backup
