@@ -23,7 +23,7 @@ Please do not change the code, just create a new issues. I solve all problems as
 
 ##  Do you want PostgreSQL, MongoDB, MySQL or SQL Server version?
 
-We can create versions for other DB's. [Read more](https://www.totaljs.com/eshop/#).
+We can create versions for other DB's. [Read more](https://www.totaljs.com/eshop/#databases).
 
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat
 [license-url]: license.txt
