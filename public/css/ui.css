@@ -295,7 +295,7 @@ label span { vertical-align: middle; }
 .ui-error li { display: block; }
 .ui-error li .fa { width: 14px; }
 
-.ui-cookie { font-size: 11px; padding: 3px 20px 5px; border-bottom: 1px solid #F0F0F0; text-align: center; }
+.ui-cookie { font-size: 11px; padding: 3px 20px 5px; border-bottom: 1px solid #E0E0E0; text-align: center; background-color: white; }
 .ui-cookie button { position: relative; display: inline-block; padding: 1px 5px; border-radius: 4px; font-size: 10px; background-color: black; color: white; border: 0; margin-left: 5px; cursor: pointer; outline: 0; }
 .ui-cookie button:hover { background-color: #303030; }
 
