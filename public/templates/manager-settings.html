@@ -145,16 +145,15 @@
 		<br />
 		<div class="row">
 			<div class="col-md-4 m">
-				<div data-jc="textboxtags" data-jc-path="settings.form.navigations">@(Registered navigations)</div>
+				<div data-jc="textboxlist" data-jc-path="settings.form.navigations" class="m" data-icon="fa-folder" data-placeholder="@(Type a name of navigation and press enter)">@(Registered navigations)</div>
 				<div class="help">@(Storage: <code>F.global.navigation.NAME</code>)</div>
 			</div>
-
 			<div class="col-md-4 m">
-				<div data-jc="textboxtags" data-jc-path="settings.form.posts">@(Posts categories)</div>
+				<div data-jc="textboxlist" data-jc-path="settings.form.posts" class="m" data-icon="fa-folder" data-placeholder="@(Type a name of category and press enter)">@(Posts categories)</div>
 				<div class="help">@(Storage: <code>F.global.posts</code>)</div>
 			</div>
 			<div class="col-md-4 m">
-				<div data-jc="textboxtags" data-jc-path="settings.form.languages">@(Supported languages)</div>
+				<div data-jc="textboxtags" data-jc-path="settings.form.languages" data-icon="fa-language">@(Supported languages)</div>
 				<div class="help">@(E.g. <code>en</code> <code>sk</code> <code>ru</code>)</div>
 			</div>
 		</div>
