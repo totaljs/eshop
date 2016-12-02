@@ -210,7 +210,7 @@ label span { vertical-align: middle; }
 .ui-checkboxlist-selectall a { color: #A0A0A0; }
 .ui-checkboxlist-selectall .fa { margin-right: 5px; color: gray; }
 
-.ui-textboxlist-label { margin-bottom: 10px; font-size: 12px; }
+.ui-textboxlist-label { margin-bottom: 5px; font-size: 12px; }
 .ui-textboxlist-label .fa { margin-right: 5px; }
 .ui-textboxlist-item { height: 30px; background-color: #F8F8F8; margin-bottom: 1px; border-radius: 3px; }
 .ui-textboxlist-item > div:first-child { float: right; width: 25px; text-align: center; color: #DA4453; font-size: 14px; margin: 4px 0 0; }
