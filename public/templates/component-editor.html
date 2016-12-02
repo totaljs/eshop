@@ -579,7 +579,9 @@
 					info.html('&lt;{0}{1}&gt;'.format(tag.toLowerCase(), tag === 'BR' || tag === 'HR' ? ' /' : ''));
 
 				var wrap = self.getParent('CMS_widget') || self.getParent('CMS_template');
+
 				cmseditor.wrap = wrap;
+				cmseditor.wrapremove = self.getParent('CMS_remove');
 
 				panel.css({ left: left, top: off.top - panel.innerHeight() - 5 });
 				panel.find('#CMS_panel_buttons_move').toggle(wrap && wrap.length ? true : false);
@@ -609,7 +611,7 @@
 						disabled = self.getParent('CMS_repeat') === null;
 
 					if (disabled && name === 'remove')
-						disabled = self.getParent('CMS_remove') === null;
+						disabled = cmseditor.wrapremove === null;
 
 					if (disabled && name === 'widgets') {
 						cmseditor.wrap_widgets = self.getParent('CMS_widgets', 5);
@@ -724,6 +726,10 @@
 
 			body.find('#CMS_panel').on('mouseenter mouseleave', '.fa-plug', function(e) {
 				cmseditor.wrap_widgets && cmseditor.wrap_widgets.length && cmseditor.wrap_widgets.toggleClass('CMS_selected_template', e.type === 'mouseenter');
+			});
+
+			body.find('#CMS_panel').on('mouseenter mouseleave', '.fa-trash', function(e) {
+				cmseditor.wrapremove && cmseditor.wrapremove.toggleClass('CMS_operation', e.type === 'mouseenter');
 			});
 
 			body.find('#CMS_panel').on('click', 'span', function(e) {
@@ -1265,9 +1271,17 @@
 			}
 
 			editor.doFind('#CMS').html(cmseditor.source);
-			editor.resize();
 			editor.change(true);
 			editor.load('sourcecode');
+
+			setTimeout(function() {
+				editor.resize(true);
+			}, 500);
+
+			setTimeout(function() {
+				editor.resize(true);
+			}, 1000);
+
 			hide();
 		};
 
