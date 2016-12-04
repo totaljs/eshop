@@ -378,9 +378,9 @@
 	function products_refresh_codelists() {
 		AJAX('GET {0}/api/products/codelists/'.format(managerurl), function(response) {
 			response.categories.sort(FN('(a, b) => a.name.localeCompare(b.name)'));
-			SET('products.categories', response.categories);
-			SET('products.templates', response.templates);
-			SET('products.manufacturers', response.manufacturers);
+			Object.keys(response).forEach(function(key) {
+				SET('products.' + key, response[key]);
+			});
 		});
 	}
 
