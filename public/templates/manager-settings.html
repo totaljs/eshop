@@ -188,7 +188,7 @@
 
 <div class="container">
 	<div class="help" style="margin-top:10px">@(For creating another access into the administration click on to below button:)</div>
-	<div class="mt5"><a href="javascript:void(0)" data-jc="click" data-jc-path="settings_users_add"><span class="fa fa-user mr5"></span>@(Add new administrator)</a></div>
+	<div class="mt5"><a href="javascript:void(0)" class="exec" data-exec="settings_users_add"><span class="fa fa-user mr5"></span>@(Add new administrator)</a></div>
 	<br />
 	<div data-jc="grid" data-jc-path="settings.form.users" data-max="1000000" data-jc-id="settings.users">
 		<script type="text/html">
@@ -204,10 +204,11 @@
 	</div>
 	<hr />
 	<br />
+	<div data-jc="error" data-jc-path="settings.form.response"></div>
 	<div class="row">
 		<div class="col-md-4 m col-md-offset-4">
 			<div data-jc="validation" data-jc-path="settings.form">
-				<button class="button b" data-jc="click" data-jc-path="settings_save">@(SAVE SETTINGS)</button>
+				<button class="button b exec" data-exec="settings_save">@(SAVE SETTINGS)</button>
 			</div>
 		</div>
 	</div>
@@ -273,7 +274,15 @@
 		settings.form.users = settings.form.users.items;
 
 		var loading = FIND('loading').show();
-		AJAX('PUT {0}/api/settings/'.format(managerurl), settings.form, function() {
+		AJAX('PUT {0}/api/settings/'.format(managerurl), settings.form, function(response) {
+
+			SET('settings.form.response', response);
+			RESET('settings.form.*');
+
+			if (response instanceof Array) {
+				loading.hide(500);
+				return;
+			}
 
 			success(true);
 			RESET('settings.form.*');
@@ -301,7 +310,7 @@
 	}
 
 	Tangular.register('roles', function(value, separator) {
-		return (!(value instanceof Array) || !value.length) ? '<em>@(super admin)</em>' : value.join(separator);
+		return value instanceof Array && value.length ? value.join(separator) : '<em>@(super admin)</em>';
 	});
 
 	// Users grid
