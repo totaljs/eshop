@@ -21,12 +21,12 @@
 						<div data-required="true" data-jc="textbox" data-jc-path="signin.password" data-jc-type="password">@(Password)</div>
 					</div>
 				</div>
-				<a href="javascript:void(0)" data-jc="click" data-jc-path="#passwordrecovery">@(Forgot your password?)</a>
+				<a href="javascript:void(0)" class="exec" data-exec="#passwordrecovery">@(Forgot your password?)</a>
 				<div data-jc="error" data-jc-path="signin.response" style="margin-top:18px"></div>
 				<div class="row">
 					<div class="col-md-10">
 						<div data-jc="validation" data-jc-path="signin">
-							<button class="button button-small" disabled="disabled" data-jc="click" data-jc-path="#doLogin" data-enter="#login">@(SUBMIT)</button>
+							<button class="button button-small exec" disabled="disabled" data-exec="#doLogin" data-enter="#login">@(SUBMIT)</button>
 						</div>
 					</div>
 				</div>
@@ -39,12 +39,12 @@
 						<div data-required="true" data-jc="textbox" data-jc-path="passwordrecovery.email" data-jc-type="email" data-jc-value="'@'">@(E-mail address)</div>
 					</div>
 				</div>
-				<a href="javascript:void(0)" data-jc="click" data-jc-path="#passwordrecovery">@(I know my password)</a>
+				<a href="javascript:void(0)" class="exec" data-exec="#passwordrecovery">@(I know my password)</a>
 				<div data-jc="error" data-jc-path="passwordrecovery.response" style="margin-top:18px"></div>
 				<div class="row">
 					<div class="col-md-10">
 						<div data-jc="validation" data-jc-path="passwordrecovery">
-							<button class="button button-small" disabled="disabled" data-jc="click" data-jc-path="#doPassword" data-enter="#password">@(SUBMIT)</button>
+							<button class="button button-small exec" disabled="disabled" data-exec="#doPassword" data-enter="#password">@(SUBMIT)</button>
 						</div>
 					</div>
 				</div>
@@ -53,9 +53,7 @@
 
 		<div class="col-md-6">
 			<div class="padding bg-smoke">
-
 				<h3 class="nmt"><i class="fa fa-lock mr5"></i>@(Create a new account)</h3>
-
 				<div class="row">
 					<div class="col-md-6 m">
 						<div data-required="true" data-jc="textbox" data-jc-path="signup.firstname" data-jc-value="''">@(First name)</div>
@@ -85,7 +83,7 @@
 				<div class="row">
 					<div class="col-md-6">
 						<div data-jc="validation" data-jc-path="signup" data-if="value && value.isterms && value.password === value.passwordreply">
-							<button class="button button-small" disabled="disabled" data-jc="click" data-jc-path="#doCreate">@(SUBMIT)</button>
+							<button class="button button-small exec" disabled="disabled" data-exec="#doCreate">@(SUBMIT)</button>
 						</div>
 					</div>
 				</div>
