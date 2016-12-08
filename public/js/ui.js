@@ -2868,7 +2868,12 @@ COMPONENT('nosqlcounter', function() {
 		if (!value || !value.length)
 			return self.empty();
 
-		var max = value.length - count;
+		var maxbars = count;
+
+		if (WIDTH() === 'xs')
+			maxbars = (maxbars / 2) >> 0;
+
+		var max = value.length - maxbars;
 		if (max < 0)
 			max = 0;
 
@@ -2877,7 +2882,7 @@ COMPONENT('nosqlcounter', function() {
 
 		var w = self.element.width();
 
-		var bar = 100 / count;
+		var bar = 100 / maxbars;
 		var builder = [];
 		var months = FIND('calendar').months;
 		var current = new Date().format('yyyyMM');
