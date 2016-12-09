@@ -1,0 +1,79 @@
+<!-- BEGIN SIDEBAR -->
+
+<div class="sidebar col-md-3 col-sm-4">
+    <h1>@(Categories)</h1>
+    <ul class="list-group margin-bottom-25 sidebar-menu">
+        @{console.log(global.categories)}
+        @{foreach m in global.categories}
+        <li class="list-group-item clearfix"><a href="@{sitemap_url('category')}@{m.linker}/@{m._id}/"><i class="fa fa-angle-right"></i> @{m.name}</a>
+            @{if m.children.length}
+            <ul class="dropdown-menu" style="display:block;">
+                @{foreach c1 in m.children}
+                <li class="list-group-item clearfix"><a href="@{sitemap_url('category')}@{c1.linker}/@{c1._id}/"><i class="fa fa-angle-right"></i> @{c1.name}</a>
+                    @{if c1.children.length}
+                    <ul class="dropdown-menu" style="display:block;">
+                        @{foreach c2 in c1.children}
+                        <li class="list-group-item clearfix"><a href="@{sitemap_url('category')}@{c2.linker}/@{c2._id}/"><i class="fa fa-angle-right"></i> @{c2.name}</a>
+                            @{if c2.children.length}
+                            <ul class="dropdown-menu" style="display:block;">
+                                @{foreach c3 in c2.children}
+                                <li class="list-group-item clearfix"><a href="@{sitemap_url('category')}@{c3.linker}/@{c3._id}/"><i class="fa fa-angle-right"></i> @{c3.name}</a>
+                                    @{if c3.children.length}
+                                    <ul class="dropdown-menu" style="display:block;">
+                                        @{foreach c4 in c3.children}
+                                        <li class="list-group-item clearfix"><a href="@{sitemap_url('category')}@{c4.linker}/@{c4._id}/"><i class="fa fa-angle-right"></i> @{c4.name}</a></li>
+                                        @{end}
+                                    </ul>
+                                    @{fi}
+                                </li>
+                                @{end}
+                            </ul>
+                            @{fi}
+                        </li>
+                        @{end}
+                    </ul>
+                    @{fi}
+                </li>
+                @{end} 
+            </ul>
+            @{fi}
+        </li>
+        @{end}
+    </ul>
+</div>
+<!-- END SIDEBAR -->
+
+
+
+<!--<li class="list-group-item clearfix"><a href="shop-product-list.html"><i class="fa fa-angle-right"></i> Ladies</a></li>
+<li class="list-group-item clearfix dropdown active">
+    <a href="javascript:void(0);" class="collapsed">
+        <i class="fa fa-angle-right"></i>
+        Mens
+
+    </a>
+    <ul class="dropdown-menu" style="display:block;">
+        <li class="list-group-item dropdown clearfix active">
+            <a href="javascript:void(0);" class="collapsed"><i class="fa fa-angle-right"></i> Shoes </a>
+            <ul class="dropdown-menu" style="display:block;">
+                <li class="list-group-item dropdown clearfix">
+                    <a href="javascript:void(0);"><i class="fa fa-angle-right"></i> Classic </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="shop-product-list.html"><i class="fa fa-angle-right"></i> Classic 1</a></li>
+                        <li><a href="shop-product-list.html"><i class="fa fa-angle-right"></i> Classic 2</a></li>
+                    </ul>
+                </li>
+                <li class="list-group-item dropdown clearfix active">
+                    <a href="javascript:void(0);" class="collapsed"><i class="fa fa-angle-right"></i> Sport  </a>
+                    <ul class="dropdown-menu" style="display:block;">
+                        <li class="active"><a href="shop-product-list.html"><i class="fa fa-angle-right"></i> Sport 1</a></li>
+                        <li><a href="shop-product-list.html"><i class="fa fa-angle-right"></i> Sport 2</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li><a href="shop-product-list.html"><i class="fa fa-angle-right"></i> Trainers</a></li>
+        <li><a href="shop-product-list.html"><i class="fa fa-angle-right"></i> Jeans</a></li>
+        <li><a href="shop-product-list.html"><i class="fa fa-angle-right"></i> Chinos</a></li>
+        <li><a href="shop-product-list.html"><i class="fa fa-angle-right"></i> T-Shirts</a></li>
+    </ul>-->

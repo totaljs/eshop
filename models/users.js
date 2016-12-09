@@ -39,36 +39,54 @@ NEWSCHEMA('User').make(function(schema) {
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
 
-		var filter = NOSQL('users').one();
+		if(!(options.email || options.password || options.id)) {
+		    error.push('error-404-user');
+		    return callback();
+		}
 
-		options.id && filter.where('id', options.id);
-		options.email && filter.where('email', options.email);
-		options.password && filter.where('password', options.password);
+		var nosql = DB(error);
 
-		filter.callback(callback, 'error-404-user');
+		nosql.select('item', 'users').make(function(builder) {
+			builder.where('isremoved', false);
+			options.email && builder.where('email', options.email);
+			options.password && builder.where('password', options.password);
+			options.id && builder.where('id', options.id);
+			builder.first();
 	});
 
-	schema.setSave(function(error, model, controller, callback) {
-		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
-		NOSQL('users').modify(model).where('id', model.id).callback(function(count) {
+        nosql.validate('item', 'error-404-user');
+	nosql.exec(function(err, doc) {
 			callback(SUCCESS(true));
-			count && F.emit('users.save', model);
-		});
+			doc && F.emit('users.save', doc);
+		}, 'item');
 	});
 
 	// Removes user from DB
 	schema.setRemove(function(error, id, callback) {
-		NOSQL('users').remove().where('id', id).callback(callback);
+
+		var nosql = DB(error);
+
+		nosql.update('item', 'users').make(function(builder) {
+			builder.where('id', id);
+			builder.set('isremoved', true);
+	});
+
+		nosql.exec(SUCCESS(callback), -1);
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		NOSQL('users').remove();
-		callback(SUCCESS(true));
+		var nosql = DB(error);
+		nosql.remove('users');
+		nosql.exec(SUCCESS(callback), -1);
 	});
 
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
+
+		// options.search {String}
+		// options.page {String or Number}
+		// options.max {String or Number}
 
 		options.page = U.parseInt(options.page) - 1;
 		options.max = U.parseInt(options.max, 20);
@@ -78,18 +96,25 @@ NEWSCHEMA('User').make(function(schema) {
 
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
-		var filter = NOSQL('users').find();
 
-		options.search && filter.like('search', options.search.keywords(true, true));
+		var nosql = DB(error);
 
-		filter.take(take);
-		filter.skip(skip);
-		filter.sort('datecreated');
+		nosql.listing('users', 'users').make(function(builder) {
+			builder.where('isremoved', false);
+			options.search && builder.in('search', options.search.keywords(true, true));
+			builder.sort('datecreated', true);
+			builder.skip(skip);
+			builder.take(take);
+		});
 
-		filter.callback(function(err, docs, count) {
+		nosql.exec(function(err, response) {
+
+			if (err)
+				return callback();
+
 			var data = {};
-			data.count = count;
-			data.items = docs;
+			data.count = response.users.count;
+			data.items = response.users.items;
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
@@ -105,55 +130,61 @@ NEWSCHEMA('User').make(function(schema) {
 		// options.type
 
 		var id = 'id' + options.type;
+		var nosql = DB(error);
 
-		NOSQL('users').one().make(function(builder) {
+		nosql.select('user', 'users').make(function(builder) {
+			builder.where('isremoved', false);
+
+			builder.scope(function() {
+				builder.where(id, options.profile[id]);
+				if (!options.profile.email)
+					return;
 			builder.or();
-			builder.where(id, options.profile[id]);
 			builder.where('email', options.profile.email);
-			builder.end();
-		}).callback(function(err, doc) {
+			});
 
-			if (doc) {
-				if (doc[id] !== options.profile[id]) {
-					NOSQL('users').update(function(user) {
-						if (user.id === doc.id)
-							user[id] = options.profile[id];
-						return user;
+			builder.first();
 					});
-				}
-			} else {
-				doc = schema.create();
-				doc.id = UID();
-				doc.name = options.profile.name;
-				doc.firstname = options.profile.firstname;
-				doc.lastname = options.profile.lastname;
-				doc.email = options.profile.email;
-				doc.gender = options.profile.gender;
-				doc.ip = options.profile.ip;
-				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ').max(500);
-				doc.datecreated = F.datetime;
-				doc[id] = options.profile[id];
 
-				var db = NOSQL('users');
-				db.insert(doc.$clean(), F.error());
-				db.counter.hit('all');
-				db.counter.hit('oauth2');
-				db.counter.hit(options.type);
-				options.profile.gender && db.counter.hit(options.profile.gender);
+		nosql.prepare(function(error, response, resume) {
+
+			if (response.user) {
+				response.user[id] !== options.profile[id] && nosql.update('users').make(function(builder) {
+					builder.set(id, options.profile[id]);
+					builder.where('id', response.user.id);
+				});
+			} else {
+				response.user = schema.create();
+				response.user.id = UID();
+				response.user.name = options.profile.name;
+				response.user.email = options.profile.email;
+				response.user.gender = options.profile.gender;
+				response.user.firstname = options.profile.firstname;
+				response.user.lastname = options.profile.lastname;
+				response.user.ip = options.profile.ip;
+				response.user.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true);
+				response.user.datecreated = F.datetime;
+				response.user[id] = options.profile[id];
+
+				// Inserts new user
+				nosql.insert('users').set(response.user);
 
 				// Writes stats
 				MODULE('webcounter').increment('users');
 			}
 
-			exports.login(options.controller.req, options.controller.res, doc.id);
-			options.controller.req.user = exports.createSession(doc);
-			callback(doc);
+			resume();
 		});
-	});
 
-	// Stats
-	schema.addWorkflow('stats', function(error, model, options, callback) {
-		NOSQL('users').counter.monthly('all', callback);
+		nosql.exec(function(err, response) {
+
+			if (response.user) {
+				exports.login(options.controller.req, options.controller.res, response.user.id);
+				options.controller.req.user = exports.createSession(response.user);
+			}
+
+			callback(response.user);
+                });
 	});
 });
 
@@ -180,9 +211,17 @@ NEWSCHEMA('UserSettings').make(function(schema) {
 		user.firstname = model.firstname;
 		user.lastname = model.lastname;
 
-		// Update an user in database
-		NOSQL('users').modify(model).where('id', model.id).callback(SUCCESS(callback));
+		var nosql = DB(error);
+
+		nosql.update('users').make(function(builder) {
+			builder.set(model);
+			builder.rem('id');
+			builder.where('id', model.id);
+			builder.first();
 	});
+
+		nosql.exec(SUCCESS(callback), -1);
+});
 });
 
 NEWSCHEMA('UserLogin').make(function(schema) {
@@ -265,7 +304,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			}
 
 			var user = GETSCHEMA('User').create();
-			user.id = UID();
+
 			user.email = model.email;
 			user.firstname = model.firstname;
 			user.lastname = model.lastname;
@@ -279,16 +318,19 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
 
 			F.config.custom.emailuserform && mail.bcc(F.config.custom.emailuserform);
-			var db = NOSQL('users');
-			db.insert(user, F.error());
-			db.counter.hit('all');
-			model.gender && db.counter.hit(model.gender);
+
+			user.$save(function(err, response) {
+				if (err)
+					return callback();
 
 			// Login user
-			exports.login(options.controller.req, options.controller.res, user.id);
+				exports.login(options.controller.req, options.controller.res, response.value);
+
+				// Response
 			callback(SUCCESS(true));
 		});
 	});
+    });
 });
 
 // Cleans online users
@@ -345,6 +387,15 @@ F.onAuthorize = function(req, res, flags, callback) {
 			return;
 		}
 
+		var nosql = DB();
+
+		nosql.update('users').make(function(builder) {
+			builder.inc('countlogin');
+			builder.set('datelogged', F.datetime);
+			builder.where('id', response.id);
+		});
+
+		nosql.exec(F.error());
 		req.user = exports.createSession(response);
 		res.cookie(COOKIE, F.encrypt({ id: response.id, ip: req.ip }, SECRET, true), '6 days');
 		callback(true);

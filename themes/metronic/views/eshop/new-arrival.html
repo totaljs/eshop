@@ -1,0 +1,34 @@
+<div class="row margin-bottom-35 ">
+    <div class="col-md-12 sale-product">
+        <h2>New Arrivals</h2>
+        <div class="owl-carousel owl-carousel5">
+            @{foreach m in model.items}
+            <div>
+                <div class="product-item">
+                    <div class="pi-img-wrapper">
+                        <img src="@{if !m.files || !m.files.length}/img/empty.png@{else}/images/s/p/ @{m.url} /@{m.category.url}/@{m.files[0]._id}/@{m.files[0].originalFilename}.jpg@{fi}" class="img-responsive" alt="@{if !m.files || !m.files.length}@{m.label}@{else}@{m.files[0].description}@{fi}">
+                        <div>
+                            <a href="@{if !m.files || !m.files.length}/img/empty.png@{else}/images/l/p/ @{m.url} /@{m.category.url}/@{m.files[0]._id}/@{m.files[0].originalFilename}.jpg@{fi}" class="btn btn-default fancybox-button">Zoom</a>
+                            <!--<a href="#product-pop-up" class="btn btn-default fancybox-fast-view">View</a>-->
+                        </div>
+                    </div>
+                    <h3><a href="@{m.linker}">@{m.label}</a></h3>
+                    <h4><a href="@{m.linker_category}">@{m.category.name}</a></h4>
+                    <p>@{m.manufacturer}</p>
+                    <div class="small">@(eshop:MaxPrice)</div>
+                    <!--@{foreach p in model.pricesDetails}
+                    @{if index+1 == model.pricesDetails.length}
+                    <div class="pi-price">@{currency(p.price)}</div>
+                    @{if model.prices.pu_ht != 27}<em>$<span>62.00</span></em>@{fi}
+                    @{fi}
+                    @{end}-->
+                    <div class="pi-price">@{currency(m.prices.pu_ht)}</div>
+                    <a href="javascript:;" class="btn btn-default add2cart">@(eshop:AddToCart)</a>
+                    @{if m.sale}<div class="sticker sticker-sale"></div>@{fi}
+                    @{if m.eshopIsNew}<div class="sticker sticker-new"></div>@{fi}
+                </div>
+            </div>
+            @{end}
+        </div>
+    </div>
+</div>

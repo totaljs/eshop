@@ -1,0 +1,270 @@
+@{view('~/menutop0')}
+
+<!-- BEGIN HEADER -->
+<div class="header">
+    <div class="container">
+        <a class="site-logo" href="/"><img src="/img/logo.png" alt="Eshop" height="40"></a>
+
+        <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+        <!-- BEGIN CART -->
+        <div class="top-cart-block">
+            <div class="top-cart-info" data-component="checkout">
+                <a href="@{sitemap_url('shopping-cart')}" class="top-cart-info-count count" >0 item</a>
+                <a href="@{sitemap_url('shopping-cart')}" class="top-cart-info-value total" data-currency="@{config.custom.currency_entity}">&nbsp;</a>
+            </div>
+            <i class="fa fa-shopping-cart"></i>
+
+            <div class="top-cart-content-wrapper">
+                <div class="top-cart-content checkoutlist">
+                    <ul class="scroller" style="height: 250px;" data-component="repeater" data-component-path="datasource">
+                        <script type="text/html">
+                            <li>
+                                <a href="{{ linker }}"><img src="{{if !files}}/img/empty.png{{else}}/images/s/p/{{url}}/{{linker_category}}/{{files._id}}/{{files.originalFilename}}.jpg{{fi}}" class="img-responsive" alt="{{if !files}} {{label}} {{else}} {{files.description}}{{fi}}" width="37" height="34"/></a>
+
+
+                                <span class="cart-content-count">x {{ count }}</span>
+                                <strong><a href="{{ linker }}">{{ name }}</a></strong>
+                                <em>@{currency('{{ price | format(2) }}')}</em>
+                                <a class="del-goods" data-id="{{ optional.cartId }}">&nbsp;</a>
+                                {{ if optional.description }}
+                                <br/><pre class="small pull-left" style="margin-left: 75px;">{{ optional.description }}</pre>
+                                {{fi}}
+                            </li>
+                            </script>
+                        </ul>
+                        <div class="text-right">
+                            <a href="@{sitemap_url('shopping-cart')}" class="btn btn-default">@(eshop:ViewCart)</a>
+                            <a href="@{sitemap_url('checkout')}" class="btn btn-primary">@(eshop:Checkout)</a>
+                        </div>
+                    </div>
+                </div>            
+            </div>
+            <!--END CART -->
+        
+        <div class="col-md-8 padding-top-20">
+                <form action="@{sitemap_url('products')}" method="GET">
+                    <div class="input-group search">
+                        <input placeholder="@(Search items ...)" value="@{query.q}" autofocus="autofocus" class="form-control" type="text" name="q">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit">@(Search)</button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+
+        <div class="header-navigation">
+          <ul>
+            @{foreach m in global.categories}
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" data-target="@{sitemap_url('products')}@{m.linker}" href="@{sitemap_url('products')}@{m.linker}">
+                        @{m.name} 
+                    </a>
+                </li>
+            @{end}
+
+          </ul>
+        </div>
+            
+            
+            <!-- END NAVIGATION -->
+        </div>
+    </div>
+    <!-- Header END -->
+
+    <!-- Stores the current user data (JSON) -->
+    @{json(user, 'userprofile')}
+
+    @{section script}
+    <script>
+
+        var common = {};
+        var form = {};
+        var datasource;
+        var optional = {};
+
+        // Reads delivery types from the eshop configuration
+        SET('common.deliverytypes', '@{config.custom.deliverytypes.join(",")}'.split(','));
+
+        form.email = '@';
+        form.address = '';
+        form.isnewsletter = true;
+
+        var userprofile = JSON.parse($('#userprofile').html());
+        if (userprofile && userprofile._id) {
+            form = JSON.parse($('#userprofile').html());
+            form.isnewsletter= true;
+            //form.firstname = userprofile.firstname;
+            //form.lastname = userprofile.lastname;
+            //form.email = userprofile.email;
+        }
+        console.log(userprofile);
+
+        jC.ready(function () {
+
+            var cart = CACHE('cart');
+            if (!cart)
+                cart = [];
+
+            var id = [];
+
+            for (var i = 0, length = cart.length; i < length; i++)
+                id.push(cart[i].optional.cardId);
+
+            if (!id.length)
+                FIND('checkout').clear();
+
+            refresh(true);
+
+
+            $('.checkoutlist').on('click', '.btn', function (e) {
+                //console.log($(this).hasClass("quantity-down"));
+                //return console.log(this);
+                var self=this;
+                var count = parseInt($(this).closest('tr').find('#product-quantity').val());
+                if (isNaN(count))
+                    return;
+
+                var id = this.getAttribute('data-id');
+                var checkout = FIND('checkout');
+                var output;
+
+                if ($(this).hasClass("quantity-down") && count > 0)
+                    output = checkout.remove(id, 1);
+
+                else if ($(this).hasClass("quantity-up"))
+                    output = checkout.add(id, 1);
+
+                var data = {};
+
+                if (output && output !== -1) // Not found
+                    data = {
+                        product: id,
+                        qty: output.count,
+                        optional: output.optional,
+                        save: true
+                    };
+                else
+                    return;
+
+                //classic form
+                AJAX('POST /api/price/', data, function (response) {
+                    refresh(true);
+                    
+                });
+            });
+
+            $('.checkoutlist').on('click', '.del-goods', function (e) {
+                //var output = FIND('checkout').update($(this).attr('data-id'), 0);
+                var target = $('.detail-checkout');
+                if (target)
+                    target.addClass('hidden');
+
+                AJAX('DELETE /api/cart/' + $(this).attr('data-id'), function (response) {
+                    datasource = response;
+                    console.log("response", response);
+
+                    FIND('checkout').clear();
+
+                    refresh(true);
+                });
+                //location.reload();
+                //reloadDataProduct();
+            });
+        });
+
+        Tangular.register('sum', function (value, format) {
+            return (value * this.count).format(format);
+        });
+
+        function refresh(redraw) {
+
+            var cart = CACHE('cart');
+
+            if (!cart)
+                cart = [];
+
+            var id = [];
+
+            console.log(cart);
+
+            for (var i = 0, length = cart.length; i < length; i++)
+                id.push(cart[i].optional.cartId);
+
+            if (id.length == 0) {
+                datasource = [];
+                UPDATE('datasource');
+            }
+
+            AJAX('PUT /api/cart/', id, function (response) {
+                datasource = response;
+                console.log("response", response);
+
+                FIND('checkout').clear();
+
+                if (typeof datasource === 'string' || !datasource.length)
+                    return;
+
+                //refresh(true);
+
+                /*var index = 0;
+                 while (true) {
+                 
+                 var product = datasource[index++];
+                 if (product === undefined)
+                 break;
+                 
+                 var item = cart.findItem('id', product.id);
+                 
+                 if (!item) {
+                 index--;
+                 datasource.splice(index, 1);
+                 continue;
+                 }
+                 
+                 product.count = item.count;
+                 product.price = item.price;
+                 }*/
+
+                //console.log(datasource);
+
+                //var count = 0;
+                //var price = 0;
+                for (var i = 0, length = datasource.length; i < length; i++) {
+                    var product = datasource[i];
+                    product.index = i;
+                    //if (FIND('checkout').exists(product.id))
+                    //    FIND('checkout').update(product.id, product.count, product.price, product.optional);
+                    //else
+                    FIND('checkout').append(product.id, product.price, product.count, product.optional);
+                }
+
+                if (redraw)
+                    UPDATE('datasource');
+            });
+        }
+
+        OPERATION('submit', function () {
+            if (BLOCKED('submit', 3000))
+                return;
+
+            form.products = datasource;
+
+            RESET('form.*');
+            loading(true);
+
+            AJAX('POST /api/checkout/create/', form, function (response) {
+                loading(false, 1000);
+
+                if (!response.success) {
+                    SET('common.success', response);
+                    return;
+                }
+
+                FIND('checkout').clear();
+                location.href = jRouting.path(location.pathname) + response.value + '/?success=1';
+            });
+        });
+
+    </script>
+    @{end}

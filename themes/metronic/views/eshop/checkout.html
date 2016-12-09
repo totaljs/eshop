@@ -1,0 +1,424 @@
+@{sitemap('checkout')} @{view('~/menutop')}
+
+<div class="main">
+    <div class="container">
+        <ul class="breadcrumb">
+            @{foreach m in sitemap()} @{if m.id === 'category'} @{sitemap_category(m.url, repository.category)} @{else} @{if m.last}
+            <li class="active">@{m.name}</li>
+            @{else}
+            <li><a href="@{m.url}">@{m.name}</a></li>
+            @{fi} @{fi} @{end}
+        </ul>
+
+        <!-- BEGIN SIDEBAR & CONTENT -->
+        <div class="row margin-bottom-40">
+            <!-- BEGIN CONTENT -->
+            <div class="col-md-12 col-sm-12">
+                <h1>@{title}</h1>
+                <!-- BEGIN CHECKOUT PAGE -->
+                <div class="panel-group checkout-page accordion scrollable" id="checkout-page">
+
+                    <!-- BEGIN CHECKOUT -->
+                    <div id="checkout" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#checkout-page" href="#checkout-content" class="accordion-toggle">
+                                    @(eshop:Step) 1 : @(eshop:Login options)
+                                </a>
+                            </h2>
+                        </div>
+                        <div id="checkout-content" class="panel-collapse collapse in">
+                            <div class="panel-body row">
+                                <div class="col-md-6 col-sm-6">
+                                    @{if !user}
+                                    <h3>@(eshop:New Customer)</h3>
+                                    <p>@(eshop:Checkout Options) :</p>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="account"  value="register"> @(eshop:Register Account)
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="account"  value="guest"> @(eshop:Guest Checkout)
+                                        </label>
+                                    </div>
+                                    <p>@(eshop:MsgCreateAccount).</p>
+                                    @{else}
+                                    <h4>@(eshop:Your are connected) @{user.firstname}</h4>
+                                    @{fi}
+                                    <button class="btn btn-primary" type="submit" data-toggle="collapse" data-parent="#checkout-page" data-target="#payment-address-content">@(eshop:Continue)</button>
+                                </div>
+                                @{if !user}
+                                <div class="col-md-6 col-sm-6">
+                                    <h3>@(eshop:Returning Customer)</h3>
+                                    <p>@(eshop:I am a returning customer).</p>
+                                    <form role="form" action="#">
+                                        <div class="form-group">
+                                            <label for="email-login">@(EMail)</label>
+                                            <input type="text" id="email-login" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="password-login">@(Password)</label>
+                                            <input type="password" id="password-login" class="form-control">
+                                        </div>
+                                        <a href="javascript:;">@(eshop:Forgotten Password)?</a>
+                                        <div class="padding-top-20">
+                                            <button class="btn btn-primary" type="submit">@(Login)</button>
+                                        </div>
+                                        <hr>
+                                        <div class="login-socio">
+                                            <p class="text-muted">or login using:</p>
+                                            <ul class="social-icons">
+                                                <li>
+                                                    <a href="javascript:;" data-original-title="facebook" class="facebook" title="facebook"></a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-original-title="Twitter" class="twitter" title="Twitter"></a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-original-title="Google Plus" class="googleplus" title="Google Plus"></a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-original-title="Linkedin" class="linkedin" title="LinkedIn"></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </form>
+                                </div>
+                                @{fi}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END CHECKOUT -->
+
+                    <!-- BEGIN PAYMENT ADDRESS -->
+                    <div id="payment-address" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#checkout-page" href="#payment-address-content" class="accordion-toggle">
+                                    @(eshop:Step) 2: @(eshop:Account) &amp; @(eshop:Billing Details)
+                                </a>
+                            </h2>
+                        </div>
+                        <div id="payment-address-content" class="panel-collapse collapse">
+                            <div class="panel-body row">
+                                <div class="col-md-6 col-sm-6">
+                                    <h3>@(eshop:Your Personal Details)</h3>
+                                    <div data-component="textbox" data-component-path="form.firstname" data-required="true" data-maxlength="30">@(eshop:First Name)</div>
+                                    <div data-component="textbox" data-component-path="form.lastname" data-required="true" data-maxlength="30">@(eshop:Last Name)</div>
+                                    <div data-component="textbox" data-component-path="form.email" data-required="true" data-maxlength="200" data-component-type="email">@(eshop:E-mail)</div>
+                                    <div data-component="textbox" data-component-path="form.phone" data-maxlength="30">@(Phone)</div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <h3>@(eshop:Your Billing Address)</h3>
+                                    <!--    <div data-component="dropdown" data-component-path="form.delivery" data-source="common.deliverytypes" data-empty="" data-required="true">@(Delivery type)</div> -->
+                                    <div data-component="textbox" data-component-path="form.societe.name" data-maxlength="30">@(eshop:Company)</div>
+
+                                    <div data-component="textarea" data-component-path="form.societe.address" data-required="true" data-height="100px" data-maxlength="1000" data-placeholder="@(Address)">@(eshop:Billing Address)</div>
+
+                                    <!--   <div class="form-group">
+                                        <label for="address1">@(eshop:Address 1)</label>
+                                        <input type="text" id="address1" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address2">@(eshop:Address 2)</label>
+                                        <input type="text" id="address2" class="form-control">
+                                    </div> -->
+                                    <div data-component="textbox" data-component-path="form.societe.zip" data-required="true" data-maxlength="200">@(eshop:Post Code)</div>
+                                    <div data-component="textbox" data-component-path="form.societe.town" data-required="true" data-maxlength="200">@(eshop:City)</div>
+
+
+                                    <div class="form-group">
+                                        <label for="country">@(eshop:Country) <span class="require">*</span></label>
+                                        <select class="form-control input-sm" id="country">
+                                            <option value=""> --- @(eshop:Please Select) --- </option>
+                                            <option value="244">Aaland Islands</option>
+                                            <option value="1">Afghanistan</option>
+                                            <option value="2">Albania</option>
+                                        </select>
+                                    </div>
+                                    <!--     <div class="form-group">
+                                        <label for="region-state">Region/State <span class="require">*</span></label>
+                                        <select class="form-control input-sm" id="region-state">
+                                            <option value=""> --- Please Select --- </option><option value="3513">Aberdeen</option><option value="3514">Aberdeenshire</option><option value="3515">Anglesey</option>
+                                        </select>
+                                    </div> -->
+                                </div>
+                                <hr>
+                                <div class="col-md-12">
+                                    <div data-component="checkbox" data-component-path="form.isnewsletter"> @(eshop:I wish to subscribe to the newsletter).</div>
+                                    <button data-component="click" data.component-path="copyAddress" class="btn btn-info btn-sm"> @(eshop:My delivery and billing addresses are the same).</button>
+                                    
+                                    <button class="btn btn-primary  pull-right" type="submit" data-toggle="collapse" data-parent="#checkout-page" data-target="#shipping-address-content" id="button-payment-address">@(eshop:Continue)</button>
+                                    <div class="checkbox pull-right">
+                                        <label>
+                                            <input type="checkbox"> @(eshop:I have read and agree to the) <a title="Privacy Policy" href="javascript:;">@(eshop:Privacy Policy)</a> &nbsp;&nbsp;&nbsp; 
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PAYMENT ADDRESS -->
+
+                    <!-- BEGIN SHIPPING ADDRESS -->
+                    <div id="shipping-address" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#checkout-page" href="#shipping-address-content" class="accordion-toggle">
+                                    @(eshop:Step) 3: @(eshop:Delivery Details)
+                                </a>
+                            </h2>
+                        </div>
+                        <div id="shipping-address-content" class="panel-collapse collapse">
+                            <div class="panel-body row">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="firstname-dd">@(eshop:First Name) <span class="require">*</span></label>
+                                        <input type="text" id="firstname-dd" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastname-dd">@(eshop:Last Name) <span class="require">*</span></label>
+                                        <input type="text" id="lastname-dd" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email-dd">@(eshop:E-Mail) <span class="require">*</span></label>
+                                        <input type="text" id="email-dd" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="telephone-dd">@(eshop:Phone) <span class="require">*</span></label>
+                                        <input type="text" id="telephone-dd" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fax-dd">@(eshop:Fax)</label>
+                                        <input type="text" id="fax-dd" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="company-dd">@(eshop:Company)</label>
+                                        <input type="text" id="company-dd" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div data-component="textarea" data-component-path="form.address" data-required="true" data-height="100px" data-maxlength="1000" data-placeholder="@(Address)">@(eshop:Delivery Address)</div>
+                                    <!--  <div class="form-group">
+                                        <label for="address1-dd">@(eshop:Address 1)</label>
+                                        <input type="text" id="address1-dd" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address2-dd">@(eshop:Address 2)</label>
+                                        <input type="text" id="address2-dd" class="form-control">
+                                    </div> -->
+                                    <div class="form-group">
+                                        <label for="city-dd">@(eshop:City) <span class="require">*</span></label>
+                                        <input type="text" id="city-dd" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="post-code-dd">@(eshop:Post Code) <span class="require">*</span></label>
+                                        <input type="text" id="post-code-dd" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="country-dd">@(eshop:Country) <span class="require">*</span></label>
+                                        <select class="form-control input-sm" id="country-dd">
+                                            <option value=""> --- @(eshop:Please Select) --- </option>
+                                            <option value="244">Aaland Islands</option>
+                                            <option value="1">Afghanistan</option>
+                                            <option value="2">Albania</option>
+                                        </select>
+                                    </div>
+                                    <!--  <div class="form-group">
+                                        <label for="region-state-dd">Region/State <span class="require">*</span></label>
+                                        <select class="form-control input-sm" id="region-state-dd">
+                                            <option value=""> --- Please Select --- </option><option value="3513">Aberdeen</option><option value="3514">Aberdeenshire</option><option value="3515">Anglesey</option><option value="3516">Angus</option>
+                                        </select>
+                                    </div> -->
+                                </div>
+                                <div class="col-md-12">
+                                    <button class="btn btn-primary  pull-right" type="submit" id="button-shipping-address" data-toggle="collapse" data-parent="#checkout-page" data-target="#shipping-method-content">@(eshop:Continue)</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END SHIPPING ADDRESS -->
+
+                    <!-- BEGIN SHIPPING METHOD -->
+                    <div id="shipping-method" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#checkout-page" href="#shipping-method-content" class="accordion-toggle">
+                                    @(eshop:Step) 4: @(eshop:Delivery Method)
+                                </a>
+                            </h2>
+                        </div>
+                        <div id="shipping-method-content" class="panel-collapse collapse">
+                            <div class="panel-body row">
+                                <div class="col-md-12">
+                                    <p>@(eshop:Please select the preferred shipping method to use on this order).</p>
+                                    <div data-component="dropdown" data-component-path="form.delivery" data-source="common.deliverytypes" data-empty="" data-required="true">@(eshop:Delivery type)</div>
+                                    <h4>Flat Rate</h4>
+                                    <!--<div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="FlatShippingRate" value="FlatShippingRate"> Flat Shipping Rate
+                                        </label>
+                                    </div>-->
+                                    <div data-component="textarea" data-component-path="form.message" data-height="50px" data-maxlength="1000">@(Add Comments About Your Order)</div>
+                                    <button class="btn btn-primary  pull-right" type="submit" id="button-shipping-method" data-toggle="collapse" data-parent="#checkout-page" data-target="#payment-method-content">@(eshop:Continue)</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END SHIPPING METHOD -->
+
+                    <!-- BEGIN PAYMENT METHOD -->
+                    <div id="payment-method" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#checkout-page" href="#payment-method-content" class="accordion-toggle">
+                                    @(eshop:Step) 5: @(eshop:Payment Method)
+                                </a>
+                            </h2>
+                        </div>
+                        <div id="payment-method-content" class="panel-collapse collapse">
+                            <div class="panel-body row">
+                                <div class="col-md-12">
+                                    <p>@(eshop:Please select the preferred payment method to use on this order).</p>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="CashOnDelivery" value="CashOnDelivery"> Cash On Delivery
+                                        </label>
+                                    </div>
+                                    <!--         <div class="form-group">
+                                        <label for="delivery-payment-method">@(eshop:Add Comments About Your Order)</label>
+                                        <textarea id="delivery-payment-method" rows="8" class="form-control"></textarea>
+                                    </div> -->
+                                    <button class="btn btn-primary  pull-right" type="submit" id="button-payment-method" data-toggle="collapse" data-parent="#checkout-page" data-target="#confirm-content">@(eshop:Continue)</button>
+                                    <div class="checkbox pull-right">
+                                        <label>
+                                            <input type="checkbox"> @(eshop:I have read and agree to the) <a title="Terms & Conditions" href="javascript:;">@(eshop:Terms & Conditions) </a> &nbsp;&nbsp;&nbsp; 
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PAYMENT METHOD -->
+
+                    <!-- BEGIN CONFIRM -->
+                    <div id="confirm" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#checkout-page" href="#confirm-content" class="accordion-toggle">
+                                    @(eshop:Step) 6: @(eshop:Confirm Order)
+                                </a>
+                            </h2>
+                        </div>
+                        <div id="confirm-content" class="panel-collapse collapse">
+                            <div class="panel-body row">
+                                <div class="col-md-12 clearfix">
+                                    <div data-component="visible" data-component-path="datasource" data-if="!value || !value.length" class="hidden">
+                                        <div class="shopping-cart-page">
+                                            <div class="shopping-cart-data clearfix">
+                                                <p>@(eshop:Your shopping cart is empty), <b>try to visit this page later</b>.</p>
+                                                <a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(eshop:Browse all products)</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div data-component="visible" data-component-path="datasource" data-if="value && value.length > 0" class="hidden">
+                                        <div class="table-wrapper-responsive">
+                                            <table summary="Shopping cart" class="checkoutlist">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="checkout-image">@(eshop:Image)</th>
+                                                        <th class="checkout-description">@(eshop:Description)</th>
+                                                        <th class="checkout-model">Ref No</th>
+                                                        <th class="checkout-quantity">@(eshop:Quantity)</th>
+                                                        <th class="checkout-price">@(eshop:Unit price)</th>
+                                                        <th class="checkout-total">@(eshop:Total)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody data-component="repeater" data-component-path="datasource">
+                                                    <script type="text/html">
+                                                        <tr>
+                                                            <td class="checkout-image">
+                                                                <a href="{{ linker }}"><img src="/images/small/{{pictures[0]}}.jpg" alt="{{ name }}"></a>
+                                                            </td>
+                                                            <td class="checkout-description">
+                                                                <h3><a href="{{ linker }}">{{ name }}</a></h3>
+                                                                <!--<p><strong>Item 1</strong> - Color: Green; Size: S</p>
+                                                            <em>More info is here</em>-->
+                                                            </td>
+                                                            <td class="checkout-model">
+                                                                javc2133
+                                                            </td>
+                                                            <td class="checkout-quantity">{{ count }}</td>
+                                                            <td class="checkout-price">
+                                                                <strong>@{currency('{{ price | format(2) }}')}</strong>
+                                                            </td>
+                                                            <td class="checkout-total">
+                                                                <strong class="checkoutlist-item-price" data-format="@{currency('{0}')}">@{currency('{{ price | sum(2) }}')}</strong>
+                                                            </td>
+                                                        </tr>
+                                                    </script>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="checkout-total-block">
+                                            <ul data-component="template" data-component-path="summarize" class="hidden-xs">
+                                                <script type="text/html">
+                                                    <li>
+                                                        <em>@(eshop:Sub total)</em>
+                                                        <strong class="price"><span>@{currency('{{ price | format(2) }}')}</strong>
+                                                    </li>
+                                                    <li>
+                                                        <em>@(eshop:Shipping cost)</em>
+                                                        <strong class="price">@{currency('{{ 0 | format(2) }}')}</strong>
+                                                    </li>
+                                                    <li>
+                                                        <em>Eco Tax (-2.00)</em>
+                                                        <strong class="price"><span>$</span>3.00</strong>
+                                                    </li>
+                                                    <li>
+                                                        <em>VAT (17.5%)</em>
+                                                        <strong class="price"><span>$</span>3.00</strong>
+                                                    </li>
+                                                    <li class="shopping-total-price">
+                                                        <em>@(eshop:Total)</em>
+                                                        <strong class="price">@{currency('{{ price | format(2) }}')}</strong>
+                                                    </li>
+                                                </script>
+                                            </ul>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <button class="btn btn-primary pull-right" data-component="click" data-component-path="#submit" id="button-confirm">@(eshop:Confirm Order)</button>
+                                        <!--<button type="button" class="btn btn-default pull-right margin-right-20">Cancel</button>-->
+                                        <div class="clearfix"></div>
+                                        <div data-component="error" data-component-path="common.success" style="margin-top:20px"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END CONFIRM -->
+                </div>
+                <!-- END CHECKOUT PAGE -->
+            </div>
+            <!-- END CONTENT -->
+        </div>
+        <!-- END SIDEBAR & CONTENT -->
+    </div>
+</div>
+
+@{view('~/footers')}
+
+@{section script}
+<script>
+    function copyAddress() {
+        alert('SUBMIT');
+    }
+
+    jC.ready(function () {
+        
+    });
+</script>
+@{end}

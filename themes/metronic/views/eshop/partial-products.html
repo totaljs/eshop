@@ -1,0 +1,46 @@
+<div class="row margin-bottom-40">
+    <!-- BEGIN SALE PRODUCT -->
+    <div class="col-md-12">
+        @{foreach m in model.items}
+        @{if index%3 == 0}<div class="row product-list">@{fi}
+            <!-- PRODUCT ITEM START -->
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="product-item">
+                    <div class="pi-img-wrapper">
+                        <img src="@{if !m.pictures || !m.pictures.length}/img/empty.png@{else}/images/small/@{m.pictures[0]}.jpg@{fi}" class="img-responsive" alt="@{m.name}">
+                        <div>
+                            <a href="@{if !m.pictures || !m.pictures.length}/img/empty.png@{else}/images/large/@{m.pictures[0]}.jpg@{fi}" class="btn btn-default fancybox-button">Zoom</a>
+                            <a href="#product-pop-up" class="btn btn-default fancybox-fast-view">View</a>
+                        </div>
+                    </div>
+                    <h3><a href="@{m.linker}">@{m.name}</a></h3>
+                    <h4><a href="@{m.linker_category}">@{m.category}</a></h4>
+                    <p>@{m.manufacturer}</p>
+                    <div class="pi-price">@{currency(m.price)}</div>
+                    <a href="javascript:;" class="btn btn-default add2cart">Add to cart</a>
+                    @{if m.sale}<div class="sticker sticker-sale"></div>@{fi}
+                    @{if m.new}<div class="sticker sticker-new"></div>@{fi}
+                </div>
+            </div>
+            <!-- PRODUCT ITEM END -->
+            @{if index%3 == 2 || index == model.items.length - 1}</div>@{fi}
+        @{end}
+    </div>
+</div>
+<!-- END CONTENT -->
+
+
+
+@{if !model.count}
+<div class="row" style="margin-top:30px;margin-bottom:100px" id="empty">
+    <div class="col-md-6 col-md-offset-3 m ui-center">
+        <div><span class="fa fa-search fa-5x"></span></div>
+        <br />
+        <br />
+        <div>
+            @(Currently we don't have any items sufficient for search criteria.)<br />
+            <b>@(Try to visit our page later)</b>.
+        </div>
+    </div>
+</div>
+@{fi}

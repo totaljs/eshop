@@ -2,6 +2,8 @@ name                      : E-shop
 version                   : 8.0.0
 author                    : Totaljs.com Ltd
 
+database                  : mongodb://127.0.0.1/europexpress
+
 // A relative URL address into the eshop management
 manager-url               : /$manager
 
@@ -25,4 +27,5 @@ mail.smtp                 : YOUR.SMTPSERVER.COM
 default-image-converter   : gm
 
 // Default theme
-default-theme             : default
+default-theme		  : metronic
+allow-websocket           : false

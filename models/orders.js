@@ -70,6 +70,13 @@ NEWSCHEMA('Order').make(function(schema) {
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 
+		// options.search {String}
+		// options.delivery {String}
+		// options.type {String}
+		// options.page {String or Number}
+		// options.max {String or Number}
+		// options.iduser {String}
+
 		options.page = U.parseInt(options.page) - 1;
 		options.max = U.parseInt(options.max, 20);
 
@@ -84,28 +91,35 @@ NEWSCHEMA('Order').make(function(schema) {
 		var skip = U.parseInt(options.page * options.max);
 		var type = U.parseInt(options.type);
 
-		var filter = NOSQL('orders').find();
+		var nosql = DB(error);
+
+		nosql.listing('orders', 'orders').make(function(builder) {
+
+			builder.where('isremoved', false);
 
 		if (type === 1)
-			filter.where('iscompleted', false); // Uncompleted
+				builder.where('iscompleted', false); // uncompleted
 		else if (type === 2)
-			filter.where('iscompleted', false).where('ispaid', false); // Uncompleted and not paid
+				builder.where('iscompleted', false).where('ispaid', false); // uncompleted and not paid
 		else if (type === 3)
-			filter.where('iscompleted', false).where('ispaid', true); // Uncompleted and paid
+				builder.where('iscompleted', false).where('ispaid', true); // uncompleted and paid
 		else if (type === 4)
-			filter.where('iscompleted', true); // Uncompleted and paid
+				builder.where('iscompleted', true); // completed
 
-		options.iduser && filter.where('iduser', options.iduser);
-		options.search && filter.like('search', options.search.keywords(true, true));
+			options.delivery && builder.where('delivery', delivery);// by delivery
+			options.search && builder.in('search', options.search.keywords(true, true));
+			options.iduser && builder.where('iduser', options.iduser);
 
-		filter.skip(skip);
-		filter.take(take);
-		filter.sort('datecreated', true);
-		filter.callback(function(err, docs, count) {
+			builder.sort('_id', true);
+			builder.take(take);
+			builder.skip(skip);
+		});
+
+		nosql.exec(function(err, response) {
 
 			var data = {};
-			data.count = count;
-			data.items = docs;
+			data.count = response.orders.count;
+			data.items = response.orders.items;
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
@@ -117,8 +131,6 @@ NEWSCHEMA('Order').make(function(schema) {
 	// Creates order
 	schema.addWorkflow('create', function(error, model, options, callback) {
 
-		var db = NOSQL('orders');
-		var counter = db.counter;
 		var price = 0;
 		var count = 0;
 
@@ -126,35 +138,17 @@ NEWSCHEMA('Order').make(function(schema) {
 			var product = model.products[i];
 			price += product.price * product.count;
 			count += product.count;
-
-			// Stats for ordered products
-			counter.hit(product.id, product.count);
 		}
 
 		model.id = UID();
 		model.price = price;
 		model.count = count;
 		model.datecreated = F.datetime;
-		model.numbering = db.meta('numbering');
-
-		counter.hit('all');
-
-		if (model.numbering) {
-			var year = model.numbering.toString().substring(0, 4);
-
-			// Validates current year with latest "numbering"
-			if (year.parseInt() === F.datetime.getFullYear())
-				model.numbering++;
-			else
-				model.numbering = createNumbering();
-
-		} else
-			model.numbering = createNumbering();
-
-		db.meta('numbering', model.numbering);
+		model.isremoved = false;
+		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true);
 
 		if (model.isnewsletter) {
-			var newsletter = CREATE('Newsletter');
+			var newsletter = GETSCHEMA('Newsletter').create();
 			newsletter.email = model.email;
 			newsletter.ip = model.ip;
 			newsletter.$save();
@@ -164,8 +158,13 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.isnewsletter = undefined;
 		model.isemail = undefined;
 
-		// Inserts order into the database
-		db.insert(model);
+		var nosql = DB(error);
+
+		nosql.insert('orders').make(function(builder) {
+			builder.set(model.$clean());
+		});
+
+		nosql.exec(F.error());
 
 		// Returns response with order id
 		callback(SUCCESS(true, model.id));
@@ -180,7 +179,18 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Gets a specific order
 	schema.setGet(function(error, model, options, callback) {
-		NOSQL('orders').one().where('id', options.id).callback(callback, 'error-404-order');
+		// options.id {String}
+
+		var nosql = DB(error);
+
+		nosql.select('order', 'orders').make(function(builder) {
+			builder.where('id', options.id);
+			builder.where('isremoved', false);
+			builder.first();
+	});
+
+		nosql.validate('order', 'error-404-order')
+		nosql.exec(callback, 'order');
 	});
 
 	// Saves the order into the database
@@ -201,19 +211,22 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.search = (model.id + ' ' + (model.reference || '') + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(500);
 		model.adminupdated = controller.user.name;
 		model.dateupdated = F.datetime;
+                
+                var nosql = DB(error);
 
-		// Update order in database
-		NOSQL('orders').modify(model).where('id', model.id).callback(function(err, count) {
+		nosql.update('order', 'orders').make(function(builder) {
+			builder.set(model.$clean());
+			builder.rem('id');
+			builder.rem('datecreated');
+			builder.set('dateupdated', F.datetime);
+			builder.set('adminupdated', controller.user.name);
+			builder.where('id', model.id);
+			builder.first();
+		});
 
-			// Returns response
+		nosql.exec(function(err) {
 			callback(SUCCESS(true));
-
-			if (!count)
-				return;
-
-			F.emit('orders.save', model);
-			model.datebackup = F.datetime;
-			DB('orders_backup').insert(model);
+			!err && F.emit('orders.save', model);
 		});
 
 		if (!isemail)
@@ -226,18 +239,30 @@ NEWSCHEMA('Order').make(function(schema) {
 
 	// Removes order from DB
 	schema.setRemove(function(error, id, callback) {
-		NOSQL('orders').remove(F.path.databases('orders_removed.nosql')).where('id', id).callback(callback);
+		var nosql = DB(error);
+
+		nosql.update('orders').make(function(builder) {
+			builder.where('id', id);
+			builder.where('isremoved', false);
+			builder.set('isremoved', true);
+			builder.first();
+	});
+
+		nosql.exec(SUCCESS(callback), -1);
 	});
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		NOSQL('orders').remove(F.path.databases('orders_removed.nosql'));
-		callback(SUCCESS(true));
+		var nosql = DB(error);
+		nosql.remove('orders');
+		nosql.exec(SUCCESS(callback), -1);
 	});
 
 	// Stats
 	schema.addWorkflow('stats', function(error, model, options, callback) {
-		NOSQL('orders').counter.monthly('all', callback);
+		var nosql = DB(error);
+                
+                NOSQL('orders').counter.monthly('all', callback);
 	});
 
 	// Gets some stats from orders for Dashboard
@@ -250,24 +275,66 @@ NEWSCHEMA('Order').make(function(schema) {
 		stats.pending = 0;
 		stats.pending_price = 0;
 
-		var prepare = function(doc) {
-			if (doc.iscompleted) {
-				stats.completed++;
-				stats.completed_price += doc.price;
-			} else {
-				stats.pending++;
-				stats.pending_price += doc.price;
-			}
-		};
+		var nosql = DB(error);
 
-		// Returns data for dashboard
-		NOSQL('orders').find().prepare(prepare).callback(() => callback(stats));
+		nosql.push('orders', 'orders', function(collection, callback) {
+
+			// groupping
+			var $group = {};
+			$group._id = {};
+			$group._id = '$iscompleted';
+			$group.sum = { $sum: '$price' };
+			$group.count = { $sum: 1 };
+
+			// filter
+			var $match = {};
+			$match.isremoved = false;
+
+			var pipeline = [];
+			pipeline.push({ $match: $match });
+			pipeline.push({ $group: $group });
+
+			collection.aggregate(pipeline, callback);
+		});
+
+		nosql.exec(function(err, response) {
+
+			if (err) {
+				callback(stats);
+				return;
+			}
+
+			for (var i = 0, length = response.orders.length; i < length; i++) {
+				var agg = response.orders[i];
+				if (agg._id) {
+					stats.completed = agg.count;
+					stats.completed_price = agg.sum;
+			} else {
+					stats.pending = agg.count;
+					stats.pending_price = agg.sum;
+			}
+			}
+
+			callback(stats);
+                });
 	});
 
 	// Sets the payment status to paid
 	schema.addWorkflow('paid', function(error, model, id, callback) {
-		NOSQL('orders').modify({ ispaid: true, datepaid: F.datetime }).where('id', id).callback(callback);
+		var nosql = DB(error);
+
+		nosql.udpate('orders').make(function(builder) {
+			builder.where('id', id);
+			builder.where('isremoved', false);
+			builder.where('ispaid', false);
+			builder.set('ispaid', true);
+			builder.set('datepaid', F.datetime);
+			builder.first();
 	});
+
+		nosql.exec(SUCCESS(callback), -1);
+});
+
 });
 
 function createNumbering() {

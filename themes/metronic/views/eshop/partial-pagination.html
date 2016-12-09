@@ -1,0 +1,17 @@
+@{if model.pages > 1}
+
+<!-- BEGIN PAGINATOR -->
+<div class="row">
+    <div class="col-md-4 col-sm-4 items-info">Items @{(model.page - 1) * model.limit + 1} to @{(model.page - 1) * model.limit + model.items.length} of @{model.count} total</div>
+    <div class="col-md-8 col-sm-8">
+        <ul class="pagination pull-right">
+            <li><a href="javascript:;">&laquo;</a></li>
+            <!-- "pagination" helper is defined in /definitions/helpers.js -->
+            @{pagination(model)}
+            <li><a href="javascript:;">&raquo;</a></li>
+        </ul>
+    </div>
+</div>
+<!-- END PAGINATOR -->
+
+@{fi}

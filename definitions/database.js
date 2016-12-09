@@ -1,2 +1,1 @@
-// Allows in-memory database
-NOSQLMEMORY('products');
+require('sqlagent/mongodb').init(CONFIG('database'));

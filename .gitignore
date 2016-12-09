@@ -5,3 +5,4 @@ backup
 node_modules/
 nbproject
 _*
+config

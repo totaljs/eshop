@@ -1,0 +1,222 @@
+@{sitemap('account')}
+
+@{view('~/menutop')}
+
+<div class="main">
+    <div class="container">
+        <ul class="breadcrumb">
+            @{foreach m in sitemap()}
+            @{if m.id === 'category'}
+            @{sitemap_category(m.url, repository.category)}
+            @{else}
+            @{if m.last}
+            <li class="active">@{m.name}</li>
+            @{else}
+            <li><a href="@{m.url}">@{m.name}</a></li>
+            @{fi}
+            @{fi}
+            @{end}
+        </ul>
+
+        <!-- BEGIN SIDEBAR & CONTENT -->
+        <div class="row margin-bottom-40">
+            <!-- BEGIN CONTENT -->
+            <div class="col-md-12 col-sm-12">
+                <h1>@{title}</h1>
+                <!-- BEGIN CHECKOUT PAGE -->
+                <div class="panel-group checkout-page accordion scrollable" id="checkout-page">
+
+                    <!-- BEGIN CHECKOUT -->
+                    <div id="checkout" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#checkout-page" href="#checkout-content" class="accordion-toggle">
+                                    @(eshop:Login)
+                                </a>
+                            </h2>
+                        </div>
+                        <div id="checkout-content" class="panel-collapse collapse in">
+                            <div class="panel-body row">
+                                <div class="col-md-6 col-sm-6">
+                                    <h3>New Customer</h3>
+                                    <p>Checkout Options:</p>
+                                    <div class="radio-list">
+                                        <label>
+                                            <input type="radio" name="account"  value="register"> Register Account
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="account"  value="guest"> Guest Checkout
+                                        </label> 
+                                    </div>
+                                    <p>By creating an account you will be able to shop faster, be up to date on an order's status, and keep track of the orders you have previously made.</p>
+                                    <button class="btn btn-primary" type="submit" data-toggle="collapse" data-parent="#checkout-page" data-target="#payment-address-content">Continue</button>
+                                </div>
+
+                                <div class="col-md-6 col-sm-6">
+                                    <h3>@(Sign in)</h3>
+                                    <p>I am a returning customer.</p>
+                                    <form role="form" action="#">
+                                        <div data-required="true" data-component="textbox" data-component-path="signin.username" data-component-type="email" data-component-value="'@'" data-component-id="email-login">@(E-mail address)</div>
+                                        <div data-required="true" data-component="textbox" data-component-path="signin.password" data-component-type="password" data-component-id="password-login">@(Password)</div>
+
+                                        <a href="javascript:void(0)" data-component="click" data-component-path="#passwordrecovery">@(Forgot your password?)</a>
+                                        <div data-component="error" data-component-path="signin.response" style="margin-top:18px"></div>
+
+                                        <div class="padding-top-20" data-component="validation" data-component-path="signin">                  
+                                            <button class="btn btn-primary" disabled="disabled" data-component="click" data-component-path="#doLogin" data-enter="#login">@(SUBMIT)</button>
+                                        </div>
+                                        <hr>
+                                        <div class="login-socio">
+                                            <p class="text-muted">or login using:</p>
+                                            <ul class="social-icons">
+                                                @{if config.custom.oauth2_google_key && config.custom.oauth2_google_secret}
+                                                <li><a href="/oauth2/google/" rel="nofollow" data-original-title="Google Plus" class="googleplus" title="Google Plus"></a></li>
+                                                @{fi}
+                                                @{if config.custom.oauth2_facebook_key && config.custom.oauth2_facebook_secret}
+                                                <li><a href="/oauth2/facebook/" data-original-title="facebook" class="facebook" title="facebook"></a></li>
+                                                @{fi}
+                                                @{if config.custom.oauth2_twitter_key && config.custom.oauth2_twitter_secret}
+                                                <li><a href="/oauth2/twitter/" data-original-title="Twitter" class="twitter" title="Twitter"></a></li>
+                                                @{fi}
+                                                @{if config.custom.oauth2_linkedin_key && config.custom.oauth2_linkedin_secret}
+                                                <li><a href="/oauth2/linkedin/" data-original-title="Linkedin" class="linkedin" title="LinkedIn"></a></li>
+                                                @{fi}
+                                            </ul>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END CHECKOUT -->
+
+                <!-- BEGIN PAYMENT ADDRESS -->
+                <div id="payment-address" class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#checkout-page" href="#payment-address-content" class="accordion-toggle">
+                                @(Create account)
+                            </a>
+                        </h2>
+                    </div>
+                    <div id="payment-address-content" class="panel-collapse collapse">
+                        <div class="panel-body row">
+                            <div class="col-md-6 col-sm-6">
+                                <h3>Your Personal Details</h3>
+                                <div class="form-group">
+                                    <label for="firstname">First Name <span class="require">*</span></label>
+                                    <input type="text" id="firstname" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastname">Last Name <span class="require">*</span></label>
+                                    <input type="text" id="lastname" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">E-Mail <span class="require">*</span></label>
+                                    <input type="text" id="email" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="telephone">Telephone <span class="require">*</span></label>
+                                    <input type="text" id="telephone" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fax">Fax</label>
+                                    <input type="text" id="fax" class="form-control">
+                                </div>
+
+                                <h3>Your Password</h3>
+                                <div class="form-group">
+                                    <label for="password">Password <span class="require">*</span></label>
+                                    <input type="password" id="password" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password-confirm">Password Confirm <span class="require">*</span></label>
+                                    <input type="text" id="password-confirm" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                            </div>
+                            <hr>
+                            <div class="col-md-12">                      
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox"> I wish to subscribe to the OXY newsletter. 
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" checked="checked"> My delivery and billing addresses are the same.
+                                    </label>
+                                </div>
+                                <button class="btn btn-primary  pull-right" type="submit" data-toggle="collapse" data-parent="#checkout-page" data-target="#shipping-address-content" id="button-payment-address">Continue</button>
+                                <div class="checkbox pull-right">
+                                    <label>
+                                        <input type="checkbox"> I have read and agree to the <a title="Privacy Policy" href="javascript:;">Privacy Policy</a> &nbsp;&nbsp;&nbsp; 
+                                    </label>
+                                </div>                        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END PAYMENT ADDRESS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@{section script}
+<script>
+
+    var common = {};
+    common.password = false;
+
+    OPERATION('passwordrecovery', function () {
+        SET('common.password', !common.password);
+    });
+
+    OPERATION('doPassword', function () {
+        if (!jC.valid('passwordrecovery.*'))
+            return;
+        if (BLOCKED('password', 1000))
+            return;
+        RESET('passwordrecovery.*');
+        AJAX('POST /api/users/password/', passwordrecovery, function (response) {
+            SET('passwordrecovery.response', response);
+            if (!response.success)
+                return;
+            DEFAULT('passwordrecovery.*');
+            FIND('message').success('@(We sent you email with instructions for resetting of your password.)');
+        });
+    });
+
+
+    OPERATION('doLogin', function () {
+        if (!jC.valid('signin.*'))
+            return;
+        if (BLOCKED('login', 1000))
+            return;
+        RESET('signin.*');
+        AJAX('POST /login/', signin, function (response) {
+            if (response.success)
+                return location.reload(true);
+            SET('signin.response', response);
+        });
+    });
+
+    OPERATION('doCreate', function () {
+        if (!jC.valid('signup.*'))
+            return;
+        if (BLOCKED('create', 1000))
+            return;
+        RESET('signup.*');
+        AJAX('POST /api/users/create/', signup, function (response) {
+            SET('signup.response', response);
+            if (response.success)
+                location.reload(true);
+        });
+    });
+
+</script>
+@{end}
+
+@{view('~/footers')}
