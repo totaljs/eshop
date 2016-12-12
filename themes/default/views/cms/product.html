@@ -69,7 +69,7 @@
 
 				<div class="row">
 					<div class="col-md-6">
-						<div><button class="detail-buy" data-id="@{model.id}" data-price="@{model.price}">@(Buy:) <b>@{currency(model.price)}</b></button></div>
+						<div><button class="detail-buy" data-id="@{model.id}" data-price="@{model.price}">@(Buy:) <b>@{currency(model.price)}</b>@{if model.priceold > model.price} <span class="red">@{currency(model.priceold)}</span>@{fi}</button></div>
 						<div style="margin-top:15px"><span class="fa fa-envelope silver mr5"></span><a href="@{sitemap_url('contact')}?productid=@{if model.reference}@{model.reference}@{else}@{model.id}@{fi}#contactform">@(Do you need more informations?)</a></div>
 					</div>
 				</div>
