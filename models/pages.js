@@ -281,6 +281,10 @@ NEWSCHEMA('Page').make(function(schema) {
 								var keys = Object.keys(partial);
 								for (var i = 0, length = keys.length; i < length; i++)
 									arr.push(partial[keys[i]]);
+                                                                
+                                                                //order partial by priority
+                                                                arr.orderBy('priority', false);
+                                                                
 								response.partial = arr;
 								callback(response);
 							});
@@ -517,7 +521,7 @@ F.eval(function() {
 				self.repository.page = response;
 
 				self.sitemap(response.breadcrumb);
-				self.meta(response.title, response.description, response.keywords);
+				self.meta(response.title, response.perex || response.description, response.keywords);
 				self.view(view || '~/cms/' + response.template, model);
 			});
 		});

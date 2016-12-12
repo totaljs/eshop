@@ -57,7 +57,7 @@
           <ul>
             @{foreach m in global.categories}
                 <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" data-target="@{sitemap_url('products')}@{m.linker}" href="@{sitemap_url('products')}@{m.linker}">
+                    <a class="dropdown-toggle" href="@{sitemap_url('products')}@{m.linker}">
                         @{m.name} 
                     </a>
                 </li>

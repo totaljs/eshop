@@ -15,6 +15,7 @@ exports.install = function() {
 
 	// ORDERS
 	F.route('#checkout');
+        F.route('#shopping-cart');
 	F.route('#order',            view_checkout, ['*Order']);
 	F.route('#payment',          process_payment_paypal, ['*Order']);
 
@@ -126,14 +127,14 @@ function view_products_detail(linker) {
 		self.repository.name = data.name;
 
 		// Writes stats
-		NOSQL('products').counter.hit(data.id);
+		NOSQL('products').counter.hit(data._id);
 
-		self.title(data.name);
 		self.sitemap('detail');
 		self.sitemap_change('detail', 'url', data.linker);
 		self.sitemap_change('detail', 'name', data.name);
 
 		// Renders view
+                self.meta(data.name, data.perex || data.description, data.keywords);
 		self.view('~cms/' + (data.template || 'product'), data);
 	});
 }

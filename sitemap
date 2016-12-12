@@ -14,3 +14,4 @@ category                 : @(Category)                 --> /shop/*              
 detail                   : @(Product)                  --> /product/{0}/                --> category
 blogs                    : @(Blogs)                    --> /blogs/                      --> homepage
 blogsdetail              : @(Blog detail)              --> /blogs/{0}/                  --> blogs
+shopping-cart            : @(eshop:ViewCart)           --> /cart                        --> homepage
