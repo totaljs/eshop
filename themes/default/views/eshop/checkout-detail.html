@@ -42,6 +42,12 @@
 						<td class="col-xs-4 active">@(Delivery type)</td>
 						<td>@{model.delivery}</td>
 					</tr>
+					@{if model.trackingcode}
+					<tr>
+						<td class="col-xs-4 active">@(Tracking code)</td>
+						<td class="b red"><i class="fa fa-dropbox mr5"></i>@{model.trackingcode}</td>
+					</tr>
+					@{fi}
 					<tr>
 						<td class="col-xs-4 active">@(Payment type)</td>
 						<td>@{model.payment}</td>
