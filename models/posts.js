@@ -1,5 +1,3 @@
-"use strict";
-
 NEWSCHEMA('Post').make(function(schema) {
 
 	schema.define('id', 'String(20)');

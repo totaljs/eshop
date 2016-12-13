@@ -1,9 +1,5 @@
 "use strict";
 
-var async = require('async');
-
-var dict = {};
-
 NEWSCHEMA('Prices').make(function(schema) {
     schema.define('pu_ht', Number, true); // For base price
     schema.define('priceQty', 'JSON'); // For quantity price reduction
@@ -21,12 +17,11 @@ NEWSCHEMA('Attributes').make(function(schema) {
 NEWSCHEMA('Product').make(function(schema) {
 
     schema.define('id', 'String(20)');
-    //schema.define('files', '[String]');
+    schema.define('files', '[String]');
     schema.define('reference', 'String(20)');
     schema.define('category', 'String(300)', true);
     schema.define('manufacturer', 'String(50)');
     schema.define('name', 'String(50)', true);
-    schema.define('ref', 'String(50)', true);
     schema.define('price', Number, true);
     schema.define('description', String, true);
     schema.define('availability', 'String(40)');
@@ -39,7 +34,6 @@ NEWSCHEMA('Product').make(function(schema) {
     schema.define('prices', 'Prices');
     schema.define('units', 'String(20)');
     schema.define('attributes', '[Attributes]');
-    schema.define('search', 'String(1000)');            // Search pharses
     
     // Gets listing
     schema.setQuery(function(error, options, callback) {
@@ -49,7 +43,6 @@ NEWSCHEMA('Product').make(function(schema) {
         // options.page {String or Number}
         // options.max {String or Number}
         // options.id {String}
-        console.log(options);
 
         options.page = U.parseInt(options.page) - 1;
         options.max = U.parseInt(options.max, 20);
@@ -67,8 +60,7 @@ NEWSCHEMA('Product').make(function(schema) {
             builder.where('isremoved', false);
             options.category && builder.like('linker_category', '^' + options.category);
             options.manufacturer && builder.where('manufacturer', options.manufacturer);
-            //console.log(options.q.keywords(true, true));
-            options.q && builder.like('search', options.q);
+            options.search && builder.in('search', options.search.keywords(true, true));
             options.id && builder.in('id', options.id);
             options.skip && builder.where('id', '<>', options.skip);
             if (options.type) {
@@ -183,59 +175,7 @@ NEWSCHEMA('Product').make(function(schema) {
             builder.first();
         });
         nosql.validate('product', 'error-404-product');
-        nosql.exec(function(err, response) {
-            if(err)
-                return callback(err);
-            
-            async.parallel([
-                //model.color
-                function(cb) {
-            
-                    var color = {};
-    
-                    if(!response.attributes)
-                        return null;
-                
-                    for(var i=0, len=response.attributes.length;i<len;i++) {
-                        if(response.attributes[i].css) {
-                            color = response.attributes[i];
-                            break;
-                        }
-                    }
-
-                    response.color=color;
-                    cb();
-                },
-                // pricesDetails
-                function(cb){
-                    var Pricebreak = INCLUDE('pricebreak');
-
-                    Pricebreak.set(response.prices.pu_ht, response.prices.pricesQty);
-
-                    response.pricesDetails = Pricebreak.humanize(true, 3);
-                    cb();
-                },
-                // _units
-                function(cb){
-                    var res = {};
-
-                    var units = response.units;
-
-                    if (units && dict.fk_units.values[units].label) {
-                        //console.log(this);
-                        res.id = units;
-                        res.name = i18n.t("products:" + dict.fk_units.values[units].label);
-                    } else { // By default
-                        res.id = units;
-                        res.name = units;
-                    }
-                    response._units = res;
-                    cb();
-                }
-            ], function(err) {
-                callback(err, response);
-        }); 
-        }, 'product');
+        nosql.exec(callback, 'product');
     });
     // Removes product
     schema.setRemove(function(error, id, callback) {
@@ -419,7 +359,7 @@ NEWSCHEMA('Product').make(function(schema) {
         // Reads all id + references (for updating/inserting)
 
         var nosql = DB(error);
-        nosql.select('Product').make(function(builder) {
+        nosql.select('products').make(function(builder) {
             builder.where('isremoved', false);
             builder.where('reference', '!=', '');
             builder.fields('id', 'reference', 'pictures');
@@ -503,7 +443,7 @@ NEWSCHEMA('Product').make(function(schema) {
     });
     schema.addWorkflow('export.xml', function(error, model, options, callback) {
         var nosql = DB(error);
-        nosql.select('products', 'Product').make(function(builder) {
+        nosql.select('products', 'products').make(function(builder) {
             builder.where('isremoved', false);
         });
         nosql.exec(function(err, response) {
@@ -551,16 +491,9 @@ NEWSCHEMA('Product').make(function(schema) {
 });
 // Refreshes internal information (categories and manufacturers)
 function refresh() {
-    
-    GETSCHEMA('Dict').query({_id: ['fk_product_status', 'fk_units'], object: true}, function (err, doc) {
-        if (err) 
-            return console.log(err);
-    
-        dict = doc;
-    });
 
     var nosql = DB();
-    nosql.push('categories', 'Product', function(collection, callback) {
+    nosql.push('categories', 'products', function(collection, callback) {
 
         // groupping
         var $group = {};
@@ -582,7 +515,7 @@ function refresh() {
         });
         collection.aggregate(pipeline, callback);
     });
-    nosql.push('manufacturers', 'Product', function(collection, callback) {
+    nosql.push('manufacturers', 'products', function(collection, callback) {
 
         // groupping
         var $group = {};

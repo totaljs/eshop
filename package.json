@@ -15,7 +15,6 @@
     "mongoose-datatable": "^1.0.6",
     "mongoose-function": "^0.1.0",
     "mongoose-timestamp": "0.5.0",
-    "node-raphael": "git://github.com/sdneon/node-raphael.git#master",
     "paypal-express-checkout": "latest",
     "q": "^1.4.1",
     "sqlagent": "latest",

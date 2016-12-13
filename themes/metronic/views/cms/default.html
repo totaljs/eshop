@@ -36,10 +36,4 @@
 		<h1 class="nmb">@{repository.page.title}</h1>
 		@{!repository.page.body}
 	@{fi}
-        
-        @{if repository.page && repository.page.partial && repository.page.partial.length }
-            @{foreach p in repository.page.partial}
-                @{!p.body}
-        @{end}
-@{fi}
 @{fi}

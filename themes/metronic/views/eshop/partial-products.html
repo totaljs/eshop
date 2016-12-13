@@ -16,8 +16,8 @@
                     <h3><a href="@{m.linker}">@{m.name}</a></h3>
                     <h4><a href="@{m.linker_category}">@{m.category}</a></h4>
                     <p>@{m.manufacturer}</p>
-                    <div class="pi-price">@{currency(m.prices.pu_ht)}</div>
-                    <a href="javascript:;" class="btn btn-default add2cart">@(eshop:AddToCart)</a>
+                    <div class="pi-price">@{currency(m.price)}</div>
+                    <a href="javascript:;" class="btn btn-default add2cart">Add to cart</a>
                     @{if m.sale}<div class="sticker sticker-sale"></div>@{fi}
                     @{if m.new}<div class="sticker sticker-new"></div>@{fi}
                 </div>
