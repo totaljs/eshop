@@ -29,7 +29,7 @@
 			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ if isnew }}<b class="badge badge-blue mr5">@(NEWS)</b>{{ fi }}{{ name }}</td>
 			<td style="width:200px" class="silver hidden-xs">{{ if manufacturer }}<span class="fa fa-building"></span> {{ manufacturer }}{{ fi }}</td>
 			<td style="width:250px" class="silver hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
-			<td style="width:100px" class="ui-right active">{{ prices.pu_ht | price(2) }}</td>
+			<td style="width:100px" class="ui-right active">{{ price | price(2) }}</td>
 			<td style="width:80px" class="ui-right">
 				<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
 				<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>

@@ -4,8 +4,6 @@ const filename = F.path.databases('newsletter.csv');
 NEWSCHEMA('Newsletter').make(function(schema) {
 
 	schema.define('email', 'Email', true);
-	schema.define('ip', 'String(80)');
-	schema.define('language', 'Lower(2)');
 
 	// Saves the model into the database
 	schema.setSave(function(error, model, options, callback, controller) {
@@ -14,26 +12,21 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 		model.ip = controller.ip;
 		model.language = controller.language;
 
-		var nosql = DB(error);
-		nosql.insert('newsletter').set(model);
-		nosql.exec(function(err, doc) {
-			if (doc) {
+		var db = NOSQL('newsletter');
+
+		db.upsert(model).where('email', model.email).callback(function(err, count) {
+			if (count) {
 				F.emit('newsletter.save', model);
 				MODULE('webcounter').increment('newsletter');
+				db.counter.hit('all', 1);
 			}
-		}, -1);
+		});
 
 		callback(SUCCESS(true));
 	});
-        
+
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
-                // options.search {String}
-		// options.navigation {String}
-		// options.language {String}
-		// options.ispartial {Boolean}
-		// options.page {String or Number}
-		// options.max {String or Number}
 
 		options.page = U.parseInt(options.page) - 1;
 		options.max = U.parseInt(options.max, 20);
@@ -41,37 +34,31 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 		if (options.page < 0)
 			options.page = 0;
 
-                var nosql = DB(error);
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
-                
-                nosql.listing('newsletter', 'newsletter').make(function(builder) {
+		var filter = NOSQL('newsletter').find();
 
-			options.language && builder.where('language', options.language);
-			options.search && builder.in('search', options.search);
+		options.language && filter.where('language', options.language);
+		options.search && filter.like('email', options.search);
 
-			builder.fields('email', 'ip','language');
-			builder.sort('datecreated');
-			builder.take(take);
-			builder.skip(skip);
-		});
-                
-                nosql.exec(function(err, response) {
+		filter.take(take);
+		filter.skip(skip);
+		filter.sort('datecreated');
 
+		filter.callback(function(err, docs, count) {
 			var data = {};
-			data.count = response.pages.count;
-			data.items = response.pages.items;
+			data.count = count;
+			data.items = docs;
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
-
 			callback(data);
 		});
 	});
 
 	// Performs download
 	schema.addWorkflow('download', function(error, model, controller, callback) {
-		schema.query(function(err, response) {
+		NOSQL('newsletter').find().fields('email').callback(function(err, response) {
 
 			var builder = [];
 			for (var i = 0, length = response.length; i < length; i++)
@@ -84,9 +71,8 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 
 	// Clears DB
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		var nosql = DB(error);
-		nosql.remove('newsletter');
-		nosql.exec(SUCCESS(callback));
+		NOSQL('newsletter').remove(F.path.databases('newsletter_removed.nosql')).callback(refresh_cache);
+		callback(SUCCESS(true));
 	});
 
 	schema.addWorkflow('stats', function(error, model, options, callback) {

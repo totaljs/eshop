@@ -12,16 +12,14 @@ NEWSCHEMA('Contact').make(function(schema) {
 	// Saves the model into the database
 	schema.setSave(function(error, model, options, callback) {
 
-		// Default values
 		model.id = UID();
 		model.datecreated = F.datetime;
 
-		var nosql = DB(error);
-		nosql.insert('contactforms').set(model);
-		nosql.exec(SUCCESS(callback), -1);
+		NOSQL('contactforms').insert(model.$clean());
+		MODULE('webcounter').increment('contactforms');
+		callback(SUCCESS(true));
 
 		F.emit('contact.save', model);
-		MODULE('webcounter').increment('contactforms');
 
 		// Sends email
 		var mail = F.mail(F.config.custom.emailcontactform, '@(Contact form #) ' + model.id, '=?/mails/contact', model, model.language || '');

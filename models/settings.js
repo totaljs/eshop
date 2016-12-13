@@ -60,54 +60,26 @@ NEWSCHEMA('Settings').make(function(schema) {
 		if (settings.url.endsWith('/'))
 			settings.url = settings.url.substring(0, settings.url.length - 1);
 
-		var nosql = DB(error);
+		settings.datebackup = F.datetime;
+		DB('settings_backup').insert(JSON.parse(JSON.stringify(settings)));
+		settings.datebackup = undefined;
 
-		nosql.update('update', 'common').make(function(builder) {
-			builder.set(settings);
-			builder.where('_id', 'settings');
-			builder.first();
-		});
-
-		nosql.ifnot('update', function(error, response) {
-			nosql.insert('common').make(function(builder) {
-				builder.replace(nosql.builder('update'), true);
-				builder.set('_id', 'settings');
-			});
-		});
-
-		nosql.exec(function(err, response) {
+		// Writes settings into the file
+		Fs.writeFile(filename, JSON.stringify(settings), function() {
+			F.emit('settings.save', settings);
 			callback(SUCCESS(true));
-			!err && F.emit('settings.save', settings);
 		});
 	});
 
 	// Gets settings
 	schema.setGet(function(error, model, options, callback) {
-
-		var nosql = DB(error);
-
-		nosql.select('common', 'common').make(function(builder) {
-			builder.where('_id', 'settings');
-			builder.first();
+		Fs.readFile(filename, function(err, data) {
+			if (err)
+				settings = { 'manager-superadmin': 'admin:admin', currency: 'EUR', currency_entity: '&euro;' };
+			else
+				settings = data.toString('utf8').parseJSON();
+			callback(settings);
 		});
-
-		nosql.exec(function(err, doc) {
-
-			if (err) {
-				F.error(err);
-				return;
-			}
-
-			if (doc && doc.common) {
-				callback(doc.common);
-				return;
-			}
-
-			model['manager-superadmin'] = 'admin:admin';
-			model.currency = 'EUR';
-			model.currency_entity = '&euro;';
-			callback();
-	});
 	});
 
 	// Loads settings + rewrites framework configuration

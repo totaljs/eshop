@@ -35,44 +35,37 @@ NEWSCHEMA('Page').make(function(schema) {
 	// Gets listing
 	schema.setQuery(function(error, options, callback) {
 
-		// options.search {String}
-		// options.navigation {String}
-		// options.language {String}
-		// options.ispartial {Boolean}
-		// options.page {String or Number}
-		// options.max {String or Number}
-
 		options.page = U.parseInt(options.page) - 1;
 		options.max = U.parseInt(options.max, 20);
 
 		if (options.page < 0)
 			options.page = 0;
 
-		var nosql = DB(error);
 		var take = U.parseInt(options.max);
 		var skip = U.parseInt(options.page * options.max);
 
-                nosql.listing('pages', 'pages').make(function(builder) {
+		// Prepares searching
+		if (options.search)
+			options.search = options.search.keywords(true, true);
 
-			builder.where('isremoved', false);
+		var filter = NOSQL('pages').find();
 
-			options.ispartial && builder.where('ispartial', options.ispartial);
-			options.language && builder.where('language', options.language);
-			options.navigation && builder.in('navigations', options.navigation);
-			options.search && builder.in('search', options.search.keywords(true, true));
-			options.template && builder.where('template', options.template);
+		options.ispartial && filter.where('ispartial', options.ispartial);
+		options.language && filter.where('language', options.language);
+		options.navigation && filter.in('navigations', options.navigation);
+		options.search && filter.like('search', options.search);
+		options.template && filter.where('template', options.template);
 
-			builder.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
-			builder.sort('name');
-			builder.take(take);
-			builder.skip(skip);
-		});
+		filter.take(take);
+		filter.skip(skip);
+		filter.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
+		filter.sort('name');
 
-		nosql.exec(function(err, response) {
+		filter.callback(function(err, docs, count) {
 
 			var data = {};
-			data.count = response.pages.count;
-			data.items = response.pages.items;
+			data.count = count;
+			data.items = docs;
 			data.limit = options.max;
 			data.pages = Math.ceil(data.count / options.max) || 1;
 			data.page = options.page + 1;
@@ -85,37 +78,23 @@ NEWSCHEMA('Page').make(function(schema) {
 	// Gets a specific page
 	schema.setGet(function(error, model, options, callback) {
 
-		// options.url {String}
-		// options.id {String}
-		// options.language {String}
+		var filter = NOSQL('pages').one();
 
-		var nosql = DB(error);
+		options.url && filter.where('url', options.url);
+		options.id && filter.where('id', options.id);
+		options.language && filter.where('language', options.language);
 
-		nosql.select('page', 'pages').make(function(builder) {
-			builder.first();
-			builder.where('isremoved', false);
-
-			options.url && builder.where('url', options.url);
-			options.id && builder.where('id', options.id);
-			options.language && builder.where('language', options.language);
+		filter.callback(function(err, doc) {
+			!doc && error.push('error-404-page');
+			callback(doc);
 		});
-
-		nosql.validate('page', 'error-404-page');
-		nosql.exec(callback, 'page');
 	});
 
 	// Removes a specific page
 	schema.setRemove(function(error, id, callback) {
-
-		var nosql = DB(error);
-
-		nosql.update('pages').make(function(builder) {
-			builder.set('isremoved', true);
-			builder.where('id', id);
-			builder.first();
-		});
-
-		nosql.exec(SUCCESS(callback));
+		var db = NOSQL('pages');
+		db.remove().where('id', id).callback(callback);
+		db.counter.remove(id);
 		setTimeout2('pages', refresh, 1000);
 	});
 
@@ -126,6 +105,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			model.name = model.title;
 
 		var newbie = model.id ? false : true;
+		var nosql = NOSQL('pages');
 
 		if (newbie) {
 			model.id = UID();
@@ -136,10 +116,8 @@ NEWSCHEMA('Page').make(function(schema) {
 			model.adminupdated = controller.user.name;
 		}
 
-		if (model.body)
-                    model.body = U.minifyHTML(model.body);
-                
-		model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true);
+		model.body = U.minifyHTML(model.body);
+		model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).keywords(true, true).join(' ').max(1000);
 
 		// Sanitizes URL
 		if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
@@ -148,29 +126,12 @@ NEWSCHEMA('Page').make(function(schema) {
 				model.url = '/' + model.url;
 		}
 
-		model.isremoved = false;
-
-		// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
-		var nosql = DB(error);
-
-		nosql.save('page', 'pages', newbie, function(builder) {
-			builder.set(model);
-			if (newbie)
-				return;
-			builder.rem('id');
-			builder.rem('datecreated');
-			builder.where('id', model.id);
-		});
-
-		nosql.exec(function(err, response) {
-
-			callback(SUCCESS(true));
-
-			if (err)
-				return;
-
+		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function(err, count) {
 			F.emit('pages.save', model);
 			setTimeout2('pages', refresh, 1000);
+			callback(SUCCESS(true));
+			model.datebackup = F.datetime;
+			DB('pages_backup').insert(model);
 		});
 	});
 
@@ -183,7 +144,12 @@ NEWSCHEMA('Page').make(function(schema) {
 
 		// Gets parent URL
 		schema.get({ id: model.parent }, function(err, response) {
-			model.url = err ? model.title.slug() : response.url + model.title.slug() + '/';
+
+			if (err)
+				model.url = model.title.slug();
+			else
+				model.url = response.url + model.title.slug() + '/';
+
 			callback();
 		});
 	});
@@ -222,7 +188,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			var key = (response.language ? response.language + ':' : '') + response.url;
 			schema.operation('breadcrumb', key, function(err, breadcrumb) {
 
-				if (breadcrumb && breadcrumb.length > 0)
+				if (breadcrumb && breadcrumb.length)
 					breadcrumb[0].first = true;
 
 				response.breadcrumb = breadcrumb;
@@ -358,14 +324,9 @@ NEWSCHEMA('Page').make(function(schema) {
 
 	// Clears database
 	schema.addWorkflow('clear', function(error, model, options, callback) {
-		var nosql = DB(error);
-		nosql.remove('pages');
-		nosql.exec(function(err, response) {
-			setTimeout(refresh, 1000);
+		NOSQL('pages').remove().callback(() => setTimeout(refresh, 1000));
 		callback(SUCCESS(true));
 	});
-});
-
 });
 
 // Refreshes internal informations (sitemap and navigations)
@@ -376,22 +337,15 @@ function refresh() {
 	var navigation = {};
 	var partial = [];
 
-	var nosql = DB();
-
-	nosql.select('pages', 'pages').make(function(builder) {
-		builder.where('isremoved', false);
-		builder.fields('id', 'language', 'url', 'name', 'title', 'parent', 'language', 'icon', 'tags', 'navigations', 'priority', 'ispartial');
-	});
-
 	var prepare = function(doc) {
-
-		var key = (doc.language ? doc.language + ':' : '') + doc.url;
 
 		// A partial content is skipped from the sitemap
 		if (doc.ispartial) {
 			partial.push({ id: doc.id, url: doc.url, name: doc.name, title: doc.title, language: doc.language, icon: doc.icon, tags: doc.tags, priority: doc.priority });
 			return;
 		}
+
+		var key = (doc.language ? doc.language + ':' : '') + doc.url;
 
 		helper[doc.id] = key;
 		sitemap[key] = { id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, language: doc.language, icon: doc.icon, tags: doc.tags };
@@ -408,15 +362,7 @@ function refresh() {
 		}
 	};
 
-	nosql.exec(function(err, response) {
-
-		if (err)
-			return F.error(err);
-
-		var docs = response.pages;
-
-		for (var i = 0, length = docs.length; i < length; i++)
-			prepare(docs[i]);
+	NOSQL('pages').find().prepare(prepare).callback(function() {
 
 		// Pairs parents by URL
 		Object.keys(sitemap).forEach(function(key) {
@@ -487,6 +433,7 @@ F.eval(function() {
 			cache = true;
 
 		if (!partial) {
+
 			if (self.language)
 				url = self.language + ':' + url;
 
@@ -506,6 +453,7 @@ F.eval(function() {
 			options.controller = self;
 
 			GETSCHEMA('Page').operation('render', options, function(err, response) {
+
 				if (err) {
 					self.status = 404;
 					self.plain(U.httpStatus(404, true));
@@ -516,12 +464,14 @@ F.eval(function() {
 				self.repository.render = true;
 				self.repository.page = response;
 
+				NOSQL('pages').counter.hit(self.repository.page.id);
+
 				self.sitemap(response.breadcrumb);
 				self.meta(response.title, response.description, response.keywords);
 				self.view(view || '~/cms/' + response.template, model);
 			});
-		});
 
+		}, NOOP, () => NOSQL('pages').counter.hit(self.repository.page.id));
 		return self;
 	};
 });
