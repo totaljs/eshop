@@ -11,7 +11,7 @@
 		<a href="@{m.linker_category}/" class="product-category">@{m.category}</a>
 		<a href="@{sitemap_url('products')}?manufacturer=@{m.linker_manufacturer}" class="product-manufacturer">@{m.manufacturer}</a>
 		<a href="@{m.linker}" class="product-name">@{m.name}</a>
-		<div class="product-price">@{currency(m.price)}@{if m.price < m.priceold} <span>@{currency(m.priceold)}</span>@{fi}</div>
+		<div class="product-price">@{currency(m.price)}</div>
 	</div>
 	@{end}
 </div>

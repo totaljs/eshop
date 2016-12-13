@@ -30,7 +30,6 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('note', 'String(500)');
 	schema.define('language', 'Lower(2)');
 	schema.define('reference', 'String(10)');
-	schema.define('trackingcode', 'String(50)');
 	schema.define('price', Number);
 	schema.define('count', Number);
 	schema.define('products', '[OrderItem]', true);

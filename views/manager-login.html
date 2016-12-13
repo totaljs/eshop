@@ -58,7 +58,7 @@
 			dt.setDate(dt.getDate() + 7);
 			document.cookie = '__manager=' + (id.toString()) + '; expires=' + dt.toUTCString() + '; path=/';
 			FIND('loading').show();
-			location.reload(true);
+			window.location.reload(true);
 		}
 	</script>
 
