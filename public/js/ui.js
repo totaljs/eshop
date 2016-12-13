@@ -2622,34 +2622,36 @@ COMPONENT('contextmenu', function() {
 });
 
 COMPONENT('checkboxlist', function() {
+
 	var self = this;
-	var template = Tangular.compile('<div class="ui-checkboxlist-checkbox {0}" data-search="{{ name }}"><label><input type="checkbox" value="{{ id }}"><span>{{ name }}</span></label></div>'.format(self.attr('data-class')));
-	var datasource;
-	var items;
-	var condition;
+	var isRequired = self.attr('data-required');
+	var template = Tangular.compile('<div class="{0} ui-checkboxlist-checkbox"><label><input type="checkbox" value="{{ id }}"><span>{{ name }}</span></label></div>'.format(self.attr('data-class')));
+
+	self.validate = function(value) {
+		return isRequired ? value && value.length > 0 : true;
+	};
+
+	self.required = function(value) {
+		isRequired = value;
+		return self;
+	};
+
+	!isRequired && self.noValid();
 
 	self.make = function() {
 
 		self.element.on('click', 'input', function() {
-			var arr = self.get();
-
-			if (!(arr instanceof Array))
-				arr = [];
-
+			var arr = self.get() || [];
 			var value = self.parser(this.value);
 			var index = arr.indexOf(value);
 			if (index === -1)
 				arr.push(value);
 			else
 				arr.splice(index, 1);
-
 			self.set(arr);
-			setTimeout2(self.id, function() {
-				self.change(true);
-			}, 400);
 		});
 
-		self.element.on('click', 'a', function() {
+		self.element.on('click', '.ui-checkboxlist-selectall', function() {
 			var arr = [];
 			var inputs = self.element.find('input');
 			var value = self.get();
@@ -2664,86 +2666,59 @@ COMPONENT('checkboxlist', function() {
 			});
 
 			self.set(arr);
-			setTimeout2(self.id, function() {
-				self.change(true);
-			}, 400);
 		});
 
-		self.make = function() {
-
-			var options = self.attr('data-options');
-			if (!options)
-				return;
-
-			var arr = options.split(';');
-			var datasource = [];
-
-			for (var i = 0, length = arr.length; i < length; i++) {
-				var item = arr[i].split('|');
-				datasource.push({ id: item[1] === undefined ? item[0] : item[1], name: item[0] });
-			}
-
-			self.redraw(datasource);
-		};
-
-		self.setter = function(value) {
-			self.element.find('input').each(function() {
-				this.checked = value && value.indexOf(self.parser(this.value)) !== -1;
-			});
-		};
-
-		self.redraw = function(arr) {
-			var builder = [];
-			var kn = self.attr('data-source-text') || 'name';
-			var kv = self.attr('data-source-value') || 'id';
-
-			for (var i = 0, length = arr.length; i < length; i++) {
-				var item = arr[i];
-
-				if (condition && !condition(item))
-					continue;
-
-				if (typeof(item) === 'string')
-					builder.push(template({ id: item, name: item }));
-				else
-					builder.push(template({ id: item[kv] === undefined ? item[kn] : item[kv], name: item[kn] }));
-			}
-
-			if (!builder.length)
-				return;
-
-			self.attr('data-button') && builder.push('<div class="clearfix"></div><div class="{1}"><div class="ui-checkboxlist-selectall"><a href="javascript:void(0)"><i class="fa fa-check-square mr5"></i>{0}</a></div></div>'.format(self.attr('data-button'), self.attr('data-class')));
-			self.html(builder.join(''));
-			self.setter(self.get());
-			return self;
-		};
-
-		condition = self.attr('data-if');
-		if (condition)
-			condition = FN(condition);
-
-		datasource = self.attr('data-source');
+		var datasource = self.attr('data-source');
 		datasource && self.watch(datasource, function(path, value) {
-			if (self.release())
-				return;
-			items = value || EMPTYARRAY;
+			if (!value)
+				value = [];
 			self.redraw(value);
+		}, true);
+
+		var options = self.attr('data-options');
+		if (!options)
+			return;
+
+		var arr = options.split(';');
+		var datasource = [];
+
+		for (var i = 0, length = arr.length; i < length; i++) {
+			var item = arr[i].split('|');
+			datasource.push({ id: item[1] === undefined ? item[0] : item[1], name: item[0] });
+		}
+
+		self.redraw(datasource);
+	};
+
+	self.setter = function(value) {
+		self.element.find('input').each(function() {
+			this.checked = value && value.indexOf(self.parser(this.value)) !== -1;
 		});
 	};
 
-	self.released = function(is) {
+	self.redraw = function(arr) {
+		var builder = [];
+		var kn = self.attr('data-source-text') || 'name';
+		var kv = self.attr('data-source-value') || 'id';
 
-		if (is) {
-			self.empty();
-			items = null;
-			return;
+		for (var i = 0, length = arr.length; i < length; i++) {
+			var item = arr[i];
+			if (typeof(item) === 'string')
+				builder.push(template({ id: item, name: item }));
+			else
+				builder.push(template({ id: item[kv] === undefined ? item[kn] : item[kv], name: item[kn] }));
 		}
 
-		var tmp = self.get(datasource) || EMPTYARRAY;
-		if (tmp === items)
+		if (!builder.length)
 			return;
-		items = tmp;
-		self.redraw(items);
+
+		var btn = self.attr('data-button') || '';
+		if (btn)
+			btn = '<div class="ui-checkboxlist-selectall"><a href="javascript:void(0)"><i class="fa fa-check-square-o mr5"></i>{0}</a></div>'.format(btn);
+
+		builder.push('<div class="clearfix"></div>' + btn);
+		self.html(builder.join(''));
+		return self;
 	};
 });
 
@@ -2868,7 +2843,12 @@ COMPONENT('nosqlcounter', function() {
 		if (!value || !value.length)
 			return self.empty();
 
-		var max = value.length - count;
+		var maxbars = count;
+
+		if (WIDTH() === 'xs')
+			maxbars = (maxbars / 2) >> 0;
+
+		var max = value.length - maxbars;
 		if (max < 0)
 			max = 0;
 
@@ -2877,7 +2857,7 @@ COMPONENT('nosqlcounter', function() {
 
 		var w = self.element.width();
 
-		var bar = 100 / count;
+		var bar = 100 / maxbars;
 		var builder = [];
 		var months = FIND('calendar').months;
 		var current = new Date().format('yyyyMM');

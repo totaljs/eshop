@@ -79,7 +79,8 @@ h2 .fa { margin-right: 10px; }
 .product-picture img { margin: 0 auto; }
 .product-name { text-align: center; font-size: 16px; font-family: $font; display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 .product-category { font-size: 12px; color: gray; text-align: center; display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-.product-price { width: 130px; margin: 10px auto; border-top: 2px solid #E0E0E0; text-align: center; font-size: 22px; font-family: $font; font-weight: 400; padding: 0 0 10px; color: black; }
+.product-price { margin: 10px auto; border-top: 2px solid #E0E0E0; text-align: center; font-size: 22px; font-family: $font; font-weight: 400; padding: 10px 0 10px; color: black; }
+.product-price span { font-size: 14px; color: red; text-decoration: line-through; }
 .product-top { position: absolute; right: 10%; }
 .product-manufacturer { height: 17px; text-align: center; font-size: 11px; color: #AAB2BD; margin-top: 3px; display: block; }
 .product:last-child { border-bottom: 0; margin-bottom: 0; }
@@ -91,6 +92,7 @@ h2 .fa { margin-right: 10px; }
 
 .detail-buy { font-size: 30px; font-weight: 200; font-family: $font; border: 1px solid silver; background-color: white; padding: 0; height: 74px; color: gray; width: 100%; border-radius: 4px; }
 .detail-buy b { font-weight: 400; }
+.detail-buy span { font-size: 22px; color: red; text-decoration: line-through; font-weight: 400; }
 .detail-buy:hover { border: 1px solid black; color: black; }
 .detail-buy:active { box-shadow: inset 0 0 10px #D0D0D0; }
 .detail-category { color: #A0A0A0; }
