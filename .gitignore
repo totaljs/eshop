@@ -2,6 +2,3 @@ tmp/
 *.pid
 .DS_store
 backup
-node_modules/
-nbproject
-_*
