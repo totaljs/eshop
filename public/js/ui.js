@@ -2884,7 +2884,7 @@ COMPONENT('nosqlcounter', function() {
 		value.forEach(function(item, index) {
 			var val = item.value;
 			if (val > 999)
-				val = (val / 1000).format(0, 2) + 'K';
+				val = (val / 1000).format(1, 2) + 'K';
 			var h = (item.value / max) * 60;
 			h += 40;
 
