@@ -1270,12 +1270,11 @@ COMPONENT('repeater-group', function() {
 			var html = element.html();
 			element.remove();
 
-			if (!index) {
+			if (index)
+				template_group = Tangular.compile(html);
+			else
 				self.template = Tangular.compile(html);
-				return;
-			}
 
-			template_group = Tangular.compile(html);
 		});
 	};
 
@@ -1297,10 +1296,10 @@ COMPONENT('repeater-group', function() {
 			if (!name)
 				name = '0';
 
-			if (!groups[name])
-				groups[name] = [value[i]];
-			else
+			if (groups[name])
 				groups[name].push(value[i]);
+			else
+				groups[name] = [value[i]];
 		}
 
 		var index = 0;
@@ -1312,13 +1311,12 @@ COMPONENT('repeater-group', function() {
 		keys.forEach(function(key) {
 			var arr = groups[key];
 
-			if (key !== '0') {
-				var options = {};
-				options[group] = key;
-				options.length = arr.length;
-				options.index = indexgroup++;
-				builder += template_group(options);
-			}
+			var options = {};
+			options[group] = key === '0' ? '' : key;
+			options.length = arr.length;
+			options.index = indexgroup++;
+
+			builder += template_group(options);
 
 			for (var i = 0, length = arr.length; i < length; i++) {
 				var item = arr[i];
