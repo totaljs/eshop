@@ -161,7 +161,7 @@ function view_checkout(linker) {
 			var paypal = PayPal.create(F.config.custom.paypaluser, F.config.custom.paypalpassword, F.config.custom.paypalsignature, redirect, redirect, F.config.custom.paypaldebug);
 			paypal.pay(data.id, data.price, F.config.name, F.config.custom.currency, function(err, url) {
 				if (err)
-					self.throw500(err);
+					self.view('checkout-error', err);
 				else
 					self.redirect(url);
 			});
@@ -181,9 +181,6 @@ function process_payment_paypal(linker) {
 	var paypal = PayPal.create(F.config.custom.paypaluser, F.config.custom.paypalpassword, F.config.custom.paypalsignature, redirect, redirect, F.config.custom.paypaldebug);
 
 	paypal.detail(self, function(err, data, id, price) {
-
-		if (err)
-			return self.throw500(err);
 
 		var success = false;
 
