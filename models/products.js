@@ -7,6 +7,7 @@ NEWSCHEMA('Product').make(function(schema) {
 	schema.define('manufacturer', 'String(50)');
 	schema.define('name', 'String(50)', true);
 	schema.define('price', Number, true);
+	schema.define('priceold', Number);
 	schema.define('description', String, true);
 	schema.define('availability', 'String(40)');
 	schema.define('template', 'String(30)');
@@ -67,6 +68,8 @@ NEWSCHEMA('Product').make(function(schema) {
 				filter.sort('datecreated', true);
 				break;
 		}
+
+		filter.fields('id', 'linker', 'linker_category', 'linker_manufacturer', 'category', 'manufacturer', 'name', 'price', 'priceold', 'isnew', 'istop', 'pictures', 'availability', 'datecreated');
 
 		filter.skip(skip);
 		filter.take(take);

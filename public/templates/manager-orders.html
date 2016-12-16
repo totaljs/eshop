@@ -101,7 +101,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="padding">
+	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-6 m">
 				<div data-jc="textbox" data-jc-path="orders.form.delivery" data-required="true" data-icon="fa fa-truck">@(Delivery type)</div>
@@ -111,6 +111,10 @@
 			</div>
 		</div>
 		<div class="row">
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.trackingcode" data-maxlength="50" data-align="center" data-icon="fa fa-truck">@(Tracking code)</div>
+				<div class="help">@(For shipment.)</div>
+			</div>
 			<div class="col-md-3 m">
 				<div data-jc="textbox" data-jc-path="orders.form.reference" data-maxlength="10" data-align="center">@(Custom number)</div>
 				<div class="help">@(For pairing invoices or payments.)</div>
