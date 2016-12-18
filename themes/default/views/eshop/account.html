@@ -1,0 +1,70 @@
+@{title(user.name)}
+@{sitemap('account')}
+
+<div id="loading"></div>
+<div class="padding">
+	<br />
+
+	<h1>@{title}</h1>
+	<nav class="quicknavigation center">
+		<a href="@{sitemap_url('contact')}"><i class="fa fa-envelope"></i>@(Support)</a>
+		<a href="@{sitemap_url('products')}" class="hidden-xs"><i class="fa fa-dropbox"></i>@(Explore)</a>
+		<a href="@{sitemap_url('settings')}"><i class="fa fa-cog"></i>@(Settings)</a>
+		<a href="/account/logoff/"><i class="fa fa-power-off"></i>@(Sign out)</a>
+	</nav>
+
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<br />
+
+			<div data-jc="visible" data-jc-path="datasource.items" data-if="value.length === 0" class="hidden">
+				<div class="row">
+					<div class="col-md-8 col-md-offset-2 ui-center">
+						<hr />
+						<br />
+						<div>@(You don't have any orders.)</div>
+						<br />
+						<hr />
+						<br />
+						<br />
+						<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
+					</div>
+				</div>
+			</div>
+
+			<div data-jc="visible" data-jc-path="datasource.items" data-if="value.length > 0" class="hidden">
+				<div class="row">
+					<h3>@(My orders:)</h3>
+				</div>
+				<div data-jc="repeater" data-jc-path="datasource.items" class="orders">
+					<script type="text/html">
+						<div class="row">
+							<div class="col-sm-5">
+								<a href="@{sitemap_url('order', '{{ id }}')}">@(Order) # {{ id }}</a>
+								<div>{{ status }}</div>
+							</div>
+							<div class="col-sm-4 ui-right">
+								<div class="b">@{currency('{{ price }}')}</div>
+								<div>{{ count }} @(items)</div>
+							</div>
+							<div class="col-sm-3 ui-right">
+								<div class="b">{{ datecreated | format('@(yyyy-MM-dd)') }}</div>
+								<div>{{ datecreated | format('HH:mm') }}</div>
+							</div>
+						</div>
+					</script>
+				</div>
+				<br />
+			</div>
+			<br />
+		</div>
+	</div>
+</div>
+
+@{json(model, 'orders')}
+
+@{section script}
+<script>
+	var datasource = JSON.parse($('#orders').html());
+</script>
+@{end}

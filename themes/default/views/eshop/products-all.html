@@ -1,0 +1,16 @@
+@{if query.q}
+	@{title('@(Search results) (' + model.count + ')')}
+@{fi}
+
+@{sitemap('products')}
+
+@{if repository.manufacturer}
+	@{title2(' - ' + repository.manufacturer.name)}
+@{fi}
+
+<div class="padding">
+	<h1 class="nmb">@{title}</h1>
+	@{view('partial-filter')}
+	@{view('partial-products', model)}
+	@{view('partial-pagination', model)}
+</div>

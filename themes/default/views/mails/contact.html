@@ -1,0 +1,32 @@
+@{layout('~mails/layout')}
+
+<div style="font-size:20px;color:#A0A0A0">@(Dear administrator)</div>
+<div style="margin-top:15px">@(On your website has been sent a contact form. Please check the contact form data below and reply on it:)</div>
+<br />
+<div style="margin-bottom:10px;line-height:18px;border-bottom:1px solid #F0F0F0;padding-bottom:5px">
+	<div style="font-weight:bold;text-transform:uppercase;color:black">@(Contact number)</div>
+	<div>@{model.id}</div>
+</div>
+<div style="margin-bottom:10px;line-height:18px;border-bottom:1px solid #F0F0F0;padding-bottom:5px">
+	<div style="font-weight:bold;text-transform:uppercase;color:black">@(Created)</div>
+	<div>@{model.datecreated.format('@(yyyy-MM-dd)')}</div>
+</div>
+<div style="margin-bottom:10px;line-height:18px;border-bottom:1px solid #F0F0F0;padding-bottom:5px">
+	<div style="font-weight:bold;text-transform:uppercase;color:black">@(Customer)</div>
+	<div>@{model.firstname} @{model.lastname}</div>
+</div>
+<div style="margin-bottom:10px;line-height:18px;border-bottom:1px solid #F0F0F0;padding-bottom:5px">
+	<div style="font-weight:bold;text-transform:uppercase;color:black">@(Email address)</div>
+	<div>@{model.email}</div>
+</div>
+@{if model.phone}
+<div style="margin-bottom:10px;line-height:18px;border-bottom:1px solid #F0F0F0;padding-bottom:5px">
+	<div style="font-weight:bold;text-transform:uppercase;color:black">@(Phone number)</div>
+	<div>@{model.phone}</div>
+</div>
+@{fi}
+<br />
+<div style="border:2px solid #F0F0F0;padding:20px;border-radius:4px">
+	<div style="margin-bottom:10px"><b>@(Message:)</b></div>
+	<div>@{!model.body.encode().replace(/\n/g, '<br />')}</div>
+</div>

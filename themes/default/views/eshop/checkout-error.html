@@ -1,0 +1,20 @@
+@{title('@(Payment problem)')}
+@{sitemap('checkout')}
+
+<div class="padding">
+	<h1>@{title}</h1>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 ui-center">
+			<hr />
+			<br />
+			<div>@(Dear user, we didn't receive your payment.<br />Please try again make a payment.)</div>
+			<br />
+			<hr />
+			<br />
+			<br />
+			<a href="../" class="linkbutton"><span class="fa fa-paypal"></span> @(Pay again)</a>
+			<br />
+			<br />
+		</div>
+	</div>
+</div>

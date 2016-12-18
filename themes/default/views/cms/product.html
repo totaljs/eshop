@@ -1,0 +1,109 @@
+@{if repository.preview}
+	<br />
+	<div id="CMS">
+		@{if repository.page && repository.page.body}
+			<!-- RENDER UPDATED CONTENT -->
+			@{!repository.page.body}
+		@{else}
+			<!-- DEFAULT CONTENT FOR NEW PAGES FO THIS TEMPLATE -->
+			<div class="CMS_widgets"></div>
+		@{fi}
+	</div>
+	<br />
+@{else}
+	<div class="padding">
+		<h1>@{title}</h1>
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1 detail">
+
+				<div class="row">
+					<div class="col-md-4 m">
+						<div class="keyvalue">
+							<div class="key">@(Category)</div>
+							<div class="value"><a href="@{sitemap_url('category')}@{model.linker_category}/">@{model.category}</a></div>
+						</div>
+					</div>
+					<div class="col-md-4 m">
+						<div class="keyvalue">
+							<div class="key">@(Manufacturer)</div>
+							<div class="value"><a href="@{sitemap_url('products')}?manufacturer=@{model.linker_manufacturer}">@{model.manufacturer}</a></div>
+						</div>
+					</div>
+					<div class="col-md-4 m">
+						<div class="keyvalue">
+							<div class="key"><i class="fa fa-dropbox"></i>@(Availability)</div>
+							<div class="value">@{model.availability}</div>
+						</div>
+					</div>
+					<div class="col-md-4 m">
+						<div class="keyvalue">
+							<div class="key">@(Product code)</div>
+							<div class="value">@{if model.reference}@{model.reference}@{else}@{model.id}@{fi}</div>
+						</div>
+					</div>
+					<div class="col-md-4 m">
+						<div class="keyvalue">
+							<div class="key">@(Created)</div>
+							<div class="value">@{model.datecreated.format('@(yyyy-MM-dd)')}</div>
+						</div>
+					</div>
+					<div class="col-md-4 m">
+						<div class="flags">
+							@{if model.istop}<div class="top">@(TOP)</div>@{fi}
+							@{if model.isnew}<div class="new">@(NEW)</div>@{fi}
+						</div>
+					</div>
+				</div>
+
+
+				<br />
+				<p><b>@(Description)</b>@{!model.description.replace(/\n/g, '<br />')}</p>
+				<br />
+
+				<div class="detail-checkout">
+					<div>@(The product <b>@{model.name}</b> is in your shopping cart) <b class="data-checkout-count"></b>.</div>
+					<span class="fa fa-shopping-cart mr5"></span><a href="/checkout/" class="b">@(Order it now)</a>
+				</div>
+
+				<br />
+
+				<div class="row">
+					<div class="col-md-6">
+						<div><button class="detail-buy" data-id="@{model.id}" data-price="@{model.price}">@(Buy:) <b>@{currency(model.price)}</b>@{if model.priceold > model.price} <span class="red">@{currency(model.priceold)}</span>@{fi}</button></div>
+						<div style="margin-top:15px"><span class="fa fa-envelope silver mr5"></span><a href="@{sitemap_url('contact')}?productid=@{if model.reference}@{model.reference}@{else}@{model.id}@{fi}#contactform">@(Do you need more informations?)</a></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br />
+	<hr />
+	<br />
+	@{if model.pictures.length === 1}
+		<div><img src="/images/large/@{model.pictures[0]}.jpg" alt="@{model.name}" border="0" class="img-responsive img-rounded center" /></div>
+		<br />
+		<hr />
+	@{else}
+		<div class="padding">
+		<div class="row detail-pictures">
+			@{foreach m in model.pictures}
+				<div class="col-md-6 m"><img src="/images/large/@{m}.jpg" alt="@{model.name}" border="0" class="img-responsive img-rounded center" /></div>
+				@{if index && (index + 1) % 2 === 0}
+				</div>
+				<hr class="visible-lg" />
+				<div class="row detail-pictures">
+				@{fi}
+			@{end}
+		</div>
+		</div>
+	@{fi}
+
+	@{if model.body}
+		@{!model.body.tidyCMS()}
+		<br />
+	@{fi}
+	<div class="hidden padding npb">
+		<h2 class="large">@(Related) @{model.category}</h2>
+		<div data-jc="related" data-category="@{model.linker_category}" data-id="@{model.id}"></div>
+	</div>
+@{fi}

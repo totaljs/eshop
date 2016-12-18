@@ -1,0 +1,317 @@
+<br />
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<h2 class="ui-center">@(Today statistics)</h2>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4 m">
+			<div data-jc="template" data-jc-path="dashboard.data">
+				<script type="text/html">
+					<br />
+					<table class="table">
+						<tr>
+							<td class="b">@(Today orders)</td>
+							<td class="col-xs-3 ui-right">{{ if webcounter.today.orders }}{{ webcounter.today.orders | format(0) }}{{ else }}0{{ fi }}x</td>
+						</tr>
+						<tr>
+							<td>@(Hits)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.hits | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td>@(Visitors)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.count | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td>@(Unique visitors)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.unique | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td>@(Visited pages per user)</td>
+							<td class="col-xs-3 ui-right">{{ webcounter.today.pages | format(0) }}x</td>
+						</tr>
+					</table>
+				</script>
+			</div>
+			<div data-jc="template" data-jc-path="dashboard.online">
+				<script type="text/html">
+					<div class="fs11 silver ui-center">@(Memory usage) <b>{{ memoryused }}</b> @(from) <b>{{ memorytotal }}</b></div>
+				</script>
+			</div>
+		</div>
+		<div class="col-md-4 m">
+			<hr />
+			<div class="fs11 silver ui-center">@(Online visitors)</div>
+			<div class="dashboard-online-counter">
+				<div data-jc="template" data-jc-path="dashboard.online">
+					<script type="text/html">
+						<span>{{ visitors }}</span>
+						<div class="ui-center">@(Last visitor:) <b>{{ if last }}{{ last | format('@(yyyy-MM-dd HH:mm)') }}{{ else }}............{{ fi }}</b></div>
+					</script>
+				</div>
+				<br />
+				<div style="max-width:230px;margin:0 auto">
+					<canvas id="dashboard-online"></canvas>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 m">
+			<div data-jc="template" data-jc-path="dashboard.online">
+				<script type="text/html">
+					<br />
+					<table class="table">
+						<tr>
+							<td style="border-left:5px solid #61E727">@(Organic search)</td>
+							<td class="col-xs-3 ui-right">{{ today.search | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #479AD0">@(Social networks)</td>
+							<td class="col-xs-3 ui-right">{{ today.social | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #E22926">@(Direct visitors)</td>
+							<td class="col-xs-3 ui-right">{{ today.direct | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #FFEE32">@(Visitors from adverts)</td>
+							<td class="col-xs-3 ui-right">{{ today.advert | format(0) }}x</td>
+						</tr>
+						<tr>
+							<td style="border-left:5px solid #585858">@(Unknown visitors)</td>
+							<td class="col-xs-3 ui-right">{{ today.unknown | format(0) }}x</td>
+						</tr>
+					</table>
+				</script>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br />
+<div class="bg-smoke">
+	<br />
+	<div class="container" data-jc="template" data-jc-path="dashboard.data.Order">
+		<script type="text/html">
+			<div class="row">
+				<div class="col-md-3 m red">
+					<div class="b">@(Pending orders)</div>
+					<div>{{ pending }}x</div>
+					<hr class="nmb" />
+				</div>
+				<div class="col-md-3 m">
+					<div class="b">@(Completed orders)</div>
+					<div>{{ completed }}x</div>
+					<hr class="nmb" />
+				</div>
+				<div class="col-md-3 m red">
+					<div class="b">@(Pending money)</div>
+					<div>{{ pending_price | price(2) }}</div>
+					<hr class="nmb" />
+				</div>
+				<div class="col-md-3 m">
+					<div class="b">@(Earned money)</div>
+					<div>{{ completed_price | price(2) }}</div>
+					<hr class="nmb" />
+				</div>
+			</div>
+		</script>
+	</div>
+</div>
+<br />
+
+<div class="container">
+	<br />
+	<div class="ui-center b">@(Desktop devices vs. Mobile devices)</div>
+	<br />
+	<div class="dashboard-devices">
+		<div class="dashboard-devices-desktop"><span class="fa fa-desktop"></span>@(Desktop)</div>
+		<div class="dashboard-devices-mobile">@(Mobile)<span class="fa fa-tablet"></span></div>
+		<div class="dashboard-devices-stats"></div>
+	</div>
+</div>
+
+<br />
+<div class="container">
+	<br />
+	<ul class="tabmenu" data-jc="tabmenu" data-jc-path="dashboard.year" data-jc-type="number">
+		<script type="text/html" data-jc="repeater" data-jc-path="dashboard.years">
+			<li data-value="{{}}">{{}}</li>
+		</script>
+	</ul>
+	<br />
+	<div class="row">
+		<div class="col-md-6 m">
+			<div class="ui-center b m">@(Yearly stats of orders)</div>
+			<canvas id="dashboard-monthly-orders" height="115"></canvas>
+		</div>
+		<div class="col-md-6 m">
+			<div class="ui-center b m">@(Yearly stats of views)</div>
+			<canvas id="dashboard-monthly-hits" height="115"></canvas>
+		</div>
+	</div>
+	<br />
+</div>
+<br />
+
+<div class="bg-smoke">
+	<div class="container">
+		<br />
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="ui-center">@(Yearly stats <b>Visitors vs. Unique Visitors</b>)</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 m">
+				<div class="legend">
+					<label><span class="fa fa-square" style="color:#FFCE54"></span><span>@(Visitors)</span></label>
+					<label><span class="fa fa-square" style="color:#FC6E51"></span><span>@(Unique Visitors)</span></label>
+				</div>
+				<br />
+				<canvas id="dashboard-monthly-visitors" height="100"></canvas>
+			</div>
+		</div>
+		<br />
+	</div>
+</div>
+
+<script>
+
+	Chart.defaults.global.legend.display = false;
+
+	var dashboard = {};
+
+	dashboard.data = {};
+	dashboard.online = {};
+	dashboard.cache = {};
+	// dashboard.years = [];
+	// dashboard.year;
+
+	function dashboard_refresh() {
+		AJAX('GET {0}/api/dashboard/'.format(managerurl), function(response, err) {
+
+			SET('dashboard.data', response);
+
+			if (dashboard.cache.processed)
+				return;
+
+			dashboard.cache.processed = true;
+
+			var data = {};
+			var options = {};
+			var labels = ['@(Organic search)', '@(Social networks)', '@(Direct)', '@(Advert)', '@(Other)'];
+
+			data.data = [response.webcounter.today.search, response.webcounter.today.social, response.webcounter.today.direct, response.webcounter.today.advert, response.webcounter.today.unknown];
+			data.backgroundColor = ['#61E727', '#479AD0', '#E22926', '#FFEE32', '#585858'];
+
+			options.type = 'doughnut';
+			options.data = { labels: labels, datasets: [data], display: true };
+
+			dashboard.cache.online && dashboard.cache.online.destroy();
+			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'), options);
+			dashboard.year = (new Date()).getFullYear();
+			dashboard.years = [];
+
+			var stats_mobile = 0;
+			var stats_desktop = 0;
+
+			Object.keys(response.webcounter.stats).forEach(function(key) {
+				var stats = response.webcounter.stats[key];
+				stats_mobile += stats.mobile;
+				stats_desktop += stats.desktop;
+				var year = key.substring(key.indexOf('-') + 1).parseInt();
+				dashboard.years.indexOf(year) === -1 && dashboard.years.push(year);
+			});
+
+			dashboard.years.sort();
+			dashboard.years.reverse();
+
+			UPDATE('!dashboard.year', 500);
+			UPDATE('!dashboard.years');
+
+			setTimeout(function() {
+				$('.dashboard-devices-stats').animate({ width: (stats_desktop / ((stats_desktop + stats_mobile) / 100) >> 0) + '%' }, 1000);
+			}, 1500);
+		});
+	}
+
+	// Helper method for generating pie chart
+	function dashboard_charts_pie_item(value, label, color) {
+		return { value: value, label: label, color: color };
+	}
+
+	// Helper method for generating bar chart
+	function dashboard_charts_bar_items(color, obj, name, year) {
+
+		var stats = [];
+
+		for (var i = 0; i < 12; i++) {
+			var value = obj[(i + 1) + '-' + year];
+
+			if (!value || !value[name])
+				stats[i] = 0;
+			else
+				stats[i] = value[name];
+		}
+
+		return { data: stats, label: name, backgroundColor: color };
+	}
+
+	WATCH('dashboard.year', function(path, value) {
+		dashboard_yearstats(value);
+	});
+
+	function dashboard_yearstats(year) {
+		var el;
+		var data = [];
+		var options = {};
+
+		data.push(dashboard_charts_bar_items('#FFCE54', dashboard.data.webcounter.stats, 'count', year));
+		data.push(dashboard_charts_bar_items('#FC6E51', dashboard.data.webcounter.stats, 'unique', year));
+
+		options.type = 'bar';
+		options.data = { labels: window.$calendar.months_short, datasets: data };
+
+		dashboard.cache.visitors && dashboard.cache.visitors.destroy();
+		el = $('#dashboard-monthly-visitors');
+		dashboard.cache.visitors = new Chart(el.get(0).getContext('2d'), options);
+
+		options = {};
+		data = [];
+		data.push(dashboard_charts_bar_items('#48CFAD', dashboard.data.webcounter.stats, 'orders', year));
+		options.type = 'bar';
+		options.data = { labels: window.$calendar.months_short, datasets: data };
+
+		dashboard.cache.orders && dashboard.cache.orders.destroy();
+		el = $('#dashboard-monthly-orders');
+		dashboard.cache.orders = new Chart(el.get(0).getContext('2d'), options);
+
+		options = {};
+		data = [];
+		data.push(dashboard_charts_bar_items('#AC92EC', dashboard.data.webcounter.stats, 'hits', year));
+		options.type = 'bar';
+		options.data = { labels: window.$calendar.months_short, datasets: data };
+		dashboard.cache.hits && dashboard.cache.hits.destroy();
+
+		el = $('#dashboard-monthly-hits');
+		dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'), options);
+	}
+
+	// Refresh online users
+	setInterval(function() {
+		// Refresh only when is the dashboard shown
+		if (jRouting.url === managerurl + '/')
+			dashboard_refresh_online();
+	}, 5000);
+
+	function dashboard_refresh_online() {
+		AJAX('GET {0}/api/dashboard/online/'.format(managerurl), function(response) {
+			!NOTMODIFIED('dashboard.online', response) && SET('dashboard.online', response);
+		});
+	}
+
+	dashboard_refresh_online();
+	dashboard_refresh();
+
+</script>

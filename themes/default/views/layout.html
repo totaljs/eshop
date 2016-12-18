@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=10" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="robots" content="all,follow" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
+	<link rel="stylesheet" href="@{global.css}" />
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	@{import('meta', 'head', 'default.css', 'default.js', 'favicon.ico')}
+</head>
+<body data-jc="exec">
+
+	<div data-jc="cookie" class="hidden">@(This site uses cookies for visitor statistics. By continuing to browse the site you are agreeing to our use of cookies.) <a href="/privacy/">@(Privacy Policy)</a></div>
+	<div data-jc="message" data-button="@(Close)"></div>
+
+	<a href="https://www.totaljs.com/eshop/" target="_blank" style="position:absolute;right:0;top:0;z-index:2"><img src="/img/demo.png" alt="DEMO PREVIEW" border="0" width="140" /></a>
+
+	<header class="header-container">
+		<div class="container">
+			<div class="header-links-container">
+				<div class="header-links">
+					@{if global.navigations.searchbar}
+						@{foreach m in global.navigations.searchbar}
+						<a href="@{m.url}">@{m.name}</a>
+						@{end}
+					@{fi}
+					@{if user}
+						<a href="@{sitemap_url('account')}" class="b">@{user.name}</a>
+						<a href="@{sitemap_url('account')}logoff/" class="red">@(Sign out)</a>
+					@{else}
+						<a href="@{sitemap_url('account')}" class="b">@(My Account)</a>
+					@{fi}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-5 m xs-center">
+					<a href="/"><img src="/img/logo.png" border="0" alt="Eshop" height="60" /></a>
+				</div>
+				<div class="col-sm-3 m ui-right header-padding">
+					<hr class="visible-xs" />
+					<div class="checkoutbutton-container">
+						<a href="@{sitemap_url('checkout')}" class="checkoutbutton xs-center" data-jc="checkout" data-currency="@{config.custom.currency_entity}">&nbsp;</a>
+						<a href="@{sitemap_url('checkout')}" class="checkoutbutton-label"><span class="fa fa-shopping-cart"></span>@(Your shopping cart)</a>
+					</div>
+					<a href="javascript:void(0)" class="header-menu-button"><span class="fa fa-navicon"></span></a>
+					<div class="clearfix"></div>
+				</div>
+				<div class="col-sm-4 m header-padding">
+					<form action="@{sitemap_url('products')}" method="GET">
+						<div class="search">
+							<div class="search-icon"><span class="fa fa-search"></span></div>
+							<div class="search-input"><input type="text" name="search" placeholder="@(Search items ...)" autofocus="autofocus" value="@{query.q}" /></div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</header>
+	<div class="padding-container">
+		<div class="container">
+			@{if url !== '/'}
+			<div class="hidden-xs m">
+				<a href="javascript:void(0)" class="categories-button"><span class="fa fa-folder mr5"></span>@(Show categories)</a>
+			</div>
+			@{fi}
+			<div@{if url !== '/'} class="categories-hide"@{fi}>
+				<div class="categories">
+					<div class="row">
+						@{foreach m in global.categories}
+							@{if m.count > 0 && !m.level}
+							<div class="col-sm-4"><a href="@{sitemap_url('products')}@{m.linker}/">@{m.name}</a></div>
+							@{fi}
+						@{end}
+					</div>
+				</div>
+				<nav class="recommendation">
+					<a href="@{sitemap_url('new')}" class="blue"><i class="fa fa-caret-right"></i>@(New items in the store)</a>
+					<a href="@{sitemap_url('top')}"><i class="fa fa-caret-right"></i>@(Top items)</a>
+					<a href="@{sitemap_url('popular')}"><i class="fa fa-caret-right"></i>@(Popular items)<b>NEW</b></a>
+				</nav>
+			</div>
+
+			<div class="content">
+				<nav class="breadcrumb hidden-xs">
+					<span class="fa fa-home"></span>
+					<ul>
+						@{foreach m in sitemap()}
+							@{if m.id === 'category'}
+								@{sitemap_category(m.url, repository.category)}
+							@{else}
+								<li>@{if !m.first}<span class="fa fa-caret-right"></span>@{fi}<a href="@{m.url}">@{m.name}</a></li>
+							@{fi}
+						@{end}
+					</ul>
+					<div class="breadcrumb-social hidden-xs">
+						<a href="https://www.facebook.com/totaljs.web.framework"><span class="fa fa-facebook-square"></span></a>
+						<a href="https://twitter.com/totalframework"><span class="fa fa-twitter-square"></span></a>
+						<a href="https://plus.google.com/u/0/+partialjs/posts"><span class="fa fa-google-plus-square"></span></a>
+					</div>
+				</nav>
+				@{body}
+			</div>
+
+			<br />
+			<div class="row footerlinks">
+				@{if global.navigations.footer}
+					@{foreach m in global.navigations.footer}
+					<div class="col-md-4"><a href="@{m.url}">@{m.title}</a></div>
+					@{end}
+				@{fi}
+			</div>
+
+			<footer>
+				<div><a href="http://www.paypal.com"><img src="/img/paypal.png" alt="Payment Provider - PayPal" border="0" width="42" height="25" /></a></div>
+				<br />
+				<div class="social">
+					<a href="https://www.facebook.com/totaljs.web.framework"><span class="fa fa-facebook"></span></a>
+					<a href="https://twitter.com/totalframework"><span class="fa fa-twitter"></span></a>
+					<a href="https://plus.google.com/u/0/+partialjs/posts"><span class="fa fa-google"></span></a>
+				</div>
+				<br />
+				<div>&copy; 2015-2017 @(All rights reserved.)</div>
+				<div><a href="http://www.totaljs.com">Powered by Total.js - Framework for Node.js</a></div>
+			</footer>
+		</div>
+	</div>
+
+	@{section('script')}
+
+</body>
+</html>

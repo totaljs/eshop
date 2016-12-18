@@ -1,0 +1,10 @@
+@{title(model.name)}
+@{sitemap('blogsdetail')}
+@{sitemap_change('blogsdetail', 'url', model.linker)}
+@{sitemap_change('blogsdetail', 'name', model.name)}
+
+<div class="padding">
+	<h1>@{title}</h1>
+	@{!model.body}
+	<br />
+</div>

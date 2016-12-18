@@ -1,0 +1,112 @@
+@{layout('')}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Manager v@{config.version}</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=10" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="robots" content="all,follow" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/codemirror.min.css" />
+	@{import('head', 'manager.css', 'favicon.ico')}
+	<script>
+		var managerurl="@{!CONFIG('manager-url')}";
+		var currency='@{!config.custom.currency_entity}';
+		var su=JSON.parse('@{json(user)}');
+		var languages='@{config.custom.languages.join(';')}'.split(';');
+	</script>
+</head>
+<body data-jc="exec,binder">
+
+	<div id="success"><span class="fa fa-check-circle"></span></div>
+	<div data-jc="calendar" data-days="@(SU,MO,TU,WE,TH,FR,SO)" data-months="@(January,February,March,April,May,Juny,July,August,September,October,November,December)" data-today="@(Set date to today)" data-firstday="0"></div>
+	<div data-jc="loading" class="ui-loading"></div>
+	<div data-jc="message" data-button="@(Close)"></div>
+	<div data-jc="autocomplete"></div>
+	<div data-jc="contextmenu"></div>
+	<div data-jc="confirm"></div>
+
+	<header>
+		<div class="mainmenu">
+			<div><b>@{config.name}</b> v@{config.version}</div>
+			<a href="javascript:void(0)" data-exec="mainmenu" class="exec mainmenu-button"><span class="fa fa-navicon"></span></a>
+		</div>
+		<nav>
+			<a href="/" title="@{config.name}" class="highlight" target="_blank"><span class="fa fa-globe"></span></a>
+			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/" title="@(Dashboard)" data-role="dashboard"><span class="fa fa-dashboard"></span></a>
+			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/orders/" title="@(Orders)" data-role="orders"><span class="fa fa-shopping-cart"></span></a>
+			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/products/" title="@(Products)" data-role="products"><span class="fa fa-dropbox"></span></a>
+			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/pages/" title="@(Pages)" data-role="pages"><span class="fa fa-file-text"></span></a>
+			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/posts/" title="@(Posts)" data-role="posts"><span class="fa fa-hashtag"></span></a>
+			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/users/" title="@(Users)" data-role="users"><span class="fa fa-users"></span></a>
+			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
+			<a class="jrouting hidden" href="@{CONFIG('manager-url')}/settings/" title="@(Settings)" data-role="settings"><span class="fa fa-cogs"></span></a>
+			<a class="logoff" href="@{CONFIG('manager-url')}/logoff/" title="@(Sign out)"><span class="fa fa-sign-out"></span></a>
+		</nav>
+	</header>
+
+	<div id="body">
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="dashboard" data-template="/templates/manager-dashboard.html"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="orders" data-template="/templates/manager-orders.html" data-reload="orders_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="products" data-template="/templates/manager-products.html" data-reload="products_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="users" data-template="/templates/manager-users.html" data-reload="users_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="pages" data-template="/templates/manager-pages.html" data-reload="pages_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="posts" data-template="/templates/manager-posts.html" data-reload="posts_reload"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="newsletter" data-template="/templates/manager-newsletter.html"></div>
+		<div data-jc="page" class="hidden" data-jc-path="common.page" data-if="settings" data-template="/templates/manager-settings.html"></div>
+	</div>
+
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/codemirror.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/javascript/javascript.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/htmlmixed/htmlmixed.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/xml/xml.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/css/css.min.js"></script>
+
+	@{import('manager.js')}
+	@{section('script')}
+
+	<script>
+		Tangular.register('time', function(value) {
+
+			if (!value)
+				return;
+
+			var diff = Date.now() - value.parseDate().getTime();
+			var minutes = ((diff / 1000) / 60) >> 0;
+
+			if (minutes < 60) {
+				if (minutes < 3)
+					return '@(now)';
+				return @(minutes + ' minutes ago');
+			}
+
+			var hours = (minutes / 60) >> 0;
+			if (hours < 24)
+				return @(hours + ' ' + Tangular.helpers.pluralize(hours, 'hours', 'hour', 'hours', 'hours') + ' ago');
+
+			var days = (hours / 24) >> 0;
+			if (days < 30)
+				return @(days + ' ' + Tangular.helpers.pluralize(days, 'days', 'day', 'days', 'days') + ' ago');
+
+			var months = (days / 29) >> 0;
+			if (months < 12)
+				return @(months + ' ' + Tangular.helpers.pluralize(months, 'months', 'month', 'months', 'months') + ' ago');
+
+			var years = (months / 12) >> 0;
+			return @(years + ' ' + Tangular.helpers.pluralize(years, 'years', 'year', 'years', 'years') + ' ago');
+		});
+
+		Tangular.register('month', function(value) {
+			var months = [@('january', 'february', 'march', 'april', 'may', 'juny', 'july', 'august', 'september', 'october', 'november', 'december')];
+			return months[value - 1];
+		});
+	</script>
+
+</body>
+</html>

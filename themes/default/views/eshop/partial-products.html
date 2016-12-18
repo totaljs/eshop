@@ -1,0 +1,31 @@
+<div class="row">
+	@{foreach m in model.items}
+	<div class="col-md-3 col-sm-4 product">
+		@{if m.istop || m.isnew}
+			<div class="flags">
+			@{if m.istop}<div class="top">@(TOP)</div>@{fi}
+			@{if m.isnew}<div class="new">@(NEW)</div>@{fi}
+			</div>
+		@{fi}
+		<a href="@{m.linker}" class="product-picture"><img src="@{if !m.pictures || !m.pictures.length}/img/empty.png@{else}/images/small/@{m.pictures[0]}.jpg@{fi}" class="img-responsive" alt="@{m.name}" border="0" /></a>
+		<a href="@{m.linker_category}/" class="product-category">@{m.category}</a>
+		<a href="@{sitemap_url('products')}?manufacturer=@{m.linker_manufacturer}" class="product-manufacturer">@{m.manufacturer}</a>
+		<a href="@{m.linker}" class="product-name">@{m.name}</a>
+		<div class="product-price">@{currency(m.price)}@{if m.price < m.priceold} <span>@{currency(m.priceold)}</span>@{fi}</div>
+	</div>
+	@{end}
+</div>
+
+@{if !model.count}
+	<div class="row" style="margin-top:30px;margin-bottom:100px" id="empty">
+		<div class="col-md-6 col-md-offset-3 m ui-center">
+			<div><span class="fa fa-search fa-5x"></span></div>
+			<br />
+			<br />
+			<div>
+				@(Currently we don't have any items sufficient for search criteria.)<br />
+				<b>@(Try to visit our page later)</b>.
+			</div>
+		</div>
+	</div>
+@{fi}

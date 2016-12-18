@@ -1,0 +1,64 @@
+<div data-jc-scope="?" data-jc-init="#contact.init">
+
+	<div data-jc="visible" data-jc-path="response" data-if="value && value.success" class="hidden">
+		<br />
+		<br />
+		<div class="center">
+			<div><span class="fa fa-5x green fa-check-circle"></span></div>
+			<p class="mt10"><b class="dark">The contact form has been sent successfully.</b><br />We will contact you as soon as possible.</p>
+		</div>
+		<br />
+		<br />
+	</div>
+
+	<div data-jc="visible" data-jc-path="response" data-if="value == null || !value.success">
+		<div class="row">
+			<div class="col-sm-6 m">
+				<div data-jc="textbox" data-jc-path="firstname" data-required="true">First name</div>
+			</div>
+			<div class="col-sm-6 m">
+				<div data-jc="textbox" data-jc-path="lastname" data-required="true">Last name</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-6 m">
+				<div data-jc="textbox" data-jc-path="company">Company</div>
+			</div>
+			<div class="col-sm-6 m">
+				<div data-jc="textbox" data-jc-path="email" data-required="true" data-jc-type="email" data-jc-value="'@'">E-mail address</div>
+			</div>
+		</div>
+
+		<div class="row" style="margin-bottom:10px">
+			<div class="col-sm-12">
+				<div data-jc="textarea" data-jc-path="body" data-required="true" data-height="200px" data-placeholder="Your questions...">Message</div>
+			</div>
+		</div>
+		<br />
+
+		<div data-jc="error" data-jc-path="response"></div>
+
+		<div class="row">
+			<div class="col-sm-6 m" data-jc="validation" data-jc-path="?">
+				<button class="button exec" disabled="disabled" data-exec="#contact.submit">SUBMIT</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script>
+
+	OPERATION('contact.submit', function(el) {
+		var component = el.closest('[data-jc]').component();
+		AJAX('POST /api/contact/', component.get(), component.pathscope + '.response');
+	});
+
+	OPERATION('contact.init', function(path) {
+		var query = jC.parseQuery();
+		query.productid && SET(path + '.body', '@(I need more informations about the product:) ' + query.productid + '.\n\n@(Thanks)');
+		query.orderid && SET(path + '.body', '@(I want to cancel the order #) ' + query.orderid + '.\n\n@(Thanks)');
+	});
+
+</script>

@@ -1,0 +1,453 @@
+<div class="filter">
+	<div class="container">
+		<nav class="buttons">
+			<a href="javascript:void(0)" class="exec" data-exec="products_menu"><i class="fa fa-navicon"></i><span>@(Options)</span></a>
+		</nav>
+		<div class="caption"><span class="fa fa-dropbox mr5"></span> @(Products)</div>
+		<div class="row">
+			<div class="col-md-3 col-sm-6 m">
+				<div data-jc="textbox" data-jc-path="products.filter.search" data-placeholder="@(Search products ...)" data-jc-type="search"></div>
+				<div class="help" data-jc="template" data-jc-path="products.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-jc="dropdown" data-jc-path="products.filter.category" data-source="products.categories" data-empty="@(All categories)" data-source-value="linker"></div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-jc="dropdown" data-jc-path="products.filter.manufacturer" data-source="products.manufacturers" data-empty="@(All manufacturers)" data-source-value="linker"></div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-jc="dropdowncheckbox" data-jc-path="products.filter.type" data-placeholder="@(All products)" data-options="@(News)|1;@(Top)|2"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div data-jc="grid" data-jc-path="products.grid" data-pagination-path="products.filter.page" data-jc-id="products.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
+		<script type="text/html">
+		<tr>
+			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if istop }}<b class="badge badge-red mr5">@(TOP)</b>{{ fi }}{{ if isnew }}<b class="badge badge-blue mr5">@(NEWS)</b>{{ fi }}{{ name }}</td>
+			<td style="width:200px" class="silver hidden-xs">{{ if manufacturer }}<span class="fa fa-building"></span> {{ manufacturer }}{{ fi }}</td>
+			<td style="width:250px" class="silver hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
+			<td style="width:100px" class="ui-right active">{{ price | price(2) }}</td>
+			<td style="width:80px" class="ui-right">
+				<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
+				<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+			</td>
+		</tr>
+		</script>
+	</div>
+</div>
+
+<div data-jc="form" data-title="@(Product form)" data-jc-path="common.form" data-if="value === 'products'" data-width="1300px" data-jc-id="products.form" class="hidden">
+	<div class="padding npb">
+		<div class="row">
+			<div class="col-md-6">
+				<div data-jc="textbox" data-jc-path="products.form.name" data-required="true" class="m" data-maxlength="50">@(Name)</div>
+				<div class="relative mr15">
+					<div data-jc="checkbox" data-jc-path="products.form.istop" class="red">@(Mark as <b>TOP product</b>)</div>
+				</div>
+				<div class="relative">
+					<div data-jc="checkbox" data-jc-path="products.form.isnew" class="blue">@(News in store)</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="dropdown" data-jc-path="products.form.template" data-source="products.templates" data-empty="" data-icon="fa-paint-brush">@(Template)</div>
+					</div>
+					<div class="col-md-6">
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr data-binder="products.form.template" data-binder-visible="n => n ? false : true" class="nmb" />
+	<div data-binder="products.form.template" data-binder-visible="n => n ? true : false">
+		<hr style="margin-bottom:8px" />
+		<div class="cmseditor-help">
+			<nav><i class="fa fa-desktop"></i><a href="javascript:products_device(1)">@(Large)</a><a href="javascript:products_device(2)">@(Medium)</a><a href="javascript:products_device(3)">@(Tablet)</a><a href="javascript:products_device(4)">@(Mobile)</a></nav>
+			<div><b>@(Editor formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L). <a href="javascript:void(0)" data-exec="products_sourcecode" class="exec black"><span class="fa fa-code w18"></span>@(Show source-code)</a></div>
+		</div>
+		<div class="pages-editor" data-jc="editor" data-jc-path="products.form.body" data-jc-import="/templates/component-editor.html" data-jc-id="products.editor"></div>
+	</div>
+	<div data-jc="visible" data-jc-path="products.form.id" data-if="value && value.length">
+		<div class="padding npb">
+			<div class="row">
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key">@(# Id)</div>
+						<div class="value" data-binder="products.form.id" data-binder-html="n => n"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
+						<div class="value" data-binder="products.form.datecreated" data-binder-html="n => Tangular.helpers.time(n)"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Updated)</div>
+						<div class="value" data-binder="products.form.dateupdated" data-binder-html="n => n ? Tangular.helpers.time(n) : '@(unchanged)'"></div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6 m">
+					<div data-jc="nosqlcounter" data-jc-path="products.form.stats.views" style="height:52px"></div>
+					<div class="help"><i class="fa fa-bar-chart"></i>@(Stats of all views for last 12 months)</div>
+				</div>
+				<div class="col-lg-3 col-md-6 m">
+					<div data-jc="nosqlcounter" data-jc-path="products.form.stats.orders" style="height:52px"></div>
+					<div class="help"><i class="fa fa-bar-chart"></i>@(Stats of all orders for last 12 months)</div>
+				</div>
+			</div>
+		</div>
+		<hr class="nmt" />
+	</div>
+	<div class="padding nmb">
+		<div class="row mt10">
+			<div class="col-md-6 m">
+				<div data-jc="dropdown" data-jc-path="products.form.category" data-source="products.categories" data-empty="" data-source-value="name" class="m" data-icon="fa-folder">@(Existing category)</div>
+			</div>
+			<div class="col-md-6">
+				<div data-jc="textbox" data-jc-path="products.form.category" data-required="true" data-icon="fa-folder-o" data-maxlength="300" data-placeholder="@(Type a category)">@(Category)</div>
+				<div class="fs11 mt10"><a href="javascript:void(0)" class="exec" data-exec="products_subcategory"><span class="fa fa-plus mr5"></span>@(Add a new sub-category)</a></div>
+			</div>
+		</div>
+	</div>
+	<div class="padding bg-smoke npb">
+		<br />
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-jc="textarea" data-jc-path="products.form.description" data-required="true" data-height="94px">@(Description)</div>
+			</div>
+			<div class="col-md-8 m">
+				<div class="row">
+					<div class="col-md-3 col-sm-6 m">
+						<div data-jc="textbox" data-jc-path="products.form.price" data-required="true" data-align="center" data-jc-type="currency" data-increment="true" data-icon="fa-credit-card" data-maxlength="8">@(Price)</div>
+					</div>
+					<div class="col-md-3 col-sm-6 m">
+						<div data-jc="textbox" data-jc-path="products.form.priceold" data-align="center" data-jc-type="currency" data-increment="true"data-maxlength="8">@(Old price)</div>
+					</div>
+					<div class="col-md-3 col-sm-6 m">
+						<div data-jc="textbox" data-jc-path="products.form.reference" data-align="center" data-maxlength="20" data-icon="fa-braille">@(Custom code)</div>
+					</div>
+					<div class="col-md-3 col-sm-6 m">
+						<div data-jc="textbox" data-jc-path="products.form.availability" data-align="center" data-icon="fa-truck" data-maxlength="40" data-placeholder="@(In stock)">@(Availability)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="dropdown" data-jc-path="products.form.manufacturer" data-source="products.manufacturers" data-empty="" data-source-value="name">@(Existing manufacturer)</div>
+					</div>
+					<div class="col-md-6">
+						<div data-jc="textbox" data-jc-path="products.form.manufacturer" data-maxlength="50" data-placeholder="@(Type a manufacturer)">@(Manufacturer)</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="row mt10">
+			<div class="col-md-6 m">
+				<div data-jc="fileupload" data-jc-path="products.form.pictures" data-placeholder="@(Browse device)" data-error-large="@(The uploaded file is too large.)" data-accept="image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(Pictures)</div>
+			</div>
+		</div>
+		<br />
+		<div class="row">
+			<div data-jc="pictures" data-jc-path="products.form.pictures"></div>
+		</div>
+	</div>
+	<div data-jc="error" data-jc-path="products.response"></div>
+	<div class="ui-form-buttons">
+		<div data-jc="validation" data-jc-path="products.form">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-jc="form" data-title="@(Category replacer)" data-jc-path="common.form" data-if="value === 'products.category'" data-width="450px" data-jc-id="products.category" class="hidden">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="silver">@(Replace old category with new category name in all products which have old category.)</div>
+				<hr />
+				<div data-jc="dropdown" data-jc-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="" data-source-value="name" class="m">@(Existing category)</div>
+				<div data-jc="textbox" data-jc-path="products.category.category_new" data-required="true" class="m">@(New name)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-jc="validation" data-jc-path="products.category">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<div data-jc="form" data-title="@(Add new category)" data-jc-path="products.subcategory.visible" data-if="value === true" data-width="450px" data-jc-id="products.subcategory" data-enter="true" class="hidden">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-12">
+				<div data-jc="textbox" data-jc-path="products.subcategory.name" data-required="true" class="m">@(New category name)</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<div data-jc="validation" data-jc-path="products.subcategory">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<!-- IMPORT CSV/XML FILE -->
+<input type="file" id="products_file_cvsxml" class="hidden" accept="text/*" />
+
+<script>
+
+	var products = {};
+
+	products.filter = {};
+	products.filter.page = 1;
+
+	products.grid = {};
+	products.form = {};
+	products.categories = [];
+	products.manufacturers = [];
+	products.response = null;
+	products.category = {};
+	products.subcategory = {};
+	products.subcategory.visible = false;
+
+	ON('#products.grid', function(component) {
+
+		// Max items per page
+		products.filter.max = component.max;
+		products_refresh_codelists();
+		products_refresh(true);
+
+		component.click = function(index, row, button) {
+			var loading = FIND('loading');
+			switch ($(button).attr('name')) {
+				case 'edit':
+					products_edit(row.id, index);
+					break;
+				case 'remove':
+					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						loading.show();
+						AJAX('DELETE {0}/api/products/'.format(managerurl), { id: row.id }, function() {
+							loading.hide(500);
+							products_refresh();
+						});
+					});
+					break;
+			}
+		};
+
+		// CSV file uploading
+		$('#products_file_cvsxml').on('change', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			var loading = FIND('loading');
+			var el = this;
+			var data = new FormData();
+			data.append('file', this.files[0]);
+			loading.show();
+			jC.UPLOAD('{0}/api/products/import/'.format(managerurl), data, function(response, err) {
+				el.value = '';
+				loading.hide(500);
+				if (!response.success)
+					return;
+				products_refresh(true);
+				setTimeout(products_refresh_codelists, 2000);
+			});
+		});
+
+		WATCH('products.form.template', function(path, value, type) {
+			FIND('#products.editor').setTemplate(value);
+			type === 2 && SET('products.form.body', '');
+		});
+	});
+
+	// Watch for changes in product filter
+	WATCH('products.filter.*', function(path, value) {
+		!NOTMODIFIED('products.filter', products.filter) && products_refresh(path !== 'products.filter.page');
+	});
+
+	ON('#products.form', function(component) {
+		component.submit = function(hide) {
+			var loading = FIND('loading');
+			var editor = FIND('#products.editor');
+			loading.show();
+
+
+			products.form.body = editor.getContent();
+			products.form.pictures2 = editor.getPictures();
+
+			AJAX('POST {0}/api/products/'.format(managerurl), products.form, function(response) {
+				loading.hide(500);
+
+				SET('products.response', response);
+				if (response instanceof Array)
+					return;
+
+				hide();
+
+				if (products.form.$index === undefined || products.grid.items[products.form.$index].category !== products.form.category || products.grid.items[products.form.$index].manufacturer !== products.form.manufacturer)
+					setTimeout(products_refresh_codelists, 2000);
+
+				products_refresh();
+				success();
+			});
+		};
+	});
+
+	ON('#products.category', function(component) {
+		component.submit = function(hide) {
+			RESET('products.category.*');
+			hide();
+			var loading = FIND('loading');
+			loading.show();
+			AJAX('POST {0}/api/products/category/'.format(managerurl), products.category, function(response) {
+				loading.hide(500);
+				setTimeout(function() {
+					setTimeout(products_refresh_codelists, 2000);
+					products_refresh(true);
+					success();
+				}, 1000);
+			});
+		};
+	});
+
+	ON('#products.subcategory', function(component) {
+		component.submit = function(hide) {
+			var arr = (products.form.category || '').split('/');
+			var clean = [];
+
+			for (var i = 0, length = arr.length; i < length; i++) {
+				var category = arr[i].trim();
+				category && clean.push(category);
+			}
+
+			clean.push(products.subcategory.name);
+			SET('products.form.category', clean.join(' / '));
+			hide();
+		};
+	});
+
+	function products_edit(id, index) {
+		var loading = FIND('loading');
+		loading.show();
+		AJAX('GET /api/products/{0}/'.format(id), function(response) {
+			loading.hide(500);
+
+			if (response instanceof Array) {
+				FIND('message').warning(response[0].error);
+				return;
+			}
+
+			SETTER('#products.editor', 'setTemplate', response.template);
+			SET('products.form', $.extend({ $index: index }, response), true);
+			SET('products.response', null);
+			SET('common.form', 'products');
+
+			AJAX('GET {0}/api/products/{1}/stats/'.format(managerurl, response.id), 'products.form.stats');
+
+			// /templates/component-editor.html:
+			cmseditor_widgets(false);
+		});
+	}
+
+	function products_new() {
+		SET('products.form', { availability: '@(In stock)' }, true);
+		SET('products.response', null);
+		SET('common.form', 'products');
+
+		// /templates/component-editor.html:
+		cmseditor_widgets(false);
+	}
+
+	function products_category() {
+		SET('products.category', {}, true);
+		SET('common.form', 'products.category');
+	}
+
+	// Method refreshes categories
+	function products_refresh_codelists() {
+		AJAX('GET {0}/api/products/codelists/'.format(managerurl), function(response) {
+			response.categories.sort(FN('(a, b) => a.name.localeCompare(b.name)'));
+			Object.keys(response).forEach(function(key) {
+				SET('products.' + key, response[key]);
+			});
+		});
+	}
+
+	// Method refreshes grid
+	function products_refresh(reset) {
+		if (reset)
+			products.filter.page = 1;
+		AJAX('GET {0}/api/products/'.format(managerurl), products.filter, 'products.grid');
+	}
+
+	function products_subcategory() {
+		SET('products.subcategory.name', '', true);
+		SET('products.subcategory.visible', true);
+	}
+
+	function products_import() {
+		$('#products_file_cvsxml').click();
+	}
+
+	function products_export(argument) {
+		location.href = '{0}/api/products/export/'.format(managerurl);
+	}
+
+	function products_reload() {
+		var hash = location.hash;
+		hash && hash.length > 1 && setTimeout(function() {
+			products_edit(hash.substring(1));
+		}, 500);
+	}
+
+	function products_sourcecode() {
+		SETTER('#products.editor', 'showSourceCode');
+	}
+
+	function products_device(type) {
+		var e = FIND('editor');
+		SETTER('loading', 'show')('loading', 'hide', 1000);
+		switch (type) {
+			case 1:
+				e.device('lg');
+				return;
+			case 2:
+				e.device('md');
+				return;
+			case 3:
+				e.device('sm');
+				return;
+			case 4:
+				e.device('xs');
+				return;
+		}
+	}
+
+	function products_menu(el) {
+		var items = [];
+
+		items.push({ name: '@(Add product)', value: 'products_new', icon: 'fa-plus-circle' });
+		items.push({ name: '@(Replace category)', value: 'products_category', icon: 'fa-folder' });
+		items.push({ name: '@(Import CSV or XML)', value: 'products_import', icon: 'fa-cloud-upload' });
+		items.push({ name: '@(Export products to XML)', value: 'products_export', icon: 'fa-file-code-o' });
+
+		FIND('contextmenu').show('right', el, items, function(value) {
+			EXEC(value);
+		}, -15, 10);
+	}
+
+</script>

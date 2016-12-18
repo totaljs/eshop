@@ -1,1 +1,0 @@
-require('sqlagent/mongodb').init(CONFIG('database'));

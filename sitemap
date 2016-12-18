@@ -1,0 +1,16 @@
+// ID : Title ---> URL --> [Parent]
+homepage                 : @(Homepage)                 --> /
+contact                  : @(Contact)                  --> /contact/                    --> homepage
+products                 : @(All items)                --> /shop/                       --> homepage
+new                      : @(New items in the store)   --> /shop/new/                   --> products
+top                      : @(Top items)                --> /shop/top/                   --> products
+popular                  : @(Popular items)            --> /shop/popular/               --> products
+checkout                 : @(Checkout)                 --> /checkout/                   --> homepage
+order                    : @(Order)                    --> /checkout/{0}/               --> checkout
+payment                  : @(Checkout Payment)         --> /checkout/{0}/{1}/           --> checkout
+account                  : @(Account)                  --> /account/                    --> homepage
+settings                 : @(Account Settings)         --> /account/settings/           --> account
+category                 : @(Category)                 --> /shop/*                      --> products
+detail                   : @(Product)                  --> /product/{0}/                --> category
+blogs                    : @(Blogs)                    --> /blogs/                      --> homepage
+blogsdetail              : @(Blog detail)              --> /blogs/{0}/                  --> blogs

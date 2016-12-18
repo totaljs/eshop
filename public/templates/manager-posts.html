@@ -1,0 +1,279 @@
+<div class="filter">
+	<div class="container">
+		<nav class="buttons">
+			<a href="javascript:void(0)" class="exec" data-exec="posts_new"><i class="fa fa-plus-circle"></i><span>@(New)</span></a>
+		</nav>
+		<div class="caption"><span class="fa fa-hashtag mr5"></span> @(Posts)</div>
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="posts.filter.search" data-placeholder="@(Search posts ...)" data-jc-type="search"></div>
+				<div class="help" data-jc="template" data-jc-path="posts.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdown" data-jc-path="posts.filter.category" data-source="posts.categories" data-empty="@(All posts)" data-source-value="name"></div>
+				<div>&nbsp;</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdown" data-jc-path="posts.filter.template" data-source="posts.templates" data-empty="@(All templates)"></div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdown" data-jc-path="posts.filter.language" data-source="languages" data-empty="@(All languages)"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div data-jc="grid" data-jc-path="posts.grid" data-pagination-path="posts.filter.page" data-jc-id="posts.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
+		<script type="text/html">
+		<tr>
+			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ name }}</td>
+			<td style="width:150px" class="silver fs11 hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
+			<td style="width:100px" class="silver ui-center hidden-xs">{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
+			<td style="width:80px" class="ui-right">
+				<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
+				<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+			</td>
+		</tr>
+		</script>
+	</div>
+</div>
+
+<div data-jc="form" data-title="@(Post form)" data-jc-path="common.form" data-if="value === 'posts'" data-width="1300px" data-jc-id="posts.form" class="hidden">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="posts.form.name" data-required="true" data-placeholder="@(Post name)">@(Name)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdown" data-jc-path="posts.form.category" data-source="posts.categories" data-empty="" data-source-value="name" data-required="true">@(Category)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdown" data-jc-path="posts.form.template" data-source="posts.templates" data-empty="" data-required="true">@(Template)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="posts.form.author" data-maxlength="30" data-icon="fa-user" data-required="true">@(Author)</div>
+			</div>
+		</div>
+	</div>
+	<hr style="margin:0 0 8px" />
+	<div class="cmseditor-help">
+		<nav><i class="fa fa-desktop"></i><a href="javascript:posts_device(1)">@(Large)</a><a href="javascript:posts_device(2)">@(Medium)</a><a href="javascript:posts_device(3)">@(Tablet)</a><a href="javascript:posts_device(4)">@(Mobile)</a></nav>
+		<div><b>@(Editor formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L). <a href="javascript:void(0)" data-exec="posts_sourcecode" class="exec black"><span class="fa fa-code w18"></span>@(Show source-code)</a></div>
+	</div>
+	<div class="pages-editor" data-jc="editor" data-jc-path="posts.form.body" data-jc-import="/templates/component-editor.html" data-jc-id="posts.editor"></div>
+	<div data-jc="visible" data-jc-path="posts.form.id" data-if="value && value.length">
+		<div class="padding npb">
+			<div class="row">
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key">@(# Id)</div>
+						<div class="value" data-binder="posts.form.id" data-binder-html="n => n"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
+						<div class="value" data-binder="posts.form.datecreated" data-binder-html="n => Tangular.helpers.time(n)"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Updated)</div>
+						<div class="value" data-binder="posts.form.dateupdated" data-binder-html="n => n ? Tangular.helpers.time(n) : '@(unchanged)'"></div>
+					</div>
+				</div>
+				<div class="col-lg-6 m">
+					<div data-jc="nosqlcounter" data-jc-path="posts.form.stats" style="height:52px" data-count="16"></div>
+					<div class="help"><i class="fa fa-bar-chart"></i>@(Stats of all views for last 16 months)</div>
+				</div>
+			</div>
+		</div>
+		<hr class="nmt" />
+	</div>
+	<br />
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textboxtags" data-jc-path="posts.form.tags">@(Tags)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-jc="textbox" data-jc-path="posts.form.datecreated" data-align="center" data-maxlength="10" data-icon="fa-calendar" data-jc-type="date" data-jc-format="@(yyyy-MM-dd)">@(Created)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-jc="dropdown" data-jc-path="posts.form.language" data-align="center" data-source="languages" data-empty="" data-icon="fa-flag">@(Language)</div>
+			</div>
+		</div>
+	</div>
+	<div data-jc="error" data-jc-path="posts.response"></div>
+	<div class="ui-form-buttons">
+		<div data-jc="validation" data-jc-path="posts.form">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<script>
+
+	var posts = {};
+	posts.filter = {};
+	posts.filter.page = 1;
+	posts.grid = {};
+	posts.form = {};
+	posts.categories = [];
+	posts.templates = [];
+	posts.response = null;
+	posts.category = {};
+	posts.subcategory = {};
+	posts.subcategory.visible = false;
+
+	ON('#posts.grid', function(component) {
+
+		// Max items per page
+		posts.filter.max = component.max;
+		posts_refresh_codelists();
+		posts_refresh(true);
+
+		component.click = function(index, row, button) {
+			switch ($(button).attr('name')) {
+				case 'edit':
+					posts_edit(row.id);
+					break;
+				case 'remove':
+					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						var loading = FIND('loading');
+						AJAX('DELETE {0}/api/posts/'.format(managerurl), { id: row.id }, function() {
+							loading.hide(500);
+							posts_refresh();
+						});
+					});
+					break;
+			}
+		};
+
+		WATCH('posts.form.template', function(path, value, type) {
+			FIND('#posts.editor').setTemplate(value);
+			type === 2 && SET('posts.form.body', '');
+		});
+	});
+
+	// Watch for changes in posts filter
+	WATCH('posts.filter.*', function(path, value) {
+		!NOTMODIFIED('posts.filter', posts.filter) && posts_refresh(path !== 'posts.filter.page');
+	});
+
+	ON('#posts.form', function(component) {
+		component.submit = function(hide) {
+			var loading = FIND('loading').show();
+			var editor = FIND('#posts.editor');
+
+			posts.form.pictures = editor.getPictures();
+			posts.form.body = editor.getContent();
+			posts.form.perex = editor.getPerex();
+			posts.form.body = editor.getContent().replace(/\n[\s\t]+\n/g, '\n');
+			posts.form.search = editor.getKeywords();
+
+			AJAX('POST {0}/api/posts/'.format(managerurl), posts.form, function(response) {
+				loading.hide(500);
+
+				// Error handling
+				SET('posts.response', response);
+				if (response instanceof Array)
+					return;
+
+				hide();
+				posts_refresh();
+				success();
+			});
+		};
+	});
+
+	function posts_edit(id) {
+		var loading = FIND('loading').show();
+		AJAX('GET {0}/api/posts/{1}/'.format(managerurl, id), function(response) {
+
+			loading.hide(500);
+
+			// Error prevention
+			if (response instanceof Array) {
+				FIND('message').warning(response[0].error);
+				return;
+			}
+
+			FIND('#posts.editor').setTemplate(response.template);
+			SET('posts.form', $.extend({ $index: index }, response), true);
+			SET('posts.response', null);
+			SET('common.form', 'posts');
+
+			AJAX('GET {0}/api/posts/{1}/stats/'.format(managerurl, response.id), 'posts.form.stats');
+
+			// /templates/component-editor.html:
+			cmseditor_widgets(false);
+		});
+	}
+
+	function posts_new() {
+		var template =  posts.templates.length === 1 ? posts.templates[0] : '';
+		SET('posts.form', { author: su.name }, true);
+		SET('posts.response', null);
+		SET('common.form', 'posts');
+
+		template && SET('posts.form.template', template, null, 2);
+
+		// /templates/component-editor.html:
+		cmseditor_widgets(false);
+	}
+
+	function posts_category() {
+		SET('posts.category', {}, true);
+		SET('common.form', 'posts.category');
+	}
+
+	// Method refreshes categories
+	function posts_refresh_codelists() {
+		AJAX('GET {0}/api/posts/codelists/'.format(managerurl), function(response) {
+			SET('posts.categories', response.categories);
+			SET('posts.templates', response.templates);
+		});
+	}
+
+	// Method refreshes grid
+	function posts_refresh(reset) {
+		if (reset)
+			posts.filter.page = 1;
+		AJAX('GET {0}/api/posts/'.format(managerurl), posts.filter, 'posts.grid');
+	}
+
+	function posts_sourcecode() {
+		FIND('#posts.editor').showSourceCode();
+	}
+
+	function posts_device(type) {
+		var e = FIND('editor');
+		SETTER('loading', 'show')('loading', 'hide', 1000);
+		switch (type) {
+			case 1:
+				e.device('lg');
+				return;
+			case 2:
+				e.device('md');
+				return;
+			case 3:
+				e.device('sm');
+				return;
+			case 4:
+				e.device('xs');
+				return;
+		}
+	}
+
+	function posts_reload() {
+		var hash = location.hash;
+		hash && hash.length > 1 && setTimeout(function() {
+			posts_edit(hash.substring(1));
+		}, 500);
+	}
+</script>

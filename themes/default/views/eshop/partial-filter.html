@@ -1,0 +1,5 @@
+<nav class="tabs">
+	<a href="@{href('sort', 0)}"@{if !query.sort || query.sort === '0'} class="selected"@{fi}>@(Newest)</a>
+	<a href="@{href('sort', 1)}"@{if query.sort === '1'} class="selected"@{fi}>@(Low price)</a>
+	<a href="@{href('sort', 2)}"@{if query.sort === '2'} class="selected"@{fi}>@(High price)</a>
+</nav>

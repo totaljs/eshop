@@ -1,0 +1,44 @@
+@{title('@(Premium electro)')}
+@{sitemap('homepage')}
+
+<!-- CMS -->
+@{if repository.page}
+	@{!repository.page.body}
+@{fi}
+
+<div class="cl"></div>
+<div class="padding homepage">
+	<br />
+	<div class="center">
+		<a href="https://www.facebook.com/totaljs.web.framework" class="mr15" target="_blank">Facebook</a>
+		<a href="https://twitter.com/totalframework" class="mr15" target="_blank">Twitter</a>
+		<a href="@{sitemap_url('contact')}" class="b" target="_blank">@(Contact)</a>
+	</div>
+	<h1>@(<b>Premium</b> electro)</h1>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<div class="newsletter" data-jc="newsletter" data-success="@(Thanks, you have been added.)">
+				<div class="newsletter-button"><button><span class="fa fa-envelope"></span>@(SUBMIT)</button></div>
+				<div class="newsletter-input"><input type="text" placeholder="@(Join to our mailing list)" /></div>
+			</div>
+		</div>
+	</div>
+</div>
+<hr />
+<div class="padding npt">
+	<nav class="manufacturers">
+	@{foreach m in global.manufacturers}
+		<a href="@{sitemap_url('products')}?manufacturer=@{m.linker}"><i class="fa fa-caret-right"></i>@{m.name}</a>
+	@{end}
+	</nav>
+	<br />
+	<br />
+	<br />
+	@{view('eshop/partial-products', model)}
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all items)</a>
+		</div>
+	</div>
+	<br />
+</div>
