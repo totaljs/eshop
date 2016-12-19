@@ -170,10 +170,23 @@ NEWSCHEMA('Product').make(function(schema) {
 			}
 
 			NOSQL('products').find().make(function(builder) {
+				builder.fields('id', 'linker', 'linker_category', 'linker_manufacturer', 'category', 'manufacturer', 'name', 'price', 'priceold', 'isnew', 'istop', 'pictures', 'availability', 'datecreated');
 				builder.in('id', id);
 				builder.callback(function(err, items) {
 
 					items.sort((a, b) => compare[a.id] < compare[b.id] ? -1 : 1);
+
+					var linker_detail = F.sitemap('detail', true);
+					var linker_category = F.sitemap('category', true);
+
+					for (var i = 0, length = items.length; i < length; i++) {
+						var doc = items[i];
+						if (linker_detail)
+							doc.linker = linker_detail.url.format(doc.linker);
+						if (linker_category)
+							doc.linker_category = linker_category.url + doc.linker_category;
+						doc.body = undefined;
+					}
 
 					var data = SINGLETON('products.popular');
 					data.count = items.length;
