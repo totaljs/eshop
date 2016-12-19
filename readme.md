@@ -8,7 +8,7 @@ Please do not change the code, just create a new issues. I solve all problems as
 
 - New version: `v8.0.0` (works only with __Total.js v2.3.0__)
 - [__HelpDesk with professional support__](https://helpdesk.totaljs.com)
-- [A simple documentation](docs.totaljs.com/eshop-cms/latest.html)
+- [A simple documentation](https://docs.totaljs.com/eshop-cms/latest.html)
 
 
 ---
