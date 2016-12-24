@@ -9,8 +9,11 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 	schema.setSave(function(error, model, options, callback, controller) {
 
 		model.datecreated = F.datetime;
-		model.ip = controller.ip;
-		model.language = controller.language;
+
+		if (controller) {
+			model.ip = controller.ip;
+			model.language = controller.language;
+		}
 
 		var db = NOSQL('newsletter');
 
