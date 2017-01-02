@@ -385,13 +385,13 @@ function refresh() {
 // Creates Controller.prototype.page()
 F.eval(function() {
 
-	Controller.prototype.render = function(url, view, model, cache) {
+	Controller.prototype.render = function(url, callback, view, model, cache) {
 		var self = this;
 		var key = (self.language ? self.language + ':' : '') + url;
 		var page = F.global.sitemap[key];
 
 		if (page)
-			self.page(self.url, view, model, cache);
+			self.page(self.url, callback, view, model, cache);
 		else
 			self.throw404();
 
@@ -410,10 +410,18 @@ F.eval(function() {
 		return self;
 	};
 
-	Controller.prototype.page = function(url, view, model, cache, partial) {
+	Controller.prototype.page = function(url, callback, view, model, cache, partial) {
 
 		var self = this;
 		var tv = typeof(view);
+
+		if (typeof(callback) !== 'function') {
+			partial = cache;
+			cache = model;
+			model = view;
+			view = callback;
+			callback = undefined;
+		}
 
 		if (tv === 'object') {
 			model = view;
@@ -468,6 +476,10 @@ F.eval(function() {
 
 				self.sitemap(response.breadcrumb);
 				self.meta(response.title, response.description, response.keywords);
+
+				F.emit('pages.render', response, self);
+				callback && callback.call(self, response);
+
 				self.view(view || '~/cms/' + response.template, model);
 			});
 
