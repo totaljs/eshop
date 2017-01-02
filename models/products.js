@@ -481,6 +481,7 @@ function refresh() {
 		var keys = Object.keys(db_categories);
 		var categories = [];
 		var categories_filter = {};
+		var tmp;
 
 		for (var i = 0, length = keys.length; i < length; i++) {
 			var name = keys[i];
@@ -501,13 +502,32 @@ function refresh() {
 				obj.text = item.names[index];
 				obj.parent = item.path.slice(0, index).join('/');
 				obj.level = index;
+				obj.path = item.path;
+				obj.is = function(path) {
+					for (var i = 0; i < this.level + 1; i++) {
+						if (path[i] !== this.path[i])
+							return false;
+					}
+					return true;
+				};
 				categories_filter[key] = obj;
 			});
 		}
 
 		Object.keys(categories_filter).forEach(key => categories.push(categories_filter[key]));
-
 		categories.sort((a, b) => a.level > b.level ? 1 : a.level < b.level ? -1 : a.name.localeCompare2(b.name));
+
+		for (var i = 0, length = categories.length; i < length; i++) {
+			var item = categories[i];
+			item.children = categories.where('parent', item.linker);
+			item.parent = categories.find('linker', item.parent);
+			item.top = tmp = item.parent;
+			while (tmp) {
+				tmp = categories.find('linker', item.parent);
+				if (tmp)
+					item.top = tmp;
+			}
+		}
 
 		// Prepares manufacturers
 		keys = Object.keys(db_manufacturers);
