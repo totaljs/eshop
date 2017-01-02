@@ -411,9 +411,7 @@ F.eval(function() {
 	};
 
 	Controller.prototype.page = function(url, callback, view, model, cache, partial) {
-
 		var self = this;
-		var tv = typeof(view);
 
 		if (typeof(callback) !== 'function') {
 			partial = cache;
@@ -422,6 +420,8 @@ F.eval(function() {
 			view = callback;
 			callback = undefined;
 		}
+
+		var tv = typeof(view);
 
 		if (tv === 'object') {
 			model = view;
