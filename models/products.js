@@ -503,7 +503,10 @@ function refresh() {
 				obj.parent = item.path.slice(0, index).join('/');
 				obj.level = index;
 				obj.path = item.path;
-				obj.is = function(path) {
+				obj.is = function(category) {
+					if (!category)
+						return false;
+					var path = category.path;
 					for (var i = 0; i < this.level + 1; i++) {
 						if (path[i] !== this.path[i])
 							return false;
