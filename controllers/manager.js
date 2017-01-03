@@ -322,8 +322,14 @@ function json_products_codelists() {
 
 	var obj = {};
 	obj.manufacturers = F.global.manufacturers;
-	obj.categories = F.global.categories;
 	obj.templates = F.config.custom.templatesproducts;
+	obj.categories = [];
+
+	for (var i = 0, length = F.global.categories.length; i < length; i++) {
+		var item = F.global.categories[i];
+		obj.categories.push({ name: item.name, level: item.level, count: item.count, linker: item.linker });
+	}
+
 	self.json(obj);
 }
 
