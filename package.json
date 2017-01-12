@@ -14,5 +14,6 @@
     "eshop",
     "ecommerce"
   ],
-  "author": "Peter Širka"
+  "author": "Peter Širka",
+  "license":"MIT"
 }
