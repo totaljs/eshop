@@ -1,6 +1,6 @@
 {
   "name": "Eshop",
-  "description": "Simple and powerful eshop solution written in Total.js / Node.js.",
+  "description": "A simple and powerful eshop solution written in Total.js / Node.js.",
   "version": "8.0.0",
   "main": "release.js",
   "dependencies": {

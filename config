@@ -1,6 +1,6 @@
 name                      : E-shop
 version                   : 8.0.0
-author                    : Totaljs.com Ltd
+author                    : Peter Širka
 
 // A relative URL address into the eshop management
 manager-url               : /$manager
