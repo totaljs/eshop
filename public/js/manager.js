@@ -14,7 +14,10 @@ $(document).ready(function() {
 
 	$('.jrouting').each(function(index) {
 		var el = $(this);
-		el.toggleClass('hidden', su.roles.length && su.roles.indexOf(el.attr('data-role')) === -1);
+		(function(el) { setTimeout(function() {
+				el.toggleClass('hidden', su.roles.length && su.roles.indexOf(el.attr('data-role')) === -1);
+			}, 120 * index);
+		})(el);
 	});
 
 	FIND('loading', FN('() => this.hide(800)'));
