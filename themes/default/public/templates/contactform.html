@@ -57,8 +57,8 @@
 
 	OPERATION('contact.init', function(path) {
 		var query = jC.parseQuery();
-		query.productid && SET(path + '.body', '@(I need more informations about the product:) ' + query.productid + '.\n\n@(Thanks)');
-		query.orderid && SET(path + '.body', '@(I want to cancel the order #) ' + query.orderid + '.\n\n@(Thanks)');
+		query.productid && SET(path + '.body', '@(I need more informations about the product:) {0}.\n\n@(Thanks)'.format(query.productid));
+		query.orderid && SET(path + '.body', '@(I want to cancel the order #) {0}.\n\n@(Thanks)'.format(query.orderid));
 	});
 
 </script>
