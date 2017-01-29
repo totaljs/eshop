@@ -5,7 +5,7 @@
 		<br />
 		<div class="center">
 			<div><span class="fa fa-5x green fa-check-circle"></span></div>
-			<p class="mt10"><b class="dark">The contact form has been sent successfully.</b><br />We will contact you as soon as possible.</p>
+			<p class="mt10"><b class="dark">@(The contact form has been sent successfully.</b><br />We will contact you as soon as possible.)</p>
 		</div>
 		<br />
 		<br />
@@ -14,25 +14,25 @@
 	<div data-jc="visible" data-jc-path="response" data-if="value == null || !value.success">
 		<div class="row">
 			<div class="col-sm-6 m">
-				<div data-jc="textbox" data-jc-path="firstname" data-required="true">First name</div>
+				<div data-jc="textbox" data-jc-path="firstname" data-required="true" data-maxlength="30">@(First name)</div>
 			</div>
 			<div class="col-sm-6 m">
-				<div data-jc="textbox" data-jc-path="lastname" data-required="true">Last name</div>
+				<div data-jc="textbox" data-jc-path="lastname" data-required="true" data-maxlength="30">@(Last name)</div>
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="col-sm-6 m">
-				<div data-jc="textbox" data-jc-path="company">Company</div>
+				<div data-jc="textbox" data-jc-path="email" data-required="true" data-jc-type="email" data-jc-value="'@'" data-maxlength="120">@(E-mail address)</div>
 			</div>
 			<div class="col-sm-6 m">
-				<div data-jc="textbox" data-jc-path="email" data-required="true" data-jc-type="email" data-jc-value="'@'">E-mail address</div>
+				<div data-jc="textbox" data-jc-path="phone" data-maxlength="30">@(Phone)</div>
 			</div>
 		</div>
 
 		<div class="row" style="margin-bottom:10px">
 			<div class="col-sm-12">
-				<div data-jc="textarea" data-jc-path="body" data-required="true" data-height="200px" data-placeholder="Your questions...">Message</div>
+				<div data-jc="textarea" data-jc-path="body" data-required="true" data-height="200px" data-placeholder="@(Your questions...)">@(Message)</div>
 			</div>
 		</div>
 		<br />
@@ -41,7 +41,7 @@
 
 		<div class="row">
 			<div class="col-sm-6 m" data-jc="validation" data-jc-path="?">
-				<button class="button exec" disabled="disabled" data-exec="#contact.submit">SUBMIT</button>
+				<button class="button exec" disabled="disabled" data-exec="#contact.submit">@(SUBMIT)</button>
 			</div>
 		</div>
 	</div>
