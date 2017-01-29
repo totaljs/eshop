@@ -92,8 +92,5 @@ function refresh() {
 	});
 }
 
-F.file('/' + CSS, function(req, res) {
-	res.file(F.path.temp(CSS));
-});
-
+F.file('/' + CSS, (req, res) => res.file(F.path.temp(CSS)));
 F.on('settings', refresh);
