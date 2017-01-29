@@ -1,6 +1,3 @@
-const Fs = require('fs');
-const filename = F.path.databases('newsletter.csv');
-
 NEWSCHEMA('Newsletter').make(function(schema) {
 
 	schema.define('email', 'Email', true);

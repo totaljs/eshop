@@ -195,10 +195,7 @@ NEWSCHEMA('UserLogin').make(function(schema) {
 			return value.hash('sha1');
 	});
 
-	schema.addWorkflow('exec', function(error, model, options, callback) {
-
-		// options.controller
-
+	schema.addWorkflow('exec', function(error, model, options, callback, controller) {
 		GETSCHEMA('User').get(model, function(err, response) {
 
 			if (err) {
@@ -211,7 +208,7 @@ NEWSCHEMA('UserLogin').make(function(schema) {
 				return callback();
 			}
 
-			exports.login(options.controller.req, options.controller.res, response.id);
+			exports.login(controller.req, controller.res, response.id);
 			callback(SUCCESS(true));
 		});
 	});
@@ -219,10 +216,7 @@ NEWSCHEMA('UserLogin').make(function(schema) {
 
 NEWSCHEMA('UserPassword').make(function(schema) {
 	schema.define('email', 'Email', true);
-	schema.addWorkflow('exec', function(error, model, options, callback) {
-
-		// options.controller
-
+	schema.addWorkflow('exec', function(error, model, options, callback, controller) {
 		GETSCHEMA('User').get(model, function(err, response) {
 
 			if (err) {
@@ -236,7 +230,7 @@ NEWSCHEMA('UserPassword').make(function(schema) {
 			}
 
 			response.hash = F.encrypt({ id: response.id, expire: F.datetime.add('2 days').getTime() });
-			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response, options.controller.language || '');
+			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response, controller.language || '');
 			callback(SUCCESS(true));
 		});
 	});
@@ -249,10 +243,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 	schema.define('email', 'Email', true);
 	schema.define('password', 'String(20)', true);
 
-	schema.addWorkflow('exec', function(error, model, options, callback) {
-
-		// options.controller
-		// options.ip
+	schema.addWorkflow('exec', function(error, model, options, callback, controller) {
 
 		var filter = {};
 		filter.email = model.email;
@@ -272,11 +263,11 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.name = model.firstname + ' ' + model.lastname;
 			user.gender = model.gender;
 			user.password = model.password.hash('sha1');
-			user.ip = options.ip;
+			user.ip = controller.ip;
 			user.datecreated = F.datetime;
 			user.search = (user.name + ' ' + (user.email || '')).keywords(true, true).join(' ').max(500);
 
-			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, options.controller.language || '');
+			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, controller.language || '');
 
 			F.config.custom.emailuserform && mail.bcc(F.config.custom.emailuserform);
 			var db = NOSQL('users');
@@ -285,7 +276,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			model.gender && db.counter.hit(model.gender);
 
 			// Login user
-			exports.login(options.controller.req, options.controller.res, user.id);
+			exports.login(controller.req, controller.res, user.id);
 			callback(SUCCESS(true));
 		});
 	});

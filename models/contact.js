@@ -7,13 +7,13 @@ NEWSCHEMA('Contact').make(function(schema) {
 	schema.define('body', String, true);
 	schema.define('phone', 'Phone');
 	schema.define('language', 'Lower(2)');
-	schema.define('ip', 'String(80)');
 
 	// Saves the model into the database
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function(error, model, options, callback, controller) {
 
 		model.id = UID();
 		model.datecreated = F.datetime;
+		controller && (model.ip = controller.ip);
 
 		NOSQL('contactforms').insert(model.$clean());
 		MODULE('webcounter').increment('contactforms');

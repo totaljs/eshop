@@ -116,7 +116,7 @@ NEWSCHEMA('Order').make(function(schema) {
 	});
 
 	// Creates order
-	schema.addWorkflow('create', function(error, model, options, callback) {
+	schema.addWorkflow('create', function(error, model, options, callback, controller) {
 
 		var db = NOSQL('orders');
 		var counter = db.counter;
@@ -137,6 +137,12 @@ NEWSCHEMA('Order').make(function(schema) {
 		model.count = count;
 		model.datecreated = F.datetime;
 		model.numbering = db.meta('numbering');
+
+		if (controller) {
+			model.ip = controller.ip;
+			model.language = controller.language;
+			model.iduser = controller.user ? controller.user.id : '';
+		}
 
 		counter.hit('all');
 
