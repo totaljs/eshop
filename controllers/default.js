@@ -65,7 +65,7 @@ function file_read(req, res) {
 	if (!req.query.s || (req.extension !== 'jpg' && req.extension !== 'gif' && req.extension !== 'png')) {
 		// Reads specific file by ID
 		F.exists(req, res, function(next, filename) {
-			DB('files').binary.read(id, function(err, stream, header) {
+			NOSQL('files').binary.read(id, function(err, stream, header) {
 
 				if (err) {
 					next();
@@ -100,7 +100,7 @@ function file_read(req, res) {
 	F.exists(req, res, 10, function(next, filename) {
 
 		// Reads specific file by ID
-		DB('files').binary.read(id, function(err, stream, header) {
+		NOSQL('files').binary.read(id, function(err, stream, header) {
 
 			if (err) {
 				next();
@@ -137,7 +137,7 @@ function file_image(req, res) {
 	F.exists(req, res, 10, function(next, filename) {
 
 		// Reads specific file by ID
-		DB('files').binary.read(req.split[2].replace('.jpg', ''), function(err, stream, header) {
+		NOSQL('files').binary.read(req.split[2].replace('.jpg', ''), function(err, stream, header) {
 
 			if (err) {
 				next();

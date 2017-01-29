@@ -126,7 +126,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			callback(SUCCESS(true));
 
 			model.datebackup = F.datetime;
-			DB('products_backup').insert(model);
+			NOSQL('products_backup').insert(model);
 
 			if (!options || !options.importing)
 				refresh_cache();
@@ -381,7 +381,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 									if (data && data.length > 3000) {
 										Fs.unlink(filename, NOOP);
-										id.push(DB('files').binary.insert('picture.jpg', data));
+										id.push(NOSQL('files').binary.insert('picture.jpg', data));
 									}
 
 									setTimeout(next, 200);

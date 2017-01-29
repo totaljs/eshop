@@ -214,7 +214,7 @@ NEWSCHEMA('Order').make(function(schema) {
 
 			F.emit('orders.save', model);
 			model.datebackup = F.datetime;
-			DB('orders_backup').insert(model);
+			NOSQL('orders_backup').insert(model);
 		});
 
 		if (!isemail)

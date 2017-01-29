@@ -131,7 +131,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			setTimeout2('pages', refresh, 1000);
 			callback(SUCCESS(true));
 			model.datebackup = F.datetime;
-			DB('pages_backup').insert(model);
+			NOSQL('pages_backup').insert(model);
 		});
 	});
 

@@ -103,7 +103,7 @@ function upload() {
 
 			// Store current file into the HDD
 			file.extension = U.getExtension(file.filename);
-			id.push(DB('files').binary.insert(file.filename, data) + '.' + file.extension);
+			id.push(NOSQL('files').binary.insert(file.filename, data) + '.' + file.extension);
 
 			// Next file
 			setTimeout(next, 100);
@@ -140,7 +140,7 @@ function upload_base64() {
 	}
 
 	var data = self.body.file.base64ToBuffer();
-	var id = DB('files').binary.insert('base64' + ext, data);
+	var id = NOSQL('files').binary.insert('base64' + ext, data);
 	self.json('/download/' + id + ext);
 }
 
@@ -157,12 +157,8 @@ function redirect_logoff() {
 
 // Clears all uploaded files
 function json_files_clear() {
-
-	U.ls(DB('files').binary.directory, function(files) {
-		files.wait((item, next) => Fs.unlink(item, next));
-	});
-
-	this.json(SUCCESS(true));
+	var self = this;
+	NOSQL('files').binary.clear(() => self.json(SUCCESS(true)));
 }
 
 // ==========================================================================

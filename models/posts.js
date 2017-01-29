@@ -108,7 +108,7 @@ NEWSCHEMA('Post').make(function(schema) {
 			refresh_cache();
 
 			model.datebackup = F.datetime;
-			DB('posts_backup').insert(model);
+			NOSQL('posts_backup').insert(model);
 		});
 
 	});
