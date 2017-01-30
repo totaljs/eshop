@@ -77,10 +77,10 @@ jR.on('location', function(url) {
 function resizer() {
 	var h = $(window).height();
 	var el = $('#body');
-	if (!el.length)
-		return;
-	var t = el.offset().top + 100;
-	el.css('min-height', h - t);
+	if (el.length) {
+		var t = el.offset().top + 100;
+		el.css('min-height', h - t);
+	}
 }
 
 function success() {
