@@ -495,6 +495,10 @@ exports.today = function() {
 	return webcounter.today;
 };
 
+exports.blacklist = function(path) {
+	return webcounter.blacklist(path);
+};
+
 exports.increment = exports.inc = function(type) {
 	return webcounter.increment(type);
 };
