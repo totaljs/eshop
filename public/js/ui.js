@@ -717,7 +717,7 @@ COMPONENT('textboxtags', function() {
 		isString = self.type === 'string';
 
 		if (content.length) {
-			self.element.empty();
+			self.empty();
 			self.append('<div class="ui-textboxtags-label' + (isRequired ? ' ui-textboxtags-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div>');
 			self.append('<div class="ui-textboxtags">' + html + '</div>');
 		} else {
@@ -1285,7 +1285,7 @@ COMPONENT('repeater-group', function() {
 	self.setter = function(value) {
 
 		if (!value || !value.length) {
-			self.element.empty();
+			self.empty();
 			return;
 		}
 
@@ -1329,7 +1329,7 @@ COMPONENT('repeater-group', function() {
 			}
 		});
 
-		self.element.empty().append(builder);
+		self.empty().append(builder);
 	};
 });
 
