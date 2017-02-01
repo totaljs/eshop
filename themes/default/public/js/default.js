@@ -55,7 +55,7 @@ COMPONENT('emaildecode', function() {
 	var self = this;
 	self.readonly();
 	self.make = function() {
-		var m = self.element.html().replace(/\(\w+\)/g, function(value) {
+		var m = self.html().replace(/\(\w+\)/g, function(value) {
 			switch (value) {
 				case '(at)':
 					return '@';
@@ -64,7 +64,7 @@ COMPONENT('emaildecode', function() {
 			}
 			return value;
 		});
-		self.element.html('<a href="mailto:' + m + '">' + m + '</a>');
+		self.html('<a href="mailto:' + m + '">' + m + '</a>');
 	};
 });
 
@@ -202,7 +202,7 @@ COMPONENT('checkout', function() {
 
 		var cart = CACHE('cart');
 		if (!cart || !cart.length) {
-			self.element.html(currency.format('0.00'));
+			self.html(currency.format('0.00'));
 			return;
 		}
 
@@ -214,7 +214,7 @@ COMPONENT('checkout', function() {
 			count += cart[i].count;
 		}
 
-		self.element.html(currency.format(sum.format(2)));
+		self.html(currency.format(sum.format(2)));
 	};
 });
 
