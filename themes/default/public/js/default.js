@@ -79,7 +79,7 @@ COMPONENT('newsletter', function() {
 		button = self.find('button');
 		input = self.find('input');
 
-		self.element.on('keydown', 'input', function(e) {
+		self.event('keydown', 'input', function(e) {
 			e.keyCode === 13 && button.trigger('click');
 		});
 

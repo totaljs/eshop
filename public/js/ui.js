@@ -12,7 +12,7 @@ COMPONENT('click', function() {
 	};
 
 	self.make = function() {
-		self.element.on('click', self.click);
+		self.event('click', self.click);
 		var enter = self.attr('data-enter');
 		enter && $(enter).on('keydown', 'input', function(e) {
 			e.keyCode === 13 && setTimeout(function() {
@@ -27,7 +27,7 @@ COMPONENT('exec', function() {
 	self.readonly();
 	self.blind();
 	self.make = function() {
-		self.element.on('click', self.attr('data-selector') || '.exec', function() {
+		self.event('click', self.attr('data-selector') || '.exec', function() {
 			var el = $(this);
 			var attr = el.attr('data-exec');
 			var path = el.attr('data-path');
@@ -63,7 +63,7 @@ COMPONENT('message', function() {
 	self.make = function() {
 		self.classes('ui-message hidden');
 
-		self.element.on('click', 'button', function() {
+		self.event('click', 'button', function() {
 			self.hide();
 		});
 
@@ -165,14 +165,14 @@ COMPONENT('checkbox', function() {
 	self.make = function() {
 		self.classes('ui-checkbox');
 		self.html('<div><i class="fa fa-check"></i></div><span{1}>{0}</span>'.format(self.html(), isRequired ? ' class="ui-checkbox-label-required"' : ''));
-		self.element.on('click', function() {
+		self.event('click', function() {
 			self.dirty(false);
 			self.getter(!self.get(), 2, true);
 		});
 	};
 
 	self.setter = function(value) {
-		self.element.toggleClass('ui-checkbox-checked', value ? true : false);
+		self.toggle('ui-checkbox-checked', value ? true : false);
 	};
 });
 
@@ -358,7 +358,7 @@ COMPONENT('textbox', function() {
 			icon2 = 'fa-calendar';
 		else if (self.type === 'search') {
 			icon2 = 'fa-search ui-textbox-control-icon';
-			self.element.on('click', '.ui-textbox-control-icon', function() {
+			self.event('click', '.ui-textbox-control-icon', function() {
 				self.$stateremoved = false;
 				$(this).removeClass('fa-times').addClass('fa-search');
 				self.set('');
@@ -373,7 +373,7 @@ COMPONENT('textbox', function() {
 
 		icon2 && builder.push('<div><span class="fa {0}"></span></div>'.format(icon2));
 		increment && !icon2 && builder.push('<div><span class="fa fa-caret-up"></span><span class="fa fa-caret-down"></span></div>');
-		increment && self.element.on('click', '.fa-caret-up,.fa-caret-down', function(e) {
+		increment && self.event('click', '.fa-caret-up,.fa-caret-down', function(e) {
 			var el = $(this);
 			var inc = -1;
 			if (el.hasClass('fa-caret-up'))
@@ -382,7 +382,7 @@ COMPONENT('textbox', function() {
 			self.inc(inc);
 		});
 
-		self.type === 'date' && self.element.on('click', '.fa-calendar', function(e) {
+		self.type === 'date' && self.event('click', '.fa-calendar', function(e) {
 			e.preventDefault();
 			window.$calendar && window.$calendar.toggle($(this).parent().parent(), self.find('input').val(), function(date) {
 				self.set(date);
@@ -641,7 +641,7 @@ COMPONENT('cookie', function() {
 		self.append('<button name="agree">' + (self.attr('data-agree') || 'OK') + '</button>');
 		self.append('<button name="cancel">' + (self.attr('data-cancel') || 'Cancel') + '</button>');
 
-		self.element.on('click', 'button', function() {
+		self.event('click', 'button', function() {
 
 			if (this.name === 'cancel')
 				return self.cancel();
@@ -668,7 +668,7 @@ COMPONENT('expander', function() {
 		if (v === undefined)
 			v = !self.element.hasClass('ui-expander-expanded');
 
-		self.element.toggleClass('ui-expander-expanded', v);
+		self.toggle('ui-expander-expanded', v);
 		var fa = self.find('.ui-expander-button').find('.fa');
 		fa.toggleClass('fa-angle-double-down', !v);
 		fa.toggleClass('fa-angle-double-up', v);
@@ -678,7 +678,7 @@ COMPONENT('expander', function() {
 		self.classes('ui-expander' + (self.attr('data-expand') === 'true' ? ' ui-expander-expanded' : ''));
 		self.element.wrapInner('<div class="ui-expander-container"></div>');
 		self.append('<div class="ui-expander-fade"></div><div class="ui-expander-button"><span class="fa fa-angle-double-down"></span></div>');
-		self.element.on('click', '.ui-expander-button', function() {
+		self.event('click', '.ui-expander-button', function() {
 			self.toggle();
 		});
 	};
@@ -725,7 +725,7 @@ COMPONENT('textboxtags', function() {
 			self.append(html);
 		}
 
-		self.element.on('click', function(e) {
+		self.event('click', function(e) {
 			self.find('input').focus();
 		});
 
@@ -753,7 +753,7 @@ COMPONENT('textboxtags', function() {
 			self.change(true);
 		});
 
-		self.element.on('keydown', 'input', function(e) {
+		self.event('keydown', 'input', function(e) {
 
 			if (e.keyCode === 8) {
 				if (this.value)
@@ -883,10 +883,10 @@ COMPONENT('grid', function() {
 		var element = self.find('script');
 
 		self.template = Tangular.compile(element.html());
-		self.element.on('click', 'tr', function() {});
+		self.event('click', 'tr', function() {});
 		self.classes('ui-grid');
 		self.html('<div><div class="ui-grid-page"></div><table width="100%" cellpadding="0" cellspacing="0" border="0"><tbody></tbody></table></div><div data-jc="pagination" data-jc-path="{0}" data-max="8" data-pages="{1}" data-items="{2}" data-target-path="{3}"></div>'.format(self.path, self.attr('data-pages'), self.attr('data-items'), self.attr('data-pagination-path')));
-		self.element.on('click', 'button', function() {
+		self.event('click', 'button', function() {
 			switch (this.name) {
 				default:
 					var index = parseInt($(this).closest('tr').attr('data-index'));
@@ -1014,7 +1014,7 @@ COMPONENT('form', function() {
 		self.classes('-hidden');
 		self.element = el;
 
-		self.element.on('scroll', function() {
+		self.event('scroll', function() {
 			EMIT('reflow', self.name);
 		});
 
@@ -1030,7 +1030,7 @@ COMPONENT('form', function() {
 			}
 		});
 
-		enter === 'true' && self.element.on('keydown', 'input', function(e) {
+		enter === 'true' && self.event('keydown', 'input', function(e) {
 			e.keyCode === 13 && !self.find('button[name="submit"]').get(0).disabled && self.submit(hide);
 		});
 	};
@@ -1042,7 +1042,7 @@ COMPONENT('form', function() {
 		}, 50);
 
 		var isHidden = !EVALUATE(self.path, self.condition);
-		self.element.toggleClass('hidden', isHidden);
+		self.toggle('hidden', isHidden);
 		EMIT('reflow', self.name);
 
 		if (isHidden) {
@@ -1058,7 +1058,7 @@ COMPONENT('form', function() {
 		el.length && el.eq(0).focus();
 
 		window.$$form_level++;
-		self.element.css('z-index', window.$$form_level * 10);
+		self.css('z-index', window.$$form_level * 10);
 		self.element.scrollTop(0);
 
 		setTimeout(function() {
@@ -1067,7 +1067,7 @@ COMPONENT('form', function() {
 
 		// Fixes a problem with freezing of scrolling in Chrome
 		setTimeout2(self.id, function() {
-			self.element.css('z-index', (window.$$form_level * 10) + 1);
+			self.css('z-index', (window.$$form_level * 10) + 1);
 		}, 1000);
 	};
 });
@@ -1381,7 +1381,7 @@ COMPONENT('dropdowncheckbox', function() {
 		container = self.find('.ui-dropdowncheckbox-values');
 		values = self.find('.ui-dropdowncheckbox-selected');
 
-		self.element.on('click', '.ui-dropdowncheckbox', function(e) {
+		self.event('click', '.ui-dropdowncheckbox', function(e) {
 
 			var el = $(this);
 			if (el.hasClass('ui-disabled'))
@@ -1400,7 +1400,7 @@ COMPONENT('dropdowncheckbox', function() {
 			e.stopPropagation();
 		});
 
-		self.element.on('click', 'input,label', function(e) {
+		self.event('click', 'input,label', function(e) {
 
 			e.stopPropagation();
 
@@ -1614,7 +1614,7 @@ COMPONENT('crop', function() {
 		canvas = self.find('canvas').get(0);
 		context = canvas.getContext('2d');
 
-		self.element.on('click', 'li', function(e) {
+		self.event('click', 'li', function(e) {
 
 			e.preventDefault();
 			e.stopPropagation();
@@ -1715,7 +1715,7 @@ COMPONENT('crop', function() {
 			reader.readAsDataURL(files[0]);
 		});
 
-		self.element.on('mousemove mouseup', function (e) {
+		self.event('mousemove mouseup', function (e) {
 
 			if (e.type === 'mouseup') {
 				is && self.change();
@@ -1791,8 +1791,8 @@ COMPONENT('codemirror', function() {
 
 	self.make = function() {
 
-		var height = self.element.attr('data-height');
-		var icon = self.element.attr('data-icon');
+		var height = self.attr('data-height');
+		var icon = self.attr('data-icon');
 		var content = self.html();
 		self.html('<div class="ui-codemirror-label' + (required ? ' ui-codemirror-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div><div class="ui-codemirror"></div>');
 
@@ -1956,7 +1956,7 @@ COMPONENT('calendar', function() {
 	}
 
 	self.hide = function() {
-		self.element.toggleClass('hidden', true);
+		self.classes('hidden');
 		visible = false;
 		return self;
 	};
@@ -1977,7 +1977,7 @@ COMPONENT('calendar', function() {
 		var off = el.offset();
 		var h = el.innerHeight();
 
-		self.element.css({ left: off.left + (offset || 0), top: off.top + h + 12 }).removeClass('hidden');
+		self.css({ left: off.left + (offset || 0), top: off.top + h + 12 }).removeClass('hidden');
 		self.click = callback;
 		self.date(value);
 		visible = true;
@@ -1988,13 +1988,13 @@ COMPONENT('calendar', function() {
 
 		self.classes('ui-calendar hidden');
 
-		self.element.on('click', '.ui-calendar-today', function() {
+		self.event('click', '.ui-calendar-today', function() {
 			var dt = new Date();
 			self.hide();
 			self.click && self.click(dt);
 		});
 
-		self.element.on('click', '.ui-calendar-day', function() {
+		self.event('click', '.ui-calendar-day', function() {
 			var arr = this.getAttribute('data-date').split('-');
 			var dt = new Date(parseInt(arr[0]), parseInt(arr[1]), parseInt(arr[2]));
 			self.find('.ui-calendar-selected').removeClass('ui-calendar-selected');
@@ -2004,7 +2004,7 @@ COMPONENT('calendar', function() {
 			self.click && self.click(dt);
 		});
 
-		self.element.on('click', 'button', function(e) {
+		self.event('click', 'button', function(e) {
 
 			e.preventDefault();
 			e.stopPropagation();
@@ -2093,7 +2093,7 @@ COMPONENT('tabmenu', function() {
 	var self = this;
 	self.readonly();
 	self.make = function() {
-		self.element.on('click', 'li', function() {
+		self.event('click', 'li', function() {
 			var el = $(this);
 			if (el.hasClass('selected'))
 				return;
@@ -2116,11 +2116,11 @@ COMPONENT('confirm', function() {
 
 	self.make = function() {
 		self.toggle('ui-confirm hidden', true);
-		self.element.on('click', 'button', function() {
+		self.event('click', 'button', function() {
 			self.hide($(this).attr('data-index').parseInt());
 		});
 
-		self.element.on('click', function(e) {
+		self.event('click', function(e) {
 			if (e.target.tagName !== 'DIV')
 				return;
 			var el = self.find('.ui-confirm-body');
@@ -2176,14 +2176,14 @@ COMPONENT('loading', function() {
 
 	self.show = function() {
 		clearTimeout(pointer);
-		self.element.toggleClass('hidden', false);
+		self.classes('-hidden');
 		return self;
 	};
 
 	self.hide = function(timeout) {
 		clearTimeout(pointer);
 		pointer = setTimeout(function() {
-			self.element.toggleClass('hidden', true);
+			self.classes('+hidden');
 		}, timeout || 1);
 		return self;
 	};
@@ -2204,7 +2204,7 @@ COMPONENT('pagination', function() {
 		self.append('<div></div><nav></nav>');
 		nav = self.find('nav');
 		info = self.find('div');
-		self.element.on('click', 'a', function(e) {
+		self.event('click', 'a', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
 			var el = $(this);
@@ -2307,14 +2307,12 @@ COMPONENT('pagination', function() {
 		if (cachePages > 1) {
 			var pluralize_pages = [cachePages];
 			var pluralize_items = [cacheCount];
-
 			pluralize_pages.push.apply(pluralize_pages, self.attr('data-pages').split(',').trim());
 			pluralize_items.push.apply(pluralize_items, self.attr('data-items').split(',').trim());
-
 			info.empty().append(Tangular.helpers.pluralize.apply(value, pluralize_pages) + ' / ' + Tangular.helpers.pluralize.apply(value, pluralize_items));
-			self.element.toggleClass('hidden', false);
-		} else
-			self.element.toggleClass('hidden', true);
+		}
+
+		self.classes((cachePages > 1 ? '-' : '') + 'hidden');
 	};
 });
 
@@ -2340,14 +2338,14 @@ COMPONENT('autocomplete', function() {
 		self.html('<div class="ui-autocomplete"><ul></ul></div>');
 		container = self.find('ul');
 
-		self.element.on('click', 'li', function(e) {
+		self.event('click', 'li', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
 			onCallback && onCallback(datasource[+$(this).attr('data-index')], old);
 			self.visible(false);
 		});
 
-		self.element.on('mouseenter mouseleave', 'li', function(e) {
+		self.event('mouseenter mouseleave', 'li', function(e) {
 			$(this).toggleClass('selected', e.type === 'mouseenter');
 		});
 
@@ -2415,7 +2413,7 @@ COMPONENT('autocomplete', function() {
 
 	self.visible = function(visible) {
 		clearTimeout(blurtimeout);
-		self.element.toggleClass('hidden', !visible);
+		self.toggle('hidden', !visible);
 		is = visible;
 	};
 
@@ -2435,7 +2433,7 @@ COMPONENT('autocomplete', function() {
 		if (margin.width)
 			offset.width += margin.width;
 
-		self.element.css(offset);
+		self.css(offset);
 	};
 
 	self.attach = function(input, search, callback, top, left, width) {
@@ -2511,7 +2509,7 @@ COMPONENT('contextmenu', function() {
 		container = self.find('.ui-contextmenu-items');
 		arrow = self.find('.ui-contextmenu-arrow');
 
-		self.element.on('touchstart mousedown', 'div[data-value]', function(e) {
+		self.event('touchstart mousedown', 'div[data-value]', function(e) {
 			self.callback && self.callback($(this).attr('data-value'), $(self.target));
 			self.hide();
 			e.preventDefault();
@@ -2593,7 +2591,7 @@ COMPONENT('contextmenu', function() {
 			top = 0;
 
 		var options = { left: orientation === 'center' ? Math.ceil((offset.left - self.element.width() / 2) + (target.innerWidth() / 2) + left) : orientation === 'left' ? offset.left - 8 : (offset.left - self.element.width() + left) + target.innerWidth(), top: offset.top + top + target.innerHeight() + 10 };
-		self.element.css(options);
+		self.css(options);
 
 		if (is)
 			return;
@@ -2640,7 +2638,7 @@ COMPONENT('checkboxlist', function() {
 
 	self.make = function() {
 
-		self.element.on('click', 'input', function() {
+		self.event('click', 'input', function() {
 			var arr = self.get() || [];
 			var value = self.parser(this.value);
 			var index = arr.indexOf(value);
@@ -2651,7 +2649,7 @@ COMPONENT('checkboxlist', function() {
 			self.set(arr);
 		});
 
-		self.element.on('click', '.ui-checkboxlist-selectall', function() {
+		self.event('click', '.ui-checkboxlist-selectall', function() {
 			var arr = [];
 			var inputs = self.find('input');
 			var value = self.get();
@@ -2745,7 +2743,7 @@ COMPONENT('textboxlist', function() {
 		self.html((html ? '<div class="ui-textboxlist-label">{1}{0}:</div>'.format(html, icon) : '') + '<div class="ui-textboxlist-items"></div>' + self.template(empty).replace('-item"', '-item ui-textboxlist-base"'));
 		container = self.find('.ui-textboxlist-items');
 
-		self.element.on('click', '.fa-times', function() {
+		self.event('click', '.fa-times', function() {
 			var el = $(this);
 			var parent = el.closest('.ui-textboxlist-item');
 			var value = parent.find('input').val();
@@ -2771,7 +2769,7 @@ COMPONENT('textboxlist', function() {
 			return arr;
 		};
 
-		self.element.on('change keypress', 'input', function(e) {
+		self.event('change keypress', 'input', function(e) {
 
 			if (e.type !== 'change' && e.keyCode !== 13)
 				return;
