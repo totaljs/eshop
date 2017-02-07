@@ -668,7 +668,7 @@ COMPONENT('expander', function() {
 		if (v === undefined)
 			v = !self.element.hasClass('ui-expander-expanded');
 
-		self.toggle('ui-expander-expanded', v);
+		self.element.toggleClass('ui-expander-expanded', v);
 		var fa = self.find('.ui-expander-button').find('.fa');
 		fa.toggleClass('fa-angle-double-down', !v);
 		fa.toggleClass('fa-angle-double-up', v);
