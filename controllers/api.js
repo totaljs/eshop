@@ -90,9 +90,6 @@ function json_products_categories() {
 // Creates a new order
 function json_orders_create() {
 	var self = this;
-	self.body.ip = self.ip;
-	self.body.language = self.language;
-	self.body.iduser = self.user ? self.user.id : '';
 	self.body.$workflow('create', self.callback());
 }
 

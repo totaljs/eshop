@@ -56,7 +56,7 @@ function view_products_category() {
 
 	options.category = self.req.path.slice(1).join('/');
 
-	var category = F.global.categories.find('linker', options.category);;
+	var category = F.global.categories.find('linker', options.category);
 	if (!category)
 		return self.throw404();
 
@@ -70,7 +70,6 @@ function view_products_category() {
 		if (!data.items.length)
 			return self.throw404();
 
-		self.repository.subcategories = F.global.categories.where('parent', options.category);
 		self.title(category.name);
 		self.view('products-category', data);
 	});
@@ -117,11 +116,9 @@ function view_products_detail(linker) {
 			return self.throw404();
 
 		self.repository.category = F.global.categories.find('linker', data.linker_category);
-
 		if (!self.repository.category)
 			return self.throw404();
 
-		self.repository.subcategories = F.global.categories.where('parent', data.linker_category);
 		self.repository.linker = linker;
 		self.repository.name = data.name;
 

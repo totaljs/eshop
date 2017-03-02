@@ -371,8 +371,8 @@
 
 		self.make = function() {
 			name = self.html();
-			self.element.addClass('oauth2callback');
-			self.element.html('<div>@(Authorize Callback URL)</div><input type="text" readonly="readonly" />')
+			self.classes('oauth2callback');
+			self.html('<div>@(Authorize Callback URL)</div><input type="text" readonly="readonly" />')
 		};
 
 		self.setter = function(value) {

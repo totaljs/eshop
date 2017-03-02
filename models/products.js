@@ -126,7 +126,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			callback(SUCCESS(true));
 
 			model.datebackup = F.datetime;
-			DB('products_backup').insert(model);
+			NOSQL('products_backup').insert(model);
 
 			if (!options || !options.importing)
 				refresh_cache();
@@ -170,10 +170,23 @@ NEWSCHEMA('Product').make(function(schema) {
 			}
 
 			NOSQL('products').find().make(function(builder) {
+				builder.fields('id', 'linker', 'linker_category', 'linker_manufacturer', 'category', 'manufacturer', 'name', 'price', 'priceold', 'isnew', 'istop', 'pictures', 'availability', 'datecreated');
 				builder.in('id', id);
 				builder.callback(function(err, items) {
 
 					items.sort((a, b) => compare[a.id] < compare[b.id] ? -1 : 1);
+
+					var linker_detail = F.sitemap('detail', true);
+					var linker_category = F.sitemap('category', true);
+
+					for (var i = 0, length = items.length; i < length; i++) {
+						var doc = items[i];
+						if (linker_detail)
+							doc.linker = linker_detail.url.format(doc.linker);
+						if (linker_category)
+							doc.linker_category = linker_category.url + doc.linker_category;
+						doc.body = undefined;
+					}
 
 					var data = SINGLETON('products.popular');
 					data.count = items.length;
@@ -368,7 +381,7 @@ NEWSCHEMA('Product').make(function(schema) {
 
 									if (data && data.length > 3000) {
 										Fs.unlink(filename, NOOP);
-										id.push(DB('files').binary.insert('picture.jpg', data));
+										id.push(NOSQL('files').binary.insert('picture.jpg', data));
 									}
 
 									setTimeout(next, 200);
@@ -468,6 +481,7 @@ function refresh() {
 		var keys = Object.keys(db_categories);
 		var categories = [];
 		var categories_filter = {};
+		var tmp;
 
 		for (var i = 0, length = keys.length; i < length; i++) {
 			var name = keys[i];
@@ -488,13 +502,35 @@ function refresh() {
 				obj.text = item.names[index];
 				obj.parent = item.path.slice(0, index).join('/');
 				obj.level = index;
+				obj.path = item.path;
+				obj.is = function(category) {
+					if (!category)
+						return false;
+					var path = category.path;
+					for (var i = 0; i < this.level + 1; i++) {
+						if (path[i] !== this.path[i])
+							return false;
+					}
+					return true;
+				};
 				categories_filter[key] = obj;
 			});
 		}
 
 		Object.keys(categories_filter).forEach(key => categories.push(categories_filter[key]));
-
 		categories.sort((a, b) => a.level > b.level ? 1 : a.level < b.level ? -1 : a.name.localeCompare2(b.name));
+
+		for (var i = 0, length = categories.length; i < length; i++) {
+			var item = categories[i];
+			item.children = categories.where('parent', item.linker);
+			item.parent = categories.find('linker', item.parent);
+			item.top = tmp = item.parent;
+			while (tmp) {
+				tmp = categories.find('linker', item.parent);
+				if (tmp)
+					item.top = tmp;
+			}
+		}
 
 		// Prepares manufacturers
 		keys = Object.keys(db_manufacturers);

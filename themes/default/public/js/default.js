@@ -27,16 +27,14 @@ $(document).ready(function() {
 	});
 
 	// Is detail
-	if (buy.length > 0) {
-		setTimeout(function() {
-			var item = FIND('checkout').exists(buy.attr('data-id'));
-			if (!item)
-				return;
+	buy.length > 0 && setTimeout(function() {
+		var item = FIND('checkout').exists(buy.attr('data-id'));
+		if (item) {
 			var target = $('.detail-checkout');
 			target.find('.data-checkout-count').html(item.count + 'x');
 			target.slideDown(300);
-		}, 1000);
-	}
+		}
+	}, 1000);
 
 	loading(false, 800);
 });
@@ -47,8 +45,7 @@ COMPONENT('related', function() {
 	self.make = function() {
 		AJAX('GET /api/products/', { html: 1, category: self.attr('data-category'), max: 8, skip: self.attr('data-id') }, function(response) {
 			var parent = self.element.parent();
-			if (parent.hasClass('hidden') && response.indexOf('id="empty"') === -1)
-				parent.removeClass('hidden');
+			parent.hasClass('hidden') && response.indexOf('id="empty"') === -1 && parent.removeClass('hidden');
 			self.html(response);
 		});
 	};
@@ -58,7 +55,7 @@ COMPONENT('emaildecode', function() {
 	var self = this;
 	self.readonly();
 	self.make = function() {
-		var m = self.element.html().replace(/\(\w+\)/g, function(value) {
+		var m = self.html().replace(/\(\w+\)/g, function(value) {
 			switch (value) {
 				case '(at)':
 					return '@';
@@ -67,7 +64,7 @@ COMPONENT('emaildecode', function() {
 			}
 			return value;
 		});
-		self.element.html('<a href="mailto:' + m + '">' + m + '</a>');
+		self.html('<a href="mailto:' + m + '">' + m + '</a>');
 	};
 });
 
@@ -82,10 +79,8 @@ COMPONENT('newsletter', function() {
 		button = self.find('button');
 		input = self.find('input');
 
-		self.element.on('keydown', 'input', function(e) {
-			if (e.keyCode !== 13)
-				return;
-			button.trigger('click');
+		self.event('keydown', 'input', function(e) {
+			e.keyCode === 13 && button.trigger('click');
 		});
 
 		button.on('click', function() {
@@ -148,9 +143,7 @@ COMPONENT('checkout', function() {
 		} else
 			cart = [];
 
-		if (!is)
-			cart.push({ id: id, price: price, count: count });
-
+		!is && cart.push({ id: id, price: price, count: count });
 		CACHE('cart', cart, expiration);
 		self.refresh();
 		return count;
@@ -201,16 +194,15 @@ COMPONENT('checkout', function() {
 
 	self.get = function(id) {
 		var cart = CACHE('cart');
-		if (!cart)
-			return;
-		return cart.findItem('id', id);
+		if (cart)
+			return cart.findItem('id', id);
 	};
 
 	self.refresh = function() {
 
 		var cart = CACHE('cart');
 		if (!cart || !cart.length) {
-			self.element.html(currency.format('0.00'));
+			self.html(currency.format('0.00'));
 			return;
 		}
 
@@ -222,7 +214,7 @@ COMPONENT('checkout', function() {
 			count += cart[i].count;
 		}
 
-		self.element.html(currency.format(sum.format(2)));
+		self.html(currency.format(sum.format(2)));
 	};
 });
 

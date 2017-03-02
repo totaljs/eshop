@@ -221,7 +221,9 @@
 		SET('posts.response', null);
 		SET('common.form', 'posts');
 
-		template && SET('posts.form.template', template, null, 2);
+		setTimeout(function() {
+			template && SET('posts.form.template', template, 2);
+		}, 1000);
 
 		// /templates/component-editor.html:
 		cmseditor_widgets(false);

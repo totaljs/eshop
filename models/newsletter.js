@@ -1,6 +1,3 @@
-const Fs = require('fs');
-const filename = F.path.databases('newsletter.csv');
-
 NEWSCHEMA('Newsletter').make(function(schema) {
 
 	schema.define('email', 'Email', true);
@@ -9,8 +6,11 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 	schema.setSave(function(error, model, options, callback, controller) {
 
 		model.datecreated = F.datetime;
-		model.ip = controller.ip;
-		model.language = controller.language;
+
+		if (controller) {
+			model.ip = controller.ip;
+			model.language = controller.language;
+		}
 
 		var db = NOSQL('newsletter');
 

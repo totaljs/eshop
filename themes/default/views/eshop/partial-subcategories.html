@@ -7,7 +7,7 @@
 		@{if repository.category.level}
 			<div class="col-md-3"><a href="../" class="up"><span class="fa fa-caret-left"></span>@(Back)</a></div>
 		@{fi}
-		@{foreach m in repository.subcategories}
+		@{foreach m in repository.category.children}
 			<div class="col-md-3"><a href="@{sitemap_url('products')}@{m.linker}/">@{m.text}</a></div>
 		@{end}
 		</div>
