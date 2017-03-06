@@ -35,6 +35,7 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('email', 'Email');
 	schema.define('gender', 'Lower(20)');
 	schema.define('isblocked', Boolean);
+	schema.define('mobile', Number, true);
 
 	// Gets a specific user
 	schema.setGet(function(error, model, options, callback) {
@@ -49,10 +50,23 @@ NEWSCHEMA('User').make(function(schema) {
 	});
 
 	schema.setSave(function(error, model, controller, callback) {
-		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
+		/*model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
 		NOSQL('users').modify(model).where('id', model.id).callback(function(count) {
 			callback(SUCCESS(true));
 			count && F.emit('users.save', model);
+		});*/
+
+		var newbie = model.id ? false : true;
+		var nosql = NOSQL('users');
+		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
+		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
+
+			F.emit('users.save', model);
+			callback(SUCCESS(true));
+
+
+			if (!options || !options.importing)
+				refresh_cache();
 		});
 	});
 
@@ -128,6 +142,7 @@ NEWSCHEMA('User').make(function(schema) {
 				doc.firstname = options.profile.firstname;
 				doc.lastname = options.profile.lastname;
 				doc.email = options.profile.email;
+				doc.mobile = options.profile.mobile;
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
 				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ').max(500);
@@ -163,6 +178,7 @@ NEWSCHEMA('UserSettings').make(function(schema) {
 	schema.define('lastname', 'Capitalize(50)', true);
 	schema.define('email', 'Email', true);
 	schema.define('password', 'String(20)', true);
+	schema.define('mobile', Number, true);
 
 	schema.setSave(function(error, model, options, callback) {
 
@@ -179,6 +195,7 @@ NEWSCHEMA('UserSettings').make(function(schema) {
 		user.email = model.email;
 		user.firstname = model.firstname;
 		user.lastname = model.lastname;
+		user.mobile = model.mobile;
 
 		// Update an user in database
 		NOSQL('users').modify(model).where('id', model.id).callback(SUCCESS(callback));
@@ -242,6 +259,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 	schema.define('gender', 'Lower(20)');
 	schema.define('email', 'Email', true);
 	schema.define('password', 'String(20)', true);
+	schema.define('mobile', Number, true);
 
 	schema.addWorkflow('exec', function(error, model, options, callback, controller) {
 
@@ -262,6 +280,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.lastname = model.lastname;
 			user.name = model.firstname + ' ' + model.lastname;
 			user.gender = model.gender;
+			user.mobile = model.mobile;
 			user.password = model.password.hash('sha1');
 			user.ip = controller.ip;
 			user.datecreated = F.datetime;
@@ -270,10 +289,20 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, controller.language || '');
 
 			F.config.custom.emailuserform && mail.bcc(F.config.custom.emailuserform);
-			var db = NOSQL('users');
+			/*var db = NOSQL('users');
 			db.insert(user, F.error());
 			db.counter.hit('all');
-			model.gender && db.counter.hit(model.gender);
+			model.gender && db.counter.hit(model.gender);*/
+
+			var newbie = model.id ? false : true;
+			var nosql = NOSQL('users');
+			model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
+			(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function() {
+
+				F.emit('users.save', model);
+				callback(SUCCESS(true));
+
+			});
 
 			// Login user
 			exports.login(controller.req, controller.res, user.id);
