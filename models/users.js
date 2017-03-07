@@ -12,7 +12,7 @@ exports.logoff = function(req, res, user) {
 };
 
 exports.createSession = function(profile) {
-	online[profile.id] = { id: profile.id, name: profile.name, firstname: profile.firstname, lastname: profile.lastname, email: profile.email, ticks: F.datetime.add('30 minutes').getTime() };
+	online[profile.id] = { id: profile.id, name: profile.name, firstname: profile.firstname, lastname: profile.lastname, email: profile.email, ticks: F.datetime.add('30 minutes').getTime(), phone: profile.phone };
 	return online[profile.id];
 };
 
@@ -32,6 +32,8 @@ NEWSCHEMA('User').make(function(schema) {
 	schema.define('name', 'Capitalize(50)', true);
 	schema.define('firstname', 'Capitalize(50)');
 	schema.define('lastname', 'Capitalize(50)');
+	schema.define('name', 'Capitalize(50)', true);
+	schema.define('phone', 'Phone');
 	schema.define('email', 'Email');
 	schema.define('gender', 'Lower(20)');
 	schema.define('isblocked', Boolean);
@@ -128,6 +130,7 @@ NEWSCHEMA('User').make(function(schema) {
 				doc.firstname = options.profile.firstname;
 				doc.lastname = options.profile.lastname;
 				doc.email = options.profile.email;
+				doc.phone = options.profile.phone;
 				doc.gender = options.profile.gender;
 				doc.ip = options.profile.ip;
 				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ').max(500);
@@ -162,6 +165,7 @@ NEWSCHEMA('UserSettings').make(function(schema) {
 	schema.define('firstname', 'Capitalize(50)', true);
 	schema.define('lastname', 'Capitalize(50)', true);
 	schema.define('email', 'Email', true);
+	schema.define('phone', 'Phone');
 	schema.define('password', 'String(20)', true);
 
 	schema.setSave(function(error, model, options, callback) {
@@ -240,6 +244,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 	schema.define('firstname', 'Capitalize(50)', true);
 	schema.define('lastname', 'Capitalize(50)', true);
 	schema.define('gender', 'Lower(20)');
+	schema.define('phone', 'Phone');
 	schema.define('email', 'Email', true);
 	schema.define('password', 'String(20)', true);
 
@@ -260,6 +265,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.email = model.email;
 			user.firstname = model.firstname;
 			user.lastname = model.lastname;
+			user.phone = model.phone;
 			user.name = model.firstname + ' ' + model.lastname;
 			user.gender = model.gender;
 			user.password = model.password.hash('sha1');
