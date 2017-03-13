@@ -1,5 +1,6 @@
 // Online visitors counter
 PING('GET /api/ping/');
+UPTODATE('2 hours', '/');
 
 $(document).ready(function() {
 
