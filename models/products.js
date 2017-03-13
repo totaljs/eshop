@@ -42,18 +42,18 @@ NEWSCHEMA('Product').make(function(schema) {
 		options.skip && filter.where('id', '<>', options.skip);
 
 		if (options.type) {
-			 if ((options.type instanceof Array))
-			 	options.type = [options.type];
-			 for (var i = 0, length = options.type.length; i < length; i++) {
-			 	switch (options.type[i]) {
-			 		case '1':
-			 			filter.where('isnew', true);
-			 			break;
-			 		case '2':
-			 			filter.where('istop', true);
-			 			break;
-			 	}
-			 }
+			if ((options.type instanceof Array))
+				options.type = [options.type];
+			for (var i = 0, length = options.type.length; i < length; i++) {
+				switch (options.type[i]) {
+					case '1':
+						filter.where('isnew', true);
+						break;
+					case '2':
+						filter.where('istop', true);
+						break;
+				}
+			}
 		}
 
 		switch (options.sort) {
