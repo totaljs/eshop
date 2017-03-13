@@ -2828,7 +2828,6 @@ COMPONENT('textboxlist', function() {
 
 COMPONENT('nosqlcounter', function() {
 	var self = this;
-	var chart;
 	var count = (self.attr('data-count') || '12').parseInt();
 
 	self.readonly();
