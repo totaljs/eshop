@@ -1012,7 +1012,7 @@ COMPONENT('form', function() {
 		var el = $('#' + self._id);
 		el.find('.ui-form').get(0).appendChild(self.element.get(0));
 		self.classes('-hidden');
-		self.element = el;
+		self.replace(el);
 
 		self.event('scroll', function() {
 			EMIT('reflow', self.name);
