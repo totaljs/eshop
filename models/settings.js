@@ -107,8 +107,8 @@ NEWSCHEMA('Settings').make(function(schema) {
 			F.config.custom.users = users;
 
 			// Rewrites internal framework settings
-			F.config['mail.address.from'] = F.config.custom.emailsender;
-			F.config['mail.address.reply'] = F.config.custom.emailreply;
+			F.config['mail-address-from'] = F.config.custom.emailsender;
+			F.config['mail-address-reply'] = F.config.custom.emailreply;
 
 			if (!F.config.custom.languages)
 				F.config.custom.languages = [];
