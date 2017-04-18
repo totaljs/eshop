@@ -6,7 +6,7 @@
 
 Please do not change the code, just create a new issues. I solve all problems as soon as possible. Do you want special upgrades? Contact us [www.totaljs.com/support](https://www.totaljs.com/support/).
 
-- New version: `v8.0.0` (works only with __Total.js v2.3.0__)
+- New version: `v8.0.0` (works only with __Total.js +v2.5.0__)
 - [__Live chat with professional support__](https://messenger.totaljs.com)
 - [__HelpDesk with professional support__](https://helpdesk.totaljs.com)
 - [A simple documentation](https://docs.totaljs.com/eshop-cms/latest.html)
