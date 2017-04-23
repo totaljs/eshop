@@ -1110,9 +1110,9 @@ COMPONENT('pictures', function() {
 
 		self.html(builder);
 
-		this.element.find('.fa').bind('click', function(e) {
+		this.element.find('.fa').bind('click', function() {
 
-			var el = $(this).parent().remove();
+			$(this).parent().remove();
 			var id = [];
 
 			self.find('div').each(function() {
