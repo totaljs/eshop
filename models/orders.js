@@ -60,6 +60,8 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('iscompleted', Boolean);
 	schema.define('isnewsletter', Boolean);
 
+	schema.define('datecreated', Date);
+
 	// Sets default values
 	schema.setDefault(function(name) {
 		switch (name) {
