@@ -277,7 +277,7 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 
 			F.config.custom.emailuserform && mail.bcc(F.config.custom.emailuserform);
 			var db = NOSQL('users');
-			db.insert(user, F.error());
+			db.insert(user);
 			db.counter.hit('all');
 			model.gender && db.counter.hit(model.gender);
 
