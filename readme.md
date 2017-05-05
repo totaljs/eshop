@@ -17,7 +17,7 @@ Please do not change the code, just create a new issues. I solve all problems as
 ## Installation
 
 - install [__Node.js__ platform](https://www.nodejs.org)
-- install [__GraphicsMagick__](https://www.nodejs.org)
+- install [__GraphicsMagick__](http://www.graphicsmagick.org)
 - `$ cd eshop`
 - install `$ npm install total.js`
 - install `$ npm install paypal-express-checkout`
