@@ -1189,7 +1189,7 @@ COMPONENT('fileupload', function() {
 			if (window.managerurl)
 				url = window.managerurl + '/upload/';
 			else
-				url = window.location.pathname
+				url = location.pathname;
 		}
 
 		var multiple = self.attr('data-multiple') === 'true';
@@ -1218,7 +1218,7 @@ COMPONENT('fileupload', function() {
 			if (loading)
 				loading.show();
 
-			$.components.UPLOAD(url, data, function(response, err) {
+			UPLOAD(url, data, function(response, err) {
 
 				if (err) {
 
