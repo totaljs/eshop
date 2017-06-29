@@ -1,19 +1,15 @@
 // ===================================================
-// IMPORTANT: only for production
-// total.js - web application framework for node.js
-// http://www.totaljs.com
+// FOR PRODUCTION
+// Total.js - framework for Node.js platform
+// https://www.totaljs.com
 // ===================================================
 
-var fs = require('fs');
-var options = {};
+const options = {};
 
 // options.ip = '127.0.0.1';
 // options.port = parseInt(process.argv[2]);
-// options.config = { name: 'total.js' };
-// options.https = { key: fs.readFileSync('keys/agent2-key.pem'), cert: fs.readFileSync('keys/agent2-cert.pem')};
-
-/**
- * Release notes:
- */
+// options.config = { name: 'Total.js' };
+// options.sleep = 3000;
 
 require('total.js').http('release', options);
+// require('total.js').cluster.http(5, 'release', options);
