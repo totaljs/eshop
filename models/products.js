@@ -227,7 +227,7 @@ NEWSCHEMA('Product').make(function(schema) {
 			return doc;
 		};
 
-		NOSQL('products').update().like('category', category_old.name).callback(function(err, count) {
+		NOSQL('products').update(update).like('category', category_old.name).callback(function(err, count) {
 			count && refresh_cache();
 			callback(SUCCESS(true));
 		});
