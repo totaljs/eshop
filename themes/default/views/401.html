@@ -1,0 +1,24 @@
+@{sitemap('homepage')}
+
+<div class="padding">
+	<h1>@(401: Unauthorized)</h1>
+	<br />
+	<div class="row">
+		<div class="col-md-12 m center">
+			@(Sorry, this action is only for logged users)<br />
+			@(Please <a href="/account/">log in or create a new account</a>.)
+		</div>
+	</div>
+	<br />
+	<br />
+	<hr />
+	<br />
+	<br />
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-shopping-cart"></span> @(Browse products)</a>
+		</div>
+	</div>
+	<br />
+	<br />
+</div>
