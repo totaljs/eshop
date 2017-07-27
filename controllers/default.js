@@ -13,6 +13,10 @@ exports.install = function() {
 	F.file('/images/small/*.jpg', file_image);
 	F.file('/images/large/*.jpg', file_image);
 	F.file('/download/', file_read);
+
+	// ERRORS
+	F.route('#404', view_404);
+	F.route('#401', view_401);
 };
 
 // ==========================================================================
@@ -168,4 +172,18 @@ function file_image(req, res) {
 			stream.pipe(writer);
 		});
 	});
+}
+
+// ==========================================================================
+// FILES
+// ==========================================================================
+
+function view_404() {
+	var self = this;
+	self.view('404');
+}
+
+function view_401() {
+	var self = this;
+	self.view('401');
 }
