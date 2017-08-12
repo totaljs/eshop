@@ -25,7 +25,7 @@ NEWSCHEMA('Order').make(function(schema) {
 	schema.define('firstname', 'Capitalize(40)', true);
 	schema.define('lastname', 'Capitalize(40)', true);
 	schema.define('email', 'Email', true);
-	schema.define('phone', 'Phone');
+	schema.define('phone', 'Phone', true);
 	schema.define('message', 'String(500)');
 	schema.define('note', 'String(500)');
 	schema.define('language', 'Lower(2)');
