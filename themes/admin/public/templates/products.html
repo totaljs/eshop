@@ -1,0 +1,211 @@
+<div data-jc-controller="Products" data-jc-scope="products" class="container">
+	<div class="toolbar">
+		<button class="right exec" data-exec="Products/create"><i class="fa fa-plus-circle"></i>@(Create)</button>
+		<button class="exec" data-exec="Products/options"><i class="fa fa-cogs"></i>@(Options)</button>
+		<span></span>
+		<button class="exec" data-exec="Products/checked" name="checked" disabled="disabled"><i class="fa fa-check-circle"></i>@(Checked)</button>
+	</div>
+	<div class="fullheight">
+		<div data-jc="grid" data-jc-path="grid" data-jc-config="padding:10;filterlabel:@(Search);checked:Products/checkbox;button:Products/operation;pagination:true;exec:Products/filter;external:true">
+			<script type="text/plain">
+			[
+				{ name: 'id', text: '', template: '<input type="checkbox" value="{{ id }}" />', size: '42px', header: '<input type="checkbox" value="{{ id }}" />', filter: false, sort: false, title: 'Options', align: 'center' },
+				{ name: 'name', text: '@(Name)', size: 2, template: '{{ if !ispublished }}<span class="badge badge-gray mr5">@(unpublished)</span>{{ fi }}{{ if pictures && pictures.length }}<i class="fa blue fa-camera mr5"></i>{{ fi }}{{ name }}{{ if isnew }}<span class="badge badge-green ml5">@(new)</span>{{ fi }}{{ if istop }}<span class="badge badge-red ml5">@(top)</span>{{ fi }}', classth: 'left', classfilter: 'left' },
+				{ name: 'category', text: '@(Category)', size: '250px', class: 'hidden-xs active' },
+				{ name: 'manufacturer', text: '@(Manufacturer)', size: '140px', class: 'hidden-xs' },
+				{ name: 'pricemin', text: '@(Price from)', size: '108px', template: '{{ pricemin | format(2) }}', class: 'hidden-xs', classtd: 'right' },
+				{ name: 'stock', text: '@(Stock)', size: '100px', template: '{{ if stock <= 0 }}<b class="red">@(out of stock)</b>{{ else }}{{ stock | format(0) }}x{{ fi }}', class: 'hidden-xs', classtd: 'right' },
+				{ name: '@(Options)', align: 'center', filter: false, sort: false, size: '110px', template: '<button title="@(Duplicate)" name="duplicate"><i class="fa fa-copy"></i></button><button name="update" title="@(Edit)"><i class="fa fa-pencil"></i></button><button class="btn-remove" name="remove" title="@(Remove)"><i class="fa fa-trash-o"></i></button>' }
+			]
+			</script>
+		</div>
+	</div>
+</div>
+<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:products-form;url:[url]forms/products.html" data-jc-controller="Products"></div>
+<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:products-replace;url:[url]forms/products-replace.html" data-jc-controller="Products"></div>
+<input type="file" accept="application/json" id="productsimportjson" class="hidden">
+
+<script>
+	CONTROLLER('Products', function(ctrl) {
+
+		ctrl.scope = 'products';
+		ctrl.limit = 100; // Count of items per page
+
+		var toolbar = ctrl.virtualize({ btnChecked: '.toolbar button[name="checked"]' });
+		var filter; // A grid filter
+
+		$('#productsimportjson').on('change', function(e) {
+			var reader = new FileReader();
+			reader.onload = function() {
+				var items = PARSE(reader.result);
+				if (items && items instanceof Array) {
+					SETTER('loading', 'show');
+					AJAX('POST [url]api/products/import/', items, function(response) {
+						SETTER('loading', 'hide', 5000);
+						SETTER('snackbar', 'success', '@(Products import has been started. <b>Please wait</b>.)');
+						setTimeout(ctrl.refresh, 5000);
+					});
+				}
+				reader = null;
+			};
+			reader.readAsText(this.files[0]);
+			this.value = '';
+		});
+
+		ctrl.destroy = function() {
+			$('#productsimportjson').remove();
+			SETTER('sitemap', 'remove', ctrl.scope);
+		};
+
+		ctrl.refresh = function() {
+
+			SETTER('loading', 'show');
+
+			!filter && (filter = {});
+			filter.limit = ctrl.limit;
+
+			AJAX('GET [url]api/{0}/'.format(ctrl.scope), filter, function(response) {
+				ctrl.set('grid', response);
+				SETTER('loading', 'hide', 500);
+			});
+		};
+
+		ctrl.reload = function() {
+			ctrl.refresh();
+		};
+
+		ctrl.operation = function(btn, row, grid) {
+			var name = btn.prop('name');
+			switch (name) {
+				case 'remove':
+					SETTER('confirm', 'show', '@(Are you sure you want to remove selected product?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+						if (index)
+							return;
+						SETTER('loading', 'show');
+						AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), row, function(response) {
+							SETTER('loading', 'hide', 1000);
+							if (response.success) {
+								SETTER('snackbar', 'success', '@(Product has been removed successfully.)');
+								ctrl.refresh();
+							}
+						});
+					});
+					break;
+				case 'update':
+				case 'duplicate':
+					SETTER('loading', 'show');
+					AJAX('GET [url]api/{0}/{1}/'.format(ctrl.scope, row.id), function(response) {
+
+						!response.widgets && (response.widgets = []);
+
+						if (name === 'duplicate')
+							response.id = '';
+						else
+							SKIP(ctrl.scope + '.form.stats.views', ctrl.scope + '.form.stats.orders');
+
+						SET('cmseditor.template', response.template);
+						SET(ctrl.scope + '.form', response, true);
+						SET('common.form', ctrl.scope + '-form');
+					});
+					break;
+			}
+		};
+
+		ctrl.checkbox = function(el, grid) {
+			el && !el.value && grid.checked(el.checked);
+			var count = grid.checked().length;
+			toolbar.btnChecked.disable(count === 0);
+		};
+
+		ctrl.checked = function(el) {
+			var items = [];
+			items.push({ id: 'toggle', name: '@(Publish / Unpublish)', icon: 'globe' });
+			items.push({ id: 'remove', name: '@(Remove products)', icon: 'trash' });
+			SETTER('contextmenu', 'show', 'center', el, items, function(item) {
+				switch (item.id) {
+					case 'toggle':
+						var arr = [];
+						FIND('.{0}.grid'.format(ctrl.scope)).checked().each(function() {
+							arr.push(this.value);
+						});
+						AJAX('GET [url]api/{0}/toggle/'.format(ctrl.scope), { id: arr.join(',') }, ctrl.refresh);
+						break;
+					case 'remove':
+						SETTER('confirm', 'show', '@(Are you sure you want to remove all selected products?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+							if (index)
+								return;
+							SETTER('loading', 'show', 'trash-o');
+							var arr = FIND('.{0}.grid'.format(ctrl.scope)).checked().toArray();
+							arr.waitFor(function(el, next, index) {
+								SET('common.progress', (index / arr.length) * 100);
+								AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), { id: el.value }, next);
+							}, function() {
+								ctrl.refresh();
+								SETTER('loading', 'hide');
+								SETTER('snackbar', 'success', '@(Products have been removed successfully.)');
+							});
+						});
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.options = function(el) {
+			var items = [];
+			items.push({ id: 'refresh', name: '@(Refresh)', icon: 'refresh' });
+			items.push({ id: 'create', name: '@(Create product)', icon: 'plus-circle' });
+			items.push({ id: 'category', name: '@(Replace category)', icon: 'folder' });
+			items.push({ id: 'manufacturer', name: '@(Replace manufacturer)', icon: 'building' });
+			items.push({ id: 'import', name: '@(Import from JSON)', icon: 'cloud-upload' });
+			items.push({ id: 'export', name: '@(Export to JSON)', icon: 'cloud-download' });
+			SETTER('contextmenu', 'show', 'left', el, items, function(item) {
+				switch (item.id) {
+					case 'refresh':
+					case 'create':
+						ctrl[item.id]();
+						break;
+					case 'category':
+					case 'manufacturer':
+						SETTER('loading', 'show');
+						AJAX('GET [url]api/{0}/dependencies/'.format(ctrl.scope), function(response) {
+							var model = {};
+							model.items = response[item.id === 'category' ? 'categories' : 'manufacturers'];
+							model.name_old = '';
+							model.name_new = '';
+							model.type = item.id;
+							ctrl.set('replaceform', model, true);
+							SET('common.form', ctrl.scope + '-replace');
+							SETTER('loading', 'hide', 1000);
+						});
+						break;
+					case 'import':
+						setTimeout(function() {
+							$('#productsimportjson').click();
+						}, 500);
+						break;
+
+					case 'export':
+						SETTER('loading', 'show');
+						SETTER('loading', 'hide', 3000);
+						setTimeout(function() {
+							location.href = '[url]api/products/export/'.env(true);
+						}, 1000);
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.create = function() {
+			ctrl.set('form', { widgets: [], ispublished: true, prices: [{ price: 1, stock: 1, name: '' }] }, true);
+			SET('common.form', ctrl.scope + '-form');
+		};
+
+		ctrl.filter = function(type, input, sort, page, grid) {
+			filter = input ? CLONE(input) : {};
+			sort && (filter.sort = sort.name + '_' + sort.sorting);
+			filter.page = page;
+			ctrl.refresh();
+		};
+	});
+
+</script>

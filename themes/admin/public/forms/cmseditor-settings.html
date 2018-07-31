@@ -1,0 +1,28 @@
+<div data-jc="form" data-jc-path="cmseditor.form" class="hidden" data-jc-config="icon:cofg;if:settings;title:@(Widget settings);width:500;submit:cmseditor_settings_submit">
+	<div class="padding">
+		<div data-jc="multioptions" data-jc-path="cmseditor.settings.options" data-jc-id="cmseditor.settings"></div>
+	</div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="cmseditor.settings" data-jc-config="delay:1000">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(APPLY)</button>
+	</div>
+</div>
+
+<script>
+
+	function cmseditor_settings_submit(com) {
+		var form = cmseditor.settings;
+		var prev = cmseditor.widgetsettings[form.id];
+
+		var dep = FIND('#cmseditor.settings').dependencies();
+		// dep === Code lists
+
+		form.exports.configure && form.exports.configure.call(dep, form.options, cmseditor.settings.target, prev);
+		cmseditor.widgetsettings[form.id] = form.options;
+		var editor = cmseditor.instance;
+		editor.change(true);
+		editor.autoresize();
+		com.hide();
+	}
+
+</script>

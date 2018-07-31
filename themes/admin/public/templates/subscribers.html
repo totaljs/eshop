@@ -1,0 +1,144 @@
+<div data-jc-controller="Subscribers" data-jc-scope="subscribers" class="container">
+	<div class="toolbar">
+		<button class="right exec" data-exec="Subscribers/import"><i class="fa fa-cloud-upload"></i>@(Import)</button>
+		<button class="exec" data-exec="Subscribers/options"><i class="fa fa-cogs"></i>@(Options)</button>
+		<span></span>
+		<button class="exec" data-exec="Subscribers/checked" name="checked" disabled="disabled"><i class="fa fa-check-circle"></i>@(Checked)</button>
+	</div>
+	<div class="fullheight">
+		<div data-jc="grid" data-jc-path="grid" data-jc-config="padding:10;filterlabel:@(Search);checked:Subscribers/checkbox;button:Subscribers/operation;pagination:true;exec:Subscribers/filter;external:true">
+			<script type="text/plain">
+			[
+				{ name: 'id', template: '<input type="checkbox" value="{{ email }}" />', size: '42px', header: '<input type="checkbox" value="{{ email }}" />', filter: false, sort: false, title: 'Options', align: 'center' },
+				{ name: 'email', text: '@(Email address)', size: 2, template: '{{ if unsubscribed }}<span class="badge badge-red mr5">@(unsubscribed)</span>{{ fi }}{{ email }}', classth: 'left', classfilter: 'left' },
+				{ name: 'datecreated', text: '@(Registered)', size: '140px', template: '{{ datecreated | format(\'@(yyyy-MM-dd HH:mm)\') }}', align: 'center', class: 'hidden-xs' },
+				{ name: '@(Options)', align: 'center', filter: false, sort: false, size: '80px', template: '<button name="ban" title="@(Ban)"><i class="fa fa-ban"></i></button><button class="btn-remove" name="remove" title="@(Remove)"><i class="fa fa-trash-o"></i></button>' }
+			]
+			</script>
+		</div>
+	</div>
+</div>
+<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:subscribers-import;url:[url]forms/subscribers-import.html" data-jc-controller="Subscribers"></div>
+
+<script>
+	CONTROLLER('Subscribers', function(ctrl) {
+
+		ctrl.scope = 'subscribers';
+		ctrl.limit = 100; // Count of items per page
+
+		var toolbar = ctrl.virtualize({ btnChecked: '.toolbar button[name="checked"]' });
+		var filter; // A grid filter
+
+		ctrl.destroy = function() {
+			SETTER('sitemap', 'remove', ctrl.scope);
+		};
+
+		ctrl.refresh = function() {
+
+			SETTER('loading', 'show', 'refresh fa-spin');
+
+			!filter && (filter = {});
+			filter.limit = ctrl.limit;
+
+			AJAX('GET [url]api/{0}/'.format(ctrl.scope), filter, function(response) {
+				ctrl.set('grid', response);
+				SETTER('loading', 'hide', 500);
+			});
+		};
+
+		ctrl.reload = function() {
+			ctrl.refresh();
+		};
+
+		ctrl.operation = function(btn, row, grid) {
+			var name = btn.prop('name');
+			switch (name) {
+				case 'remove':
+					SETTER('confirm', 'show', '@(Are you sure you want to remove selected subscriber?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+						if (index)
+							return;
+						SETTER('loading', 'show', 'trash-o');
+						AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), { id: row.email }, function(response) {
+							SETTER('loading', 'hide', 1000);
+							if (response.success) {
+								SETTER('snackbar', 'success', '@(Subscriber has been removed successfully.)');
+								ctrl.refresh();
+							}
+						});
+					});
+					break;
+				case 'ban':
+					SETTER('loading', 'show');
+					AJAX('GET [url]api/{0}/toggle/'.format(ctrl.scope), { id: row.email }, ctrl.refresh);
+		 			break;
+			}
+		};
+
+		ctrl.checkbox = function(el, grid) {
+			el && !el.value && grid.checked(el.checked);
+			var count = grid.checked().length;
+			toolbar.btnChecked.disable(count === 0);
+		};
+
+		ctrl.checked = function(el) {
+			var items = [];
+			items.push({ id: 'toggle', name: '@(Subscribe / Unsubscribe)', icon: 'globe' });
+			items.push({ id: 'remove', name: '@(Remove subscribers)', icon: 'trash' });
+			SETTER('contextmenu', 'show', 'center', el, items, function(item) {
+				switch (item.id) {
+					case 'toggle':
+						var arr = [];
+						FIND('.{0}.grid'.format(ctrl.scope)).checked().each(function() {
+							arr.push(this.value);
+						});
+						AJAX('GET [url]api/{0}/toggle/'.format(ctrl.scope), { id: arr.join(',') }, ctrl.refresh);
+						break;
+					case 'remove':
+						SETTER('confirm', 'show', '@(Are you sure you want to remove all selected subscribers?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+							if (index)
+								return;
+							SETTER('loading', 'show', 'trash-o');
+							var arr = FIND('.{0}.grid'.format(ctrl.scope)).checked().toArray();
+							arr.waitFor(function(el, next, index) {
+								SET('common.progress', (index / arr.length) * 100);
+								AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), { id: el.value }, next);
+							}, function() {
+								ctrl.refresh();
+								SETTER('loading', 'hide', 1000);
+								SETTER('snackbar', 'success', '@(Subscribers have been removed successfully.)');
+							});
+						});
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.options = function(el) {
+			var items = [];
+			items.push({ id: 'refresh', name: '@(Refresh)', icon: 'refresh' });
+			items.push({ id: 'import', name: '@(Import addresses)', icon: 'plus-circle' });
+			items.push({ id: 'export', name: '@(Export addresses to CSV)', icon: 'cloud-upload' });
+			SETTER('contextmenu', 'show', 'left', el, items, function(item) {
+				switch (item.id) {
+					case 'refresh':
+					case 'import':
+						ctrl[item.id]();
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.import = function() {
+			ctrl.set('import', { progress: 0, body: '' }, true);
+			SET('common.form', ctrl.scope + '-import');
+		};
+
+		ctrl.filter = function(type, input, sort, page, grid) {
+			filter = input ? CLONE(input) : {};
+			sort && (filter.sort = sort.name + '_' + sort.sorting);
+			filter.page = page;
+			ctrl.refresh();
+		};
+	});
+
+</script>

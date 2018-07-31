@@ -1,0 +1,377 @@
+@{layout('')}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>@{config.name} v@{config.version}</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=10" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="#A0A0A0" />
+	<meta name="apple-mobile-web-app-title" content="@{config.name}" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+	<meta name="robots" content="all,follow" />
+	<link rel="apple-touch-icon" href="/icon.png" />
+	<link rel="stylesheet" href="//cdn.componentator.com/spa.min@14.css" />
+	<script src="//cdn.componentator.com/spa.min@14.js"></script>
+	<style type="text/css">
+		/*auto*/
+		html,body { overflow: hidden; height: 100%; }
+		body { background-color: #E6E9ED; }
+		.panel { max-width: 280px; width: 100%; position: absolute; left: 50%; top: 50%; margin: -300px 0 0 -140px; background-color: white; box-shadow: 0 5px 10px rgba(0,0,0,0.1); border-radius: 4px; transition: all 0.5s; transform: scale(1.5); }
+		.padding { padding: 20px; }
+		.panelshow { transform: scale(1); }
+
+		h1 { color: black; margin: 0; padding: 30px 0 20px; font-family: Arial; text-align: center; background-color: #F8F8F8; background: repeating-linear-gradient(45deg,#F0F0F0,#F0F0F0 10px,#F9F9F9 10px,#F9F9F9 20px); border-radius: 4px 4px 0 0; }
+		h1 .fa { margin-right: 10px; }
+		input:-ms-input-placeholder, input:-webkit-input-placeholder, input:-moz-input-placeholder { color: silver; }
+		input[type="text"]:disabled, input[type="password"]:disabled, select:disabled { background-color: #F0F0F0; cursor: not-allowed; color: silver; }
+		.ui-textbox { border: 1px solid #E0E0E0; padding: 5px 2px 5px 5px; border-radius: 2px; position: relative; width: 100%; background-color: white; display: table; }
+		.ui-textbox input { display: table-cell; border: 0; outline: 0; font: normal 14px Arial; color: black; width: 100%; background-color: white; }
+		.ui-textbox div { width: 1%; position: relative; vertical-align: middle; display: table-cell; text-align: center; white-space: nowrap; text-overflow: clip; border-left: 1px solid #E0E0E0; width: 30px; color: silver; }
+		.ui-textbox .fa-times { color: red; cursor: pointer; }
+		.ui-textbox-label { margin-bottom: 5px; font-size: 12px; color: #656D78; text-align: left; }
+		.ui-textbox-label .fa { margin-right: 5px; }
+		.ui-textbox-label-required:before { color: red; content: '***'; margin-right: 5px; }
+		.ui-textbox-invalid { border-color: #E1A1A1 !important; background-color: #FFF3F3 !important; }
+		.ui-textbox-invalid input { background-color: #FFF3F3 !important; }
+		.ui-textbox .fa-caret-up, .ui-textbox .fa-caret-down { display: block; line-height: 9px; cursor: pointer; }
+		.ui-textbox .fa-calendar { cursor: pointer; }
+		.ui-textbox-helper { margin-top: 8px; font-size: 11px; color: red; text-align: left; display: none; }
+		.ui-textbox-helper-show { display: block; }
+		.ui-textbox-container.ui-disabled .ui-textbox { background-color: #F0F0F0; cursor: not-allowed; }
+		.ui-textbox-container.ui-disabled .ui-textbox input { background-color: #F0F0F0; }
+		.ui-error { margin: 0 0 15px; padding: 0; list-style-type: none; padding: 10px 0; color: #BE3A48; font-family: Arial; font-size: 14px }
+		.ui-error .fa { width: 16px; }
+
+		.hidden { display: none; }
+		.m { margin-bottom: 15px; }
+
+		button { background-color: #4285F4; border: 0; color: white; cursor: pointer; outline: 0; width: 100%; border-radius: 4px; height: 50px; text-transform: uppercase; }
+		button:hover { box-shadow: 0 2px 5px rgba(0,0,0,0.1); opacity: 0.9; }
+		button:disabled { background-color: #F0F0F0; color: silver; cursor: not-allowed; box-shadow: none; opacity: 1; }
+		button .fa { margin-right: 5px; }
+		footer { font-size: 11px; text-align: center; color: #A0A0A0; margin: 20px 0 0 0; }
+
+		@media(max-width: 768px) {
+			.panel { margin-top: -200px; }
+		}
+
+	</style>
+</head>
+<body>
+
+	<div class="panel">
+		<h1><i class="fa fa-lock"></i>@(Admin)</h1>
+		<div class="padding">
+			<div class="m" data-jc="textbox" data-jc-path="form.name" data-jc-config="icon2:user;required:true;autofocus:true;autofill:true">@(Login name)</div>
+			<div class="m" data-jc="textbox" data-jc-path="form.password" data-jc-config="icon2:lock;required:true;type:password;autofill:true">@(Password)</div>
+			<div data-jc="error" data-jc-path="form.response"></div>
+			<div data-jc="validation" data-jc-path="form">
+				<button name="submit" disabled="disabled"><i class="fa fa-lock"></i>@(Login)</button>
+			</div>
+			<footer>
+				<div>All rights reserved &copy; 2017</div>
+				<a href="https://www.totaljs.com" target="_blank">www.totaljs.com</a>
+			</footer>
+		</div>
+	</div>
+
+	<script>
+	COMPONENT('validation', function(self, config) {
+
+		var path, elements = null;
+		var def = 'button[name="submit"]';
+
+		self.readonly();
+
+		self.make = function() {
+			elements = self.find(config.selector || def);
+			path = self.path.replace(/\.\*$/, '');
+			setTimeout(function() {
+				self.watch(self.path, self.state, true);
+			}, 50);
+		};
+
+		self.configure = function(key, value, init) {
+			if (init)
+				return;
+			switch (key) {
+				case 'selector':
+					elements = self.find(value || def);
+					break;
+			}
+		};
+
+		self.state = function() {
+			var disabled = MAIN.disabled(path);
+			if (!disabled && config.if)
+				disabled = !EVALUATE(self.path, config.if);
+			elements.prop('disabled', disabled);
+		};
+	});
+
+	COMPONENT('textbox', function(self, config) {
+
+		var input, container, content = null;
+
+		self.validate = function(value) {
+
+			if (!config.required || config.disabled)
+				return true;
+
+			if (self.type === 'date')
+				return value instanceof Date && !isNaN(value.getTime());
+
+			if (value == null)
+				value = '';
+			else
+				value = value.toString();
+
+			EMIT('reflow', self.name);
+
+			switch (self.type) {
+				case 'email':
+					return value.isEmail();
+				case 'url':
+					return value.isURL();
+				case 'currency':
+				case 'number':
+					return value > 0;
+			}
+
+			return config.validation ? self.evaluate(value, config.validation, true) ? true : false : value.length > 0;
+		};
+
+		self.make = function() {
+
+			content = self.html();
+
+			self.type = config.type;
+			self.format = config.format;
+
+			self.event('click', '.fa-calendar', function(e) {
+				if (config.disabled)
+					return;
+				if (config.type === 'date') {
+					e.preventDefault();
+					window.$calendar && window.$calendar.toggle(self.element, self.find('input').val(), function(date) {
+						self.set(date);
+					});
+				}
+			});
+
+			self.event('click', '.fa-caret-up,.fa-caret-down', function() {
+				if (config.disabled)
+					return;
+				if (config.increment) {
+					var el = $(this);
+					var inc = el.hasClass('fa-caret-up') ? 1 : -1;
+					self.change(true);
+					self.inc(inc);
+				}
+			});
+
+			self.event('click', '.ui-textbox-control-icon', function() {
+				if (config.disabled)
+					return;
+				if (self.type === 'search') {
+					self.$stateremoved = false;
+					$(this).rclass('fa-times').aclass('fa-search');
+					self.set('');
+				}
+			});
+
+			self.redraw();
+		};
+
+		self.redraw = function() {
+
+			var attrs = [];
+			var builder = [];
+			var tmp;
+
+			if (config.type === 'password')
+				tmp = 'password';
+			else
+				tmp = 'text';
+
+			self.tclass('ui-disabled', config.disabled === true);
+			self.type = config.type;
+			attrs.attr('type', tmp);
+			config.placeholder && attrs.attr('placeholder', config.placeholder);
+			config.maxlength && attrs.attr('maxlength', config.maxlength);
+			config.keypress != null && attrs.attr('data-jc-keypress', config.keypress);
+			config.delay && attrs.attr('data-jc-keypress-delay', config.delay);
+			config.disabled && attrs.attr('disabled');
+			config.error && attrs.attr('error');
+			attrs.attr('data-jc-bind', '');
+
+			config.autofill && attrs.attr('name', self.path.replace(/\./g, '_'));
+			config.align && attrs.attr('class', 'ui-' + config.align);
+			config.autofocus && attrs.attr('autofocus');
+
+			builder.push('<input {0} />'.format(attrs.join(' ')));
+
+			var icon = config.icon;
+			var icon2 = config.icon2;
+
+			if (!icon2 && self.type === 'date')
+				icon2 = 'calendar';
+			else if (self.type === 'search') {
+				icon2 = 'search ui-textbox-control-icon';
+				self.setter2 = function(value) {
+					if (self.$stateremoved && !value)
+						return;
+					self.$stateremoved = !value;
+					self.find('.ui-textbox-control-icon').tclass('fa-times', !!value).tclass('fa-search', !value);
+				};
+			}
+
+			icon2 && builder.push('<div><span class="fa fa-{0}"></span></div>'.format(icon2));
+			config.increment && !icon2 && builder.push('<div><span class="fa fa-caret-up"></span><span class="fa fa-caret-down"></span></div>');
+
+			if (config.label)
+				content = config.label;
+
+			if (content.length) {
+				var html = builder.join('');
+				builder = [];
+				builder.push('<div class="ui-textbox-label{0}">'.format(config.required ? ' ui-textbox-label-required' : ''));
+				icon && builder.push('<span class="fa fa-{0}"></span> '.format(icon));
+				builder.push(content);
+				builder.push(':</div><div class="ui-textbox">{0}</div>'.format(html));
+				config.error && builder.push('<div class="ui-textbox-helper"><i class="fa fa-warning" aria-hidden="true"></i> {0}</div>'.format(config.error));
+				self.html(builder.join(''));
+				self.aclass('ui-textbox-container');
+				input = self.find('input');
+				container = self.find('.ui-textbox');
+			} else {
+				config.error && builder.push('<div class="ui-textbox-helper"><i class="fa fa-warning" aria-hidden="true"></i> {0}</div>'.format(config.error));
+				self.aclass('ui-textbox ui-textbox-container');
+				self.html(builder.join(''));
+				input = self.find('input');
+				container = self.element;
+			}
+		};
+
+		self.configure = function(key, value, init) {
+
+			if (init)
+				return;
+
+			var redraw = false;
+
+			switch (key) {
+				case 'disabled':
+					self.tclass('ui-disabled', value);
+					self.find('input').prop('disabled', value);
+					break;
+				case 'format':
+					self.format = value;
+					self.refresh();
+					break;
+				case 'required':
+					self.noValid(!value);
+					!value && self.state(1, 1);
+					self.find('.ui-textbox-label').tclass('ui-textbox-label-required', value);
+					break;
+				case 'placeholder':
+					input.prop('placeholder', value || '');
+					break;
+				case 'maxlength':
+					input.prop('maxlength', value || 1000);
+					break;
+				case 'autofill':
+					input.prop('name', value ? self.path.replace(/\./g, '_') : '');
+					break;
+				case 'label':
+					content = value;
+					redraw = true;
+					break;
+				case 'type':
+					self.type = value;
+					if (value === 'password')
+						value = 'password';
+					else
+						self.type = 'text';
+					redraw = true;
+					break;
+				case 'align':
+					input.rclass(input.attr('class')).aclass('ui-' + value || 'left');
+					break;
+				case 'autofocus':
+					input.focus();
+					break;
+				case 'icon':
+				case 'icon2':
+				case 'increment':
+					redraw = true;
+					break;
+			}
+
+			redraw && setTimeout2('redraw.' + self.id, function() {
+				self.redraw();
+				self.refresh();
+			}, 100);
+		};
+
+		self.state = function(type) {
+			if (!type)
+				return;
+			var invalid = config.required ? self.isInvalid() : false;
+			if (invalid === self.$oldstate)
+				return;
+			self.$oldstate = invalid;
+			container.tclass('ui-textbox-invalid', invalid);
+			config.error && self.find('.ui-box-helper').tclass('ui-box-helper-show', invalid);
+		};
+	});
+
+	COMPONENT('error', function(self, config) {
+
+		self.readonly();
+
+		self.make = function() {
+			self.aclass('ui-error hidden');
+		};
+
+		self.setter = function(value) {
+
+			if (!(value instanceof Array) || !value.length) {
+				self.tclass('hidden', true);
+				return;
+			}
+
+			var builder = [];
+			for (var i = 0, length = value.length; i < length; i++)
+				builder.push('<div><span class="fa {1}"></span>{0}</div>'.format(value[i].error, 'fa-' + (config.icon || 'times-circle')));
+
+			self.html(builder.join(''));
+			self.tclass('hidden', false);
+		};
+	});
+
+	setTimeout(function() {
+		$('.panel').aclass('panelshow');
+	}, 200);
+
+	$(document).on('keyup', 'input', function(e) {
+		e.which === 13 && $('button').trigger('click');
+	});
+
+	$(document).on('click', 'button', function() {
+		if (!MAIN.can('form.*') || BLOCKED('adminlogin', 2000))
+			return;
+		RESET('form.*');
+		AJAX('POST /api/login/admin/', form, function(response) {
+			SET('form.response', response);
+			response.success && location.reload(true);
+		});
+	});
+
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<style>
+	.wcontactform { border-radius: 3px; background-color: white; box-shadow: 0 5px 10px rgba(0,0,0,0.05); }
+	.wcontactformbody { padding: 20px; }
+	.wcontactform label { padding: 15px 20px; border-bottom: 1px solid #E0E0E0; display: block; font-weight: bold; font-size: 16px; }
+	.wcontactform label .fa { margin-right: 8px; }
+	.wcontactform > h2 { margin-bottom: 10px; }
+</style>
+
+<div class="wcontactform" data-jc-scope="?" data-jc-init="wcontactform_init">
+	<label><i class="fa fa-envelope-o"></i>@(Contact form)</label>
+	<div class="wcontactformbody">
+		<div class="row">
+			<div class="col-md-5 m">
+				<div data-jc="textbox" data-jc-path="firstname" data-jc-config="required:true;maxlength:40" data-jc-value="''">@(First name)</div>
+			</div>
+			<div class="col-md-5 m">
+				<div data-jc="textbox" data-jc-path="lastname" data-jc-config="required:true;maxlength:40" data-jc-value="''">@(Last name)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-5 m">
+				<div data-jc="textbox" data-jc-path="email" data-jc-config="required:true;maxlength:120;type:email;icon:envelope-o" data-jc-value="'@'">@(Email address)</div>
+			</div>
+			<div class="col-md-5 m">
+				<div data-jc="textbox" data-jc-path="phone" data-jc-config="maxlength:30;icon:phone;placeholder:@(International format)" data-jc-value="''">@(Phone number)</div>
+			</div>
+		</div>
+		<div data-jc="textarea" data-jc-path="body" class="m" data-jc-config="required:true;height:120" data-jc-value="''">@(Message)</div>
+		<div data-jc="error" data-jc-path="response"></div>
+		<div data-jc="validation" data-jc-path="?">
+			<button name="submit" class="button exec b" data-exec="wcontactform_submit" disabled="disabled"><i class="fa fa-send"></i>@(SEND FORM)</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	function wcontactform_init(scope) {
+		// LOGGED is defined in layout in <head> tag
+		LOGGED && AJAX('GET /api/account/settings/', scope);
+	}
+
+	function wcontactform_submit(el) {
+		var com = el.closest('[data-jc]').component();
+		var scope = com.pathscope;
+		CAN(scope) && AJAX('POST /api/contact/', GET(scope), function(response) {
+			SET(scope + '.response', response);
+			if (response.success)
+				DEFAULT(scope + '.*');
+			else
+				RESET(scope + '.*');
+		});
+	}
+</script>

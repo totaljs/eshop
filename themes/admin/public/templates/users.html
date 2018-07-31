@@ -1,0 +1,142 @@
+<div data-jc-controller="Users" data-jc-scope="users" class="container">
+	<div class="toolbar">
+		<button class="exec" data-exec="Users/options"><i class="fa fa-cogs"></i>@(Options)</button>
+		<span></span>
+		<button class="exec" data-exec="Users/checked" name="checked" disabled="disabled"><i class="fa fa-check-circle"></i>@(Checked)</button>
+	</div>
+	<div class="fullheight">
+		<div data-jc="grid" data-jc-path="grid" data-jc-config="padding:10;filterlabel:@(Search);checked:Users/checkbox;button:Users/operation;pagination:true;exec:Users/filter;external:true">
+			<script type="text/plain">
+			[
+				{ name: 'id', text: '', template: '<input type="checkbox" value="{{ id }}" />', size: '42px', header: '<input type="checkbox" value="{{ id }}" />', filter: false, sort: false, title: 'Options', align: 'center' },
+				{ name: 'name', text: '@(Name)', size: 2, template: '{{ if isconfirmed }}<i class="fa fa-check-circle green mr5" title="@(Confirmed)"></i>{{ fi }}{{ if online }}<span class="badge badge-green mr5">@(online)</span>{{ fi }}{{ if isblocked }}<span class="badge badge-red mr5">@(blocked)</span>{{ fi }}{{ name }}', classth: 'left', classfilter: 'left' },
+				{ name: 'gender', text: '@(Gender)', size: '100px', template: '{{ if gender === \'male\' }}@(male){{ else if gender === \'female\' }}@(female){{fi}}', filter: false, classtd: 'active hidden-xs' },
+				{ name: 'email', text: '@(Email)', size: '250px', class: 'hidden-xs' },
+				{ name: 'phone', text: '@(Phone)', size: '150px', class: 'hidden-xs' },
+				{ name: 'discount', text: '@(Discount)', size: '100px', template: '{{ discount | format(2) }}%',classtd: 'active right hidden-xs' },
+				{ name: 'datecreated', text: '@(Created)', size: '140px', class: 'hidden-xs center', template: '{{ datecreated | format(\'yyyy-MM-dd\') }}' },
+				{ name: '@(Options)', align: 'center', filter: false, sort: false, size: '90px', template: '<button name="update" title="@(Edit)"><i class="fa fa-pencil"></i></button><button class="btn-remove" name="remove" title="@(Remove)"><i class="fa fa-trash-o"></i></button>' }
+			]
+			</script>
+		</div>
+	</div>
+</div>
+<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:users-form;url:[url]forms/users.html" data-jc-controller="Users"></div>
+
+<script>
+	CONTROLLER('Users', function(ctrl) {
+
+		ctrl.scope = 'users';
+		ctrl.limit = 100; // Count of items per page
+
+		var toolbar = ctrl.virtualize({ btnChecked: '.toolbar button[name="checked"]' });
+		var filter; // A grid filter
+
+		ctrl.destroy = function() {
+			SETTER('sitemap', 'remove', ctrl.scope);
+		};
+
+		ctrl.refresh = function() {
+
+			SETTER('loading', 'show');
+
+			!filter && (filter = {});
+			filter.limit = ctrl.limit;
+
+			AJAX('GET [url]api/{0}/'.format(ctrl.scope), filter, function(response) {
+				ctrl.set('grid', response);
+				SETTER('loading', 'hide', 500);
+			});
+		};
+
+		ctrl.reload = function() {
+			ctrl.refresh();
+		};
+
+		ctrl.operation = function(btn, row, grid) {
+			var name = btn.prop('name');
+			switch (name) {
+				case 'remove':
+					SETTER('confirm', 'show', '@(Are you sure you want to remove selected user?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+						if (index)
+							return;
+						SETTER('loading', 'show');
+						AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), row, function(response) {
+							SETTER('loading', 'hide', 1000);
+							if (response.success) {
+								SETTER('snackbar', 'success', '@(User has been removed successfully.)');
+								ctrl.refresh();
+							}
+						});
+					});
+					break;
+				case 'update':
+					SETTER('loading', 'show');
+					AJAX('GET [url]api/{0}/{1}/'.format(ctrl.scope, row.id), function(response) {
+						SKIP(ctrl.scope + '.form.stats.logins', ctrl.scope + '.form.stats.orders');
+						SET(ctrl.scope + '.form', response, true);
+						SET('common.form', ctrl.scope + '-form');
+					});
+					break;
+			}
+		};
+
+		ctrl.checkbox = function(el, grid) {
+			el && !el.value && grid.checked(el.checked);
+			var count = grid.checked().length;
+			toolbar.btnChecked.disable(count === 0);
+		};
+
+		ctrl.checked = function(el) {
+			var items = [];
+			items.push({ id: 'remove', name: '@(Remove users)', icon: 'trash' });
+			SETTER('contextmenu', 'show', 'center', el, items, function(item) {
+				switch (item.id) {
+					case 'toggle':
+						var arr = [];
+						FIND('.{0}.grid'.format(ctrl.scope)).checked().each(function() {
+							arr.push(this.value);
+						});
+						AJAX('GET [url]api/{0}/toggle/'.format(ctrl.scope), { id: arr.join(',') }, ctrl.refresh);
+						break;
+					case 'remove':
+						SETTER('confirm', 'show', '@(Are you sure you want to remove all selected users?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+							if (index)
+								return;
+							SETTER('loading', 'show', 'trash-o');
+							var arr = FIND('.{0}.grid'.format(ctrl.scope)).checked().toArray();
+							arr.waitFor(function(el, next, index) {
+								SET('common.progress', (index / arr.length) * 100);
+								AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), { id: el.value }, next);
+							}, function() {
+								ctrl.refresh();
+								SETTER('loading', 'hide');
+								SETTER('snackbar', 'success', '@(Users have been removed successfully.)');
+							});
+						});
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.options = function(el) {
+			var items = [];
+			items.push({ id: 'refresh', name: '@(Refresh)', icon: 'refresh' });
+			SETTER('contextmenu', 'show', 'left', el, items, function(item) {
+				switch (item.id) {
+					case 'refresh':
+						ctrl[item.id]();
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.filter = function(type, input, sort, page, grid) {
+			filter = input ? CLONE(input) : {};
+			sort && (filter.sort = sort.name + '_' + sort.sorting);
+			filter.page = page;
+			ctrl.refresh();
+		};
+	});
+
+</script>

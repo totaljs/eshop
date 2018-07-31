@@ -1,0 +1,51 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:clone;if:pages-globals;title:@(Edit global variables);width:800;reload:pagesglobals_reload;submit:pagesglobals_submit">
+	<div class="padding">
+		<p>@(Globals variables can contain preddefined values for the page content. In other words: you can define some keys with the content onetime and use them in different pages.)</p>
+		<div class="help">@(System replaces all <code>$key</code> for a value in all pages which are rendered.)</div>
+	</div>
+	<div class="padding bg-yellow">
+		<div data-jc="codemirror" data-jc-path="pages.formglobals.body" data-jc-config="height:300;icon:keyboard-o;type:totaljsresources;tabs:true;trim:true">@(Global variables)</div>
+		<div class="row fs12 mt10">
+			<div class="col-xs-6">
+				<a href="javascript:void(0)" class="exec" data-exec="pagesglobals_upload"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a>
+			</div>
+		</div>
+	</div>
+	<div data-jc="error" data-jc-path="pages.formglobals.response"></div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="pages.formglobals">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(SAVE)</button>
+	</div>
+</div>
+
+<script>
+
+	function pagesglobals_reload() {
+		AJAX('GET [url]api/pagesglobals/', function(response) {
+
+			if (!response.body)
+				response.body = '@(keyA)      : @(value)\n@(keyB)      : @(value)';
+
+			SET('pages.formglobals', response, true);
+			SETTER('loading', 'hide', 1000);
+		});
+	}
+
+	function pagesglobals_upload() {
+		refresh_filebrowser(function(file) {
+			SETTER('.pages.formglobals.body', 'insert', file);
+		});
+	}
+
+	function pagesglobals_submit() {
+		SETTER('loading', 'show');
+		AJAX('POST [url]api/pagesglobals/', GET('pages.formglobals'), function(response) {
+			SETTER('loading', 'hide', 1000);
+			if (response.success) {
+				SETTER('snackbar', 'success', '@(Globals variables have been saved successfully.)');
+				SET('common.form', '');
+			}
+		});
+	}
+
+</script>

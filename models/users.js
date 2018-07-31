@@ -1,227 +1,228 @@
 const COOKIE = '__user';
-const SECRET = 'total2016eshop';
-const online = {};
+const SECRET = '06eshopToTal11';
+const ONLINE = {};
 
-exports.login = function(req, res, id) {
-	res.cookie(COOKIE, F.encrypt({ id: id, ip: req.ip }, SECRET, true), '6 days');
+// Creates a cookie
+exports.login = function(controller, id) {
+	controller.cookie(COOKIE, F.encrypt({ id: id, ip: controller.ip }, SECRET, true), '6 days');
 };
 
-exports.logoff = function(req, res, user) {
-	delete online[user.id];
-	res.cookie(COOKIE, '', F.datetime.add('-1 day'));
+// Removes a cookie
+exports.logoff = function(controller, user) {
+	if (user)
+		delete ONLINE[user.id];
+	controller.cookie(COOKIE, '', F.datetime.add('-1 day'));
 };
 
-exports.createSession = function(profile) {
-	online[profile.id] = { id: profile.id, name: profile.name, firstname: profile.firstname, lastname: profile.lastname, email: profile.email, ticks: F.datetime.add('30 minutes').getTime(), phone: profile.phone };
-	return online[profile.id];
+// Creates a session object
+exports.session = function(user) {
+	return ONLINE[user.id] = { id: user.id, name: user.name, firstname: user.firstname, lastname: user.lastname, email: user.email, ticks: F.datetime.add('30 minutes').getTime(), phone: user.phone, discount: user.discount };
 };
 
 NEWSCHEMA('User').make(function(schema) {
 
-	schema.define('id', 'String(20)');
-	schema.define('idfacebook', 'String(30)');
-	schema.define('idgoogle', 'String(30)');
-	schema.define('idlinkedin', 'String(30)');
-	schema.define('idinstagram', 'String(30)');
-	schema.define('idyandex', 'String(30)');
-	schema.define('iddropbox', 'String(30)');
-	schema.define('idvk', 'String(30)');
-	schema.define('idyahoo', 'String(30)');
-	schema.define('idlive', 'String(30)');
+	schema.define('id', 'UID');
 	schema.define('ip', 'String(80)');
-	schema.define('name', 'Capitalize(50)', true);
+	schema.define('name', 'String(100)', true);
 	schema.define('firstname', 'Capitalize(50)');
 	schema.define('lastname', 'Capitalize(50)');
-	schema.define('name', 'Capitalize(50)', true);
 	schema.define('phone', 'Phone');
 	schema.define('email', 'Email');
-	schema.define('gender', 'Lower(20)');
+	schema.define('gender', ['male', 'female']);
+	schema.define('discount', Number);
 	schema.define('isblocked', Boolean);
+	schema.define('isconfirmed', Boolean);
 
 	// Gets a specific user
-	schema.setGet(function(error, model, options, callback) {
+	schema.setGet(function($) {
 
+		var options = $.options;
 		var filter = NOSQL('users').one();
 
 		options.id && filter.where('id', options.id);
 		options.email && filter.where('email', options.email);
 		options.password && filter.where('password', options.password);
+		$.id && filter.where('id', $.id);
 
-		filter.callback(callback, 'error-404-user');
+		filter.callback($.callback, 'error-users-404');
 	});
 
-	schema.setSave(function(error, model, controller, callback) {
-		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
-		NOSQL('users').modify(model).where('id', model.id).callback(function(count) {
-			callback(SUCCESS(true));
-			count && F.emit('users.save', model);
+	schema.setSave(function($) {
+
+		var model = $.model;
+		var user = $.user.name;
+
+		model.search = (model.name + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(500);
+
+		NOSQL('users').modify(model).backup(user).log('Update: ' + model.id, user).where('id', model.id).callback(function(count) {
+
+			if (model.isblocked) // Logout user
+				delete ONLINE[model.id];
+			else if (ONLINE[model.id]) // Modifies session
+				exports.session(model);
+
+			$.success();
+
+			if (count) {
+				EMIT('users.save', model);
+				ADMIN.notify({ type: 'users.save', message: model.firstname + ' ' + model.lastname });
+			}
 		});
 	});
 
 	// Removes user from DB
-	schema.setRemove(function(error, id, callback) {
-		NOSQL('users').remove().where('id', id).callback(callback);
+	schema.setRemove(function($) {
+		var id = $.body.id;
+		var user = $.user.name;
+		NOSQL('users').remove().backup(user).log('Remove: ' + id, user).where('id', id).callback(() => $.success());
 	});
 
 	// Clears DB
-	schema.addWorkflow('clear', function(error, model, options, callback) {
-		NOSQL('users').remove();
-		callback(SUCCESS(true));
+	schema.addWorkflow('clear', function($) {
+		var user = $.user.name;
+		NOSQL('users').remove().backup(user).log('Clear all users', user).callback(() => $.success());
 	});
 
 	// Gets listing
-	schema.setQuery(function(error, options, callback) {
+	schema.setQuery(function($) {
 
-		options.page = U.parseInt(options.page) - 1;
-		options.max = U.parseInt(options.max, 20);
-
-		if (options.page < 0)
-			options.page = 0;
-
-		var take = U.parseInt(options.max);
-		var skip = U.parseInt(options.page * options.max);
+		var opt = $.options === EMPTYOBJECT ? $.query : $.options;
+		var isAdmin = $.controller ? $.controller.name === 'admin' : false;
 		var filter = NOSQL('users').find();
 
-		options.search && filter.like('search', options.search.keywords(true, true));
+		filter.paginate(opt.page, opt.limit, 70);
 
-		filter.take(take);
-		filter.skip(skip);
-		filter.sort('datecreated');
+		if (isAdmin) {
+			opt.name && filter.adminFilter('name', opt, String);
+			opt.email && filter.adminFilter('email', opt, String);
+			opt.phone && filter.adminFilter('phone', opt, String);
+			opt.discount && filter.adminFilter('discount', opt, Number);
+			opt.datecreated && filter.adminFilter('datecreated', opt, Date);
+		}
 
+		if (opt.sort)
+			filter.adminSort(opt.sort);
+		else
+			filter.sort('datecreated', true);
+
+		filter.fields('id', 'name', 'discount', 'gender', 'email', 'phone', 'datecreated', 'isblocked', 'isconfirmed');
 		filter.callback(function(err, docs, count) {
-			var data = {};
-			data.count = count;
-			data.items = docs;
-			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max) || 1;
-			data.page = options.page + 1;
 
-			callback(data);
-		});
-	});
-
-	schema.addWorkflow('login', function(error, model, options, callback) {
-
-		// options.controller
-		// options.profile
-		// options.type
-
-		var id = 'id' + options.type;
-
-		NOSQL('users').one().make(function(builder) {
-			builder.or();
-			builder.where(id, options.profile[id]);
-			builder.where('email', options.profile.email);
-			builder.end();
-		}).callback(function(err, doc) {
-
-			if (doc) {
-				if (doc[id] !== options.profile[id]) {
-					NOSQL('users').update(function(user) {
-						if (user.id === doc.id)
-							user[id] = options.profile[id];
-						return user;
-					});
-				}
-			} else {
-				doc = schema.create();
-				doc.id = UID();
-				doc.name = options.profile.name;
-				doc.firstname = options.profile.firstname;
-				doc.lastname = options.profile.lastname;
-				doc.email = options.profile.email;
-				doc.phone = options.profile.phone;
-				doc.gender = options.profile.gender;
-				doc.ip = options.profile.ip;
-				doc.search = (options.profile.name + ' ' + (options.profile.email || '')).keywords(true, true).join(' ').max(500);
-				doc.datecreated = F.datetime;
-				doc[id] = options.profile[id];
-
-				var db = NOSQL('users');
-				db.insert(doc.$clean(), F.error());
-				db.counter.hit('all');
-				db.counter.hit('oauth2');
-				db.counter.hit(options.type);
-				options.profile.gender && db.counter.hit(options.profile.gender);
-
-				// Writes stats
-				MODULE('webcounter').increment('users');
+			for (var i = 0, length = docs.length; i < length; i++) {
+				var item = docs[i];
+				item.online = !!ONLINE[item.id];
 			}
 
-			exports.login(options.controller.req, options.controller.res, doc.id);
-			options.controller.req.user = exports.createSession(doc);
-			callback(doc);
+			$.callback(filter.adminOutput(docs, count));
 		});
 	});
 
 	// Stats
-	schema.addWorkflow('stats', function(error, model, options, callback) {
-		NOSQL('users').counter.monthly('all', callback);
+	schema.addWorkflow('stats', function($) {
+		var output = {};
+		var nosql = NOSQL('users');
+
+		if (!$.id) {
+			nosql.counter.monthly('all', $.callback);
+			return;
+		}
+
+		nosql.counter.monthly($.id, function(err, response) {
+			output.logins = response;
+			nosql.counter.monthly('order' + $.id, function(err, response) {
+				output.orders = response;
+				$.callback(output);
+			});
+		});
 	});
 });
 
 NEWSCHEMA('UserSettings').make(function(schema) {
-	schema.define('id', 'String(20)');
+
+	schema.define('name', 'String(100)', true);
 	schema.define('firstname', 'Capitalize(50)', true);
 	schema.define('lastname', 'Capitalize(50)', true);
 	schema.define('email', 'Email', true);
 	schema.define('phone', 'Phone');
-	schema.define('password', 'String(20)', true);
 
-	schema.setSave(function(error, model, options, callback) {
+	schema.define('ispassword', 'Boolean');
+	schema.define('password', 'String(30)');
+	schema.define('passwordreply', 'String(30)');
 
-		if (model.password.startsWith('*****'))
-			model.password = undefined;
-		else
+	// Validation
+	schema.required('password', model => model.ispassword);
+
+	schema.setSave(function($) {
+
+		var model = $.model;
+
+		if (model.ispassword && model.password !== model.passwordreply) {
+			$.invalid('error-password-check');
+			return;
+		}
+
+		if (model.ispassword)
 			model.password = model.password.hash('sha1');
+		else
+			model.password = undefined;
 
-		model.name = model.firstname + ' ' + model.lastname;
-		model.search = (model.name + ' ' + (model.email || '')).keywords(true, true).join(' ').max(500);
+		model.passwordreply = undefined;
+		model.search = (model.name + ' ' + model.firstname + ' ' + model.lastname + ' ' + model.email).keywords(true, true).join(' ').max(500);
 
-		var user = options.controller.user;
+		var user = $.user;
 		user.name = model.name;
-		user.email = model.email;
 		user.firstname = model.firstname;
 		user.lastname = model.lastname;
+		user.email = model.email;
+		user.phone = model.phone;
 
-		// Update an user in database
-		NOSQL('users').modify(model).where('id', model.id).callback(SUCCESS(callback));
+		ADMIN.notify({ type: 'users.update', message: model.firstname + ' ' + model.lastname });
+		NOSQL('users').modify(model).where('id', $.user.id).log('Update account, IP: ' + $.controller.ip, $.user.name).callback(() => $.success());
 	});
+
+	schema.setGet(function($) {
+		NOSQL('users').one().fields('name', 'firstname', 'lastname', 'phone', 'email', 'datecreated', 'discount').where('id', $.user.id).callback($.callback, 'error-users-404');
+	});
+
 });
 
 NEWSCHEMA('UserLogin').make(function(schema) {
 
 	schema.define('email', 'Email', true);
-	schema.define('password', 'String(20)', true);
+	schema.define('password', 'String(30)', true);
 
 	schema.setPrepare(function(name, value) {
 		if (name === 'password')
 			return value.hash('sha1');
 	});
 
-	schema.addWorkflow('exec', function(error, model, options, callback, controller) {
-		GETSCHEMA('User').get(model, function(err, response) {
+	schema.addWorkflow('exec', function($) {
 
-			if (err) {
-				error.push(err);
-				return callback();
+		var model = $.model;
+
+		NOSQL('users').one().fields('id', 'firstname', 'lastname').where('email', model.email).where('password', model.password).callback(function(err, response) {
+
+			if (!response) {
+				$.invalid('error-users-credentials');
+				return;
 			}
 
 			if (response.isblocked) {
-				error.push('error-user-blocked');
-				return callback();
+				$.invalid('error-users-blocked');
+				return;
 			}
 
-			exports.login(controller.req, controller.res, response.id);
-			callback(SUCCESS(true));
+			exports.login($.controller, response.id);
+			$.success();
 		});
+
 	});
 });
 
 NEWSCHEMA('UserPassword').make(function(schema) {
 	schema.define('email', 'Email', true);
 	schema.addWorkflow('exec', function(error, model, options, callback, controller) {
-		GETSCHEMA('User').get(model, function(err, response) {
+		$GET('User', model, function(err, response) {
 
 			if (err) {
 				error.push(err);
@@ -234,33 +235,75 @@ NEWSCHEMA('UserPassword').make(function(schema) {
 			}
 
 			response.hash = F.encrypt({ id: response.id, expire: F.datetime.add('2 days').getTime() });
-			F.mail(model.email, '@(Password recovery)', '=?/mails/password', response, controller.language || '');
+			MAIL(model.email, '@(Password recovery)', '=?/mails/password', response, controller.language || '');
 			callback(SUCCESS(true));
 		});
 	});
 });
 
-NEWSCHEMA('UserRegistration').make(function(schema) {
-	schema.define('firstname', 'Capitalize(50)', true);
-	schema.define('lastname', 'Capitalize(50)', true);
-	schema.define('gender', 'Lower(20)');
-	schema.define('phone', 'Phone');
-	schema.define('email', 'Email', true);
-	schema.define('password', 'String(20)', true);
+NEWSCHEMA('UserOrder').make(function(schema) {
 
-	schema.addWorkflow('exec', function(error, model, options, callback, controller) {
+	// Gets all created orders
+	schema.setQuery(function($) {
+		NOSQL('orders').find().where('iduser', $.user.id).fields('id', 'price', 'count', 'name', 'datecreated', 'number', 'status', 'delivery', 'payment', 'isfinished', 'ispaid').sort('datecreated', true).callback($.callback);
+	});
 
-		var filter = {};
-		filter.email = model.email;
+	// Autofill
+	// Gets latest data from last order or gets a user profile
+	schema.setGet(function($) {
 
-		GETSCHEMA('User').get(filter, function(err, response) {
+		NOSQL('orders').one().where('iduser', $.user.id).sort('datecreated', true).fields('iduser', 'firstname', 'lastname', 'billingstreet', 'billingcity', 'billingzip', 'billingcountry', 'email', 'phone', 'iscompany', 'company', 'companyvat', 'companyid').callback(function(err, response) {
 
-			if (!err) {
-				error.push('error-user-exists');
-				return callback();
+			if (response) {
+				$.callback(response);
+				return;
 			}
 
-			var user = GETSCHEMA('User').create();
+			var data = CLONE($.user);
+			data.id = undefined;
+			data.ticks = undefined;
+			data.name = undefined;
+			$.callback(data);
+		});
+	});
+
+});
+
+NEWSCHEMA('UserCreate').make(function(schema) {
+
+	schema.define('firstname', 'Capitalize(50)', true);
+	schema.define('lastname', 'Capitalize(50)', true);
+	schema.define('gender', ['male', 'female']);
+	schema.define('phone', 'Phone');
+	schema.define('email', 'Email', true);
+	schema.define('password', 'String(30)', true);
+	schema.define('passwordreply', 'String(30)', true);
+	schema.define('isterms', Boolean);
+
+	schema.setSave(function($) {
+
+		var model = $.model;
+
+		if (!model.isterms) {
+			$.invalid('error-terms');
+			return;
+		}
+
+		if (model.password !== model.passwordreply) {
+			$.invalid('error-password-check');
+			return;
+		}
+
+		var nosql = NOSQL('users');
+
+		nosql.one().where('email', model.email).callback(function(err, doc) {
+
+			if (doc) {
+				$.invalid('error-users-email');
+				return;
+			}
+
+			var user = $CREATE('User');
 			user.id = UID();
 			user.email = model.email;
 			user.firstname = model.firstname;
@@ -269,49 +312,44 @@ NEWSCHEMA('UserRegistration').make(function(schema) {
 			user.name = model.firstname + ' ' + model.lastname;
 			user.gender = model.gender;
 			user.password = model.password.hash('sha1');
-			user.ip = controller.ip;
+			user.ip = $.ip;
 			user.datecreated = F.datetime;
-			user.search = (user.name + ' ' + (user.email || '')).keywords(true, true).join(' ').max(500);
+			user.isblocked = false;
+			user.isconfirmed = false;
 
-			var mail = F.mail(model.email, '@(Registration)', '=?/mails/registration', user, controller.language || '');
+			var mail = MAIL(model.email, '@(Registration)', '=?/mails/registration', user, $.language);
+			F.global.config.emailuserform && mail.bcc(F.global.config.emailuserform);
 
-			F.config.custom.emailuserform && mail.bcc(F.config.custom.emailuserform);
-			var db = NOSQL('users');
-			db.insert(user);
-			db.counter.hit('all');
-			model.gender && db.counter.hit(model.gender);
+			var nosql = NOSQL('users');
+			nosql.insert(user);
+			nosql.counter.hit('all');
+			model.gender && nosql.counter.hit(model.gender);
+
+			ADMIN.notify({ type: 'users.create', message: user.firstname + ' ' + user.lastname });
 
 			// Login user
-			exports.login(controller.req, controller.res, user.id);
-			callback(SUCCESS(true));
+			exports.login($.controller, user.id);
+			$.success(true);
 		});
+
 	});
 });
 
-// Cleans online users
-F.on('service', function(counter) {
+// Cleans expired users
+ON('service', function(counter) {
 
 	if (counter % 10 !== 0)
 		return;
 
-	var users = Object.keys(online);
+	var users = Object.keys(ONLINE);
 	var ticks = F.datetime.getTime();
 
 	for (var i = 0, length = users.length; i < length; i++) {
-		var user = online[users[i]];
+		var user = ONLINE[users[i]];
 		if (user.ticks < ticks)
-			delete online[users[i]];
+			delete ONLINE[users[i]];
 	}
 });
-
-exports.usage = function() {
-	return { online: online };
-};
-
-function removeCookie(res, callback) {
-	res.cookie(COOKIE, '', F.datetime.add('-1 day'));
-	callback(false);
-}
 
 // Rewrites framework authorization
 F.onAuthorize = function(req, res, flags, callback) {
@@ -323,10 +361,13 @@ F.onAuthorize = function(req, res, flags, callback) {
 	}
 
 	var user = F.decrypt(hash, SECRET, true);
-	if (!user || user.ip !== req.ip)
-		return removeCookie(res, callback);
+	if (!user || user.ip !== req.ip) {
+		exports.logoff(res);
+		callback(false);
+		return;
+	}
 
-	var session = online[user.id];
+	var session = ONLINE[user.id];
 	if (session) {
 		req.user = session;
 		session.ticks = F.datetime.add('30 minutes').getTime();
@@ -334,16 +375,23 @@ F.onAuthorize = function(req, res, flags, callback) {
 		return;
 	}
 
-	GETSCHEMA('User').get(user, function(err, response) {
+	NOSQL('users').one().where('id', user.id).where('isblocked', false).callback(function(err, response) {
 
-		if (err || !response) {
-			removeCookie(res, callback);
+		if (response) {
+
+			req.user = exports.session(response);
+			callback(true);
+
+			// Notifies admin
+			ADMIN.notify({ type: 'users.login', message: response.firstname + ' ' + response.lastname });
+
+			// Writes stats of login
+			NOSQL('users').counter.hit(response.id);
+
+		} else {
+			exports.logoff(res);
 			callback(false);
-			return;
 		}
 
-		req.user = exports.createSession(response);
-		res.cookie(COOKIE, F.encrypt({ id: response.id, ip: req.ip }, SECRET, true), '6 days');
-		callback(true);
 	});
 };

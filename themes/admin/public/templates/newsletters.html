@@ -1,0 +1,159 @@
+<div data-jc-controller="Newsletters" data-jc-scope="newsletters" class="container">
+	<div class="toolbar">
+		<button class="right exec hidden-xs" data-exec="Newsletters/create"><i class="fa fa-plus-circle"></i>@(Create)</button>
+		<button class="exec" data-exec="Newsletters/options"><i class="fa fa-cogs"></i>@(Options)</button>
+		<span></span>
+		<button class="exec" data-exec="Newsletters/checked" name="checked" disabled="disabled"><i class="fa fa-check-circle"></i>@(Checked)</button>
+		<div class="fs12 red ml5" data-b="newsletters.state.sending" data-b-visible="value"><i class="fa fa-spin fa-refresh mr5"></i>@(Sending) (<b data-b="newsletters.state.percentage" data-b-html="value + '%'"></b>)</div>
+	</div>
+	<div class="fullheight">
+		<div data-jc="grid" data-jc-path="grid" data-jc-config="padding:10;filterlabel:@(Search);checked:Newsletters/checkbox;button:Newsletters/operation;pagination:true;exec:Newsletters/filter;external:true">
+			<script type="text/plain">
+			[
+				{ name: 'id', text: '', template: '<input type="checkbox" value="{{ id }}" />', size: '42px', header: '<input type="checkbox" value="{{ id }}" />', filter: false, sort: false, title: 'Options', align: 'center' },
+				{ name: 'name', text: '@(Name)', size: 2, template: '{{ if issent }}<span class="badge badge-green mr5">@(send)</span>{{ fi }}{{ name }}', classth: 'left', classfilter: 'left' },
+				{ name: 'count', text: '@(Subscribers)', size: '140px', class: 'hidden-xs', classtd: 'right active', template: '{{ count | default(0) | format(0) }}x<i class="fa fa-envelope-o ml5"></i>' },
+				{ name: 'datecreated', text: '@(Created)', size: '140px', class: 'hidden-xs center', template: '{{ datecreated | format(\'yyyy-MM-dd HH:mm\') }}' },
+				{ name: '@(Options)', align: 'center', filter: false, sort: false, size: '100px', template: '<button title="@(Duplicate)" name="duplicate"><i class="fa fa-copy"></i></button><button name="update" title="@(Edit)"><i class="fa fa-pencil"></i></button><button class="btn-remove" name="remove" title="@(Remove)"><i class="fa fa-trash-o"></i></button>' }
+			]
+			</script>
+		</div>
+	</div>
+</div>
+<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:newsletters-form;url:[url]forms/newsletters.html" data-jc-controller="Newsletters"></div>
+
+<script>
+	CONTROLLER('Newsletters', function(ctrl) {
+
+		ctrl.scope = 'newsletters';
+		ctrl.limit = 100; // Count of items per page
+
+		var toolbar = ctrl.virtualize({ btnChecked: '.toolbar button[name="checked"]' });
+		var filter; // A grid filter
+
+		ctrl.destroy = function() {
+			SETTER('sitemap', 'remove', ctrl.scope);
+		};
+
+		ctrl.refresh = function() {
+
+			SETTER('loading', 'show', 'refresh fa-spin');
+
+			!filter && (filter = {});
+			filter.limit = ctrl.limit;
+
+			AJAX('GET [url]api/{0}/'.format(ctrl.scope), filter, function(response) {
+				ctrl.set('grid', response);
+				SETTER('loading', 'hide', 500);
+			});
+		};
+
+		ctrl.refreshState = function() {
+			AJAX('GET [url]api/{0}/state/'.format(ctrl.scope), function(response) {
+				ctrl.set('state', response);
+				response.sending && !ctrl.removed && setTimeout(ctrl.refreshState, 5000);
+			});
+		};
+
+		ctrl.reload = function() {
+			ctrl.refresh();
+			ctrl.refreshState();
+		};
+
+		ctrl.operation = function(btn, row, grid) {
+			var name = btn.prop('name');
+			switch (name) {
+				case 'remove':
+					SETTER('confirm', 'show', '@(Are you sure you want to remove selected newsletter?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+						if (index)
+							return;
+						SETTER('loading', 'show', 'trash-o');
+						AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), row, function(response) {
+							SETTER('loading', 'hide', 1000);
+							if (response.success) {
+								SETTER('snackbar', 'success', '@(Newsletter has been removed successfully.)');
+								ctrl.refresh();
+							}
+						});
+					});
+					break;
+				case 'update':
+				case 'duplicate':
+					SETTER('loading', 'show', 'pencil');
+					AJAX('GET [url]api/{0}/{1}/'.format(ctrl.scope, row.id), function(response) {
+
+						if (name === 'duplicate') {
+							response.id = '';
+							response.count = 0;
+							response.send = false;
+							response.issent = false;
+						} else
+							SKIP(ctrl.scope + '.form.stats');
+
+						SET('cmseditor.template', response.template);
+						SET(ctrl.scope + '.form', response, true);
+						SET('common.form', ctrl.scope + '-form');
+					});
+					break;
+			}
+		};
+
+		ctrl.checkbox = function(el, grid) {
+			el && !el.value && grid.checked(el.checked);
+			var count = grid.checked().length;
+			toolbar.btnChecked.disable(count === 0);
+		};
+
+		ctrl.checked = function(el) {
+			var items = [];
+			items.push({ id: 'remove', name: '@(Remove newsletters)', icon: 'trash' });
+			SETTER('contextmenu', 'show', 'center', el, items, function(item) {
+				switch (item.id) {
+					case 'remove':
+						SETTER('confirm', 'show', '@(Are you sure you want to remove all selected newsletters?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+							if (index)
+								return;
+							var arr = FIND('.{0}.grid'.format(ctrl.scope)).checked().toArray();
+							SETTER('loading', 'show', 'trash-o');
+							arr.waitFor(function(el, next, index) {
+								SET('common.progress', (index / arr.length) * 100);
+								AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), { id: el.value }, next);
+							}, function() {
+								ctrl.refresh();
+								SETTER('loading', 'hide', 1000);
+								SETTER('snackbar', 'success', '@(Newsletters have been removed successfully.)');
+							});
+						});
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.options = function(el) {
+			var items = [];
+			items.push({ id: 'refresh', name: '@(Refresh)', icon: 'refresh' });
+			items.push({ id: 'create', name: '@(Create newsletter)', icon: 'plus-circle' });
+			SETTER('contextmenu', 'show', 'left', el, items, function(item) {
+				switch (item.id) {
+					case 'refresh':
+					case 'create':
+						ctrl[item.id]();
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.create = function() {
+			ctrl.set('form', { widgets: [] }, true);
+			SET('common.form', ctrl.scope + '-form');
+		};
+
+		ctrl.filter = function(type, input, sort, page, grid) {
+			filter = input ? CLONE(input) : {};
+			sort && (filter.sort = sort.name + '_' + sort.sorting);
+			filter.page = page;
+			ctrl.refresh();
+		};
+	});
+
+</script>

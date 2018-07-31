@@ -1,183 +1,205 @@
-const PayPal = require('paypal-express-checkout');
-
 exports.install = function() {
+	ROUTE('#popular', view_popular);
+	ROUTE('#top', view_top);
+	ROUTE('#new', view_new);
+	ROUTE('#category', view_category);
+	ROUTE('#detail', view_detail);
+	ROUTE('#checkout');
+	ROUTE('#order', view_order);
+	ROUTE('#account', 'account', ['authorize']);
+	ROUTE('#settings', 'settings', ['authorize']);
+	ROUTE('#account', view_signin, ['unauthorize']);
+	ROUTE('#logoff', redirect_logoff, ['authorize']);
 
-	// IMPORTANT:
-	// routing is linked with the "sitemap" file
-
-	// PRODUCTS
-	F.route('#products',         view_products, ['*Product']);
-	F.route('#new',              view_products_new, ['*Product']);
-	F.route('#popular',          view_products_popular, ['*Product']);
-	F.route('#top',              view_products_top, ['*Product']);
-	F.route('#category',         view_products_category, ['*Product']);
-	F.route('#detail',           view_products_detail, ['*Product']);
-
-	// ORDERS
-	F.route('#checkout');
-	F.route('#order',            view_checkout, ['*Order']);
-	F.route('#payment',          process_payment_paypal, ['*Order']);
-
-	// USER ACCOUNT
-	F.route('#account',          view_account, ['authorized', '*Order']);
-	F.route('#settings',         'account-settings', ['authorized']);
-	F.route('/account/logoff/',  redirect_account_logoff, ['authorized']);
-	F.route('#account',          view_login, ['unauthorized']);
-
-	// POSTS
-	F.route('#blogs',            view_blogs, ['*Post']);
-	F.route('#blogsdetail',      view_blogs_detail, ['*Post']);
+	// Payment process
+	ROUTE('#order/paypal/', paypal_process, ['*Order', 10000]);
 };
 
-// ============================================
-// PRODUCTS
-// ============================================
-
-// Gets products
-function view_products() {
+function view_category() {
 	var self = this;
-	var options = U.clone(self.query);
+	var url = self.sitemap_url('category');
+	var linker = self.url.substring(url.length, self.url.length - 1);
+	var category = null;
 
-	// Total.js monitoring fulltext stats
-	self.query.search && MODULE('webcounter').inc('fulltext');
+	if (linker !== '/') {
+		category = F.global.categories.findItem('linker', linker);
+		if (category == null) {
+			self.throw404();
+			return;
+		}
+	}
 
-	// DB
-	self.$query(options, function(err, response) {
-		if (self.query.manufacturer)
-			self.repository.manufacturer = F.global.manufacturers.findItem('linker', self.query.manufacturer);
-		self.view('products-all', response);
-	});
-}
+	// Binds a sitemap
+	self.sitemap();
 
-// Gets products by category
-function view_products_category() {
-	var self = this;
-	var options = U.clone(self.query);
-
-	options.category = self.req.path.slice(1).join('/');
-
-	var category = F.global.categories.find('linker', options.category);
-	if (!category)
-		return self.throw404();
-
-	self.repository.category = category;
-
-	if (self.query.manufacturer)
-		self.repository.manufacturer = F.global.manufacturers.findItem('linker', self.query.manufacturer);
-
-	self.$query(options, function(err, data) {
-
-		if (!data.items.length)
-			return self.throw404();
-
-		self.title(category.name);
-		self.view('products-category', data);
-	});
-}
-
-// Gets new products
-function view_products_new() {
-	var self = this;
-	var options = U.clone(self.query);
-	options.type = '1';
-	self.sitemap('new');
-	self.repository.filter = true;
-	self.$query(options, self.callback('products-special'));
-}
-
-// Gets top products
-function view_products_top() {
-	var self = this;
-	var options = U.clone(self.query);
-	options.type = '2';
-	self.sitemap('top');
-	self.repository.filter = true;
-	self.$query(options, self.callback('products-special'));
-}
-
-// Gets popular products
-function view_products_popular() {
-	var self = this;
-	self.sitemap('popular');
-	self.$workflow('popular', self.callback('products-special'));
-}
-
-// Gets product detail
-function view_products_detail(linker) {
-	var self = this;
 	var options = {};
 
+	if (category) {
+		options.category = category.linker;
+		self.title(category.name);
+		self.repository.category = category;
+
+		var path = self.sitemap_url('category');
+		var tmp = category;
+		while (tmp) {
+			self.sitemap_add('category', tmp.name, path + tmp.linker + '/');
+			tmp = tmp.parent;
+		}
+
+	} else
+		self.title(self.sitemap_name('category'));
+
+	options.published = true;
+	options.limit = 15;
+
+	self.query.page && (options.page = self.query.page);
+	self.query.manufacturer && (options.manufacturer = self.query.manufacturer);
+	self.query.size && (options.size = self.query.size);
+	self.query.color && (options.color = self.query.color);
+	self.query.q && (options.search = self.query.q);
+	self.query.sort && (options.sort = self.query.sort);
+
+	$QUERY('Product', options, function(err, response) {
+		self.repository.linker_category = linker;
+		self.view('category', response);
+	});
+}
+
+function view_popular() {
+	var self = this;
+	var options = {};
+	options.published = true;
+	self.query.manufacturer && (options.manufacturer = self.query.manufacturer);
+	self.query.size && (options.size = self.query.size);
+	self.sitemap();
+	$WORKFLOW('Product', 'popular', options, self.callback('special'));
+}
+
+function view_new() {
+	var self = this;
+	var options = {};
+	options.isnew = true;
+	options.published = true;
+	self.query.manufacturer && (options.manufacturer = self.query.manufacturer);
+	self.query.size && (options.size = self.query.size);
+	self.sitemap();
+	$QUERY('Product', options, self.callback('special'));
+}
+
+function view_top() {
+	var self = this;
+	var options = {};
+	options.istop = true;
+	options.published = true;
+	self.query.manufacturer && (options.manufacturer = self.query.manufacturer);
+	self.query.size && (options.size = self.query.size);
+	self.sitemap();
+	$QUERY('Product', options, self.callback('special'));
+}
+
+function view_detail(linker) {
+	var self = this;
+	var options = {};
 	options.linker = linker;
 
-	// Increases the performance (1 minute cache)
-	self.$read(options, function(err, data) {
+	$GET('Product', options, function(err, response) {
 
-		if (!data || err)
-			return self.throw404();
+		if (err)
+			return self.invalid().push(err);
 
-		self.repository.category = F.global.categories.find('linker', data.linker_category);
-		if (!self.repository.category)
-			return self.throw404();
+		// Binds a sitemap
+		self.sitemap();
 
-		self.repository.linker = linker;
-		self.repository.name = data.name;
+		var path = self.sitemap_url('category');
+		var tmp = response.category;
 
-		// Writes stats
-		NOSQL('products').counter.hit(data.id);
+		while (tmp) {
+			self.sitemap_add('category', tmp.name, path + tmp.linker + '/');
+			tmp = tmp.parent;
+		}
 
-		self.title(data.name);
-		self.sitemap('detail');
-		self.sitemap_change('detail', 'url', data.linker);
-		self.sitemap_change('detail', 'name', data.name);
+		// Category menu
+		self.repository.linker_category = response.category.linker;
 
-		// Renders view
-		self.view('~cms/' + (data.template || 'product'), data);
+		self.title(response.name);
+		self.sitemap_change('detail', 'url', linker);
+		self.view('~cms/' + (response.template || 'product'), response);
 	});
 }
 
-// ============================================
-// ORDERS
-// ============================================
-
-// Gets order detail
-function view_checkout(linker) {
+function view_order(id) {
 	var self = this;
 	var options = {};
 
-	options.id = linker;
+	self.id = options.id = id;
 
-	self.$read(options, function(err, data) {
+	$GET('Order', options, function(err, response) {
 
-		if (err || !data)
-			return self.throw404();
-
-		// Payment
-		// ?pay=1 ---> redirect to PayPal if the order is not paid
-		if (self.query.pay === '1' && !data.ispaid) {
-			var redirect = F.config.custom.url + self.url + 'paypal/';
-			var paypal = PayPal.create(F.config.custom.paypaluser, F.config.custom.paypalpassword, F.config.custom.paypalsignature, redirect, redirect, F.config.custom.paypaldebug);
-			paypal.pay(data.id, data.price, F.config.name, F.config.custom.currency, function(err, url) {
-				if (err)
-					self.view('checkout-error', err);
-				else
-					self.redirect(url);
-			});
+		if (err) {
+			self.invalid().push(err);
 			return;
 		}
 
+		if (!response.ispaid) {
+			switch (self.query.payment) {
+				case 'paypal':
+					paypal_redirect(response, self);
+					return;
+			}
+		}
+
 		self.sitemap('order');
-		self.sitemap_change('order', 'url', self.url);
-		self.view('checkout-detail', data);
+		self.view('order', response);
 	});
 }
 
-// Processes PayPal payment
-function process_payment_paypal(linker) {
+function redirect_logoff() {
 	var self = this;
-	var redirect = F.config.custom.url + self.url;
-	var paypal = PayPal.create(F.config.custom.paypaluser, F.config.custom.paypalpassword, F.config.custom.paypalsignature, redirect, redirect, F.config.custom.paypaldebug);
+	MODEL('users').logoff(self, self.user);
+	self.redirect(self.sitemap_url('account'));
+}
 
-	paypal.detail(self, function(err, data, id, price) {
+function view_signin() {
+	var self = this;
+	var hash = self.query.hash;
+
+	// Auto-login
+	if (hash && hash.length) {
+		var user = F.decrypt(hash);
+		if (user && user.expire > F.datetime.getTime()) {
+			MODEL('users').login(self, user.id);
+			self.redirect(self.sitemap_url('settings') + '?password=1');
+			return;
+		}
+	}
+
+	self.sitemap();
+	self.view('signin');
+}
+
+function paypal_redirect(order, controller) {
+	var redirect = F.global.config.url + controller.sitemap_url('order', controller.id) + 'paypal/';
+	var paypal = require('paypal-express-checkout').create(F.global.config.paypaluser, F.global.config.paypalpassword, F.global.config.paypalsignature, redirect, redirect, F.global.config.paypaldebug);
+	paypal.pay(order.id, order.price, F.config.name, F.global.config.currency, function(err, url) {
+		if (err) {
+			LOGGER('paypal', order.id, err);
+			controller.throw500(err);
+		} else
+			controller.redirect(url);
+	});
+}
+
+function paypal_process(id) {
+
+	var self = this;
+	var redirect = F.global.config.url + self.url;
+	var paypal = require('paypal-express-checkout').create(F.global.config.paypaluser, F.global.config.paypalpassword, F.global.config.paypalsignature, redirect, redirect, F.global.config.paypaldebug);
+
+	self.id = id;
+
+	paypal.detail(self, function(err, data) {
+
+		LOGGER('paypal', self.id, JSON.stringify(data));
 
 		var success = false;
 
@@ -189,73 +211,11 @@ function process_payment_paypal(linker) {
 				break;
 		}
 
+		var url = self.sitemap_url('order', self.id);
+
 		if (success)
-			self.$workflow('paid', linker, () => self.redirect('../?success=1'));
+			self.$workflow('paid', () => self.redirect(url + '?paid=1'));
 		else
-			self.view('checkout-error');
-	});
-}
-
-// ============================================
-// ACCOUNT
-// ============================================
-
-function view_login() {
-	var self = this;
-	var user;
-
-	if (self.query.hash)
-		user = F.decrypt(self.query.hash);
-
-	if (user && user.expire > Date.now()) {
-		MODEL('users').login(self.req, self.res, user.id);
-		self.redirect(self.sitemap_url('account') + '?password=1');
-		return;
-	}
-
-	self.view('account-unlogged');
-}
-
-function view_account() {
-	var self = this;
-	var model = {};
-	var options = {};
-
-	options.type = 0;
-	options.iduser = self.user.id;
-	options.max = 100;
-
-	// Reads all orders
-	self.$query(options, self.callback('account'));
-}
-
-// Logoff
-function redirect_account_logoff() {
-	var self = this;
-	MODEL('users').logoff(self.req, self.res, self.user);
-	self.redirect(self.sitemap_url('account'));
-}
-
-// ============================================
-// POSTS
-// ============================================
-
-function view_blogs() {
-	var self = this;
-	var options = self.query;
-	options.category = 'Blogs';
-	self.$query(options, self.callback('blogs-all'));
-}
-
-function view_blogs_detail(linker) {
-	var self = this;
-	var options = {};
-	options.category = 'Blogs';
-	options.linker = linker;
-	self.$read(options, function(err, response) {
-		if (err)
-			return self.throw404(err);
-		NOSQL('posts').counter.hit(response.id);
-		self.view('blogs-detail', response);
+			self.redirect(url + '?paid=0');
 	});
 }

@@ -1,0 +1,151 @@
+@{repository.loading = true}
+<div class="row">
+	<div class="col-lg-5 col-md-4">
+		<div class="content">
+
+			<div class="contentbody bg-yellow" data-jc="enter" data-jc-path="account.signin" data-jc-config="exec:signinsubmit" data-b="account.type" data-b-visible="value === 'signin'">
+				<h2>@(Sign in)</h2>
+				<div data-jc="textbox" data-jc-path="account.signin.email" data-jc-config="required:true;maxlength:120;type:email" data-jc-value="'@'" class="m">@(Email address)</div>
+				<div data-jc="textbox" data-jc-path="account.signin.password" data-jc-config="required:true;maxlength:40;type:password" class="m">@(Password)</div>
+				<a href="javascript:void(0)" class="fs12 exec link m" data-exec="switchpassword"><i class="fa fa-chevron-right"></i>@(I forgot my password)</a>
+				<div data-jc="error" data-jc-path="account.signin.response"></div>
+				<div data-jc="validation" data-jc-path="account.signin">
+					<button class="button b exec" data-exec="signinsubmit" name="submit" disabled="disabled">@(Sign in)</button>
+				</div>
+			</div>
+
+			<div class="contentbody hidden" data-jc="enter" data-jc-path="account.password" data-jc-config="exec:passwordsubmit" data-b="account.type" data-b-visible="value === 'password'">
+				<h2>@(Password recovery)</h2>
+				<div data-jc="textbox" data-jc-path="account.password.email" data-jc-config="required:true;maxlength:120;type:email" data-jc-value="'@'" class="m">@(Email address)</div>
+				<a href="javascript:void(0)" class="fs12 exec link m" data-exec="switchpassword"><i class="fa fa-chevron-left"></i>@(Back to sign in)</a>
+				<div data-jc="error" data-jc-path="account.password.response"></div>
+				<div data-jc="validation" data-jc-path="account.password">
+					<button class="button b exec" data-exec="passwordsubmit" name="submit" disabled="disabled">@(Reset)</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<div class="col-lg-7 col-md-8">
+		<div class="content">
+			<div class="contentbody">
+				<h2>@(Sign up)</h2>
+				<div class="caption2 nmb"><i class="fa fa-user"></i>@(Personal informations)</div>
+				<br />
+				<div class="row">
+					<div class="col-md-4 m">
+						<div data-jc="dropdown" data-jc-path="account.signup.gender" data-jc-config="items:,@(Male)|male,@(Female)|female;required:true">@(Gender)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="account.signup.firstname" data-jc-config="required:true;maxlength:40">@(First name)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="account.signup.lastname" data-jc-config="required:true;maxlength:40">@(Last name)</div>
+					</div>
+				</div>
+				<br />
+				<div class="caption2 nmb"><i class="fa fa-user"></i>@(Contact informations)</div>
+				<br />
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="account.signup.email" data-jc-config="required:true;maxlength:120;type:email" data-jc-value="'@'">@(Email address)</div>
+						<div class="help">@(Will be used as a login name.)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="account.signup.phone" data-jc-config="maxlength:30;type:phone;placeholder:@(International format)">@(Phone number)</div>
+					</div>
+				</div>
+			</div>
+			<hr class="nmt nmb" />
+			<div class="contentbody">
+				<div class="row mt10">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="account.signup.password" data-jc-config="required:true;maxlength:30;type:password">@(Password)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="account.signup.passwordreply" data-jc-config="required:true;maxlength:30;type:password">@(Password again)</div>
+					</div>
+				</div>
+			</div>
+			<hr class="nmt nmb" />
+			<div class="contentbody">
+				<div data-jc="checkbox" data-jc-path="account.signup.isterms" class="b red m">@(I agree with terms and conditions)</div>
+				<div data-jc="error" data-jc-path="account.signup.response"></div>
+				<div data-jc="validation" data-jc-path="account.signup">
+					<button class="button b exec" data-exec="signupsubmit" name="submit" disabled="disabled">@(Sign up)</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+	var account = {};
+
+	account.type = 'signin';
+
+	SETTER(true, 'loading', 'hide', 500);
+
+	function signupsubmit() {
+
+		if (BLOCKED('account', 3000))
+			return;
+
+		SETTER('loading', 'show');
+		AJAX('POST /api/account/create/', account.signup, function(response) {
+
+			SETTER('loading', 'hide', 1000);
+
+			if (response.success)
+				location.reload(true);
+			else {
+				RESET('account.signup.*', true);
+				SET('account.signup.response', response);
+			}
+		});
+	}
+
+	function signinsubmit() {
+
+		if (BLOCKED('account', 3000))
+			return;
+
+		SETTER('loading', 'show');
+		AJAX('POST /api/account/login/', account.signin, function(response) {
+
+			SETTER('loading', 'hide', 1000);
+
+			if (response.success)
+				location.reload(true);
+			else {
+				RESET('account.sigin.*', true);
+				SET('account.sigin.response', response);
+			}
+		});
+	}
+
+	function passwordsubmit() {
+
+		if (BLOCKED('account', 3000))
+			return;
+
+		SETTER('loading', 'show');
+		AJAX('POST /api/account/password/', account.password, function(response) {
+			SETTER('loading', 'hide', 1000);
+			if (response.success)
+				SETTER('message', 'success', '@(We sent you the email with instructions for resetting password.)');
+			else {
+				RESET('account.password.*', true);
+				SET('account.password.response', response);
+			}
+		});
+	}
+
+	function switchpassword() {
+		SET('account.type', account.type === 'password' ? 'signin' : 'password');
+	}
+
+</script>

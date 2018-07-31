@@ -1,0 +1,134 @@
+<div data-jc="form" data-jc-path="cmseditor.form" class="hidden" data-jc-config="icon:link;if:link;title:@(Link editor);width:500;autofocus:true;submit:cmseditor_link_submit;cancel:cmseditor_link_cancel">
+	<div class="padding">
+		<div data-jc="dropdown" data-jc-path="cmseditor.link.href" class="m" data-jc-config="datasource:%links;empty:;icon:sitemap;text:path;value:url">@(URL according to the sitemap)</div>
+	</div>
+	<hr class="nmt nmb" />
+	<div class="padding bg-yellow">
+		<div data-jc="textbox" data-jc-path="cmseditor.link.href" data-jc-id="cmseditorlinkhref" data-jc-config="icon:globe;required:true">@(URL address)</div>
+		<div class="m mt10 fs12">
+			<a href="javascript:void(0)" class="exec mr10" data-exec="cmseditor_link_type" data-type="upload"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a>
+			<a href="javascript:void(0)" class="exec mr10" data-exec="cmseditor_link_type" data-type="email"><i class="fa fa-envelope-o mr5"></i>@(Email)</a>
+			<a href="javascript:void(0)" class="exec" data-exec="cmseditor_link_type" data-type="phone"><i class="fa fa-phone mr5"></i>@(Phone number)</a>
+		</div>
+		<div data-jc="dropdown" data-jc-path="cmseditor.link.target" class="m" data-jc-config="items:@(Current tab or window)|_self,@(New tab or window)|_blank;required:true">@(Target)</div>
+		<div data-jc="textbox" data-jc-path="cmseditor.link.title" data-jc-config="icon:info-circle" class="m">@(Tooltip)</div>
+		<div data-jc="checkbox" data-jc-path="cmseditor.link.alllinks">@(Apply on all links in the parent container)</div>
+	</div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="cmseditor.link">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(APPLY)</button>
+	</div>
+</div>
+
+<script>
+
+	function cmseditor_link_type(el) {
+		var r = /^(tel|mailto)\:/;
+		switch (el.attrd('type')) {
+			case 'upload':
+				cmseditor.instance.filebrowser('cmseditor.link.href');
+				break;
+			case 'email':
+				SET('cmseditor.link.href', 'mailto:' + cmseditor.link.href.replace(r, ''));
+				break;
+			case 'phone':
+				SET('cmseditor.link.href', 'tel:' + cmseditor.link.href.replace(r, ''));
+				break;
+		}
+	}
+
+	function cmseditor_link_submit(com) {
+
+		var editor = cmseditor.instance;
+		var target = editor.getTarget();
+		var link;
+
+		if (target.prop('tagName') === 'A')
+			link = target;
+		else
+			link = editor.getParentElement('A');
+
+		link.attr('href', cmseditor.link.href);
+
+		if (cmseditor.link.title)
+			link.attr('title', cmseditor.link.title.trim());
+		else
+			link.rattr('title');
+
+		if (cmseditor.link.target === '_self')
+			link.rattr('target');
+		else
+			link.attr('target', cmseditor.link.target);
+
+		if (cmseditor.link.alllinks) {
+			var parent = editor.getParent('CMS_repeat', 8);
+			parent == null && (parent = editor.getParent('CMS_remove', 5));
+			parent && parent.find('a').each(function() {
+				var link = $(this);
+
+				link.attr('href', cmseditor.link.href);
+
+				if (cmseditor.link.title)
+					link.attr('title', cmseditor.link.title.trim());
+				else
+					link.rattr('title');
+
+				if (cmseditor.link.target === '_self')
+					link.rattr('target');
+				else
+					link.attr('target', cmseditor.link.target);
+			});
+		}
+
+		target.data('temporary') && target.removeData('temporary');
+		editor.change(true);
+		com.hide();
+	}
+
+	function cmseditor_link_cancel(com) {
+		var editor = cmseditor.instance;
+		var target = editor.getTarget();
+
+		if (target.data('temporary')) {
+			target.removeData('temporary');
+			target.replaceWith(target.html());
+		}
+
+		com.hide();
+	}
+
+	ON('#cmseditorlinkhref', function(component) {
+		component.event('focus', 'input', function(e) {
+			SETTER('autocomplete', 'attach', this, function(query, render) {
+
+				var q = query.substring(0, 6);
+				if (q === 'http:/' || q === 'https:') {
+					render(EMPTYARRAY);
+					return;
+				}
+
+				var output = [];
+				if (query.substring(0, 1) === '#') {
+					query = query.substring(1);
+					$(cmseditor.instance.getDocument()).find('[id]').each(function() {
+						if (this.id.toLowerCase().substring(0, 3) !== 'cms' && this.id.indexOf(query) !== -1)
+							output.push({ name: '#' + this.id, type: this.nodeName });
+					});
+				} else {
+					var arr = GET('%links');
+					for (var i = 0; i < arr.length; i++) {
+						var item = arr[i];
+						(item.url.indexOf(query) !== -1 || item.name.indexOf(query) !== -1) && output.push({ name: item.url, type: item.name });
+					}
+				}
+
+				output.quicksort('name');
+				render(output);
+
+			}, function(value, input) {
+				input.closest('[data-jc]').component().set(value.name);
+			}, 12, -6, 9);
+		});
+	});
+
+</script>

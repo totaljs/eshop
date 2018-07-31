@@ -1,365 +1,250 @@
-// ====== Supported operations:
-// "render"            - renders page
-// "render-multiple"   - renders multiple pages (uses "render")
-// "breadcrumb"        - creates bredcrumb (uses "render")
-// "clear"             - clears database
-
-// ====== Supported workflows:
-// "url"               - creates URL
-
-const REGEXP_HTML_CLASS = /(\s)class\=\".*?\"/g;
+const REGEXP_HTML_CLASS = /(\s)class=".*?"/g;
+const REGEXP_HTML_ATTR = /(\s)data-cms-id="[a-z0-9]+"|data-cms-widget="[a-z0-9]+"/g;
+const REGEXP_HTML_DIV = /<div\s>/g;
+const REGEXP_GLOBAL = /\$[0-9a-z-_]+/gi;
+const Fs = require('fs');
+var GLOBALS = {};
+var loaded = false;
 
 NEWSCHEMA('Page').make(function(schema) {
 
-	schema.define('id', 'String(20)');
+	schema.define('id', 'UID');
 	schema.define('body', String);                      // RAW html
+	schema.define('bodywidgets', '[String(22)]');       // List of all used widgets
 	schema.define('icon', 'String(20)');                // Font-Awesome icon name
 	schema.define('ispartial', Boolean);                // Is only partial page (the page will be shown in another page)
 	schema.define('keywords', 'String(200)');           // Meta keywords
 	schema.define('description', 'String(200)');        // Meta description
-	schema.define('language', 'Lower(2)');              // For which language is the page targeted?
-	schema.define('name', 'String(50)');                // Name in manager
-	schema.define('navigations', '[String]');           // In which navigation will be the page?
-	schema.define('parent', 'String(20)');              // Parent page for breadcrumb
-	schema.define('partial', '[String]');               // A partial content
-	schema.define('perex', 'String(500)');              // Short page description generated according to the "CMS_perex" class in CMS editor
-	schema.define('pictures', '[String]')               // URL addresses for first 5 pictures
-	schema.define('priority', Number);                  // Sorting in navigation
+	schema.define('name', 'String(50)', true);          // Name in admin
+	schema.define('parent', 'UID');                     // Parent page for breadcrumb
+	schema.define('partial', '[UID]');                  // A partial content
+	schema.define('summary', 'String(500)');            // Short page description generated according to the "CMS_summary" class in CMS editor
+	schema.define('pictures', '[String]');              // URL addresses for first 5 pictures
 	schema.define('search', 'String(1000)');            // Search pharses
-	schema.define('settings', '[String]');              // Widget settings (according to widgets array index)
 	schema.define('template', 'String(30)');            // Render template views/cms/*.html
-	schema.define('title', 'String(100)', true);        // Meta title
+	schema.define('title', 'String(100)');              // Meta title
 	schema.define('url', 'String(200)');                // URL (can be realive for showing content or absolute for redirects)
-	schema.define('widgets', '[String]');               // Widgets lists, contains Array of ID widget
+	schema.define('oldurl', 'String(200)');             // Temporary: old URL
+	schema.define('widgets', '[Object]');               // List of dynamic widgets, contains Array of ID widget
+	schema.define('signals', '[String(30)]');           // Registered signals
+	schema.define('navigations', '[String]');           // List of navigation ID (optional, for side rendering)
+
+	schema.define('navicon', Boolean);                  // Can replace the item icon in navigation
+	schema.define('navname', Boolean);                  // Can replace the item name in navigation
+	schema.define('replacelink', Boolean);              // Can replace the link in the whole content
 
 	// Gets listing
-	schema.setQuery(function(error, options, callback) {
-
-		options.page = U.parseInt(options.page) - 1;
-		options.max = U.parseInt(options.max, 20);
-
-		if (options.page < 0)
-			options.page = 0;
-
-		var take = U.parseInt(options.max);
-		var skip = U.parseInt(options.page * options.max);
-
-		// Prepares searching
-		if (options.search)
-			options.search = options.search.keywords(true, true);
-
+	schema.setQuery(function($) {
 		var filter = NOSQL('pages').find();
-
-		options.ispartial && filter.where('ispartial', options.ispartial);
-		options.language && filter.where('language', options.language);
-		options.navigation && filter.in('navigations', options.navigation);
-		options.search && filter.like('search', options.search);
-		options.template && filter.where('template', options.template);
-
-		filter.take(take);
-		filter.skip(skip);
-		filter.fields('id', 'name', 'parent', 'url', 'navigations', 'ispartial', 'priority', 'language', 'icon');
-		filter.sort('name');
-
-		filter.callback(function(err, docs, count) {
-
-			var data = {};
-			data.count = count;
-			data.items = docs;
-			data.limit = options.max;
-			data.pages = Math.ceil(data.count / options.max) || 1;
-			data.page = options.page + 1;
-
-			// Returns data
-			callback(data);
-		});
+		filter.fields('id', 'name', 'title', 'url', 'ispartial', 'icon', 'parent');
+		filter.sort('datecreated', true);
+		filter.callback((err, docs, count) => $.callback(filter.adminOutput(docs, count)));
 	});
 
 	// Gets a specific page
-	schema.setGet(function(error, model, options, callback) {
-
+	schema.setGet(function($) {
+		var opt = $.options;
 		var filter = NOSQL('pages').one();
-
-		options.url && filter.where('url', options.url);
-		options.id && filter.where('id', options.id);
-		options.language && filter.where('language', options.language);
-
-		filter.callback(function(err, doc) {
-			!doc && error.push('error-404-page');
-			callback(doc);
-		});
+		opt.url && filter.where('url', opt.url);
+		opt.id && filter.where('id', opt.id);
+		$.id && filter.where('id', $.id);
+		filter.callback($.callback, 'error-pages-404');
 	});
 
 	// Removes a specific page
-	schema.setRemove(function(error, id, callback) {
+	schema.setRemove(function($) {
+		var user = $.user.name;
+		var id = $.body.id;
 		var db = NOSQL('pages');
-		db.remove().where('id', id).callback(callback);
-		db.counter.remove(id);
-		setTimeout2('pages', refresh, 1000);
+		db.remove().where('id', id).backup(user).log('Remove: ' + id, user).callback(function(err, count) {
+			$.success();
+			count && db.counter.remove(id);
+			count && setTimeout2('pages', refresh, 1000);
+		});
 	});
 
-	// Saves the page into the database
-	schema.setSave(function(error, model, controller, callback) {
+	// Saves a page into the database
+	schema.setSave(function($) {
 
-		if (!model.name)
-			model.name = model.title;
-
-		var newbie = model.id ? false : true;
+		var model = $.model.$clean();
+		var user = $.user.name;
+		var oldurl = model.oldurl;
+		var isUpdate = !!model.id;
 		var nosql = NOSQL('pages');
 
-		if (newbie) {
+		if (!model.title)
+			model.title = model.name;
+
+		if (isUpdate) {
+			model.dateupdated = F.datetime;
+			model.adminupdated = user;
+		} else {
 			model.id = UID();
 			model.datecreated = F.datetime;
-			model.admincreated = controller.user.name;
-		} else {
-			model.dateupdated = F.datetime;
-			model.adminupdated = controller.user.name;
+			model.admincreated = user;
 		}
+
+		if (!model.navigations.length)
+			model.navigations = null;
 
 		model.body = U.minifyHTML(model.body);
 		model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).keywords(true, true).join(' ').max(1000);
 
 		// Sanitizes URL
-		if (model.url[0] !== '#' && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
+		if (!model.ispartial && !model.url.startsWith('http:') && !model.url.startsWith('https:')) {
 			model.url = U.path(model.url);
 			if (model.url[0] !== '/')
 				model.url = '/' + model.url;
 		}
 
-		(newbie ? nosql.insert(model) : nosql.modify(model).where('id', model.id)).callback(function(err, count) {
-			F.emit('pages.save', model);
-			setTimeout2('pages', refresh, 1000);
-			callback(SUCCESS(true));
-			model.datebackup = F.datetime;
-			NOSQL('pages_backup').insert(model);
+		model.oldurl = undefined;
+		var db = isUpdate ? nosql.modify(model).where('id', model.id).backup(user).log('Update: ' + model.id, user) : nosql.insert(model).log('Create: ' + model.id, user);
+
+		// Update a URL in all navigations where this page is used
+		if (!model.ispartial)
+			$WORKFLOW('Navigation', 'page', { page: model });
+
+		db.callback(function() {
+
+			ADMIN.notify({ type: 'pages.save', message: model.name });
+			EMIT('pages.save', model);
+
+			if (model.replacelink && model.url !== oldurl && oldurl)
+				$WORKFLOW('Page', 'replacelinks', { url: model.url, oldurl: oldurl });
+			else
+				setTimeout2('pages', refresh, 1000);
+
+			$.success();
 		});
 	});
 
-	schema.addWorkflow('url', function(error, model, options, callback) {
+	// Generates URL according to the parents
+	schema.addWorkflow('url', function($) {
 
-		if (!model.parent) {
-			model.url = model.title.slug();
-			return callback();
+		var model = $.model;
+
+		if (model.ispartial) {
+			$.callback();
+			return;
 		}
 
-		// Gets parent URL
-		schema.get({ id: model.parent }, function(err, response) {
+		if (!model.url || model.url === '---') {
+			if (model.parent) {
+				var parent = F.global.pages.findItem('id', model.parent);
+				model.url = parent ? (parent.url + model.name.slug() + '/') : model.name.slug();
+			} else
+				model.url = model.name.slug();
+		}
 
-			if (err)
-				model.url = model.title.slug();
-			else
-				model.url = response.url + model.title.slug() + '/';
+		$.callback();
+	});
 
-			callback();
-		});
+	// Replaces all older links to a new
+	schema.addWorkflow('replacelinks', function($) {
+
+		var opt = $.options;
+		var reg = new RegExp(opt.oldurl.replace(/\//, '\\/'), 'gi');
+
+		NOSQL('pages').update(function(doc) {
+			doc.body = doc.body.replace(reg, opt.url);
+			return doc;
+		}).where('ispartial', false).callback(refresh);
+
+		$.success();
 	});
 
 	// Stats
-	schema.addWorkflow('stats', function(error, model, options, callback) {
-		NOSQL('pages').counter.monthly(options.id, callback);
-	});
-
-	// Renders page
-	schema.addOperation('render', function(error, model, options, callback) {
-
-		// options.id {String}
-		// options.url {String}
-
-		if (typeof(options) === 'string') {
-			var tmp = options;
-			options = {};
-			options.id = options.url = tmp;
-		}
-
-		// Gets the page
-		schema.get(options, function(err, response) {
-
-			if (err) {
-				error.push(err);
-				return callback();
-			}
-
-			if (!response) {
-				error.push('error-404-page');
-				return callback();
-			}
-
-			// Loads breadcrumb
-			var key = (response.language ? response.language + ':' : '') + response.url;
-			schema.operation('breadcrumb', key, function(err, breadcrumb) {
-
-				if (breadcrumb && breadcrumb.length)
-					breadcrumb[0].first = true;
-
-				response.breadcrumb = breadcrumb;
-
-				if (response.body)
-					response.body = response.body.replace(' id="CMS"', '');
-
-				if (!response.widgets)
-					return callback(response);
-
-				var Widget = GETSCHEMA('Widget');
-
-				// Loads widgets
-				Widget.workflow('load', null, response.widgets, function(err, widgets) {
-					var index = 0;
-					response.widgets.wait(function(key, next) {
-						// INIT WIDGET
-						var custom = {};
-						custom.settings = response.settings[index++];
-						custom.page = response;
-						custom.controller = options.controller;
-
-						if (!widgets[key]) {
-							F.error(new Error('Widget # ' + key + ' not found'), 'Page: ' + response.name, response.url);
-							return next();
-						}
-
-						// Executes transform
-						Widget.transform(key, widgets[key], custom, function(err, content) {
-
-							if (err)
-								F.error(err, 'Widget: ' + widgets[key].name + ' - ' + key + ' (page: ' + response.name + ')', response.url);
-							else
-								response.body = response.body.replace('data-id="' + key + '">', '>' + content);
-
-							next();
-						}, true);
-
-					}, function() {
-
-						// DONE
-						if (response.language)
-							response.body = F.translator(response.language, response.body);
-
-						response.body = response.body.tidyCMS();
-
-						if (response.partial && response.partial.length) {
-							schema.operation2('render-multiple', { id: response.partial }, function(err, partial) {
-
-								if (err) {
-									error.push(err);
-									return callback();
-								}
-
-								var arr = [];
-								var keys = Object.keys(partial);
-								for (var i = 0, length = keys.length; i < length; i++)
-									arr.push(partial[keys[i]]);
-								response.partial = arr;
-								callback(response);
-							});
-							return;
-						}
-
-						callback(response);
-					});
-				}, true);
-			});
-		});
-	});
-
-	// Renders multiple page
-	schema.addOperation('render-multiple', function(error, model, options, callback) {
-
-		// options.id {String Array}
-		// options.url {String Array}
-		// options.language {String}
-
-		var output = {};
-		var pending = [];
-
-		if (options.url instanceof Array) {
-			for (var i = 0, length = options.url.length; i < length; i++) {
-				(function(id) {
-					pending.push(function(next) {
-						var custom = {};
-						custom.url = id;
-						custom.language = options.language;
-						schema.operation('render', custom, function(err, response) {
-							output[id] = response;
-							next();
-						});
-					});
-				})(options.url[i]);
-			}
-		}
-
-		if (options.id instanceof Array) {
-			for (var i = 0, length = options.id.length; i < length; i++) {
-				(function(id) {
-					pending.push(function(next) {
-						var custom = {};
-						custom.id = id;
-						custom.language = options.language;
-						schema.operation('render', custom, function(err, response) {
-							output[id] = response;
-							next();
-						});
-					});
-				})(options.id[i]);
-			}
-		}
-
-		pending.async(() => callback(output));
-	});
-
-	// Loads breadcrumb according to URL
-	schema.addOperation('breadcrumb', function(error, model, url, callback) {
-
-		var arr = [];
-
-		while (true) {
-			var item = F.global.sitemap[url];
-			if (!item)
-				break;
-			arr.push(item);
-			url = item.parent;
-		};
-
-		arr.reverse();
-		callback(arr);
-	});
-
-	// Clears database
-	schema.addWorkflow('clear', function(error, model, options, callback) {
-		NOSQL('pages').remove().callback(() => setTimeout(refresh, 1000));
-		callback(SUCCESS(true));
+	schema.addWorkflow('stats', function($) {
+		var nosql = NOSQL('pages').counter;
+		if ($.id)
+			nosql.monthly($.id, $.callback);
+		else
+			nosql.monthly($.callback);
 	});
 });
 
-// Refreshes internal informations (sitemap and navigations)
+NEWSCHEMA('PageGlobals').make(function(schema) {
+
+	var pending = [];
+
+	schema.define('body', 'String');
+
+	schema.setSave(function($) {
+		Fs.writeFile(F.path.databases('pagesglobals.json'), JSON.stringify($.model.$clean()), function() {
+			refresh();
+			$.success();
+		});
+	});
+
+	schema.setGet(function($) {
+		Fs.readFile(F.path.databases('pagesglobals.json'), function(err, data) {
+
+			if (data) {
+				data = data.toString('utf8').parseJSON(true);
+				$.model.body = data.body;
+			}
+
+			$.callback();
+		});
+	});
+
+	schema.addWorkflow('add', function($) {
+
+		if (GLOBALS[$.options.name]) {
+			$.success();
+			return;
+		}
+
+		pending.push($.options);
+
+		// For multiple usage at the time
+		setTimeout2('pageglobalsadd', function() {
+
+			if (!pending.length)
+				return;
+
+			WAIT(() => loaded, function() {
+				schema.get(function(err, response) {
+					var arr = pending.slice(0);
+					var is = false;
+					for (var i = 0, length = arr.length; i < length; i++) {
+						if (!GLOBALS[arr[i].name]) {
+							response.body += '\n' + arr[i].name.padRight(25) + ': ' + arr[i].value;
+							is = true;
+						}
+					}
+					is && response.$save();
+				});
+			});
+
+		}, 1000);
+
+		$.success();
+	});
+});
+
+// Refreshes internal information (sitemap)
 function refresh() {
 
 	var sitemap = {};
 	var helper = {};
-	var navigation = {};
 	var partial = [];
+	var pages = [];
 
 	var prepare = function(doc) {
 
 		// A partial content is skipped from the sitemap
 		if (doc.ispartial) {
-			partial.push({ id: doc.id, url: doc.url, name: doc.name, title: doc.title, language: doc.language, icon: doc.icon, tags: doc.tags, priority: doc.priority });
+			partial.push({ id: doc.id, url: doc.url, name: doc.name, title: doc.title, icon: doc.icon });
 			return;
 		}
 
-		var key = (doc.language ? doc.language + ':' : '') + doc.url;
+		var key = doc.url;
+		var obj = { id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, icon: doc.icon, links: [] };
 
 		helper[doc.id] = key;
-		sitemap[key] = { id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, language: doc.language, icon: doc.icon, tags: doc.tags };
-
-		if (!doc.navigations)
-			return;
-
-		// Loads navigation by menu id
-		for (var i = 0, length = doc.navigations.length; i < length; i++) {
-			var name = doc.navigations[i];
-			if (!navigation[name])
-				navigation[name] = [];
-			navigation[name].push({ url: doc.url, name: doc.name, title: doc.title, priority: doc.priority, language: doc.language, icon: doc.icon, tags: doc.tags, external: doc.url.match(/(https|http)\:\/\//) != null });
-		}
+		sitemap[key] = obj;
+		pages.push(obj);
 	};
 
 	NOSQL('pages').find().prepare(prepare).callback(function() {
@@ -367,143 +252,166 @@ function refresh() {
 		// Pairs parents by URL
 		Object.keys(sitemap).forEach(function(key) {
 			var parent = sitemap[key].parent;
-			if (parent)
+			if (parent) {
 				sitemap[key].parent = helper[parent];
+				sitemap[sitemap[key].parent].links.push(sitemap[key]);
+			}
 		});
 
-		// Sorts navigation according to priority
-		Object.keys(navigation).forEach((name) => navigation[name].orderBy('priority', false));
-		partial.orderBy('priority', false);
-
-		F.global.navigations = navigation;
 		F.global.sitemap = sitemap;
 		F.global.partial = partial;
-		F.cache.removeAll('cache.');
+		F.global.pages = pages;
+
+		$GET('PageGlobals', function(err, response) {
+			parseGlobals(response.body);
+			F.cache.removeAll('cachecms');
+			loaded = true;
+		});
 	});
 }
 
-// Creates Controller.prototype.page()
-F.eval(function() {
+function parseGlobals(val) {
+	GLOBALS = {};
+	var arr = val.split('\n');
+	for (var i = 0, length = arr.length; i < length; i++) {
+		var str = arr[i];
+		if (!str || str[0] === '#' || str.substring(0, 2) === '//')
+			continue;
 
-	Controller.prototype.render = function(url, callback, view, model, cache) {
-		var self = this;
-		var key = (self.language ? self.language + ':' : '') + url;
-		var page = F.global.sitemap[key];
-
-		if (page)
-			self.page(self.url, callback, view, model, cache);
-		else
-			self.throw404();
-
-		return self;
-	};
-
-	Controller.prototype.partial = function(url, callback) {
-		var self = this;
-		var page = F.global.partial.find(n => n.url === url && n.language === (self.language || ''));
-
-		if (page)
-			GETSCHEMA('Page').operation('render', { id: page.id }, callback);
-		else
-			callback(new ErrorBuilder().push('error-404-page'));
-
-		return self;
-	};
-
-	Controller.prototype.page = function(url, callback, view, model, cache, partial) {
-		var self = this;
-
-		if (typeof(callback) !== 'function') {
-			partial = cache;
-			cache = model;
-			model = view;
-			view = callback;
-			callback = undefined;
+		var index = str.indexOf(' :');
+		if (index === -1) {
+			index = str.indexOf('\t:');
+			if (index === -1)
+				continue;
 		}
 
-		var tv = typeof(view);
+		var name = str.substring(0, index).trim();
 
-		if (tv === 'object') {
-			model = view;
-			view = undefined;
-		} else if (tv === 'boolean') {
-			cache = view;
-			view = undefined;
-			model = null;
-		}
+		if (name[0] === '$')
+			name = name.substring(1);
 
-		if (typeof(model) === 'boolean') {
-			cache = model;
-			model = null;
-		}
+		var value = str.substring(index + 2).trim();
+		if (name && value)
+			GLOBALS[name] = value;
+	}
+}
 
-		if (cache === undefined)
-			cache = true;
+String.prototype.CMSrender = function(settings, callback, controller) {
+	var body = this;
 
-		if (!partial) {
+	if (!settings || !settings.length) {
+		callback(body.CMStidy());
+		return;
+	}
 
-			if (self.language)
-				url = self.language + ':' + url;
+	if (!F.global.widgets.$ready) {
+		// Widget are not ready
+		setTimeout((body, settings, callback) => body.CMSrender(settings, callback, controller), 500, body, settings, callback);
+		return;
+	}
 
-			if (!F.global.sitemap[url]) {
-				self.status = 404;
-				self.plain(U.httpStatus(404, true));
-				return self;
+	settings.wait(function(item, next) {
+
+		var widget = F.global.widgets[item.idwidget];
+
+		var index = body.indexOf('data-cms-id="{0}"'.format(item.id));
+		if (index === -1)
+			return next();
+
+		var eindex = body.indexOf('>', index);
+		if (!widget || !widget.total || !widget.total.render)
+			return next();
+
+		var beg = '<div';
+		var end = '</div>';
+		var pos = eindex + 1;
+		var count = 0;
+		var counter = 0;
+
+		while (true) {
+
+			if (counter++ > 100)
+				break;
+
+			var a = body.indexOf(beg, pos);
+			var b = body.indexOf(end, pos);
+
+			if (a !== -1 && a < b) {
+				count++;
+				pos = body.indexOf('>', a);
+				continue;
+			}
+
+			if (a === -1 || b < a) {
+
+				pos = b + 6;
+
+				if (count) {
+					count--;
+					continue;
+				}
+
+				break;
 			}
 		}
 
-		self.memorize('cache.' + url, '3 minute', cache !== true, function() {
+		var content = body.substring(eindex + 1, pos - end.length);
+		widget.total.render.call(controller || EMPTYCONTROLLER, widgetsettings(widget, item.options), content, function(response) {
+			body = body.replace(content, response);
+			next();
+		});
 
-			var options = {};
+	}, () => callback(body.CMSglobals().CMStidy()));
+};
 
-			options.language = self.language;
-			options.url = self.url;
-			options.controller = self;
+function widgetsettings(widget, settings) {
+	var keys = Object.keys(widget.def);
+	var obj = {};
+	for (var i = 0, length = keys.length; i < length; i++) {
+		var key = keys[i];
+		if (settings[key] == null)
+			obj[key] = widget.def[key];
+		else
+			obj[key] = settings[key];
+	}
+	return obj;
+}
 
-			GETSCHEMA('Page').operation('render', options, function(err, response) {
+function globalsreplacer(text) {
+	var val = GLOBALS[text.substring(1)];
+	return val ? val : text;
+}
 
-				if (err) {
-					self.status = 404;
-					self.plain(U.httpStatus(404, true));
-					return;
-				}
-
-				self.repository.cms = true;
-				self.repository.render = true;
-				self.repository.page = response;
-
-				NOSQL('pages').counter.hit(self.repository.page.id);
-
-				self.sitemap(response.breadcrumb);
-				self.meta(response.title, response.description, response.keywords);
-
-				F.emit('pages.render', response, self);
-				callback && callback.call(self, response);
-
-				self.view(view || '~/cms/' + response.template, model);
-			});
-
-		}, NOOP, () => NOSQL('pages').counter.hit(self.repository.page.id));
-		return self;
-	};
-});
+String.prototype.CMSglobals = function() {
+	return this.replace(REGEXP_GLOBAL, globalsreplacer);
+};
 
 // Cleans CMS markup
-String.prototype.tidyCMS = function() {
+String.prototype.CMStidy = function() {
 
 	var body = this;
 	var beg;
 	var end;
 	var index = 0;
 	var count = 0;
-	var b = ' data-themes="';
+	var b = ' data-cms-theme="';
 	var c = 'CMS_unwrap';
 	var tag;
 	var tagend;
-	var tmp = 0;
 
-	body = U.minifyHTML(body).replace(/\sclass=\"CMS_template CMS_remove\"/gi, '');
+	body = U.minifyHTML(body).replace(/\sclass="CMS_template CMS_remove"/gi, '');
 
+	while (true) {
+		beg = body.indexOf(b, beg);
+		if (beg === -1)
+			break;
+		index = body.indexOf('"', beg + b.length);
+		if (index === -1)
+			break;
+		body = body.substring(0, beg) + body.substring(index + 1);
+	}
+
+	b = ' data-cms-category="';
 	while (true) {
 		beg = body.indexOf(b, beg);
 		if (beg === -1)
@@ -564,7 +472,7 @@ String.prototype.tidyCMS = function() {
 		}
 	}
 
-	return body.replace(REGEXP_HTML_CLASS, function(text) {
+	return body.replace(REGEXP_HTML_ATTR, '').replace(REGEXP_HTML_CLASS, function(text) {
 
 		var is = text[0] === ' ';
 		var arr = text.substring(is ? 8 : 7, text.length - 1).split(' ');
@@ -572,13 +480,157 @@ String.prototype.tidyCMS = function() {
 
 		for (var i = 0, length = arr.length; i < length; i++) {
 			var cls = arr[i];
-			if (cls[0] === 'C' && cls[3] === '_' && cls !== 'CMS_hidden')
+			if (cls[0] === 'C' && cls[1] === 'M' && cls[2] === 'S' && cls !== 'CMS_hidden')
 				continue;
 			builder += (builder ? ' ' : '') + cls;
 		}
 
 		return builder ? (is ? ' ' : '') + 'class="' + builder + '"' : '';
-	});
+	}).replace(REGEXP_HTML_DIV, '<div>');
 };
 
-F.on('settings', refresh);
+function loadpartial(page, callback, controller) {
+
+	var output = {};
+
+	if (!page.partial || !page.partial.length)
+		return callback(output);
+
+	var nosql = NOSQL('pages');
+	nosql.find().in('id', page.partial).callback(function(err, response) {
+
+		response.wait(function(item, next) {
+
+			nosql.counter.hit(item.id);
+			output[item.id] = item;
+			output[item.url] = item;
+
+			item.body.CMSrender(item.widgets, function(body) {
+				item.body = body;
+				next();
+			}, controller);
+
+		}, () => callback(output));
+	});
+}
+
+Controller.prototype.CMSpage = function(callback, cache) {
+
+	var self = this;
+	var page = F.global.sitemap[self.url];
+
+	if (!page) {
+		self.throw404();
+		return self;
+	}
+
+	if (typeof(callback) === 'boolean') {
+		cache = callback;
+		callback = null;
+	}
+
+	self.memorize('cachecms' + self.url, cache || '1 minute', cache === false, function() {
+		var nosql = NOSQL('pages');
+		nosql.one().where('id', page.id).callback(function(err, response) {
+
+			var repo = self.repository;
+			self.meta(response.title, response.description, response.keywords);
+			self.sitemap('homepage');
+
+			// Sitemap
+			var tmp = page;
+			while (tmp && tmp.url !== '/') {
+				self.sitemap_add('homepage', tmp.name, tmp.url);
+				tmp = F.global.sitemap[tmp.parent];
+			}
+
+			nosql.counter.hit('all').hit(response.id);
+
+			response.body.CMSrender(response.widgets, function(body) {
+				response.body = body;
+				repo.page = response;
+				loadpartial(repo.page, function(partial) {
+					repo.page.partial = partial;
+					if (callback) {
+						callback.call(self, function(model) {
+							self.view('~cms/' + repo.page.template, model);
+							repo.page.body = null;
+							repo.page.pictures = EMPTYARRAY;
+							repo.page.search = null;
+						});
+					} else {
+						self.view('~cms/' + repo.page.template);
+						repo.page.body = null;
+						repo.page.pictures = EMPTYARRAY;
+						repo.page.search = null;
+					}
+				}, self);
+			}, self);
+		});
+	}, function() {
+		if (self.repository.page)
+			NOSQL('pages').counter.hit('all').hit(self.repository.page.id);
+	});
+
+	return self;
+};
+
+Controller.prototype.CMSrender = function(url, callback) {
+
+	var self = this;
+	var page = F.global.sitemap[url];
+
+	if (!page) {
+		callback('404');
+		return self;
+	}
+
+	NOSQL('pages').one().where('id', page.id).callback(function(err, response) {
+
+		var repo = self.repository;
+		self.title(response.title);
+		self.sitemap('homepage');
+
+		// Sitemap
+		var tmp = page;
+		while (tmp && tmp.url !== '/') {
+			self.sitemap_add('homepage', tmp.name, tmp.url);
+			tmp = F.global.sitemap[tmp.parent];
+		}
+
+		response.body.CMSrender(response.widgets, function(body) {
+			response.body = body;
+			repo.page = response;
+			loadpartial(repo.page.partial, function(partial) {
+				repo.page.partial = partial;
+				callback(null, repo.page);
+			}, self);
+		}, self);
+	});
+
+	return self;
+};
+
+Controller.prototype.CMSpartial = function(url, callback) {
+
+	var self = this;
+	var page = F.global.partial.findItem(url.isUID() ? 'id' : 'url', url);
+
+	if (!page) {
+		callback('404');
+		return self;
+	}
+
+	var nosql = NOSQL('pages');
+	nosql.counter.hit(page.id);
+	nosql.one().where('id', page.id).callback(function(err, response) {
+		response.body.CMSrender(response.widgets, function(body) {
+			response.body = body;
+			callback(null, response);
+		}, self);
+	});
+
+	return self;
+};
+
+ON('settings', refresh);

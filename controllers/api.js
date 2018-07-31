@@ -1,134 +1,39 @@
-// API for e.g. Mobile application
-// This API uses the website
-
 exports.install = function() {
-	// COMMON
-	F.route('/api/ping/',                 json_ping);
+	// Enable CORS for API
+	CORS('/api/*', ['get', 'post', 'put', 'delete'], true);
 
-	// ORDERS
-	F.route('/api/checkout/create/',      json_orders_create, ['post', '*Order']);
-	F.route('/api/checkout/{id}/',        json_orders_read, ['*Order']);
+	// Operations
+	ROUTE('/api/subscribers/',              ['*Subscriber --> save', 'post']);
+	ROUTE('/api/unsubscribe/', unsubscribe, ['*Subscriber']);
+	ROUTE('/api/contact/',                  ['*Contact --> save', 'post']);
 
-	// USERS
-	F.route('/api/users/create/',         json_users, ['post', '*UserRegistration']);
-	F.route('/api/users/password/',       json_users, ['post', '*UserPassword']);
-	F.route('/api/users/login/',          json_users, ['post', '*UserLogin']);
-	F.route('/api/users/settings/',       json_users_settings, ['put', '*UserSettings', 'authorize']);
+	// Eshop
+	ROUTE('/api/products/',                 ['*Product --> query']);
+	ROUTE('/api/products/prices/',          ['*Product --> prices']);
+	ROUTE('/api/products/search/',          ['*Product --> search']);
+	ROUTE('/api/orders/create/',            ['*Order --> create', 'post']);
+	ROUTE('/api/orders/dependencies/',      ['*Order --> dependencies']);
 
-	// PRODUCTS
-	F.route('/api/products/',             json_products_query, ['*Product']);
-	F.route('/api/products/{id}/',        json_products_read, ['*Product']);
-	F.route('/api/products/categories/',  json_products_categories);
+	// Account
+	ROUTE('/api/account/create/',           ['*UserCreate --> save', 'post']);
+	ROUTE('/api/account/login/',            ['*UserLogin --> exec', 'post']);
+	ROUTE('/api/account/orders/',           ['*UserOrder --> query', 'authorize']);
+	ROUTE('/api/account/autofill/',         ['*UserOrder --> read', 'authorize']);
+	ROUTE('/api/account/settings/',         ['*UserSettings --> read', 'authorize']);
+	ROUTE('/api/account/settings/',         ['*UserSettings --> save', 'post', 'authorize']);
+	ROUTE('/api/account/password/',         ['*UserPassword --> exec', 'post', 'unauthorize']);
 
-	// NEWSLETTER
-	F.route('/api/newsletter/',           json_save, ['post', '*Newsletter']);
-
-	// CONTACTFORM
-	F.route('/api/contact/',              json_save, ['post', '*Contact']);
+	// Newsletter view
+	FILE('/newsletter.gif', file_newsletterviewstats);
 };
 
-// ==========================================================================
-// COMMON
-// ==========================================================================
-
-function json_ping() {
-	var self = this;
-	self.plain('null');
+function file_newsletterviewstats(req, res) {
+	NOSQL('newsletters').counter.hit('all');
+	req.query.id && NOSQL('newsletters').counter.hit(req.query.id);
+	res.binary('R0lGODdhAQABAIAAAAAAAAAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==', 'image/gif', 'base64');
 }
 
-// ==========================================================================
-// PRODUCTS
-// ==========================================================================
-
-// Reads product categories
-function json_products_categories() {
+function unsubscribe() {
 	var self = this;
-
-	if (!F.global.categories)
-		F.global.categories = [];
-
-	self.json(F.global.categories);
-}
-
-// Reads products
-function json_products_query() {
-	var self = this;
-
-	// Renders related products
-	if (self.query.html) {
-		// Disables layout
-		self.layout('');
-		self.$query(self.query, self.callback('~eshop/partial-products'));
-		return;
-	}
-
-	self.$query(self.query, self.callback());
-}
-
-// Reads a specific product
-function json_products_read(id) {
-	var self = this;
-	var options = {};
-	options.id = id;
-	self.$get(options, self.callback());
-}
-
-// Reads all product categories
-function json_products_categories() {
-	var self = this;
-
-	if (!F.global.categories)
-		F.global.categories = [];
-
-	self.json(F.global.categories);
-}
-
-// ==========================================================================
-// ORDERS
-// ==========================================================================
-
-// Creates a new order
-function json_orders_create() {
-	var self = this;
-	self.body.$workflow('create', self.callback());
-}
-
-// Reads a specific order
-function json_orders_read(id) {
-	var self = this;
-	var options = {};
-	options.id = id;
-	self.$get(options, self.callback());
-}
-
-// ==========================================================================
-// USERS
-// ==========================================================================
-
-function json_users() {
-	var self = this;
-	var options = {};
-
-	options.controller = self;
-	options.ip = self.ip;
-
-	self.body.$workflow('exec', options, self.callback());
-}
-
-function json_users_settings() {
-	var self = this;
-	var options = {};
-	options.controller = self;
-	self.body.id = self.user.id;
-	self.body.$save(options, self.callback());
-}
-
-// ==========================================================================
-// NEWSLETTER & CONTACTFORM
-// ==========================================================================
-
-// Appends a new email into the newsletter list
-function json_save() {
-	var self = this;
-	self.body.$save(self.callback());
+	self.$workflow('unsubscribe', () => self.plain(TRANSLATOR(self.language, '@(You have been successfully unsubscribed.\nThank you)')));
 }

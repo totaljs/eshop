@@ -1,0 +1,34 @@
+<div class="row">
+@{foreach m in model.items}
+	<div class="col-md-4">
+		<div class="product" data-new="@{m.pricemin}" data-old="@{m.priceold}" data-currency="@{global.config.currency_entity}">
+			@{if m.isnew}
+				<div class="flags">
+					@{if m.isnew}<span style="background-color:#8CC152">@(NEW)</span>@{fi}
+					@{if m.istop}<span style="background-color:#DA4453">@(TOP)</span>@{fi}
+				</div>
+			@{fi}
+			<a href="@{m.linker}" class="image"><img src="/images/small/@{m.pictures[0]}.jpg" border="0" alt="@{m.name}" /></a>
+			@{if m.size && m.size.length}
+				<div class="sizes">
+					@{foreach a in m.size}
+						<span>@{a}</span>
+					@{end}
+				</div>
+			@{fi}
+			@{m.price}
+			<a href="@{m.linker_category}/" class="category"><i class="fa fa-folder-o"></i>@{m.category}</a>
+			<a href="@{m.linker}" class="name">@{m.name}</a>
+			<a href="@{if !url || url === '/'}@{sitemap_url('category')}@{fi}?manufacturer=@{m.linker_manufacturer}" class="manufacturer">@{m.manufacturer}</a>
+			<div class="price">
+				@{if m.stock}
+					<a href="@{m.linker}" class="more"><i class="fa fa-plus"></i>@(Detail)</a>
+				@{else}
+					<span class="outofstock">@(Out of stock)</span>
+				@{fi}
+				<div>@{!m.pricemin.currency()}@{if m.priceold && m.priceold > m.pricemin} <span>@{!m.priceold.currency()}</span>@{fi}</div>
+			</div>
+		</div>
+	</div>
+@{end}
+</div>

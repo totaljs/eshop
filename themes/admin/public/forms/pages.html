@@ -1,0 +1,215 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:file-text-o;if:pages-form;width:1500;reload:Pages/formShow;submit:Pages/formSubmit;autofocus:true" data-jc-controller="Pages">
+	<div class="padding" style="padding-bottom:10px">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="pages.form.name" data-jc-config="placeholder:@(Homepage);required:true">@(Name)</div>
+				<div data-jc="checkbox" data-jc-path="pages.form.ispartial" class="green b mt10">@(Is a partial content)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="pages.form.url" data-jc-config="icon:globe;placeholder:@(Page relative URL address);required:true">@(URL address)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdown" data-jc-path="pages.form.template" data-jc-config="datasource:common.dependencies.templatespages;empty:">@(Template)</div>
+			</div>
+			<div class="col-md-3 m" data-jc="disable" data-jc-path="pages.form.ispartial" data-jc-config="if:value">
+				<div data-jc="dropdown" data-jc-path="pages.form.parent" data-jc-config="datasource:pages.parents;empty:;icon:sitemap">@(Parent)</div>
+				<div class="help">@(Affects sitemap and breadcrumb.)</div>
+			</div>
+		</div>
+	</div>
+	<div class="cmseditor" data-jc="cmseditor" data-jc-path="pages.form.body" data-jc-import="[url]components/cmseditor.html"></div>
+	<div class="backups hidden" data-b="pages.form.id" data-b-visible="!!value">
+		<a href="javascript:void(0)" class="exec" data-exec="Pages/backups"><i class="fa fa-clock-o mr5"></i>@(Restore a backup)</a>
+		<a href="javascript:void(0)" class="exec red" data-exec="Pages/formSubmit" style="float:right"><i class="fa fa-floppy-o mr5"></i>@(Save content)</a>
+		<a href="javascript:void(0)" data-b="pages.form.url" data-b-href="value" target="_blank" style="float:right" class="mr10"><i class="fa fa-search mr5"></i>@(Preview)</a>
+	</div>
+	<div class="padding">
+		<div class="row mt10">
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="pages.form.title" data-jc-config="maxlenght:50">@(Title)</div>
+				<div class="help">@(Meta title, maximum 60 chars.)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="pages.form.keywords" data-jc-config="icon:tags;maxlenght:80">@(Keywords)</div>
+				<div class="help">@(Meta keywords, maximum 6 words.)</div>
+			</div>
+			<div class="col-md-4">
+				<div data-jc="textbox" data-jc-path="pages.form.description" data-jc-config="icon:align-center;maxlenght:120">@(Description)</div>
+				<div class="help">@(Meta description, maximum 120 chars.)</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding bg-yellow">
+		<div class="row">
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-md-4 m">
+						<div data-jc="dropdowncheckbox" data-jc-path="pages.form.signals" data-jc-config="datasource:common.dependencies.signals;empty:@(Doesn't contain any signals.);icon:dot-circle-o">@(Signals)</div>
+						<div class="help">@(Signals can start special actions when the page is displayed.)</div>
+					</div>
+					<div class="col-md-4 m">
+						<div data-jc="dropdowncheckbox" data-jc-path="pages.form.partial" data-jc-config="datasource:pages.partial;empty:@(Doesn't contain any partial pages.);icon:database;cleaner:false">@(Nested partial pages)</div>
+						<div class="help">@(Join other partial pages with this.)</div>
+					</div>
+					<div class="col-md-4 m">
+						<div data-jc="dropdowncheckbox" data-jc-path="pages.form.navigations" data-jc-config="datasource:common.dependencies.navigations;empty:@(Doesn't contain any navigations.);icon:navicon;cleaner:false">@(Side navigations)</div>
+						<div class="help">@(Add side navigations.)</div>
+					</div>
+				</div>
+				<hr />
+				<div class="b"><i class="fa fa-cog mr5"></i>@(Settings for navigations)</div>
+				<div style="margin-top:8px">
+					<div data-jc="checkbox" data-jc-path="pages.form.navicon" class="inline mr10">@(Replace icon in all navigations)</div>
+					<div data-jc="checkbox" data-jc-path="pages.form.navname" class="inline mr10">@(Replace name in all navigations)</div>
+					<div data-jc="checkbox" data-jc-path="pages.form.replacelink" class="inline">@(Replace older URL in the whole content)</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="fs12"><i class="fa fa-font-awesome mr5"></i>@(Choose icon):</div>
+				<div class="mt5" data-jc="fontawesomebox" data-jc-path="pages.form.icon" data-jc-config="search:@(Search icons);height:160"></div>
+			</div>
+		</div>
+	</div>
+	<div data-b="pages.form.id" data-b-visible="value && value.length" class="hidden">
+		<hr class="nmt" />
+		<div class="padding">
+			<div class="row">
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key">@(# Id)</div>
+						<div class="value" data-b="pages.form.id" data-b-html="n => n"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
+						<div class="value" data-b="pages.form.datecreated" data-b-html="n => Tangular.helpers.time(n)"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Updated)</div>
+						<div class="value" data-b="pages.form.dateupdated" data-b-html="n => n ? Tangular.helpers.time(n) : '@(unchanged)'"></div>
+					</div>
+				</div>
+				<div class="col-lg-6 m" data-b="pages.form.stats" data-b-visible="value != null">
+					<div data-jc="nosqlcounter" data-jc-path="pages.form.stats" data-jc-config="height:52"></div>
+					<div class="help"><i class="fa fa-bar-chart"></i>@(Stats of all views for the last period)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div data-jc="error" data-jc-path="pages.form.response"></div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="pages.form">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(SAVE)</button>
+	</div>
+</div>
+
+<script>
+
+	SCOPE('Pages', function(ctrl) {
+		ctrl.formShow = function(com) {
+
+			var model = pages.form;
+			var items = pages.grid.items;
+			var parent = [];
+			var partial = [];
+
+			com.reconfigure({ title: model.id ? '@(Edit page)' : '@(New page)' });
+
+			for (var i = 0, length = items.length; i < length; i++) {
+				var item = items[i];
+				if (item.id !== model.id) {
+					if (item.ispartial)
+						partial.push({ id: item.id, name: item.name });
+					else
+						parent.push({ id: item.id, name: item.name, url: item.url });
+				}
+			}
+
+			ctrl.set('partial', partial);
+			ctrl.set('parents', parent);
+
+			WAIT('cmseditor.instance', function() {
+				cmseditor.instance.setWidgetOptions(model.widgets);
+			});
+
+			model.id && AJAX('GET [url]api/{0}/{1}/stats/'.format(ctrl.scope, model.id), ctrl.scope + '.form.stats');
+			SETTER('loading', 'hide', 1000);
+		};
+
+		ctrl.formSubmit = function(com) {
+
+			SETTER('loading', 'show');
+
+			var model = CLONE(pages.form);
+			var editor = cmseditor.instance;
+
+			model.pictures = editor.getPictures();
+			model.summary = editor.getSummary();
+			model.body = editor.getContent().replace(/\n[\s\t]+\n/g, '\n');
+			model.search = editor.getKeywords();
+
+			var w = editor.getWidgets();
+			model.widgets = w.settings;
+			model.bodywidgets = w.widgets;
+
+			if (model.ispartial) {
+				model.navigations = null;
+				model.partial = null;
+				model.parent = '';
+			}
+
+			model.stats = undefined;
+
+			AJAX('POST [url]api/{0}/'.format(ctrl.scope), model, function(response) {
+				SETTER('loading', 'hide', 1000);
+				if (response.success) {
+					SETTER('snackbar', 'success', '@(Page has been saved successfully.)');
+
+					if (com && !(com instanceof jQuery)) {
+						com.hide();
+						SET('%links', null);
+					}
+
+					ctrl.refresh();
+				}
+			});
+		};
+
+		ctrl.backups = function(el) {
+
+			SETTER('loading', 'show');
+			AJAX('GET [url]api/{0}/{1}/backups/'.format(ctrl.scope, ctrl.get('form.id')), function(response) {
+
+				SETTER('loading', 'hide', 1000);
+
+				for (var i = 0, length = response.length; i < length; i++) {
+					var item = response[i];
+					item.name = '{0} <b class="badge badge-blue"><i class="fa fa-user mr5"></i>{1}</b>'.format(item.date.format('@(yyyy-MM-dd HH:mm)'), item.user);
+				}
+
+				response.quicksort('date', false);
+
+				SETTER('suggestion', 'show', 'left', el, response, function(value) {
+					SETTER('loading', 'show');
+					setTimeout(function() {
+						cmseditor.instance.replace(value.data.body);
+						SETTER('loading', 'hide', 1000);
+					}, 100);
+				});
+			});
+		};
+
+		ctrl.watch('form.template', function(path, value, type) {
+
+			if (type === 2) {
+				cmseditor.instance.reconfigure('template:' + value);
+				cmseditor.instance.set('');
+			}
+
+		}, true);
+	});
+
+</script>

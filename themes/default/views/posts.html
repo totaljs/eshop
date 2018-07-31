@@ -1,0 +1,23 @@
+<h1>@{title}</h1>
+
+@{if model.count}
+	<div class="row">
+	@{foreach m in model.items}
+		<div class="col-md-6">
+			<div class="post">
+				<a href="@{sitemap_url('post', m.linker)}" class="image"><img src="@{m.pictures[0]}" alt="@{m.name}" border="0" class="img-responsive" /></a>
+				<div class="postbody">
+					<a href="@{sitemap_url('post', m.linker)}" class="title">@{m.name}</a>
+					<p>@{m.description}</p>
+					<a href="@{sitemap_url('post', m.linker)}" class="read"><i class="fa fa-plus"></i>@(Read more)</a>
+					<div class="date"><i class="fa fa-calendar"></i>@{m.date.format('@(yyyy-MM-dd)')}</div>
+				</div>
+			</div>
+		</div>
+	@{end}
+	</div>
+	@{view('/partials/pagination', model)}
+@{else}
+	<br />
+	<div class="empty"><i class="fa fa-search"></i>@(No posts in database.)</div>
+@{fi}

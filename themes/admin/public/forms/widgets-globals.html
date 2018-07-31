@@ -1,0 +1,49 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:clone;if:widgets-globals;title:@(Edit global style and script);width:800;reload:widgetglobals_reload;submit:widgetglobals_submit">
+	<div class="padding npt">
+		<p class="nmb">@(Globals variables can contain preddefined values for styles and main script. Styles support auto-vendor-prefixes and variable declaration like in SASS. All content will be minified into the single file of CSS and JS.)</p>
+	</div>
+	<div class="padding bg-yellow">
+		<div data-jc="codemirror" data-jc-path="widgets.formglobals.css" data-jc-config="height:250;icon:paint-brush;type:css;tabs:true;trim:true">@(Global CSS)</div>
+		<div class="row fs12 mt10">
+			<div class="col-xs-6">
+				<a href="javascript:void(0)" class="exec" data-exec="widgetglobals_upload"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a>
+			</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div data-jc="codemirror" data-jc-path="widgets.formglobals.js" data-jc-config="height:250;icon:code;type:javascript;tabs:true;trim:true" class="m">@(Global JavaScript)</div>
+	</div>
+	<div data-jc="error" data-jc-path="widgets.formglobals.response"></div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="widgets.formglobals">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(SAVE)</button>
+	</div>
+</div>
+
+<script>
+
+	function widgetglobals_reload() {
+		AJAX('GET [url]api/widgetsglobals/', function(response) {
+			SET('widgets.formglobals', response, true);
+			SETTER('loading', 'hide', 1000);
+		});
+	}
+
+	function widgetglobals_submit() {
+		SETTER('loading', 'show');
+		AJAX('POST [url]api/widgetsglobals/', GET('widgets.formglobals'), function(response) {
+			SETTER('loading', 'hide', 1000);
+			if (response.success) {
+				SETTER('snackbar', 'success', '@(Globals variables have been saved successfully.)');
+				SET('common.form', '');
+			}
+		});
+	}
+
+	function widgetglobals_upload() {
+		refresh_filebrowser(function(file) {
+			SETTER('.widgets.formglobals.css', 'insert', file);
+		});
+	}
+
+</script>

@@ -6,104 +6,128 @@
 			@{!repository.page.body}
 		@{else}
 			<!-- DEFAULT CONTENT FOR NEW PAGES FO THIS TEMPLATE -->
-			<div class="CMS_widgets"></div>
+			<div class="CMS_widgets" data-cms-category="Content,Columns"></div>
+		@{fi}
+	</div>
+@{else}
+	<h1 class="mb10">@{title}</h1>
+	<div class="row">
+		<div class="col-md-4 m">
+			<div class="keyvalue">
+				<div class="key">@(Category)</div>
+				<div class="value"><a href="@{sitemap_url('category')}@{model.category.linker}/">@{model.category.text}</a></div>
+			</div>
+		</div>
+		@{if model.manufacturer}
+		<div class="col-md-4 m">
+			<div class="keyvalue">
+				<div class="key">@(Manufacturer)</div>
+				<div class="value"><a href="@{sitemap_url('category')}?manufacturer=@{model.manufacturer.linker}">@{model.manufacturer.name}</a></div>
+			</div>
+		</div>
+		@{fi}
+		@{if model.availability}
+		<div class="col-md-4 m">
+			<div class="keyvalue">
+				<div class="key"><i class="fa fa-truck"></i>@(Availability)</div>
+				<div class="value">@{model.availability}</div>
+			</div>
+		</div>
+		@{fi}
+		<div class="col-md-4 m">
+			<div class="keyvalue">
+				<div class="key"><i class="fa fa-dropbox"></i>@(In stock)</div>
+				<div class="value">@{model.stock}x</div>
+			</div>
+		</div>
+		@{if model.reference}
+		<div class="col-md-4 m">
+			<div class="keyvalue">
+				<div class="key">@(Reference)</div>
+				<div class="value">@{model.reference}</div>
+			</div>
+		</div>
+		@{fi}
+		<div class="col-md-4 m">
+			<div class="keyvalue">
+				<div class="key">@(Created)</div>
+				<div class="value">@{model.datecreated.format('@(yyyy-MM-dd)')}</div>
+			</div>
+		</div>
+		@{if model.size && model.size.length}
+		<div class="col-md-4 m">
+			<div class="keyvalue">
+				<div class="key">@(Sizes)</div>
+				<div class="value">@{model.size.join(', ')}</div>
+			</div>
+		</div>
+		@{fi}
+		@{if model.color && model.color.length}
+		<div class="col-md-4 m">
+			<div class="keyvalue">
+				<div class="key">@(Colors)</div>
+				<div class="value">@{model.color.join(', ')}</div>
+			</div>
+		</div>
 		@{fi}
 	</div>
 	<br />
-@{else}
-	<div class="padding">
-		<h1>@{title}</h1>
-		<div class="row">
-			<div class="col-md-10 col-md-offset-1 detail">
-
-				<div class="row">
-					<div class="col-md-4 m">
-						<div class="keyvalue">
-							<div class="key">@(Category)</div>
-							<div class="value"><a href="@{sitemap_url('category')}@{model.linker_category}/">@{model.category}</a></div>
-						</div>
-					</div>
-					<div class="col-md-4 m">
-						<div class="keyvalue">
-							<div class="key">@(Manufacturer)</div>
-							<div class="value"><a href="@{sitemap_url('products')}?manufacturer=@{model.linker_manufacturer}">@{model.manufacturer}</a></div>
-						</div>
-					</div>
-					<div class="col-md-4 m">
-						<div class="keyvalue">
-							<div class="key"><i class="fa fa-dropbox"></i>@(Availability)</div>
-							<div class="value">@{model.availability}</div>
-						</div>
-					</div>
-					<div class="col-md-4 m">
-						<div class="keyvalue">
-							<div class="key">@(Product code)</div>
-							<div class="value">@{if model.reference}@{model.reference}@{else}@{model.id}@{fi}</div>
-						</div>
-					</div>
-					<div class="col-md-4 m">
-						<div class="keyvalue">
-							<div class="key">@(Created)</div>
-							<div class="value">@{model.datecreated.format('@(yyyy-MM-dd)')}</div>
-						</div>
-					</div>
-					<div class="col-md-4 m">
-						<div class="flags">
-							@{if model.istop}<div class="top">@(TOP)</div>@{fi}
-							@{if model.isnew}<div class="new">@(NEW)</div>@{fi}
-						</div>
-					</div>
-				</div>
-
-
-				<br />
-				<p><b>@(Description)</b>@{!model.description.replace(/\n/g, '<br />')}</p>
-				<br />
-
-				<div class="detail-checkout">
-					<div>@(The product <b>@{model.name}</b> is in your shopping cart) <b class="data-checkout-count"></b>.</div>
-					<span class="fa fa-shopping-cart mr5"></span><a href="/checkout/" class="b">@(Order it now)</a>
-				</div>
-
-				<br />
-
-				<div class="row">
-					<div class="col-md-6">
-						<div><button class="detail-buy" data-id="@{model.id}" data-price="@{model.price}">@(Buy:) <b>@{currency(model.price)}</b>@{if model.priceold > model.price} <span class="red">@{currency(model.priceold)}</span>@{fi}</button></div>
-						<div style="margin-top:15px"><span class="fa fa-envelope silver mr5"></span><a href="@{sitemap_url('contact')}?productid=@{if model.reference}@{model.reference}@{else}@{model.id}@{fi}#contactform">@(Do you need more informations?)</a></div>
+	@{if model.stock}
+		@{if model.priceold}
+			<div class="detail-priceold">@(Old price:) <b>@{!model.priceold.currency()}</b></div>
+		@{fi}
+		@{if model.prices.length > 1}
+			<table class="table table-bordered detail-prices">
+				<thead>
+					<tr>
+						<th>@(Variant name)</th>
+						<th>@(Stock)</th>
+						<th>@(Price)</th>
+					</tr>
+				</thead>
+				<tbody>
+				@{foreach m in model.prices}
+					<tr>
+						<td class="detail-prices-name">@{m.name || model.name}</td>
+						<td class="detail-prices-stock">@{m.stock}x</td>
+						<td class="detail-prices-buy">@{if m.stock}<button class="detail-buysmall addcart" data-id="@{model.id}" data-name="@{model.name}" data-idvariant="@{m.id}" data-variant="@{m.name}" data-price="@{m.price}"><i class="fa"></i>@(Buy: ) <b>@{!m.price.currency()}</b></button>@{else}<b class="red fs12"><i class="fa fa-warning"></i> @(Out of stock)</b>@{fi}</td>
+					</tr>
+				@{end}
+				</tbody>
+			</table>
+		@{else}
+			<div class="row">
+				<div class="col-md-5 m">
+					<div class="detail-buy">
+						<button class="addcart" data-id="@{model.id}" data-name="@{model.name}" data-idvariant="@{model.prices[0].id}" data-variant="@{model.prices[0].name}" data-price="@{model.prices[0].price}"><i class="fa"></i>@(Buy: ) <b>@{!model.prices[0].price.currency()}</b></button>
 					</div>
 				</div>
 			</div>
-		</div>
-	</div>
-	<br />
-	<hr />
-	<br />
-	@{if model.pictures.length === 1}
-		<div><img src="/images/large/@{model.pictures[0]}.jpg" alt="@{model.name}" border="0" class="img-responsive img-rounded center" /></div>
-		<br />
-		<hr />
+		@{fi}
 	@{else}
-		<div class="padding">
-		<div class="row detail-pictures">
-			@{foreach m in model.pictures}
-				<div class="col-md-6 m"><img src="/images/large/@{m}.jpg" alt="@{model.name}" border="0" class="img-responsive img-rounded center" /></div>
-				@{if index && (index + 1) % 2 === 0}
-				</div>
-				<hr class="visible-lg" />
-				<div class="row detail-pictures">
-				@{fi}
-			@{end}
-		</div>
+		<div class="detail-outofstock">
+			<i class="fa fa-warning"></i>@(The product is out of stock.)
 		</div>
 	@{fi}
 
+	<p class="detail-description"><b>@(Description)</b><br />@{model.description}</p>
+
 	@{if model.body}
-		@{!model.body.tidyCMS()}
+		<div class="content">
+			<br />
+			@{!model.body}
+		</div>
 		<br />
 	@{fi}
-	<div class="hidden padding npb">
-		<h2 class="large">@(Related) @{model.category}</h2>
-		<div data-jc="related" data-category="@{model.linker_category}" data-id="@{model.id}"></div>
+
+	@{if model.pictures && model.pictures.length}
+	<h2>@(Pictures of @{model.name})</h2>
+	<div data-jc="gallery" class="ui-gallery">
+		<img src="/images/large/@{model.pictures[0]}.jpg" alt="@{model.name}" border="0" />
+		@{foreach m in model.pictures}
+			<img src="/images/small/@{m}.jpg" border="0" alt="@{model.name} @{index}" />
+		@{end}
 	</div>
+	@{fi}
+
 @{fi}

@@ -1,373 +1,287 @@
-@{sitemap('checkout')}
+@{repository.loading = true}
 
-<div id="loading"></div>
-<div class="padding">
+<h1><i class="fa fa-shopping-cart"></i>@{title}</h1>
 
-	<h1>@{title}</h1>
-
-	<div data-jc="visible" data-jc-path="datasource" data-if="!value || !value.length" class="hidden">
-		<div class="row">
-			<div class="col-md-8 col-md-offset-2 ui-center">
-				<hr />
-				<br />
-				<div>@(Your shopping cart is empty, <b>try to visit this page later</b>.)</div>
-				<br />
-				<hr />
-				<br />
-				<br />
-				<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
-				<br />
-				<br />
-			</div>
-		</div>
-	</div>
-
-	<div data-jc="visible" data-jc-path="datasource" data-if="value && value.length > 0" class="hidden">
-		<div class="row">
-			<div class="col-md-1"></div>
-			<div class="col-md-10">
-				<table class="table table-bordered checkoutlist" border="0">
-					<thead class="hidden-xs">
-						<tr>
-							<th class="ui-center">@(Item name)</th>
-							<th class="ui-center hidden-xs">@(Price)</th>
-							<th class="ui-center">@(Count)</th>
-							<th class="ui-center">@(Total)</th>
-						</tr>
-					</thead>
-					<tbody data-jc="repeater" data-jc-path="datasource">
-						<script type="text/html">
-							<tr>
-								<td><a href="{{ linker }}">{{ name }}</a><div class="visible-xs fs11 mt10">@(One piece:) @{currency('{{ price | format(2) }}')}</div></td>
-								<td class="ui-right col-xs-2">@{currency('{{ price | format(2) }}')}</td>
-								<td class="ui-right col-xs-2 col-sm-1 active"><input type="text" value="{{ count }}" data-id="{{ id }}" maxlength="2" /></td>
-								<td class="ui-right col-xs-3 col-sm-2 b warning"><span class="visible-xs checkoutlist-label">@(Together:)</span><span class="checkoutlist-item-price" data-format="@{currency('{0}')}">@{currency('{{ price | sum(2) }}')}</span><span class="fa fa-times-circle hidden-xs" data-id="{{ id }}"></span></td>
-							</tr>
-						</script>
-					</tbody>
-					<tfoot data-jc="template" data-jc-path="summarize" class="hidden-xs">
-						<script type="text/html">
-							<tr class="active">
-								<td class="b black">@(Summarize)</td>
-								<td class="col-xs-2"></td>
-								<td class="ui-center col-xs-2 col-sm-1 b black">{{ count }}x</td>
-								<td class="ui-right col-xs-3 col-sm-2 b black">@{currency('{{ price | format(2) }}')}<span class="fa fa-calculator hidden-xs"></span></td>
-							</tr>
-						</script>
-					</tfoot>
-				</table>
-			</div>
-		</div>
-		<br />
-		<hr />
-		<br />
-
-		@{if !user}
-		<div class="row">
-			<div class="col-md-8 col-md-offset-2">
-				<div class="ui-center m silver"><span class="fa fa-lock fa-3x"></span></div>
-				<div class="row">
-					<div class="col-md-6 col-md-offset-3 ui-center">
-						<div>@(<b>Sign up</b> now and watch states of your orders easily. It's easy, safe and very fast.)</div>
-						<br />
-						<a href="@{sitemap_url('account')}" class="linkbutton linkbutton-small">@(Create account)</a>
-					</div>
-				</div>
-				<br />
-				<br />
-			</div>
-		</div>
-		<hr />
-		<br />
-		@{fi}
-
-		<div class="row">
-			<div class="col-md-10 col-md-offset-1">
-
-				<h2>@(Order form)</h2>
-				<div class="row">
-					<div class="col-md-6 m">
-						<div data-jc="textbox" data-jc-path="form.firstname" data-required="true" data-maxlength="30">@(First name)</div>
-					</div>
-					<div class="col-md-6 m">
-						<div data-jc="textbox" data-jc-path="form.lastname" data-required="true" data-maxlength="30">@(Last name)</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6 m">
-						<div data-jc="textbox" data-jc-path="form.email" data-required="true" data-maxlength="120" data-jc-type="email">@(Email address)</div>
-					</div>
-					<div class="col-md-6 m">
-						<div data-jc="textbox" data-jc-path="form.phone" data-maxlength="30" data-required="true" data-placeholder="+421903163301">@(Phone number)</div>
-					</div>
-				</div>
-				<br />
-				<div class="b m"><i class="fa fa-credit-card"></i> @(Billing address)</div>
-				<div class="row">
-					<div class="col-md-6 m">
-						<div data-jc="textbox" data-jc-path="form.billingstreet" data-required="true" data-maxlength="30">@(Street)</div>
-					</div>
-					<div class="col-md-3 m">
-						<div data-jc="textbox" data-jc-path="form.billingnumber" data-required="true" data-maxlength="15" data-align="center">@(Number)</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6 m">
-						<div data-jc="textbox" data-jc-path="form.billingcity" data-required="true" data-maxlength="30">@(City)</div>
-					</div>
-					<div class="col-md-3 m">
-						<div data-jc="textbox" data-jc-path="form.billingzip" data-required="true" data-maxlength="12" data-align="center">@(ZIP)</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6">
-						<div data-jc="textbox" data-jc-path="form.billingcountry" data-required="true" data-maxlength="30" data-jc-value="'Slovakia'">@(Country)</div>
-					</div>
-				</div>
-				<br />
-				<div data-jc="checkbox" data-jc-path="form.iscompany" class="b blue m">@(I want to create the order to company)</div>
-
-				<div data-jc="visible" data-jc-path="form.iscompany" class="padding2 bg-white">
-					<br />
-					<div data-jc="disable" data-jc-path="form.iscompany" data-if="!value" data-validate="form.company,form.companyid,form.companyvat">
-						<div class="row">
-							<div class="col-md-6 m">
-								<div data-jc="textbox" data-jc-path="form.company" data-required="true" data-maxlength="40">@(Company)</div>
-							</div>
-							<div class="col-md-3 m">
-								<div data-jc="textbox" data-jc-path="form.companyid" data-required="true" data-maxlength="15" data-align="center">@(Company ID)</div>
-							</div>
-							<div class="col-md-3 m">
-								<div data-jc="textbox" data-jc-path="form.companyvat" data-required="true" data-maxlength="30" data-align="center">@(VAT number)</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<hr />
-				<br />
-				<div class="row">
-					<div class="col-md-12">
-						<div data-jc="dropdown" data-jc-path="form.delivery" data-source="common.deliverytypes" data-empty="" data-required="true" class="b">@(Delivery)</div>
-					</div>
-				</div>
-				<br />
-				<br />
-				<div>
-					<div class="row">
-						<div class="col-xs-7 b"><h2><i class="fa fa-truck"></i>@(Delivery address)</h2></div>
-						<div class="col-xs-5 ui-right fs11 mt10">
-							<a href="javascript:void(0)" data-jc="click" data-jc-path="copyaddress"><i class="fa fa-copy mr5"></i>@(Address is same as billing address)</a>
-						</div>
-					</div>
-					<br />
-					<div class="row">
-						<div class="col-md-6 m">
-							<div data-jc="textbox" data-jc-path="form.deliveryfirstname" data-required="true" data-maxlength="30">@(First name)</div>
-						</div>
-						<div class="col-md-6 m">
-							<div data-jc="textbox" data-jc-path="form.deliverylastname" data-required="true" data-maxlength="30">@(Last name)</div>
-						</div>
-						<div class="col-md-6 m">
-							<div data-jc="textbox" data-jc-path="form.deliveryphone" data-required="true" data-maxlength="30">@(Phone number)</div>
-						</div>
-					</div>
-					<br />
-					<div class="row">
-						<div class="col-md-6 m">
-							<div data-jc="textbox" data-jc-path="form.deliverystreet" data-required="true" data-maxlength="30">@(Street)</div>
-						</div>
-						<div class="col-md-3 m">
-							<div data-jc="textbox" data-jc-path="form.deliverynumber" data-required="true" data-maxlength="15" data-align="center">@(Number)</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-6 m">
-							<div data-jc="textbox" data-jc-path="form.deliverycity" data-required="true" data-maxlength="30">@(City)</div>
-						</div>
-						<div class="col-md-3 m">
-							<div data-jc="textbox" data-jc-path="form.deliveryzip" data-required="true" data-maxlength="12" data-align="center">@(ZIP)</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-6 m">
-							<div data-jc="textbox" data-jc-path="form.deliverycountry" data-required="true" data-maxlength="30" data-jc-value="'Slovakia'">@(Country)</div>
-						</div>
-					</div>
-				</div>
-				<br />
-				<hr />
-				<br />
-				<div class="row">
-					<div class="col-md-12">
-						<div class="b"><i class="fa fa-credit-card mr5"></i>@(Choose a type of payment)</div>
-						<br />
-						<div data-jc="dropdown" data-jc-path="form.payment" data-source="common.paymenttypes" data-required="true" data-empty="">@(Payment)</div>
-					</div>
-				</div>
-				<br />
-				<hr />
-				<br />
-				<div data-jc="textarea" data-jc-path="form.message" data-height="50px" data-maxlength="1000">@(Notes)</div>
-				<div class="row">
-					<div class="col-md-12 m">
-						<br />
-						<div data-jc="checkbox" data-jc-path="form.isnewsletter">@(I want to be notified about discounts and news)</div>
-						<div data-jc="checkbox" data-jc-path="form.isterms" class="b" style="color:red">@(I agree with terms and conditions)</div>
-						<div data-jc="error" data-jc-path="common.success" style="margin-top:20px"></div>
-						<div data-jc="validation" data-jc-path="form" data-if="form.isterms === true">
-							<button class="button" disabled="disabled" data-jc="click" data-jc-path="#submit">@(SUBMIT ORDER)</button>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
+<div class="hidden" data-b="shoppingcart.items" data-b-visible="!value || !value.length">
+	<br />
+	<div class="empty">
+		@(Your shopping cart is empty, <b>try to visit this page later.</b>)
 	</div>
 	<br />
 </div>
 
-<!-- Stores the current user data (JSON) -->
-@{json(user, 'userprofile')}
+<div class="row hidden" data-b="shoppingcart.items" data-b-visible="value && value.length > 0">
+	<div class="col-md-5 m col-md-push-7">
+		<div class="caption">@(Your shopping cart)</div>
+		<div data-jc="checkout" data-currency="@{global.config.currency_entity}">
+			<script type="text/html">
+				<div class="checkout-container">
+					<div class="name"><i class="fa fa-times-circle"></i><b>...</b></div>
+					<div class="variant"></div>
+					<div class="checkout-controls">
+						<div class="sum">..</div>
+						<div class="count"><input type="text" maxlength="2" /></div>
+						<div class="price">/ @(1 piece =) <span>...</span></div>
+						<div class="stock">@(In stock:) <b>...</b></div>
+					</div>
+				</div>
+			</script>
+		</div>
+	</div>
+	<div class="col-md-7 m col-md-pull-5">
+		<div class="content">
+			<div class="contentbody">
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.firstname" data-jc-config="required:true;maxlength:40">@(First name)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.lastname" data-jc-config="required:true;maxlength:40">@(Last name)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.email" data-jc-config="required:true;type:email;maxlength:120" data-jc-value="'@'">@(Email address)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.phone" data-jc-config="required:true;type:phone;placeholder:@(International format);maxlength:25">@(Phone number)</div>
+					</div>
+				</div>
+			</div>
+			<hr class="nmt nmb" />
+			<div class="contentbody">
+				<div class="caption"><i class="fa fa-address-card"></i>@(Billing address)</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.billingstreet" data-jc-config="required:true;maxlength:50">@(Street)</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data-jc="textbox" data-jc-path="order.form.billingzip" data-jc-config="required:true;type:zip;align:center">@(ZIP)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.billingcity" data-jc-config="required:true;maxlength:50">@(City)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.billingcountry" data-jc-config="required:true;maxlength:50">@(Country)</div>
+					</div>
+				</div>
+				<div data-jc="checkbox" data-jc-path="order.form.iscompany">@(Billing to company)</div>
+			</div>
+			<div  data-b="order.form.iscompany" data-b-visible="value === true" class="hidden contentbody bg-yellow">
+				<div data-jc="textbox" data-jc-path="order.form.company" data-jc-config="maxlength:40;required:true" class="m">@(Company name)</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.companyid" data-jc-config="maxlength:15;required:true">@(Company ID)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.companyvat" data-jc-config="maxlength:30;required:true">@(VAT number)</div>
+					</div>
+				</div>
+			</div>
+			<hr class="nmt nmb" />
+			<div class="contentbody">
+				<div data-jc="dropdown" data-jc-path="order.form.delivery" data-jc-config="icon:truck;required:true;datasource:order.dependencies.deliverytypes;empty:">@(Delivery)</div>
+				<div class="help m">@(Please choose a type of delivery.)</div>
+				<div data-jc="dropdown" data-jc-path="order.form.payment" data-jc-config="icon:credit-card;required:true;datasource:order.dependencies.paymenttypes;empty:">@(Payment)</div>
+				<div class="help">@(Please choose a type of payment.)</div>
+			</div>
+			<div class="contentbody bg-yellow">
+				<div class="caption"><i class="fa fa-address-card"></i>@(Delivery address)</div>
 
-@{section script}
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.deliveryfirstname" data-jc-config="required:true;maxlength:40">@(First name)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.deliverylastname" data-jc-config="required:true;maxlenght:40">@(Last name)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.deliveryphone" data-jc-config="required:true;type:phone;placeholder:@(International format);maxlength:25">@(Phone number)</div>
+						<div class="help">@(This phone number is for courier.)</div>
+					</div>
+					<div class="col-md-6" style="margin-top:10px">
+						<br class="hidden-xs" />
+						<a href="javascript:void(0)" class="copy exec" data-exec="ordercopypersonal"><i class="fa fa-copy"></i>@(Copy same data as above)</a>
+					</div>
+				</div>
+			</div>
+			<hr class="nmt nmb" style="border-color:#DDDC9F" />
+			<div class="contentbody bg-yellow">
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.deliverystreet" data-jc-config="required:true;maxlength:50">@(Street)</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data-jc="textbox" data-jc-path="order.form.deliveryzip" data-jc-config="required:true;type:zip;align:center">@(ZIP)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.deliverycity" data-jc-config="required:true;maxlength:50">@(City)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="order.form.deliverycountry" data-jc-config="required:true;maxlength:50">@(Country)</div>
+					</div>
+				</div>
+				<a href="javascript:void(0)" class="copy exec" data-exec="ordercopyaddress"><i class="fa fa-copy"></i>@(Copy from billing address)</a>
+			</div>
+			<div class="contentbody">
+				<div data-jc="textarea" data-jc-path="order.form.note" class="m">@(Note)</div>
+				<div data-jc="checkbox" data-jc-path="order.form.isnewsletter" data-jc-value="true">@(I want to be notified about discounts and news)</div>
+				<div data-jc="checkbox" data-jc-path="order.form.isterms" class="m b red">@(I agree with terms and conditions)</div>
+				<div data-jc="error" data-jc-path="order.form.response"></div>
+				<div data-jc="validation" data-jc-path="order.form" data-jc-config="flags:visible">
+					<button class="button b exec" data-exec="ordersubmit" name="submit" disabled="disabled"><i class="fa fa-send"></i>@(Submit order)</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
 
-	var common = {};
-	var form = {};
-	var datasource;
+	SETTER(true, 'loading', 'hide', 500);
 
-	// Reads delivery types from the eshop configuration
-	SET('common.deliverytypes', '@{config.custom.deliverytypes.join(",")}'.split(','));
-	SET('common.paymenttypes', '@{config.custom.paymenttypes.join(",")}'.split(','));
+	var order = {};
 
-	form.email = '@';
-	form.address = '';
-	form.isnewsletter = true;
+	ON('@shoppingcart', function(com) {
+		var data = com.get();
 
-	var userprofile = JSON.parse($('#userprofile').html());
-	if (userprofile) {
-		form.firstname = userprofile.firstname;
-		form.lastname = userprofile.lastname;
-		form.email = userprofile.email;
-	}
-
-	jC.ready(function() {
-
-		var cart = CACHE('cart');
-		if (!cart)
+		if (!data || !data.items.length)
 			return;
 
-		var id = [];
+		// Reads types of delivery and payment
+		AJAX('GET /api/orders/dependencies/', 'order.dependencies');
 
-		for (var i = 0, length = cart.length; i < length; i++)
-			id.push(cart[i].id);
-
-		AJAX('GET /api/products/', { id: id.join(',') }, function(response) {
-
-			datasource = [];
-
-			for (var i = 0, length = response.items.length; i < length; i++) {
-				var item = response.items[i];
-				datasource.push({ id: item.id, name: item.name, price: item.price, linker: item.linker, linker_category: item.linker_category, pictures: item.pictures, reference: item.reference });
-			}
-
-			!datasource.length && SETTER('checkout', 'clear');
-			refresh(true);
+		// Performs autofill if the user is logged
+		MAIN.cookies.get('__user') && AJAX('GET /api/account/autofill/', function(response) {
+			EXTEND('order.form', response);
 		});
 
-		$('.checkoutlist').on('change', 'input', function(e) {
-			var count = parseInt(this.value.match(/\d+/));
-			if (isNaN(count))
-				return;
-
-			var id = this.getAttribute('data-id');
-			var checkout = FIND('checkout');
-			var output = checkout.update(id, count);
-
-			if (!output) {
-				var el = $(this).closest('tr').find('.checkoutlist-item-price');
-				var item = checkout.get(id);
-				el.html(el.attr('data-format').format(Tangular.helpers.sum.call(item, item.price, 2)));
-			}
-
-			refresh(output === 1);
-		});
-
-		$('.checkoutlist').on('click', '.fa-times-circle', function(e) {
-			var output = FIND('checkout').update($(this).attr('data-id'), 0);
-			refresh(output === 1);
+		// Get current prices according to the database
+		// A check for price hijacking
+		com.sync(function(arr, data) {
+			AJAX('GET /api/products/prices/?id=' + arr.join(','), com.modify);
 		});
 	});
 
-	Tangular.register('sum', function(value, format) {
-		return (value * this.count).format(format);
+	COMPONENT('checkout', function(self, config) {
+
+		var currency = '';
+		var skip = false;
+		var container, summarize;
+
+		self.readonly();
+		self.blind();
+
+		self.make = function() {
+
+			var el = self.find('script');
+
+			self.template = VIRTUALIZE(el.html(), { name: '.name b', count: 'input', price: '.price span', variant: '.variant', sum: '.sum', stock: '.stock b' });
+			currency = self.attrd('currency') || '{0}';
+
+			self.html('<div class="checkout"></div><div class="checkout-summarize"><b></b></div>');
+			container = self.find('.checkout');
+			summarize = self.find('.checkout-summarize b');
+
+			self.event('click', '.fa-times-circle', function() {
+				var ccontainer = $(this).closest('.checkout-container');
+				skip = true;
+				FIND('shoppingcart').rem(ccontainer.attrd('token'));
+				ccontainer.remove();
+			});
+
+			self.event('input', 'input', function() {
+				setTimeout2(self.id, function(input) {
+					skip = true;
+					var count = input.value.parseInt();
+					var ccontainer = $(input).closest('.checkout-container');
+					var shoppingcart = FIND('shoppingcart');
+					var product = shoppingcart.read(ccontainer.attrd('token'));
+					var item = ccontainer.get(0).$item;
+					count = shoppingcart.upd(product.token, count);
+					item.sum.html(currency.format((count * product.sum).format(2)));
+					input.value = count;
+				}, 500, 10, this);
+			});
+
+			self.on('shoppingcart.sum', function(data) {
+				summarize.html(currency.format(data.sum.format(2)));
+				!skip && self.render();
+			});
+		};
+
+		self.render = function() {
+			FIND('shoppingcart', function(com) {
+				container.empty();
+				com.items().forEach(function(item) {
+					var obj = self.template.clone();
+					obj.attrd('token', item.token);
+					obj.name.html(item.name);
+					item.variant && obj.variant.html(item.variant);
+					obj.count.val(item.count);
+					obj.price.html(currency.format(item.sum.format(2)));
+					obj.sum.html(currency.format((item.count * item.sum).format(2)));
+
+					if (item.stock)
+						obj.stock.html(item.stock).rclass('red');
+					else
+						obj.stock.html('@(out of stock)').aclass('red');
+
+					// a hidden reference to this virtualized instance
+					obj.element.get(0).$item = obj;
+					container.append(obj.element);
+				});
+			});
+		};
 	});
 
-	function refresh(redraw) {
-		var cart = CACHE('cart');
-		var index = 0;
-		while (true) {
+	function ordersubmit() {
 
-			var product = datasource[index++];
-			if (product === undefined)
-				break;
+		var shoppingcart = FIND('shoppingcart');
+		if (shoppingcart.price === 0) {
+			// error
+			return;
+		}
 
-			var item = cart.findItem('id', product.id);
+		// Removes products with zero count
+		shoppingcart.clean();
+		order.form.items = shoppingcart.get().items;
+		SETTER('loading', 'show');
 
-			if (!item) {
-				index--;
-				datasource.splice(index, 1);
-				continue;
+		AJAX('POST /api/orders/create/', order.form, function(response) {
+
+			SETTER('loading', 'hide', 1000);
+
+			if (response.success) {
+				shoppingcart.clear();
+				setTimeout(function() {
+					location.href = '@{sitemap_url('order', '{0}')}'.format(response.value);
+				}, 1000);
+			} else {
+				RESET('order.form.*');
+				SET('order.form.response', response);
 			}
 
-			product.count = item.count;
-		}
-
-		var count = 0;
-		var price = 0;
-		for (var i = 0, length = datasource.length; i < length; i++) {
-			var product = datasource[i];
-			price += product.price * product.count;
-			count += product.count;
-		}
-
-		redraw && UPDATE('datasource');
-		SET('summarize', { count: count, price: price });
+		});
 	}
 
-	OPERATION('submit', function() {
-		if (BLOCKED('submit', 3000))
-			return;
+	function ordercopyaddress() {
+		SET('order.form.deliverystreet', order.form.billingstreet, true);
+		SET('order.form.deliverycity', order.form.billingcity, true);
+		SET('order.form.deliveryzip', order.form.billingzip, true);
+		SET('order.form.deliverycountry', order.form.billingcountry, true);
+	}
 
-		form.products = datasource;
-
-		RESET('form.*');
-		loading(true);
-
-		AJAX('POST /api/checkout/create/', form, function(response) {
-			loading(false, 1000);
-
-			if (!response.success) {
-				SET('common.success', response);
-				return;
-			}
-
-			SETTER('checkout', 'clear');
-			location.href = jRouting.path(location.pathname) + response.value + '/?success=1';
-		});
-	});
-
-	function copyaddress() {
-		form.deliveryfirstname = form.firstname;
-		form.deliverylastname = form.lastname;
-		form.deliverystreet = form.billingstreet;
-		form.deliverynumber = form.billingnumber;
-		form.deliverycountry = form.billingcountry;
-		form.deliveryphone = form.phone;
-		form.deliveryzip = form.billingzip;
-		form.deliverycity = form.billingcity;
-		UPDATE('form');
+	function ordercopypersonal() {
+		SET('order.form.deliveryfirstname', order.form.firstname, true);
+		SET('order.form.deliverylastname', order.form.lastname, true);
+		SET('order.form.deliveryphone', order.form.phone, true);
 	}
 
 </script>
-@{end}

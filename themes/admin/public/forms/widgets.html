@@ -1,0 +1,152 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:plug;if:widgets-form;title:@(Edit);width:800;reload:Widgets/formShow;submit:Widgets/formSubmit;autofocus:true" data-jc-controller="Widgets">
+	<div class="padding">
+		<div data-jc="textbox" data-jc-path="widgets.form.name" data-jc-config="required:true;maxlength:50" class="m">@(Name)</div>
+		<div data-jc="dropdown" data-jc-path="widgets.form.category" data-jc-config="items:,@(Layout)|Layouts,@(Columns)|Columns,@(Content)|Content,@(Inline)|Inline,@(Newsletter)|Newsletter;icon:folder-o;required:true">@(Select existing category)</div>
+		<div class="fs11 mt10" data-b="widgets.form.id" data-b-visible="!!value"><a href="javascript:void(0)" class="exec" data-exec="Widgets/backups"><i class="fa fa-clock-o mr5"></i>@(Restore a backup)</a></div>
+	</div>
+	<div class="padding bg-yellow">
+		<div data-jc="codemirror" data-jc-path="widgets.form.body" data-jc-config="height:500;icon:code;required:true;tabs:true;trim:true">@(Source-code)</div>
+		<div class="row fs12 mt10">
+			<div class="col-xs-6">
+				<a href="javascript:void(0)" class="exec mr10" data-exec="Widgets/upload"><i class="fa fa-folder mr5"></i>@(Browse files)</a>
+				<a href="https://componentator.com/widgets/" target="_blank"><i class="fa fa-download mr5"></i>@(Download widgets)</a>
+			</div>
+			<div class="col-xs-6 right">
+				<a href="javascript:void(0)" class="exec mr10" data-exec="Widgets/formTemplate"><i class="fa fa-code mr5"></i>@(Preddefined template)</a>
+				<a href="https://wiki.totaljs.com/?q=cms%20widgets" target="_blank"><i class="fa fa-book mr5"></i>@(Documentation)</a>
+			</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-8">
+				<div data-jc="fontawesomebox" data-jc-path="widgets.form.icon" data-jc-config="search:@(Search icon);height:200"></div>
+			</div>
+			<div class="col-md-4">
+				<div data-jc="preview" data-jc-path="widgets.form.picture" data-jc-config="width:300;height:200;url:[url]api/upload/base64/">@(Preview)</div>
+				<div class="help">@(Keep the fix size 300x200px)</div>
+			</div>
+		</div>
+	</div>
+	<div data-jc="error" data-jc-path="widgets.form.response"></div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="widgets.form">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(SAVE)</button>
+	</div>
+</div>
+
+<script id="widgetstemplate" type="text/plain">
+<CSS>
+	/* "$color" variable needs to be defined in globals */
+	.wmywidgetname { border: 2px solid $color; }
+</CSS>
+
+<JS editor>
+
+	// Optional, this code you can remove
+
+	// option(id, label, defValue, [type]);
+	// https://componentator.com/#j-multioptions
+	option('size', 'Size', 10);
+
+	exports.configure = function(options, element, prev) {
+
+		// is executed if the user change the widget settings
+		// options = defined options (always Object)
+		// element = jQuery element
+		// prev    = previous options (can be "null")
+
+		// Here you can transform the widget e.g. like this:
+		element.find('.wmywidgetname').css('font-size', options.size);
+	};
+
+</JS>
+
+<JS total>
+
+	// Optional, this code you can remove
+
+	exports.install = function() {
+		// optional
+	};
+
+	exports.uninstall = function() {
+		// optional
+	};
+
+	// Server-side processing (async)
+	exports.render = function(options, html, next) {
+
+		// optional
+
+		// options = defined options (always Object)
+		// html    = String (a content of the whole widget element)
+		// next    = Function
+
+		// Next needs to return a new HTML string
+		// CMS replaces old HTML with a new
+		next(html + 'UPDATED');
+
+	};
+</JS>
+
+<div class="wmywidgetname CMS_edit CMS1">Lorem Ispum Text</div>
+</script>
+
+<script>
+
+	SCOPE('Widgets', function(ctrl) {
+
+		ctrl.formShow = function(com) {
+			com.reconfigure({ title: ctrl.get('form.id') ? '@(Edit widget)' : '@(New widget)' });
+			SETTER('loading', 'hide', 1000);
+		};
+
+		ctrl.upload = function(el) {
+			refresh_filebrowser(function(file) {
+				SETTER('.widgets.form.body', 'insert', file);
+			});
+		};
+
+		ctrl.formTemplate = function() {
+			ctrl.set('form.body', $('#widgetstemplate').html().replace(/<CSS/g, '<style').replace(/<\/CSS/g, '</style').replace(/<JS/g, '<script').replace(/<\/JS/g, '</script').trim());
+		};
+
+		ctrl.formSubmit = function(com) {
+			SETTER('loading', 'show');
+			AJAX('POST [url]api/widgets/', ctrl.get('form'), function(response) {
+				SETTER('loading', 'hide', 1000);
+				if (response.success) {
+					SETTER('snackbar', 'success', '@(Widget has been saved successfully.)');
+					com.hide();
+					ctrl.refresh();
+				}
+			});
+		};
+
+		ctrl.backups = function(el) {
+
+			SETTER('loading', 'show');
+			AJAX('GET [url]api/widgets/{0}/backups/'.format(ctrl.get('form.id')), function(response) {
+
+				SETTER('loading', 'hide', 1000);
+
+				for (var i = 0, length = response.length; i < length; i++) {
+					var item = response[i];
+					item.name = '{0} <b class="badge badge-blue"><i class="fa fa-user mr5"></i>{1}</b>'.format(item.date.format('@(yyyy-MM-dd HH:mm)'), item.user);
+				}
+
+				response.quicksort('date', false);
+
+				SETTER('suggestion', 'show', 'left', el, response, function(value) {
+					SETTER('loading', 'show');
+					setTimeout(function() {
+						SET(ctrl.path('form.body'), value.data.body);
+						CHANGE(ctrl.path('form.body'), true);
+						SETTER('loading', 'hide', 1000);
+					}, 100);
+				});
+			});
+		};
+	});
+</script>

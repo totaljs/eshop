@@ -1,0 +1,16 @@
+@{notranslate}
+@{nocompress html}
+
+<!-- ALL CMS CONTENT (FOR EDITOR) MUST BE WRAPPED IN <div id="CMS"> -->
+<div id="CMS" class="postdetail">
+	@{if repository.page && repository.page.body}
+		<!-- RENDER UPDATED CONTENT -->
+		@{!repository.page.body}
+	@{else}
+		<div class="image"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA1IAAAEsAQMAAADzXxDcAAAAA1BMVEWpqamhHEfZAAAANklEQVR4Xu3AMQEAAADCIPuntsYOWBIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB36QAAFcj3CiAAAAAElFTkSuQmCC" class="CMS_edit img-responsive" data-cms-width="850" data-cms-height="300" alt="" /></div>
+		<h1 class="CMS_edit CMS_search">Lorem ipsum dolor sit amet</h1>
+		<div class="CMS_widgets content" data-cms-category="Content,Columns">
+
+		</div>
+	@{fi}
+</div>

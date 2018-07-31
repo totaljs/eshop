@@ -1,0 +1,352 @@
+<style>
+	/*auto*/
+	.ui-productsprices { display: table; width: 100%; margin-bottom: 10px; }
+	.ui-productsprices-item { display: table-row; }
+	.ui-productsprices-item > div { display: table-cell; padding: 2px 5px; }
+	.ui-productsprices-item > div:first-child { padding-left: 0; }
+	.ui-productsprices-item > div:last-child { padding-right: 0; }
+	.ui-productsprices-item input { width: 100%; background-color: transparent; border: 0; border-bottom: 1px dotted black; font-weight: normal; outline: 0; text-align: right; padding: 1px 5px; margin: 0; font-size: 14px; }
+	.ui-productsprices-reference { width: 100px; }
+	.ui-productsprices-reference input { text-align: left; }
+	.ui-productsprices-name input { text-align: left; }
+	.ui-productsprices-stock { width: 110px; }
+	.ui-productsprices-stock div { margin-right: 20px; }
+	.ui-productsprices-stock .fa { float: right; color: red; width: 18px; cursor: pointer; margin: 5px 0 0; text-align: right; }
+	.ui-productsprices-price { width: 120px; background-color: #F0F0F0; padding-right: 10px !important; }
+	.ui-productsprices-sum { width: 120px; text-align: right; background-color: #FFFFF5; font-size: 14px; }
+	.ui-productsprices-sum > div { padding: 1px 5px; border-bottom: 1px solid black; }
+	.ui-productsprices-header { margin-bottom: 10px; }
+	.ui-productsprices-header .ui-productsprices-price { background-color: transparent; }
+	.ui-productsprices-header > div { padding: 5px 5px; font-weight: bold; text-align: right; }
+	.ui-productsprices-header .ui-productsprices-name { text-align: left; }
+	.ui-productsprices-header .ui-productsprices-stock { padding-right: 20px !important; }
+	.ui-productsprices-header .fa { margin: 0 5px 0 0; cursor: default; color: black; }
+
+	@media(max-width: 768px) {
+		.ui-productsprices-item > div { display: block; height: 30px; }
+		.ui-productsprices-item { display: block; height: 80px; }
+		.ui-productsprices { display: block; }
+		.ui-productsprices-reference { width: 33%; float: left;}
+		.ui-productsprices-name { margin-left: 33%; }
+		.ui-productsprices-price { width: 33%; float: left; }
+		.ui-productsprices-stock { width: 33%; float: left; }
+		.ui-productsprices-sum { width: 33%; float: right; }
+	}
+</style>
+
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:dropbox;if:products-form;width:1300;reload:Products/formShow;submit:Products/formSubmit;autofocus:true" data-jc-controller="Products">
+	<div class="padding" style="padding-bottom:10px">
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="products.form.name" data-jc-config="placeholder:@(Homepage);required:true">@(Name)</div>
+				<div class="mt10">
+					<div data-jc="checkbox" data-jc-path="products.form.ispublished" class="inline mr10">@(Is published)</div>
+					<div data-jc="checkbox" data-jc-path="products.form.istop" class="inline mr10">@(Mark as <b>TOP product</b>)</div>
+					<div data-jc="checkbox" data-jc-path="products.form.isnew" class="inline">@(New in the store)</div>
+				</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdown" data-jc-path="products.form.template" data-jc-config="datasource:common.dependencies.templatesproducts;empty:">@(Template)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdowncheckbox" data-jc-path="products.form.signals" data-jc-config="datasource:signals;empty:@(Doesn't contain any signals.);icon:dot-circle-o">@(Signals)</div>
+			</div>
+		</div>
+	</div>
+	<hr data-b="products.form.template" data-b-visible="!value" class="nmt nmb" />
+	<div class="cmseditor" data-jc="cmseditor" data-jc-path="products.form.body" data-jc-import="[url]components/cmseditor.html" data-b="products.form.template" data-b-visible="value"></div>
+	<div class="backups hidden" data-b="products.form.id" data-b-visible="!!value"><a href="javascript:void(0)" class="exec" data-exec="Products/backups"><i class="fa fa-clock-o mr5"></i>@(Restore a backup)</a></div>
+
+	<div class="col-md-6 bg-yellow np">
+		<div class="padding">
+			<div data-jc="dropdown" data-jc-path="products.form.category" data-jc-config="datasource:products.dependencies.categories;empty:;value:name;icon:folder-o" class="m">@(Choose existing category)</div>
+			<div data-jc="textbox" data-jc-path="products.form.category" data-jc-config="required:true;maxlength:500;placeholder:@(Main category / Sub-category 1 / Sub-category 2)">@(Category)</div>
+			<div class="help">@(Subcategories are created automatically by splitting / backslash char.)</div>
+		</div>
+	</div>
+	<div class="col-md-6 bg-smoke np">
+		<div class="padding">
+			<div data-jc="dropdown" data-jc-path="products.form.manufacturer" data-jc-config="datasource:products.dependencies.manufacturers;empty:;value:name;icon:industry" class="m">@(Choose existing manufacturer)</div>
+			<div data-jc="textbox" data-jc-path="products.form.manufacturer" data-jc-config="required:true;maxlength:50">@(Manufacturer)</div>
+			<div class="help">&nbsp;</div>
+		</div>
+	</div>
+	<div class="clearfix"></div>
+	<hr class="nmt" />
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textarea" data-jc-path="products.form.description" data-jc-config="height:86;required:true">@(Simple description)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textboxtags" data-jc-path="products.form.size" data-jc-config="height:92;uppercase:true">@(Sizes)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textboxtags" data-jc-path="products.form.color" data-jc-config="height:92;lowercase:true">@(Colors)</div>
+			</div>
+		</div>
+		<br />
+		<div class="row">
+			<div class="col-md-2 m">
+				<div data-jc="textbox" data-jc-path="products.form.priceold" data-jc-config="maxlength:12;type:currency;align:center">@(Old price)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-jc="textbox" data-jc-path="products.form.reference" data-jc-config="maxlength:50;align:center;icon:braille">@(Custom reference)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-jc="textbox" data-jc-path="products.form.availability" data-jc-config="maxlength:50;align:center;placeholder:@(In stock)">@(Availability)</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="bg-yellow padding">
+		<div data-jc="productsprices" data-jc-path="products.form.prices">
+			<div class="ui-productsprices-item ui-productsprices-header">
+				<div class="ui-productsprices-name"><i class="fa fa-dropbox"></i>@(Variant name)</div>
+				<div class="ui-productsprices-price">@(Price)</div>
+				<div class="ui-productsprices-stock">@(Stock)</div>
+			</div>
+			<script type="text/html">
+				<div class="ui-productsprices-item ui-productsprices-row">
+					<div class="ui-productsprices-name"><input type="text" maxlength="100" name="name" placeholder="@(Enter e.g. size and color)" /></div>
+					<div class="ui-productsprices-price"><input type="text" maxlength="10" name="price" placeholder="@(Price)" /></div>
+					<div class="ui-productsprices-stock"><i class="fa fa-times"></i><div><input type="text" maxlength="5" name="stock" placeholder="@(Stock)" /></div></div>
+				</div>
+			</script>
+		</div>
+		<div class="row">
+			<div class="col-xs-6 fs12"><a href="javascript:void(0)" class="exec" data-exec="Products/formAddItem"><i class="fa fa-plus-circle mr5"></i>@(Add a new item)</a></div>
+		</div>
+	</div>
+
+	<hr class="nmt" />
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4 col-md-offset-4 m mt10">
+				<button class="button button-small b" data-jc="fileupload" data-jc-path="products.form.pictures" data-jc-config="url:[url]api/upload/;multiple:true;accept:image/*;property:id;array:true"><i class="fa fa-camera"></i>@(Upload photos)</button>
+			</div>
+		</div>
+		<br />
+		<div class="row">
+			<div data-jc="pictures" data-jc-path="products.form.pictures"></div>
+		</div>
+	</div>
+
+	<div data-b="products.form.id" data-b-visible="value && value.length" class="hidden">
+		<hr class="nmt" />
+		<div class="padding">
+			<div class="row">
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key">@(# Id)</div>
+						<div class="value" data-b="products.form.id" data-b-html="n => n"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
+						<div class="value" data-b="products.form.datecreated" data-b-html="n => Tangular.helpers.time(n)"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Updated)</div>
+						<div class="value" data-b="products.form.dateupdated" data-b-html="n => n ? Tangular.helpers.time(n) : '@(unchanged)'"></div>
+					</div>
+				</div>
+			</div>
+			<br />
+			<div class="row">
+				<div class="col-md-6 m">
+					<div data-jc="nosqlcounter" data-jc-path="products.form.stats.views" data-jc-config="height:52"></div>
+					<div class="help"><i class="fa fa-bar-chart"></i>@(Stats of all views for the last period)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-jc="nosqlcounter" data-jc-path="products.form.stats.orders" data-jc-config="height:52"></div>
+					<div class="help"><i class="fa fa-bar-chart"></i>@(Stats of all orders for the last period)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div data-jc="error" data-jc-path="products.form.response"></div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="products.form">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(SAVE)</button>
+	</div>
+</div>
+
+<script>
+
+	SCOPE('Products', function(ctrl) {
+
+		ctrl.refreshDependencies = function() {
+			AJAX('GET [url]api/{0}/dependencies/'.format(ctrl.scope), ctrl.scope + '.dependencies');
+		};
+
+		ctrl.formShow = function(com) {
+
+			var model = products.form;
+			com.reconfigure({ title: model.id ? '@(Edit product)' : '@(New product)' });
+
+			WAIT('cmseditor.instance', function() {
+				cmseditor.instance.setWidgetOptions(model.widgets);
+			});
+
+			SETTER('loading', 'hide', 500);
+			model.id && AJAX('GET [url]api/{0}/{1}/stats/'.format(ctrl.scope, model.id), ctrl.scope + '.form.stats');
+		};
+
+		ctrl.formSubmit = function(com) {
+
+			SETTER('loading', 'show');
+
+			var model = CLONE(products.form);
+			var editor = cmseditor.instance;
+
+			model.pictures2 = editor.getPictures();
+			// model.summary = editor.getSummary();
+			model.body = editor.getContent().replace(/\n[\s\t]+\n/g, '\n');
+			// model.search = editor.getKeywords();
+
+			var w = editor.getWidgets();
+			model.widgets = w.settings;
+			model.bodywidgets = w.widgets;
+			model.stats = undefined;
+
+			AJAX('POST [url]api/{0}/'.format(ctrl.scope), model, function(response) {
+				SETTER('loading', 'hide', 1000);
+				if (response.success) {
+					SETTER('snackbar', 'success', '@(Product has been saved successfully.)');
+					com.hide();
+					ctrl.refresh();
+				}
+			});
+		};
+
+		ctrl.backups = function(el) {
+
+			SETTER('loading', 'show');
+			AJAX('GET [url]api/{0}/{1}/backups/'.format(ctrl.scope, ctrl.get('form.id')), function(response) {
+
+				SETTER('loading', 'hide', 1000);
+
+				for (var i = 0, length = response.length; i < length; i++) {
+					var item = response[i];
+					item.name = '{0} <b class="badge badge-blue"><i class="fa fa-user mr5"></i>{1}</b>'.format(item.date.format('@(yyyy-MM-dd HH:mm)'), item.user);
+				}
+
+				response.quicksort('date', false);
+
+				SETTER('suggestion', 'show', 'left', el, response, function(value) {
+					SETTER('loading', 'show');
+					setTimeout(function() {
+						cmseditor.instance.replace(value.data.body);
+						SETTER('loading', 'hide', 1000);
+					}, 100);
+				});
+			});
+		};
+
+		ctrl.watch('form.template', function(path, value, type) {
+			if (type === 2) {
+				cmseditor.instance.reconfigure('template:' + value);
+				cmseditor.instance.set('');
+			}
+		}, true);
+
+		ctrl.formAddItem = function() {
+			PUSH('products.form.prices', { price: 1, stock: 1, name: '' });
+		};
+
+		ctrl.refreshDependencies();
+	});
+
+	COMPONENT('productsprices', function(self, config) {
+
+		var template, items, skip = false;;
+
+		self.validate = function(value) {
+			return value ? value.length > 0 : false;
+		};
+
+		self.make = function() {
+			self.aclass('ui-productsprices');
+			var el = self.find('script');
+
+			// Creates a template
+			template = VIRTUALIZE(el.html(), { name: 'input[name="name"]', stock: 'input[name="stock"]', price: 'input[name="price"]' });
+
+			self.event('change', 'input', function() {
+				self.rebind();
+			});
+
+			self.event('click', '.fa', function() {
+				var index = $(this).closest('.ui-productsprices-item').attrd('index');
+				self.get().splice(index, 1);
+				self.update(true);
+				self.change(true);
+			});
+
+			el.remove();
+		};
+
+		self.rebind = function() {
+
+			var arr = self.get();
+			var tmp = {};
+
+			for (var i = 0, length = items.length; i < length; i++) {
+				var item = items[i];
+				var value = arr[i];
+
+				tmp.price = item.price.val().replace(/\s/g, '').parseFloat();
+				tmp.stock = item.stock.val().replace(/\s/g, '').parseInt();
+
+				if (tmp.stock < 0)
+					tmp.stock = 0;
+
+				value.name = item.name.val().trim();
+
+				if (tmp.price !== value.price || tmp.stock || value.stock) {
+					value.stock = tmp.stock;
+					value.price = tmp.price;
+					item.price.val(value.price.format(2));
+					item.stock.val(value.stock + 'x');
+				}
+			}
+
+			skip = true;
+			self.update(true);
+		};
+
+		self.setter = function(value) {
+
+			if (skip) {
+				skip = false;
+				return;
+			}
+
+			if (!value)
+				value = EMPTYARRAY;
+
+			self.find('.ui-productsprices-row').remove();
+			items = [];
+
+			for (var i = 0, length = value.length; i < length; i++) {
+				var item = value[i];
+				var el = template.clone();
+
+				el.name.val(item.name || '');
+				el.price.val((item.price || 0).format(2));
+				el.stock.val((item.stock || 0) + 'x');
+
+				el.attrd('index', i);
+				items.push(el);
+				self.append(el.element);
+			}
+
+		};
+	});
+
+
+</script>

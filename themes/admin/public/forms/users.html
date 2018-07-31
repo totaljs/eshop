@@ -1,0 +1,104 @@
+<div data-jc="form" data-jc-path="common.form" data-jc-id="users.form" data-jc-config="icon:user;if:users-form;title:@(Edit user);width:900;reload:Users/formShow;submit:Users/formSubmit;autofocus:true" data-jc-controlller="Users">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div class="keyvalue">
+					<div class="key">@(# Id)</div>
+					<div class="value" data-b="users.form.id" data-b-html="value"></div>
+				</div>
+			</div>
+			<div class="col-md-3 m">
+				<div class="keyvalue">
+					<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
+					<div class="value" data-b="users.form.datecreated" data-b-html="Tangular.helpers.time(value)"></div>
+				</div>
+			</div>
+			<div class="col-md-3 m">
+				<div class="keyvalue">
+					<div class="key"><i class="fa fa-desktop"></i>@(IP address)</div>
+					<div class="value" data-b="users.form.ip" data-b-html="value"></div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="nosqlcounter" data-jc-path="users.form.stats.logins" data-jc-config="height:52"></div>
+				<div class="help"><i class="fa fa-bar-chart"></i>@(Stats of all logins for last 16 months)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="nosqlcounter" data-jc-path="users.form.stats.orders" data-jc-config="height:52"></div>
+				<div class="help"><i class="fa fa-bar-chart"></i>@(Stats of all orders for last 16 months)</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding bg-yellow">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="users.form.discount" data-jc-config="align:center;increment:true;maxlength:10;type:number">@(Discount %)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="dropdown" data-jc-path="users.form.gender" data-jc-config="items:,@(male)|male,@(female)|female;required:true">@(Gender)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="users.form.name" data-jc-config="maxlength:50;required:true">@(Account name)</div>
+			</div>
+		</div>
+		<div data-jc="checkbox" data-jc-path="users.form.isblocked" class="b inline mr10 red">@(Is blocked)</div>
+		<div data-jc="checkbox" data-jc-path="users.form.isconfirmed" class="b inline blue">@(Is confirmed)</div>
+	</div>
+	<div class="padding mt10">
+		<div class="caption"><i class="fa fa-user"></i>@(Personal information)</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="users.form.firstname" data-jc-config="maxlength:50;required:true">@(First name)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="users.form.lastname" data-jc-config="maxlength:50;required:true">@(Last name)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="users.form.phone" data-jc-config="icon2:phone;maxlength:30;type:phone">@(Phone)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="users.form.email" data-jc-config="icon2:envelope-o;maxlength:120;required:true;type:email">@(Email)</div>
+			</div>
+		</div>
+	</div>
+
+	<div data-jc="error" data-jc-path="users.form.response"></div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="users.form">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(SAVE)</button>
+	</div>
+</div>
+
+<script>
+
+	SCOPE('Users', function(ctrl) {
+
+		ctrl.formShow = function(com) {
+			var model = ctrl.get('form');
+			model.id && AJAX('GET [url]api/{0}/{1}/stats/'.format(ctrl.scope, model.id), ctrl.scope + '.form.stats');
+			SETTER('loading', 'hide', 1000);
+		};
+
+		ctrl.formSubmit = function(com) {
+			SETTER('loading', 'show');
+
+			var data = CLONE(ctrl.scope + '.form');
+			data.stats = undefined;
+
+			AJAX('POST [url]api/{0}/'.format(ctrl.scope), data, function(response) {
+				SETTER('loading', 'hide', 1000);
+				if (response.success) {
+					SETTER('snackbar', 'success', '@(User has been saved successfully.)');
+					com.hide();
+					ctrl.refresh();
+				}
+			});
+		};
+
+	});
+
+</script>

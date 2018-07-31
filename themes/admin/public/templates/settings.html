@@ -1,0 +1,387 @@
+<div data-jc-controller="Settings" data-jc-scope="settings">
+
+	<br />
+	<div class="container">
+		<div class="panel">
+			<label>@(Main settings)</label>
+			<div class="panelbody">
+				<div class="row">
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox" data-jc-path="form.url" data-jc-config="required:true;placeholder:@(https://eshop.totaljs.com)">@(URL address)</div>
+					</div>
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox" data-jc-path="form.emailcontactform" data-jc-config="required:true;type:email">@(Email for contact form)</div>
+					</div>
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox" data-jc-path="form.emailorderform" data-jc-config="required:true;type:email">@(Email for order form)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox" data-jc-path="form.emailuserform" data-jc-config="required:true;type:email">@(Email for user form)</div>
+					</div>
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox" data-jc-path="form.emailreply" data-jc-config="required:true;type:email">@(Email for answers)</div>
+					</div>
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox" data-jc-path="form.emailsender" data-jc-config="required:true;type:email">@(Email for sending)</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br />
+	<br />
+	<div class="container">
+		<div class="panel">
+			<label>@(Delivery and Payment)</label>
+			<div class="panelbody bg-yellow">
+				<div class="row">
+					<div class="col-md-6 col-sm-6 m">
+						<div class="m" data-jc="textbox" data-jc-path="form.defaultorderstatus" data-jc-config="required:true">@(A default status for orders)</div>
+						<div class="row">
+							<div class="col-md-4">
+								<div data-jc="textbox" data-jc-path="form.currency" data-jc-config="align:center;maxlength:10;required:true;placeholder:EUR">@(Currency)</div>
+							</div>
+						</div>
+						<div class="help">@(Supports) <code>EUR</code>, <code>USD</code>, <code>GBP</code>, <code>JPY</code>, <code>CZK</code> and <code>BRL</code></div>
+					</div>
+					<div class="col-md-6 col-sm-6 m">
+						<div data-jc="textboxlist" data-jc-path="form.deliverytypes" class="m" data-jc-config="icon:truck;placeholder:@(Type a value and press enter)">@(Delivery types)</div>
+						<div data-jc="textboxlist" data-jc-path="form.paymenttypes" class="m" data-jc-config="icon:credit-card;placeholder:@(Type a value and press enter)">@(Payment types)</div>
+					</div>
+				</div>
+			</div>
+			<hr class="nmt" />
+			<div class="panelbody">
+				<div class="b"><i class="fa fa-paypal mr5"></i><b class="blue">PayPal</b> Express Checkout</div>
+				<br />
+				<div class="row">
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox" data-jc-path="form.paypaluser">@(User name)</div>
+					</div>
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox" data-jc-path="form.paypalpassword">@(Password)</div>
+					</div>
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox" data-jc-path="form.paypalsignature">@(Signature)</div>
+					</div>
+				</div>
+				<div data-jc="checkbox" data-jc-path="form.paypaldebug">@(Enable <b>a test mode for PayPal</b>)</div>
+			</div>
+		</div>
+	</div>
+	<br />
+	<br />
+
+	<div class="bg-yellow" data-b="user" data-b-visible="value.sa === true">
+		<br />
+		<br />
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3 col-sm-4 m">
+					<h3><i class="fa fa-file-text-o"></i>@(Templates)</h3>
+				</div>
+				<div class="col-md-9 col-sm-8 m">
+					<div data-jc="keyvalue" data-jc-path="form.templates" data-jc-value="{}" data-jc-config="icon:file-text-o;placeholderkey:@(A template name);placeholdervalue:@(Type a view name)">@(Page templates)</div>
+					<br />
+					<div data-jc="keyvalue" data-jc-path="form.templatesnewsletters" data-jc-value="{}" data-jc-config="icon:file-text-o;placeholderkey:@(A template name);placeholdervalue:@(Type a view name)">@(Newsletter templates)</div>
+					<br />
+					<div data-jc="keyvalue" data-jc-path="form.templatesposts" data-jc-value="{}" data-jc-config="icon:file-text-o;placeholderkey:@(A template name);placeholdervalue:@(Type a view name)">@(Post templates)</div>
+					<br />
+					<div data-jc="keyvalue" data-jc-path="form.templatesproducts" data-jc-value="{}" data-jc-config="icon:file-text-o;placeholderkey:@(A template name);placeholdervalue:@(Type a view name)">@(Product templates)</div>
+					<br />
+					<div class="help nmt"><i class="fa fa-warning"></i>@(All templates need to be created manually in <code>/themes/THEME_NAME/views/cms/</code> directory.)</div>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3 col-sm-4 m">
+					<h3><i class="fa fa-folder-o"></i>@(Categories)</h3>
+				</div>
+				<div class="col-md-9 col-sm-8 m">
+					<div data-jc="keyvalue" data-jc-path="form.navigations" data-jc-config="icon:sitemap;placeholderkey:@(A navigation name);placeholdervalue:@(Type an identificator and press enter)">@(Registered navigations)</div>
+					<div class="help">@(Global variable: <code>F.global.navigation.IDENTIFICATOR</code>)</div>
+					<br />
+					<div data-jc="keyvalue" data-jc-path="form.notices" data-jc-config="icon:folder-o;placeholderkey:@(A category name);placeholdervalue:@(Type an identificator and press enter)">@(Notices categories)</div>
+					<div class="help">@(Global variable: <code>F.global.notices</code>)</div>
+					<br />
+					<div data-jc="keyvalue" data-jc-path="form.posts" data-jc-config="icon:folder-o;placeholderkey:@(A category name);placeholdervalue:@(Type an identificator and press enter)">@(Posts categories)</div>
+					<div class="help">@(Global variable: <code>F.global.posts</code>)</div>
+					<br />
+					<div data-jc="keyvalue" data-jc-path="form.signals" data-jc-config="icon:dot-circle-o;placeholderkey:@(A signal name);placeholdervalue:@(Type an identificator and press enter)">@(Registered signals)</div>
+					<div class="help">@(Signals can affect a behaviour in pages or products.)</div>
+				</div>
+			</div>
+			<hr />
+			<div data-jc="textarea" data-jc-path="form.defaultcategories" data-jc-config="height:150;icon:folder-o;placeholder:@(Level 1 / Level 2 / Level 3)" class="ui-textarea-code">@(Preddefined categories for products)</div>
+			<div class="help">@(Each line will be parsed as a category.)</div>
+		</div>
+		<hr />
+		<div class="container">
+			<h3><i class="fa fa-envelope-o"></i>@(SMTP settings)</h3>
+			<div class="row">
+				<div class="col-md-6 m">
+					<div data-jc="textbox" data-jc-path="form.smtp" data-jc-config="icon:server;placeholder:@(smtp.yourdomain.com)">@(SMTP server)</div>
+					<div class="help">@(IP address or hostname.)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-jc="textbox" data-jc-path="form.smtpoptions" data-jc-config="icon:code;placeholder:@(SMTP options)">@(SMTP options)</div>
+					<div class="help">@(Options need to be defined in JSON format.)</div>
+				</div>
+			</div>
+		</div>
+		<br />
+	</div>
+	<br />
+
+	<div class="container">
+		<br />
+		<div class="help nmt">@(List of all registered administrators:)</div>
+		<div class="mt5"><a href="javascript:void(0)" class="exec" data-exec="Settings/userCreate"><i class="fa fa-user mr5"></i>@(Add a new administrator)</a></div>
+		<br />
+		<table class="table ui-table-grid">
+			<tbody data-jc="repeater" data-jc-path="form.users">
+				<script type="text/html">
+				<tr data-index="{{ index }}">
+					<td>{{ name }}</td>
+					<td style="width:300px" class="active hidden-xs fs11"><div class="singleline"><i class="fa fa-lock mr5"></i>{{ if roles && roles.length }}{{ roles | join(', ') }}{{ else }}<b class="b">@(Full privileges)</b>{{ fi }}</div></td>
+					<td style="width:80px" class="center">
+						<button name="edit" title="@(Edit)" class="exec" data-exec="Settings/userEdit"><i class="fa fa-pencil"></i></button>
+						<button name="remove" title="@(Remove)" class="exec btn-remove" data-exec="Settings/userRemove"><i class="fa fa-times"></i></button>
+					</td>
+				</tr>
+				</script>
+			</tbody>
+		</table>
+		<hr style="border-color:#D0D0D0" />
+		<br />
+		<div data-jc="error" data-jc-path="form.response"></div>
+		<div class="row">
+			<div class="col-md-4 m col-md-offset-4">
+				<div data-jc="validation" data-jc-path="form">
+					<button class="button b exec" name="submit" disabled="disabled" data-exec="Settings/save">@(SAVE SETTINGS)</button>
+				</div>
+			</div>
+		</div>
+		<br />
+	</div>
+</div>
+<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:settings-admin;url:[url]forms/settings-admin.html" data-jc-controller="Settings"></div>
+
+<script>
+
+	CONTROLLER('Settings', function(ctrl) {
+
+		ctrl.scope = 'settings';
+
+		ctrl.destroy = function() {
+			SETTER('sitemap', 'remove', ctrl.scope);
+		};
+
+		ctrl.save = function() {
+
+			// Prepare users
+			var data = CLONE(ctrl.get('form'));
+
+			data.users = ctrl.get('form').users;
+
+			var tmp = [];
+			Object.keys(data.templates).forEach(function(key) {
+				tmp.push({ name: key, id: settings.form.templates[key] });
+			});
+			data.templates = tmp;
+
+			tmp = [];
+			Object.keys(data.templatesposts).forEach(function(key) {
+				tmp.push({ name: key, id: data.templatesposts[key] });
+			});
+			data.templatesposts = tmp;
+
+			tmp = [];
+			Object.keys(data.templatesproducts).forEach(function(key) {
+				tmp.push({ name: key, id: data.templatesproducts[key] });
+			});
+			data.templatesproducts = tmp;
+
+			tmp = [];
+			Object.keys(data.templatesnewsletters).forEach(function(key) {
+				tmp.push({ name: key, id: data.templatesnewsletters[key] });
+			});
+			data.templatesnewsletters = tmp;
+
+			tmp = [];
+			Object.keys(data.navigations).forEach(function(key) {
+				tmp.push({ name: key, id: data.navigations[key] });
+			});
+			data.navigations = tmp;
+
+			tmp = [];
+			Object.keys(data.posts).forEach(function(key) {
+				tmp.push({ name: key, id: data.posts[key] });
+			});
+			data.posts = tmp;
+
+			tmp = [];
+			Object.keys(data.notices).forEach(function(key) {
+				tmp.push({ name: key, id: data.notices[key] });
+			});
+			data.notices = tmp;
+
+			tmp = [];
+			Object.keys(data.signals).forEach(function(key) {
+				tmp.push({ name: key, id: data.signals[key] });
+			});
+			data.signals = tmp;
+
+			tmp = [];
+			Object.keys(data.languages).forEach(function(key) {
+				tmp.push({ name: key, id: data.languages[key] });
+			});
+			data.languages = tmp;
+
+			SETTER('loading', 'show');
+			AJAX('POST [url]api/settings/', data, function(response) {
+
+				SETTER('loading', 'hide', 1000);
+
+				ctrl.set('form.response', response);
+				// RESET('settings.form.*');
+
+				if (response instanceof Array)
+					return;
+
+				// SET('languages', data.languages);
+				// SET('signals', data.signals);
+
+				// success(true);
+				// RESET('settings.form.*');
+				// EXEC('pages_refresh_dependencies');
+				// EXEC('posts_refresh_codelists');
+
+				refresh_dependencies();
+				ctrl.reset('form.*');
+				SETTER('snackbar', 'success', '@(Settings have been saved successfully.)');
+			});
+		};
+
+		ctrl.reload = function() {
+			AJAX('GET [url]api/settings/', function(response) {
+
+				var tmp = {};
+				response.templates && response.templates.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+
+				response.templates = tmp;
+
+				tmp = {};
+				response.templatesposts && response.templatesposts.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.templatesposts = tmp;
+
+				tmp = {};
+				response.templatesproducts && response.templatesproducts.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.templatesproducts = tmp;
+
+				tmp = {};
+				response.templatesnewsletters && response.templatesnewsletters.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.templatesnewsletters = tmp;
+
+				tmp = {};
+				response.navigations && response.navigations.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.navigations = tmp;
+
+				tmp = {};
+				response.posts && response.posts.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.posts = tmp;
+
+				tmp = {};
+				response.notices && response.notices.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.notices = tmp;
+
+				tmp = {};
+				response.languages && response.languages.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.languages = tmp;
+
+				tmp = {};
+				response.signals && response.signals.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.signals = tmp;
+
+				ctrl.set('form', response);
+			});
+
+		};
+
+		ctrl.userCreate = function() {
+			SET('settings.formuser', {}, true);
+			SET('common.form', 'settings-admin');
+		};
+
+		ctrl.userEdit = function(el) {
+			SET('settings.formuser', CLONE(settings.form.users[+el.closest('tr').attrd('index')]), true);
+			SET('common.form', 'settings-admin');
+		};
+
+		ctrl.userRemove = function(el) {
+
+			var index = +el.closest('tr').attrd('index');
+			var users = settings.form.users;
+			var user = users[index];
+
+			SETTER('confirm', 'confirm', '@(Are you sure you want to remove the user <b>"{0}"</b>?)'.format(user.name), ['"times-circle"@(Remove)', '@(No)'], function(index) {
+				if (!index) {
+					users.splice(index, 1);
+					ctrl.update('form.users');
+					ctrl.change('form.url', true);
+				}
+			});
+		};
+
+	});
+
+</script>

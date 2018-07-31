@@ -1,0 +1,591 @@
+<style>
+	/*auto*/
+
+	.dashboard-online-position { position: absolute; width: 100%; margin: 108px 0 0 -15px; }
+	.dashboard-online { font-size: 70px; text-align: center; font-weight: bold; line-height: 70px; }
+	.dashboard-online-date { font-size: 12px; color: gray; text-align: center; margin-bottom: 20px; }
+	.dashboard-devices { background-color: #4781B8; border-radius: 3px; margin-top: 5px; }
+	.dashboard-devices > div { height: 17px; border-radius: 3px; background-color: #EF914E; color: white; font-size: 11px; overflow: hidden; text-align: right; padding: 1px 5px 0 0; }
+
+	@media (max-width: 1199px) {
+		.dashboard-online-position { margin-top: 90px; }
+		.dashboard-online { font-size: 50px; line-height: 50px; }
+	}
+
+	.ui-dashboardvisitors table { border: 0; width: 100%; table-layout: fixed; font-size: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+	.ui-dashboardvisitors table .fa { margin-right: 5px; }
+	.ui-dashboardvisitors table tr td { background-color: white; }
+	.ui-dashboardvisitors table tr:nth-child(even) td { background-color: #F9F9F9; }
+	.ui-dashboardvisitors table td { padding: 3px 10px; border-left: 1px solid #E0E0E0; }
+	.ui-dashboardvisitors table .singline { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+	.ui-dashboardvisitors table td:first-child { border-left: 0; }
+	.ui-dashboardvisitors table th { padding: 5px 10px; background-color: #4285F4; color: white; border-left: 1px solid #6398F4; }
+	.ui-dashboardvisitors table th .fa { margin-right: 5px; }
+	.ui-dashboardvisitors table th:first-child { border-radius: 3px 0 0 0; border-left: 0; }
+	.ui-dashboardvisitors table th:last-child { border-radius: 0 3px 0 0; }
+
+	.ui-stats24 { height: 120px; background-color: #E5E5E5; border-radius: 3px 3px 0 0; box-shadow: inset 0 5px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
+	.ui-stats24-container { display: table; width: 100%; height: 119px; table-layout: fixed; }
+	.ui-stats24-bar { display: table-cell; vertical-align: bottom; padding: 0 1px; width: 4.16%; font-size: 9px; text-align: center; color: gray; }
+	.ui-stats24-bar div { background-color: #D0D0D0; border-radius: 3px 3px 0 0; position: relative; text-align: left; color: gray; }
+	.ui-stats24-bar:hover { opacity: 0.9; }
+	.ui-stats24-bar div span { position: absolute; top: 3px; width: 100%; text-align: center; border-bottom: 1px solid #E0E0E0; padding: 0 0 1px 0; }
+	.ui-stats24-bar div.online { background-color: #4584F1; color: white; }
+	.ui-stats24-bar div.online span { border-bottom-color: #6398F4; }
+	.ui-stats24-bar > span { background-color: #3D6ECC; padding: 1px 0; display: block; color: white; font-weight: bold; }
+
+	.dashboard-referrer { font-size: 12px; background-color: white; margin: 0 0 5px; padding: 5px 5px 5px 10px; border-radius: 3px; }
+	.dashboard-referrer > div:last-child { margin-right: 40px; }
+	.dashboard-referrer > div:first-child { width: 40px; text-align: center; float: right; font-weight: bold; border-left: 1px solid #E0E0E0; padding: 0 5px; }
+	.dashboard-referrer > div { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+
+	.dashboard-sources { height: 25px; display: table; width: 100%; table-layout: fixed; }
+	.dashboard-sources > div { height: 25px; display: table-cell; cursor: default; font-size: 11px; padding: 5px 5px 0; color: black; overflow: hidden; }
+	.dashboard-sources > div:first-child { border-radius: 3px 0 0 3px; }
+	.dashboard-sources > div:last-child { border-radius: 0 3px 3px 0; }
+	.dashboard-sources > div:hover { opacity: 0.9; }
+	.dashboard-sources span { display: block; max-width: 100%; width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+
+	@media (max-width: 500px) {
+		.dashboard-online-position { margin-top: 110px; }
+		.ui-stats24-bar { font-size: 7px; }
+	}
+</style>
+
+<div data-jc-controller="Dashboard">
+	<div class="container">
+		<div class="m">@(The total number of visitors:) <b data-b="dashboard.stats.today.visitors" data-b-html="(value || 0).format(0) + ' ' + (value || 0).pluralize(@('visitors', 'visitor', 'visitors', 'visitors'))"></b></div>
+		<div class="row">
+			<div class="col-md-4 m">
+				<div class="panel">
+					<label class="center"><i class="fa fa-circle green blink"></i>@(Online-visitors)</label>
+					<div class="panelbody">
+						<div class="dashboard-online-position hidden">
+							<div class="dashboard-online" data-b="dashboard.stats.today.online" data-b-html="value ? value : 0">0</div>
+							<div class="dashboard-online-date"><b>@(Last visitor:)</b> <span data-b="dashboard.stats.today.last" data-b-html="value ? Tangular.helpers.time(value) : '...'"></span></div>
+						</div>
+						<div data-jc="donutchart" data-jc-path="dashboard.stats.sources" data-jc-config="tooltip:false;redraw:Dashboard/redrawSources;select:Dashboard/selectSource;animate:false"></div>
+					</div>
+					<hr class="nmt nmb" />
+
+					<div class="panelbody">
+						<div class="stats m">
+							<div class="value" data-b="dashboard.stats.today.robots" data-b-html="dashboardcount(value)"></div>
+							<div class="key">@(Robots / Crawlers)</div>
+						</div>
+						<div class="stats">
+							<div class="value" data-b="dashboard.stats.today.mobile" data-b-html="dashboardcount(value)"></div>
+							<div class="key"><i class="fa fa-square" style="color:#EF914E"></i>@(Mobile devices)</div>
+						</div>
+						<div class="stats" style="border-bottom:0">
+							<div class="value" data-b="dashboard.stats.today.desktop" data-b-html="dashboardcount(value)"></div>
+							<div class="key"><i class="fa fa-square" style="color:#4781B8"></i>@(Desktop computers)</div>
+						</div>
+						<div data-b="dashboard.stats.today" data-b-html="dashboardmobiledesktop(value)" class="dashboard-devices"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-8 m">
+				<div class="row mt10">
+					<div class="col-md-6 m">
+						<div class="caption"><i class="fa fa-globe"></i>@(Sources today)</div>
+						<div class="stats" id="dashboard-sources-social">
+							<div class="value" data-b="dashboard.stats.today.social" data-b-html="dashboardcount(value)"></div>
+							<div class="key"><i class="fa fa-square" style="color:#649BD0"></i>@(From social networks)</div>
+						</div>
+						<div class="stats" id="dashboard-sources-advert">
+							<div class="value" data-b="dashboard.stats.today.advert" data-b-html="dashboardcount(value)"></div>
+							<div class="key"><i class="fa fa-square" style="color:#FD8D3C"></i>@(From adverts)</div>
+						</div>
+						<div class="stats" id="dashboard-sources-search">
+							<div class="value" data-b="dashboard.stats.today.search" data-b-html="dashboardcount(value)"></div>
+							<div class="key"><i class="fa fa-square" style="color:#74C476"></i>@(From organic search)</div>
+						</div>
+						<div class="stats" id="dashboard-sources-direct">
+							<div class="value" data-b="dashboard.stats.today.direct" data-b-html="dashboardcount(value)"></div>
+							<div class="key"><i class="fa fa-square" style="color:#9E9AC8"></i>@(Direct visitors)</div>
+						</div>
+						<div class="stats" id="dashboard-sources-unknown">
+							<div class="value" data-b="dashboard.stats.today.unknown" data-b-html="dashboardcount(value)"></div>
+							<div class="key"><i class="fa fa-square" style="color:#969696"></i>@(From unknown source)</div>
+						</div>
+					</div>
+					<div class="col-md-6 m">
+						<div class="caption"><i class="fa fa-users"></i>@(Today statistics)</div>
+						<div class="stats">
+							<div class="value" data-b="dashboard.stats.today.hits" data-b-html="dashboardcount(value)"></div>
+							<div class="key">@(Hits)</div>
+						</div>
+						<div class="stats">
+							<div class="value" data-b="dashboard.stats.today.count" data-b-html="dashboardcount(value)"></div>
+							<div class="key">@(Visitors)</div>
+						</div>
+						<div class="stats">
+							<div class="value" data-b="dashboard.stats.today.unique" data-b-html="dashboardcount(value)"></div>
+							<div class="key">@(Unique visitors)</div>
+						</div>
+						<div class="stats">
+							<div class="value" data-b="dashboard.stats.today.uniquemonth" data-b-html="dashboardcount(value)"></div>
+							<div class="key">@(Unique visitors per month)</div>
+						</div>
+						<div class="stats">
+							<div class="value" data-b="dashboard.stats.today.pages" data-b-html="dashboardcount(value)"></div>
+							<div class="key">@(Visited pages per user)</div>
+						</div>
+					</div>
+				</div>
+				<div data-jc="dashboardvisitors">
+					<table>
+						<thead>
+							<tr>
+								<th style="width:135px"><i class="fa fa-refresh fa-spin"></i>@(Type)</th>
+								<th><i class="fa fa-globe"></i>@(Address)</th>
+								<th style="width:110px" class="hidden-xs"><i class="fa fa-user"></i>@(User)</th>
+								<th style="width:110px" class="hidden-xs">@(IP address)</th>
+								<th style="width:70px" class="hidden-xs center"><i class="fa fa-clock-o"></i>@(Time)</th>
+							</tr>
+						</thead>
+						<tbody>
+
+							<!-- WITH DATA -->
+							<script type="text/html">
+								<tr>
+									<td><div class="singline">{{ if newbie }}<i class="fa fa-plus-circle green"></i>{{ fi }}{{ type }}</div></td>
+									<td><div class="singline"><span class="badge badge-silver badge-small mr5">{{ id }}</span>{{ if unique }}<span class="badge badge-green mr5">@(+new)</span>{{ fi }}{{ if mobile }}<i class="fa fa-mobile"></i>{{ fi }}<a href="{{ url }}" target="_blank">{{ url }}</a></div></td>
+									<td class="hidden-xs"><div class="singline">{{ user }}</div></td>
+									<td class="hidden-xs">{{ ip }}</td>
+									<td class="hidden-xs center">{{ date | format('HH:mm:ss') }}</td>
+								</tr>
+							</script>
+
+							<!-- EMPTY -->
+							<script type="text/html">
+							<tr>
+								<td>&nbsp;</td>
+								<td></td>
+								<td class="hidden-xs"></td>
+								<td class="hidden-xs"></td>
+								<td class="hidden-xs"></td>
+							</tr>
+							</script>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<br />
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4">
+				<div class="caption"><i class="fa fa-user-circle"></i>@(Maximum daily online visitors)</div>
+			</div>
+			<div class="col-md-4 col-md-offset-4 right hidden-sm hidden-xs">
+				&empty; <span data-b="dashboard.stats.today.hoursavg" class="fs11 gray" data-b-html="(value || 0).pluralize(@('# visitors', '# visitor', '# visitors', '# visitors'))"></span>
+			</div>
+		</div>
+		<div data-jc="stats24" data-jc-path="dashboard.stats.today.hours"></div>
+
+		<div data-b="dashboard.stats.visitors" data-b-visible="value" class="hidden m">
+			<div class="row">
+				<div class="col-md-6 m">
+
+					<div style="float:right;margin-top:-3px" data-b="dashboard.stats.history" data-b-template="true">
+						{{ foreach m in value }}
+							<a href="javascript:void(0)" class="exec fs12" style="margin-left:15px" data-exec="Dashboard/history" data-year="{{ m }}"><i class="fa fa-calendar mr5"></i>{{ m }}</a>
+						{{ end }}
+					</div>
+
+					<div class="legend m fs12">
+						<i class="fa fa-square legend-1 mr5"></i><span class="mr10">@(Visitors)</span>
+						<i class="fa fa-square legend-2 mr5"></i><span class="mr10">@(Unique)</span>
+					</div>
+					<div data-jc="barchart" data-jc-path="dashboard.stats.visitors" data-jc-config="height:250"></div>
+					<div class="mt10" data-b="dashboard.stats.visitorssum" data-b-template="true">
+						<script type="text/html">
+							<span class="fs11 gray" style="float:right"><b>{{ value.unique | format(0) }}</b> {{ value.unique | pluralize(@('uniques', 'unique', 'uniques', 'uniques')) }}</span>
+							<span class="fs11 gray"><b>{{ value.count | format(0) }}</b> {{ value.count | pluralize(@('visitors', 'visitor', 'visitors', 'visitors')) }}</span>
+						</script>
+					</div>
+				</div>
+				<div class="col-md-6 m">
+					<div class="legend m fs12">
+						<i class="fa fa-square legend-1 mr5"></i><span class="mr10">@(Desktop)</span>
+						<i class="fa fa-square legend-2 mr5"></i><span class="mr10">@(Mobile)</span>
+					</div>
+					<div data-jc="barchart" data-jc-path="dashboard.stats.devices" data-jc-config="height:250"></div>
+					<div style="margin-top:8px" data-b="dashboard.stats.devicessum" data-b-template="true">
+						<script type="text/html">
+							<span class="fs11 gray" style="float:right">@(Mobile:) <b>{{ value.mobile | format(0) }}</b></span>
+							<span class="fs11 gray">@(Desktop:) <b>{{ value.desktop | format(0) }}</b></span>
+						</script>
+					</div>
+				</div>
+			</div>
+
+			<div data-b="dashboard.stats.sourcessum" data-b-template="true">
+				<div class="dashboard-sources">
+					<div style="width:{{ value.social }}%;background-color:#649BD0" title="@(From social networks: {{ value.social }}%)"><span>@(Social {{ value.social }}%)</span></div>
+					<div style="width:{{ value.advert }}%;background-color:#EF914E" title="@(From adverts: {{ value.advert }}%)"><span>@(Adverts {{ value.advert }}%)</span></div>
+					<div style="width:{{ value.search }}%;background-color:#87C17E" title="@(From search engines: {{ value.search }}%)"><span>@(Search {{ value.search }}%)</span></div>
+					<div style="width:{{ value.direct }}%;background-color:#9D9BC5" title="@(Direct visitors: {{ value.direct }}%)"><span>@(Direct {{ value.direct }}%)</span></div>
+					<div style="width:{{ value.unknown }}%;background-color:#969696" title="@(From unknown sources: {{ value.unknown }}%)"><span>@(Unknown {{ value.unknown }}%)</span></div>
+				</div>
+			</div>
+
+		</div>
+
+		<br />
+
+		<div data-b="dashboard.stats.referrers" data-b-template="true">
+			<script type="text/html">
+				{{ if value && value.length }}
+				<div class="row">
+					<div class="col-md-4">
+						<div class="caption"><i class="fa fa-exchange"></i>@(Top referrers)</div>
+					</div>
+				</div>
+				<div class="row">
+					{{ foreach m in value }}
+					<div class="col-md-3 col-xs-6">
+						<div class="dashboard-referrer">
+							<div>{{ m.count }}</div>
+							<div>{{ m.id }}</div>
+						</div>
+					</div>
+					{{ end }}
+				</div>
+				<br />
+				<br />
+				{{ fi }}
+			</script>
+		</div>
+	</div>
+
+	<div class="container">
+
+		<div class="tabmenu-container">
+			<ul data-jc="tabmenu" class="tabmenu" data-jc-path="dashboard.tab" data-jc-value="'orders'">
+				<li data-value="orders"><i class="fa fa-shopping-basket"></i>@(New orders)</li>
+				<li data-value="contactforms"><i class="fa fa-envelope"></i>@(Contact forms)</li>
+				<li data-value="pages"><i class="fa fa-search"></i>@(Page views)</li>
+				<li data-value="posts"><i class="fa fa-hashtag"></i>@(Posts)</li>
+				<li data-value="subscribers"><i class="fa fa-send"></i>@(New subscribers)</li>
+				<li data-value="users"><i class="fa fa-user-circle"></i>@(New users)</li>
+				<li data-value="newsletters"><i class="fa fa-envelope-open-o"></i>@(Newsletter views)</li>
+			</ul>
+		</div>
+	</div>
+	<div class="bg-white">
+		<br />
+		<br />
+		<br />
+		<div class="container">
+			<div data-jc="nosqlcounter" data-jc-path="dashboard.stats.nosqlcounter" class="m" data-jc-config="height:250"></div>
+		</div>
+		<br />
+		<br />
+	</div>
+</div>
+
+<script>
+
+	function dashboardcount(value) {
+		return (value || 0).format(0) + 'x';
+	}
+
+	function dashboardmobiledesktop(value) {
+
+		if (!value)
+			return '';
+
+		var max = value.mobile + value.desktop;
+		var mobile = 0;
+
+		if (max)
+			mobile = (value.mobile / max) * 100;
+		else
+			mobile = 50;
+
+		var p = mobile < 10 ? 10 : mobile;
+		return '<div style="width:{0}%">{1}%</div>'.format(p, mobile.format(0));
+	}
+
+	CONTROLLER('Dashboard', function(ctrl) {
+
+		var interval;
+		var prevsource;
+		var historystats;
+		var internalstats = {};
+
+		// Default scope
+		ctrl.scope = 'dashboard';
+
+		ctrl.destroy = function() {
+			clearInterval(interval);
+			SETTER('sitemap', 'remove', ctrl.scope);
+		};
+
+		ctrl.getOnline = function() {
+
+			if (common.page !== 'dashboard')
+				return;
+
+			AJAX('GET [url]api/dashboard/online/', function(response) {
+				response.hoursavg = response.hours.filter(FN('n => n > 0')).scalar('median') >> 0;
+				ctrl.set('stats.sources', [{ name: '@(Social networks)', value: response.social, id: 'social' }, { name: '@(Visitors from advert)', value: response.advert, id: 'advert' }, { name: '@(Organic search)', value: response.search, id: 'search' }, { name: '@(Direct visitors)', value: response.direct, id: 'direct' }, { name: '@(From unknown sources)', value: response.unknown, id: 'unknown' }]);
+				ctrl.set('stats.today', response);
+			});
+		};
+
+		ctrl.hidden = function() {
+			clearInterval(interval);
+		};
+
+		// Public methods
+		ctrl.reload = function() {
+			interval = setInterval(ctrl.getOnline, 4000);
+			ctrl.getOnline();
+
+			setTimeout(function() {
+				AJAX('GET [url]api/dashboard/', function(response) {
+
+					var keys = Object.keys(response);
+					var years = {};
+
+					for (var i = 0, length = keys.length; i < length; i++) {
+						var item = response[keys[i]];
+						years[item.year] = true;
+					}
+
+					years = Object.keys(years);
+					years.sort();
+
+					historystats = response;
+
+					keys.forEach(function(key) {
+						var o = historystats[key];
+						internalstats.visitors = Math.max(o.count || 0, internalstats.visitors || 0);
+						internalstats.devices = Math.max(o.mobile || 0, o.desktop || 0, internalstats.devices || 0);
+					});
+
+					if (internalstats.visitors > 0) {
+						SETTER('barchart .dashboard.stats.visitors', 'reconfigure', 'limit:' + (Math.ceil(internalstats.visitors / 10000) * 10000));
+						SETTER('barchart .dashboard.stats.devices', 'reconfigure', 'limit:' + (Math.ceil(internalstats.devices / 10000) * 10000));
+					}
+
+					SET('dashboard.stats.history', years);
+					years.length && ctrl.history(years.last());
+				});
+
+				AJAX('GET [url]api/dashboard/referrers/', 'dashboard.stats.referrers');
+
+			}, 500);
+		};
+
+		ctrl.history = function(el) {
+			var year = +(typeof(el) === 'string' ? el : el.attr('data-year'));
+			SET('dashboard.stats.visitors', ctrl.getStats(year, ['count', 'unique']));
+			SET('dashboard.stats.devices', ctrl.getStats(year, ['desktop', 'mobile']));
+			SET('dashboard.stats.visitorssum', ctrl.getStatsSum(year, ['count', 'unique']));
+			SET('dashboard.stats.devicessum', ctrl.getStatsSum(year, ['desktop', 'mobile']));
+
+			var source = ctrl.getStatsSum(year, ['search', 'direct', 'advert', 'unknown', 'social']);
+			var sum = 0;
+			var keys = Object.keys(source);
+
+			keys.forEach(function(key) {
+				sum += source[key];
+			});
+
+			keys.forEach(function(key) {
+				source[key] = ((source[key] / sum) * 100).floor(2);
+			});
+
+			SET('dashboard.stats.sourcessum', source);
+		};
+
+		ctrl.getStatsSum = function(year, names) {
+
+			var stats = {};
+
+			for (var a = 0; a < names.length; a++) {
+				for (var b = 0; b < 12; b++) {
+					var key = (b + 1) + '-' + year;
+					var obj = historystats[key];
+					stats[names[a]] = (stats[names[a]] || 0) + (obj ? obj[names[a]] : 0);
+				}
+			}
+
+			return stats;
+		};
+
+		ctrl.getStats = function(year, names) {
+
+			var stats = [];
+
+			for (var a = 0; a < names.length; a++) {
+				var arr = [];
+				for (var b = 0; b < 12; b++) {
+					var key = (b + 1) + '-' + year;
+					var obj = historystats[key];
+					var item = {};
+					item.x = MONTHS[b].substring(0, 3);
+					item.y = obj ? obj[names[a]] : 0;
+					arr.push(item);
+				}
+				stats.push({ name: names[a], values: arr });
+			}
+
+			return stats;
+		};
+
+		ctrl.redrawSources = function() {
+			$('.dashboard-online-position').rclass('hidden');
+		};
+
+		ctrl.watch('tab', function(path, value) {
+			AJAXCACHE('GET [url]api/{0}/stats/'.format(value), null, ctrl.scope + '.stats.nosqlcounter', '5 minutes');
+		}, true);
+
+		ctrl.selectSource = function(item) {
+			prevsource && prevsource.rclass('selected');
+			prevsource = $('#dashboard-sources-' + item.id);
+			prevsource.aclass('selected');
+		};
+
+		ON('visitor', function(data) {
+			SETTER('dashboardvisitors', 'add', data);
+		});
+	});
+
+	COMPONENT('dashboardvisitors', 'count:15', function(self, config) {
+
+		var container, counter = 0, Tempty;
+
+		self.singleton();
+		self.readonly();
+		self.blind();
+
+		self.make = function() {
+			self.aclass('ui-dashboardvisitors');
+			var el = self.find('script');
+
+			el.each(function(index) {
+				if (index)
+					Tempty = this.innerHTML;
+				else
+					self.template = Tangular.compile(this.innerHTML);
+			});
+
+			container = $(el.parent().get(0));
+			el.remove();
+
+			var builder = [];
+
+			for (var i = 0; i < config.count - 1; i++)
+				builder.push(Tempty);
+
+			counter = builder.length;
+			container.append(builder.join(''));
+		};
+
+		self.add = function(item) {
+			item.date = new Date();
+
+			if (item.ping)
+				item.type = '@(Reading)';
+			else {
+				switch (item.type) {
+					case 'browse':
+					case 'visitor':
+						item.type = '@(Browsing)';
+						break;
+					case 'advert':
+						item.newbie = true;
+						item.type = '@(From advert)';
+						break;
+					case 'search':
+						item.newbie = true;
+						item.type = '@(From search)';
+						break;
+					case 'social':
+						item.newbie = true;
+						item.type = '@(From social)';
+						break;
+					case 'direct':
+						item.newbie = true;
+						item.type = '@(Direct visitor)';
+						break;
+					case 'unknown':
+						item.newbie = true;
+						item.type = item.referer ? item.referer : '@(Referrer)';
+						break;
+				}
+			}
+
+			counter++;
+			container.prepend(self.template(item));
+			counter >= config.count && container.find('tr:last-child').remove();
+		};
+	});
+
+	COMPONENT('stats24', function(self, config) {
+
+		var old = '';
+		var bars = [];
+		var binded = false;
+
+		self.readonly();
+
+		self.make = function() {
+			self.aclass('ui-stats24');
+			var builder = [];
+			for (var i = 0; i < 24; i++)
+				builder.push('<div class="ui-stats24-bar"><div><span></span></div><span>{0}</span></div>'.format(i));
+			self.append('<div class="ui-stats24-container hidden">{0}</div>'.format(builder.join('')));
+			self.find('.ui-stats24-bar').each(function() {
+				bars.push($($(this).find('div').get(0)));
+			});
+		};
+
+		self.setter = function(value) {
+
+			var sum = value ? value.join(',') : '';
+			if (sum === old)
+				return;
+
+			self.height(function(height) {
+
+				if (!binded) {
+					self.find('.ui-stats24-container').rclass('hidden');
+					binded = true;
+				}
+
+				old = sum;
+				var max = 0;
+
+				for (var i = 0; i < 24; i++) {
+					if (value[i] > max)
+						max = value[i];
+				}
+
+				for (var i = 0; i < 24; i++) {
+
+					var p = (value[i] / max) * 100;
+
+					if (isNaN(p))
+						p = 0;
+
+					var h = ((height / 100) * p) - 17;
+					if (h < 18)
+						h = 18;
+
+					bars[i].css('height', h + 'px').tclass('online', value[i] > 0).find('span').html(value[i]);
+				}
+			});
+		};
+	});
+
+</script>

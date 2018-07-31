@@ -1,0 +1,207 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:sitemap;if:pages-navigation;title:@(Navigation);width:800;submit:Pages/formNavigationSubmit;reload:Pages/formNavigationReload" data-jc-controller="Pages">
+	<div class="toolbar toolbar2">
+		<button class="exec" data-exec="Pages/formNavigationCreate"><i class="fa fa-plus-circle"></i>@(Add new)</button>
+		<span></span>
+		<button class="exec" data-exec="Pages/formNavigationClear"><i class="fa fa-trash"></i>@(Clear all)</button>
+	</div>
+	<div class="padding npt">
+		<div data-jc="navigation" data-jc-path="pages.navigation.children"></div>
+	</div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="pages.navigation">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(APPLY)</button>
+	</div>
+</div>
+
+<style>
+	.ui-navigation-children { margin-left: 32px; }
+	.ui-navigation-item { background-color: #FFF9D1; border-radius: 3px; margin-bottom: 3px; font-size: 12px; height: 38px; line-height: 14px; cursor: pointer; }
+	.ui-navigation-item:hover { background-color: #FFF7B6; }
+	.ui-navigation-item .name { margin: 0 84px 0 42px; padding: 6px 0 0; font-weight: bold; }
+	.ui-navigation-item .plus { float: right; width: 32px; text-align: center; font-size: 14px; padding: 12px 0 0 0; cursor: pointer; border-right: 1px solid #F5F1A3; border-left: 1px solid #F5F1A3; height: 38px; }
+	.ui-navigation-item .edit { float: right; width: 32px; text-align: center; font-size: 14px; padding: 12px 0 0 0; cursor: pointer; border-right: 1px solid #F5F1A3; height: 38px; }
+	.ui-navigation-item .remove { float: right; width: 32px; text-align: center; color: red; font-size: 14px; padding: 12px 0 0 0; cursor: pointer; }
+	.ui-navigation-item span { display: block; font-size: 11px; color: gray; font-weight: normal; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+	.ui-navigation-item .icon { width: 32px; border-right: 1px solid #F5F1A3; text-align: center; height: 38px; padding: 12px 0 0 4px; float: left; font-size: 14px; }
+	.ui-navigation-empty { padding: 50px 0; text-align: center; color: #A0A0A0; }
+	.ui-navigation-empty .fa { margin-right: 5px; }
+</style>
+
+<script>
+
+	COMPONENT('navigation', function(self) {
+
+		var dragdrop;
+
+		self.template = Tangular.compile('<div data-id="{{ id }}" class="ui-navigation-itemcontainer" draggable="true"><div class="ui-navigation-item"><i class="fa fa-times remove"></i><i class="fa fa-pencil edit"></i><i class="fa fa-plus-circle plus"></i><i class="icon{{ if icon }} fa fa-{{ icon }}{{ fi }}"></i><div class="name">{{ name }}<span>URL: {{ url }}</span></div></div>{{ if children && children.length }}<div class="ui-navigation-children">{{ children | navigationchildren($.template) }}</div>{{ fi }}</div>');
+		self.noValid();
+		self.getter = null;
+
+		self.make = function() {
+			self.aclass('ui-navigation');
+
+			self.event('click', '.fa', function() {
+				var el = $(this);
+				var id = el.closest('.ui-navigation-itemcontainer').attrd('id');
+				if (el.hclass('edit')) {
+					var item = self.finditem(id, self.get());
+					var obj = CLONE(item.item);
+					obj.$target = item.children;
+					SET('pages.navigationitem', obj, true);
+					SET('common.form2', 'pages-navigation-item');
+				} else if (el.hclass('remove')) {
+					var item = self.finditem(id, self.get());
+					var index = item.children.indexOf(item.item);
+					item.children.splice(index, 1);
+					self.update();
+					self.change(true);
+				} else if (el.hclass('plus')) {
+					var item = self.finditem(id, self.get());
+					var obj = {};
+					!item.item.children && (item.item.children = []);
+					obj.$target = item.item.children;
+					obj.behaviour = 'default';
+					obj.target = '_self';
+					SET('pages.navigationitem', obj, true);
+					SET('common.form2', 'pages-navigation-item');
+				}
+			});
+
+			self.event('dragover dragenter dragstart drag drop', '.ui-navigation-itemcontainer', function(e) {
+
+				var cls = 'ui-navigation-itemcontainer';
+
+				switch (e.type) {
+					case 'dragstart':
+						dragdrop = $(e.target);
+						if (!dragdrop.hclass(cls))
+							dragdrop = dragdrop.closest('.' + cls);
+						dragdrop.aclass('ui-navigation-drag');
+						e.originalEvent.dataTransfer.setData('text', '1');
+						return;
+
+					case 'drop':
+						dragdrop.rclass('ui-navigation-drag');
+						var el = $(e.target);
+						if (!el.hclass(cls))
+							el = el.closest('.' + cls);
+
+						if (!el.length || el.closest(dragdrop).length || el.get(0) === dragdrop.get(0))
+							return;
+
+						setTimeout2(self.id, function() {
+							self.move(el, dragdrop);
+						}, 50);
+						break;
+				}
+
+				e.preventDefault();
+			});
+		};
+
+		self.move = function(target, dragged) {
+
+			var arr = self.get();
+			var a = self.finditem(target.attrd('id'), arr);
+			var b = self.finditem(dragged.attrd('id'), arr);
+
+			if (a.children === b.children) {
+
+				// moving in the same array
+				var items = b.children;
+
+				var ai = items.indexOf(a.item);
+				var bi = items.indexOf(b.item);
+
+				if (ai < bi) {
+					items.splice(bi, 1);
+					ai = items.indexOf(a.item);
+					items.splice(ai, 0, b.item);
+				} else {
+					items.splice(ai, 1);
+					bi = items.indexOf(b.item);
+					items.splice(bi, 0, a.item);
+				}
+
+			} else {
+				// moving between arrays
+				b.children.splice(b.children.indexOf(b.item), 1);
+				a.children.push(b.item);
+			}
+			self.update();
+			self.change(true);
+		};
+
+		self.finditem = function(id, items) {
+			for (var i = 0; i < items.length; i++) {
+				var item = items[i];
+				if (item.id === id)
+					return { children: items, item: item };
+				if (item.children) {
+					item = self.finditem(id, item.children);
+					if (item)
+						return item;
+				}
+			}
+		};
+
+		self.setter = function(value) {
+
+			if (!value)
+				value = EMPTYARRAY;
+
+			var builder = [];
+			for (var i = 0, length = value.length; i < length; i++) {
+				var item = value[i];
+				builder.push(self.template(item, { template: self.template }));
+			}
+
+			self.html(builder.length ? builder : '<div class="ui-navigation-empty"><i class="fa fa-ban"></i>@(No items)</div>');
+		};
+	});
+
+	Tangular.register('navigationchildren', function(value, template) {
+		var builder = [];
+		for (var i = 0, length = value.length; i < length; i++) {
+			var item = value[i];
+			builder.push(template(item, { template: template }));
+		}
+		return builder.join('');
+	});
+
+	SCOPE('Pages', function(ctrl) {
+
+		ctrl.formNavigationCreate = function() {
+			ctrl.set('navigationitem', { $target: pages.navigation.children, target: '_self', behaviour: 'default' }, true);
+			SET('common.form2', 'pages-navigation-item');
+		};
+
+		ctrl.formNavigationClear = function() {
+			ctrl.set('navigation.children', []);
+			ctrl.change('navigation.children', true);
+		};
+
+		ctrl.formNavigationReload = function(com) {
+			com.reconfigure({ title: '@(Edit navigation: {0})'.format(common.dependencies.navigations.findItem('id', pages.navigation.id).name) });
+		};
+
+		ctrl.formNavigationSubmit = function(com) {
+			SETTER('loading', 'show');
+
+			function clean(arr) {
+				for (var i = 0, length = arr.length; i < length; i++) {
+					if (arr[i].children && !arr[i].children.length)
+						arr[i].children = null;
+				}
+			}
+
+			clean(pages.navigation.children);
+
+			AJAX('POST [url]api/nav/', pages.navigation, function(response) {
+				SETTER('loading', 'hide', 1000);
+				com.hide();
+			});
+		};
+	});
+
+</script>

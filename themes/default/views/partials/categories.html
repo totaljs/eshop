@@ -1,0 +1,25 @@
+<nav id="categories" data-url="@{sitemap_url('category')}@{repository.linker_category}/">
+	@{foreach a in F.global.categories}
+		@{if !a.level && a.count}
+		<a href="@{sitemap_url('category')}@{a.linker}/"><i class="fa fa-caret-right"></i>@{a.text}</a>
+			@{if a.children.length && a.contains(repository.linker_category)}
+			<nav>
+				@{foreach b in a.children}
+				@{if b.count}
+				<a href="@{sitemap_url('category')}@{b.linker}/"><i class="fa fa-caret-right"></i>@{b.text}</a>
+					@{if b.children.length && b.contains(repository.linker_category)}
+						<nav>
+						@{foreach c in b.children}
+							@{if c.count}
+							<a href="@{sitemap_url('category')}@{c.linker}/"><i class="fa fa-caret-right"></i>@{c.text}</a>
+							@{fi}
+						@{end}
+						</nav>
+					@{fi}
+				@{fi}
+				@{end}
+			</nav>
+			@{fi}
+		@{fi}
+	@{end}
+</nav>

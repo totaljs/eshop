@@ -1,7 +1,13 @@
 const Fs = require('fs');
 const filename = F.path.databases('settings.json');
 
+NEWSCHEMA('SettingsKeyValue').make(function(schema) {
+	schema.define('id', 'String(50)', true);
+	schema.define('name', 'String(50)', true);
+});
+
 NEWSCHEMA('SuperUser').make(function(schema) {
+	schema.define('id', 'String(15)');
 	schema.define('name', String, true);
 	schema.define('login', String, true);
 	schema.define('password', String, true);
@@ -18,16 +24,21 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('emailsender', 'Email', true);
 	schema.define('emailuserform', 'Email', true);
 	schema.define('url', 'Url', true);
-	schema.define('templates', '[String]');
-	schema.define('templatesposts', '[String]');
-	schema.define('templatesproducts', '[String]');
-	schema.define('posts', '[String]');
-	schema.define('navigations', '[String]');
+	schema.define('templates', '[SettingsKeyValue]');
+	schema.define('templatesposts', '[SettingsKeyValue]');
+	schema.define('templatesproducts', '[SettingsKeyValue]');
+	schema.define('templatesnewsletters', '[SettingsKeyValue]');
+	schema.define('posts', '[SettingsKeyValue]');
+	schema.define('notices', '[SettingsKeyValue]');
+	schema.define('navigations', '[SettingsKeyValue]');
 	schema.define('deliverytypes', '[String]');
 	schema.define('paymenttypes', '[String]');
 	schema.define('defaultorderstatus', String);
+	schema.define('defaultcategories', String);
 	schema.define('users', '[SuperUser]');
-	schema.define('languages', '[Lower(2)]');
+	schema.define('signals', '[SettingsKeyValue]');
+	schema.define('smtp', 'String');
+	schema.define('smtpoptions', 'JSON');
 
 	// PayPal account
 	schema.define('paypaluser', String);
@@ -35,117 +46,142 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('paypalsignature', String);
 	schema.define('paypaldebug', Boolean);
 
-	// OAuth2
-	schema.define('oauth2_facebook_key', String);
-	schema.define('oauth2_facebook_secret', String);
-	schema.define('oauth2_google_key', String);
-	schema.define('oauth2_google_secret', String);
-	schema.define('oauth2_instagram_key', String);
-	schema.define('oauth2_instagram_secret', String);
-	schema.define('oauth2_yahoo_key', String);
-	schema.define('oauth2_yahoo_secret', String);
-	schema.define('oauth2_live_key', String);
-	schema.define('oauth2_live_secret', String);
-	schema.define('oauth2_dropbox_key', String);
-	schema.define('oauth2_dropbox_secret', String);
-	schema.define('oauth2_vk_key', String);
-	schema.define('oauth2_vk_secret', String);
-	schema.define('oauth2_linkedin_key', String);
-	schema.define('oauth2_linkedin_secret', String);
-
 	// Saves settings into the file
-	schema.setSave(function(error, model, options, callback) {
+	schema.setSave(function($) {
+
+		var model = $.model;
 		var settings = U.extend({}, model.$clean());
 
 		if (settings.url.endsWith('/'))
 			settings.url = settings.url.substring(0, settings.url.length - 1);
 
 		settings.datebackup = F.datetime;
+
 		NOSQL('settings_backup').insert(JSON.parse(JSON.stringify(settings)));
 		settings.datebackup = undefined;
 
 		// Writes settings into the file
 		Fs.writeFile(filename, JSON.stringify(settings), function() {
-			F.emit('settings.save', settings);
-			callback(SUCCESS(true));
+			EMIT('settings.save', settings);
+			ADMIN.notify('settings.save');
+			$.success();
 		});
 	});
 
 	// Gets settings
-	schema.setGet(function(error, model, options, callback) {
+	schema.setGet(function($) {
 		Fs.readFile(filename, function(err, data) {
-			if (err)
-				settings = { 'manager-superadmin': 'admin:admin', currency: 'EUR', currency_entity: '&euro;' };
-			else
-				settings = data.toString('utf8').parseJSON();
-			callback(settings);
+
+			var settings = null;
+
+			if (err) {
+				settings = $.model;
+				settings.currency = 'EUR';
+				settings.currency_entity = '&euro;';
+			} else
+				settings = data.toString('utf8').parseJSON(true);
+
+			$.callback(settings);
 		});
 	});
 
+	schema.addWorkflow('dependencies', function($) {
+		var config = F.global.config;
+		var obj = {};
+		obj.templatespages = config.templates;
+		obj.navigations = config.navigations;
+		obj.signals = config.signals;
+		obj.templatesposts = config.templatesposts;
+		obj.templatesproducts = config.templatesproducts;
+		obj.templatesnewsletters = config.templatesnewsletters;
+		obj.posts = config.posts;
+		obj.paymenttypes = config.paymenttypes;
+		obj.notices = config.notices;
+		obj.deliverytypes = config.deliverytypes;
+		$.callback(obj);
+	});
+
+	// Tests SMTP
+	schema.addWorkflow('smtp', function($) {
+		var model = $.model;
+		if (model.smtp)
+			F.useSMTP(model.smtp, model.smtpoptions ? model.smtpoptions.parseJSON() : '', err => err ? $.invalid(err) : $.success());
+		else
+			$.success();
+	});
+
 	// Loads settings + rewrites framework configuration
-	schema.addWorkflow('load', function(error, model, options, callback) {
+	schema.addWorkflow('load', function($) {
 		schema.get(null, function(err, settings) {
 
-			F.config.custom = settings;
+			F.global.config = settings;
+			F.config.url = settings.url;
 
 			// Refreshes internal informations
-			if (!F.config.custom.users)
-				F.config.custom.users = [];
+			!settings.users && (settings.users = []);
 
 			// Adds an admin (service) account
-			var sa = CONFIG('manager-superadmin').split(':');
-			F.config.custom.users.push({ name: 'Administrator', login: sa[0], password: sa[1], roles: [], sa: true });
+			var sa = F.config['admin-superadmin'].split(':');
+			settings.users.push({ name: 'Administrator', login: sa[0], password: sa[1], roles: [], sa: true });
 
 			// Optimized for the performance
 			var users = {};
-			for (var i = 0, length = F.config.custom.users.length; i < length; i++) {
-				var user = F.config.custom.users[i];
+			for (var i = 0, length = settings.users.length; i < length; i++) {
+				var user = settings.users[i];
 				var key = (user.login + ':' + user.password).hash();
 				users[key] = user;
 			}
 
-			F.config.custom.users = users;
+			settings.users = users;
 
 			// Rewrites internal framework settings
-			F.config['mail-address-from'] = F.config.custom.emailsender;
-			F.config['mail-address-reply'] = F.config.custom.emailreply;
-
-			if (!F.config.custom.languages)
-				F.config.custom.languages = [];
+			F.config['mail-address-from'] = settings.emailsender;
+			F.config['mail-address-reply'] = settings.emailreply;
 
 			// Currency settings
-			switch (F.config.custom.currency.toLowerCase()) {
+			switch (settings.currency.toLowerCase()) {
 				case 'eur':
-					F.config.custom.currency_entity = '&euro; {0}';
+					settings.currency_entity = '&euro; {0}';
 					break;
 				case 'usd':
-					F.config.custom.currency_entity = '&dollar; {0}';
+					settings.currency_entity = '$ {0}';
 					break;
 				case 'gbp':
-					F.config.custom.currency_entity = '{0} &pound;';
+					settings.currency_entity = '{0} &pound;';
 					break;
 				case 'jpy':
-					F.config.custom.currency_entity = '&yen; {0}';
+					settings.currency_entity = '&yen; {0}';
 					break;
 				case 'czk':
-					F.config.custom.currency_entity = '{0} Kč';
+					settings.currency_entity = '{0} Kč';
 					break;
 				case 'brl':
-					F.config.custom.currency_entity = 'R&dollar; {0}';
+					settings.currency_entity = 'R&dollar; {0}';
 					break;
 				default:
-					F.config.custom.currency_entity = '{0} ' + F.config.custom.currency;
+					settings.currency_entity = '{0} ' + F.global.config.currency;
 					break;
 			}
 
-			if (!F.config.custom.paymenttypes)
-				F.config.custom.paymenttypes = [];
+			!settings.paymenttypes && (settings.paymenttypes = []);
+			!settings.deliverytypes && (settings.deliverytypes = []);
+			!settings.signals && (settings.signals = []);
+			!settings.navigations && (settings.navigations = []);
+			!settings.posts && (settings.posts = []);
+			!settings.notices && (settings.notices = []);
+			!settings.templates && (settings.templates = []);
+			!settings.templatesnewsletters && (settings.templatesnewsletters = []);
+			!settings.templatesproducts && (settings.templatesproducts = []);
+			!settings.templatesposts && (settings.templatesposts = []);
 
-			if (!F.config.custom.deliverytypes)
-				F.config.custom.deliverytypes = [];
+			settings.smtp && F.useSMTP(settings.smtp, settings.smtpoptions.parseJSON());
+			EMIT('settings', settings);
+			$.success();
 
-			F.emit('settings', settings);
-			callback(SUCCESS(true));
 		});
 	});
 });
+
+Number.prototype.currency = function() {
+	return F.global.config.currency_entity.format(this.format(2));
+};

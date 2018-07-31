@@ -1,0 +1,43 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:address-book-o;if:subscribers-import;title:@(Import subscribers);width:600;submit:Subscribers/importSubmit;autofocus:true" data-jc-controller="Subscribers">
+	<div class="padding">
+		<div data-b="subscribers.import.importing" data-b-visible="!value">
+			<div data-jc="textarea" data-jc-path="subscribers.import.body" data-jc-config="required:true;height:200;placeholder:@(Put all new email addresses)">@(Email addresses)</div>
+		</div>
+		<div data-b="subscribers.import.importing" data-b-visible="value">
+			<div data-jc="progress" data-jc-path="subscribers.import.progress"></div>
+			<div class="help"><i class="fa fa-spin fa-refresh mr5"></i>@(Importing ...)</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons" data-b="subscribers.import.importing" data-b-visible="!value" data-jc="validation" data-jc-path="subscribers.import">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(IMPORT)</button>
+	</div>
+</div>
+
+<script>
+	SCOPE('Subscribers', function(ctrl) {
+		ctrl.importSubmit = function(com) {
+			ctrl.set('import.importing.progress', 0);
+			ctrl.set('import.importing', true);
+			var data = {};
+			var arr = ctrl.get('import.body').replace(/\n|\r|;/g, ',').replace(/["']/g, '').trim().split(',');
+			arr.waitFor(function(item, next, index) {
+				ctrl.set('import.progress', ((index / arr.length) * 100) >> 0);
+				if (item.isEmail()) {
+					data.email = item;
+					AJAX('POST /api/subscribers/', data, function() {
+						setTimeout(next, 50);
+					});
+				} else
+					next();
+			}, function() {
+				SETTER('snackbar', 'success', '@(Email addresses have been imported successfully.)');
+				setTimeout(function() {
+					ctrl.set('import.importing', false);
+					ctrl.refresh();
+					com.hide();
+				}, 1000);
+			});
+		};
+	});
+</script>

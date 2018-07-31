@@ -1,0 +1,25 @@
+<div data-jc="form" data-jc-path="cmseditor.form" class="hidden" data-jc-config="icon:code;if:sourcecode;title:@(Source code editor);width:1100;submit:cmseditor_sourcecode_submit;cancel:cmseditor_sourcecode_cancel">
+	<div class="padding">
+		<div data-jc="codemirror" data-jc-path="cmseditor.sourcecode" data-jc-config="height:500;icon:code;required:true;tabs:true;trim:true">@(HTML)</div>
+	</div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="cmseditor.sourcecode">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(APPLY)</button>
+	</div>
+</div>
+
+<script>
+
+	function cmseditor_sourcecode_submit(com) {
+		cmseditor.instance.replace(cmseditor.sourcecode);
+		com.hide();
+	}
+
+	function cmseditor_sourcecode_cancel(com) {
+		var editor = cmseditor.instance;
+		editor.resize();
+		editor.load('sourcecode');
+		com.hide();
+	}
+
+</script>

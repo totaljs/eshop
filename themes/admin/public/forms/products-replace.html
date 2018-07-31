@@ -1,0 +1,30 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:sitemap;if:products-replace;title:@(Replace);width:500;autofocus:true;submit:Products/formReplaceSubmit" data-jc-controller="Pages">
+	<div class="padding bg-yellow">
+		<div data-jc="dropdown" data-jc-path="products.replaceform.name_old" class="m" data-jc-config="datasource:products.replaceform.items;empty:;icon:folder-o;key:name;value:name;required:true">@(Choose older name)</div>
+		<div data-jc="textbox" data-jc-config="maxlength:200;required:true" data-jc-path="products.replaceform.name_new" class="m">@(New name)</div>
+	</div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="products.replaceform">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(APPLY)</button>
+	</div>
+</div>
+
+<script>
+	SCOPE('Products', function(ctrl) {
+
+		ctrl.formReplaceSubmit = function(com) {
+			var model = ctrl.get('replaceform');
+			var data = {};
+			data.name_old = model.name_old;
+			data.name_new = model.name_new;
+			SETTER('loading', 'show');
+			AJAX('GET [url]api/products/{0}/'.format(model.type), data, function(response) {
+				SETTER('loading', 'hide', 1000);
+				ctrl.refresh();
+				com.hide();
+				SETTER('snackbar', 'success', model.type === 'category' ? '@(Category has been replaced successfully.)' : '@(Manufacturer has been replaced successfully.)');
+			});
+		};
+
+	});
+</script>

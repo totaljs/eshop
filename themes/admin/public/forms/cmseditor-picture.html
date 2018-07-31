@@ -1,0 +1,84 @@
+<div data-jc="form" data-jc-path="cmseditor.form" class="hidden" data-jc-config="icon:picture-o;if:picture;title:@(Picture editor);width:900;submit:cmseditor_crop_submit">
+	<div class="padding">
+		<div data-jc="crop" data-jc-path="cmseditor.crop.url" data-jc-id="cmseditor.crop" data-jc-config="width:200;height:100"></div>
+	</div>
+	<div class="padding">
+		<div data-jc="textbox" data-jc-path="cmseditor.crop.alt">@(Alternate text)</div>
+	</div>
+	<div class="hidden" data-b="cmseditor.crop.href" data-b-visible="value && value.length > 0">
+		<hr class="nmb nmt" />
+		<div class="padding">
+			<div class="row">
+				<div class="col-md-6 m">
+					<div data-jc="dropdown" data-jc-path="cmseditor.crop.href" data-jc-config="datasource:%links;empty:;icon:sitemap;key:name;value:url">@(URL according to the sitemap)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-jc="textbox" data-jc-path="cmseditor.crop.href">@(URL address)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="cmseditor.crop">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(APPLY)</button>
+	</div>
+</div>
+
+<script>
+
+	function cmseditor_crop_submit(com) {
+
+		var editor = cmseditor.instance;
+		var target = cmseditor.crop.target;
+		var cropper = FIND('#cmseditor.crop');
+
+		target.attr('alt', cmseditor.crop.alt);
+		cmseditor.crop.href && target.parent('a').attr('href', cmseditor.crop.href);
+		editor.change(true);
+
+		// Is the picture changed?
+		if (cropper.dirty()) {
+			com.hide();
+			return;
+		}
+
+		var url = cropper.getUrl();
+		if (url) {
+			var size = target.attrd('cms-size');
+			if (size) {
+				target.attrd('cms-original', url);
+				target.attr('src', url + '?s=' + size.replace('%', ''));
+			} else
+				target.attr('src', url);
+			com.hide();
+			return;
+		}
+
+		var data = cropper.output();
+		SETTER('loading', 'show');
+
+		AJAX('POST [url]api/upload/base64/', { file: data, name: (cmseditor.crop.alt || 'base64').slug() }, function(response, err) {
+
+			SETTER('loading', 'hide', 500);
+
+			if (err) {
+				SETTER('snackbar', 'warning', err.toString());
+				return;
+			}
+
+			response && setTimeout(function() {
+				var size = target.attrd('cms-size');
+				if (size) {
+					target.attrd('cms-original', response);
+					target.attr('src', response + '?s=' + size.replace('%', ''));
+				} else
+					target.attr('src', response);
+				editor.autoresize();
+			}, 1000);
+
+			setTimeout(com.hide, 1000);
+		});
+
+	}
+
+</script>

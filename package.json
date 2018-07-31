@@ -1,8 +1,12 @@
 {
   "name": "Eshop",
-  "description": "A simple and powerful eshop solution written in Total.js / Node.js.",
-  "version": "8.0.0",
+  "description": "A simple and powerful Eshop solution written in Total.js / Node.js.",
+  "version": "11.0.0",
   "main": "release.js",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/totaljs/eshop"
+  },
   "dependencies": {
     "paypal-express-checkout": "latest",
     "total.js": "latest"

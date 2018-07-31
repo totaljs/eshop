@@ -1,0 +1,82 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:plug;if:widgets-import;title:@(Download existing widgets);width:800;reload:Widgets/importShow;submit:Widgets/importSubmit" data-jc-controller="Widgets">
+	<div class="padding">
+		<div data-jc="listing" data-jc-path="widgets.external">
+			<script type="text/html">
+				<div class="col-xs-4 col-sm-3 m">
+					<div class="widgetext exec{{ id | widgetsinstalled }}" data-id="{{ id }}" data-exec="Widgets/importSubmit">
+						<i class="fa fa-check-circle green"></i>
+						<div><img src="{{ picture }}" border="0" class="img-responsive" /></div>
+						<div class="widgetext-name">{{ name }}</div>
+						<div class="widgetext-category"><i class="fa fa-folder-o"></i>{{ category }}</div>
+					</div>
+				</div>
+			</script>
+			<script type="text/html">
+				<div class="row">
+					{{ body | raw }}
+				</div>
+			</script>
+		</div>
+	</div>
+	<div class="ui-form-buttons">
+		<button name="cancel" style="width:100%">@(Cancel)</button>
+	</div>
+</div>
+
+<style>
+	.widgetext { cursor: pointer; position: relative; }
+	.widgetext img { border: 1px solid #E0E0E0; border-radius: 3px; }
+	.widgetext-name { font-weight: bold; color: black; margin-top: 8px; line-height: 16px; }
+	.widgetext-category { font-size: 11px; color: gray; }
+	.widgetext .fa { margin-right: 5px; }
+	.widgetext .fa-check-circle { display: none; }
+	.widgetextinstalled .fa-check-circle { display: block; position: absolute; font-size: 40px; right: 10px; bottom: 50px; background-color: white; border-radius: 100px; padding: 0 2px 0; }
+	.widgetextinstalled img { border-color: #79AF65; }
+</style>
+
+<script>
+	SCOPE('Widgets', function(ctrl) {
+
+		ctrl.importShow = function() {
+			AJAXCACHE('GET https://componentator.com/api/widgets/', function(response) {
+
+				for (var i = 0; i < response.items.length; i++) {
+					var item = response.items[i];
+					if (item.picture.substring(0, 5) !== 'https')
+						item.picture = 'https://componentator.com' + item.picture;
+				}
+
+				ctrl.set('external', response.items);
+			}, '2 minutes');
+		};
+
+		ctrl.importSubmit = function(el) {
+			SETTER('confirm', 'show', '@(Are you sure you want to import selected widget?)', ['"cloud-download" @(Import)', '@(Cancel)'], function(index) {
+				!index && AJAX('GET https://componentator.com/api/widgets/{0}/'.format(+el.attrd('id')), function(response) {
+					var data = {};
+					data.name = response.name;
+					data.category = response.category;
+					data.body = response.html;
+					data.picture = 'https://componentator.com' + response.picture;
+					data.reference = response.id + '';
+
+					SETTER('loading', 'show');
+					AJAX('POST [url]api/widgets/', data, function(response) {
+						SETTER('loading', 'hide', 1000);
+						if (response.success) {
+							el.aclass('widgetextinstalled');
+							SETTER('snackbar', 'success', '@(Widget <b>{0}</b> has been imported successfully.)'.format(data.name));
+							ctrl.refresh();
+						}
+					});
+				});
+			});
+
+		};
+	});
+
+	Tangular.register('widgetsinstalled', function(value) {
+		return widgets.grid.items.findItem('reference', value + '') ? ' widgetextinstalled' : '';
+	});
+
+</script>

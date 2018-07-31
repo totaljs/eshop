@@ -1,0 +1,87 @@
+@{repository.loading = true}
+
+<br />
+<div class="row">
+	<div class="col-md-4">
+		<h2>@{title}</h2>
+		<p class="help">@(In this place you can modify your account information.)</p>
+		<hr class="darker" />
+
+		<div class="keyvalue">
+			<div class="key">@(Registered)</div>
+			<div class="value" data-b="settings.datecreated" data-b-html="value ? value.format('@(yyyy-MM-dd HH:mm)') : '...'"></div>
+		</div>
+
+		<div class="keyvalue">
+			<div class="key">@(Discount)</div>
+			<div class="value" data-b="settings.discount" data-b-html="(value ? value.format(2) : '0') + '%'"></div>
+		</div>
+
+	</div>
+	<div class="col-md-8">
+		<div class="content">
+			<div class="contentbody bg-yellow">
+				<div data-jc="textbox" data-jc-path="settings.name" data-jc-config="required:true;maxlength:40">@(Account name)</div>
+			</div>
+			<div class="contentbody npb">
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="settings.firstname" data-jc-config="required:true;maxlength:40">@(First name)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="settings.lastname" data-jc-config="required:true;maxlength:40">@(Last name)</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="settings.email" data-jc-config="required:true;maxlength:120;type:email" data-jc-value="'@'">@(Email address)</div>
+						<div class="help">@(Will be used as a login name.)</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data-jc="textbox" data-jc-path="settings.phone" data-jc-config="maxlength:30;type:phone;placeholder:@(International format)">@(Phone number)</div>
+					</div>
+				</div>
+			</div>
+			<hr class="nmt nmb" />
+			<div class="contentbody">
+				<div data-jc="checkbox" data-jc-path="settings.ispassword" class="m" data-jc-value="MAIN.parseQuery().password === '1'">@(I want to change my password)</div>
+				<div data-b="settings.ispassword" data-b-visible="value" class="hidden">
+					<div class="row">
+						<div class="col-md-6 m">
+							<div data-jc="textbox" data-jc-path="settings.password" data-jc-config="required:true;maxlength:30;type:password">@(Password)</div>
+						</div>
+						<div class="col-md-6 m">
+							<div data-jc="textbox" data-jc-path="settings.passwordreply" data-jc-config="required:true;maxlength:30;type:password">@(Password again)</div>
+						</div>
+					</div>
+				</div>
+				<div data-jc="error" data-jc-path="settings.response"></div>
+				<div data-jc="validation" data-jc-path="settings">
+					<button class="button b exec" data-exec="settingssubmit" name="submit" disabled="disabled">@(Submit)</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	SETTER(true, 'loading', 'hide', 1000);
+	AJAX('GET /api/account/settings/', 'settings');
+
+	function settingssubmit() {
+
+		if (BLOCKED('settings', 3000))
+			return;
+
+		AJAX('POST /api/account/settings/', settings, function(response) {
+			RESET('settings.*', true);
+
+			if (response.success)
+				SETTER('message', 'success', '@(Your account has been changed successfully.)');
+			else
+				SET('settings.response', response);
+
+		});
+	}
+
+</script>

@@ -1,0 +1,154 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:newspaper-o;if:posts-form;title:@(Edit);width:1500;reload:Posts/formShow;submit:Posts/formSubmit;autofocus:true" data-jc-controller="Posts">
+	<div class="padding" style="padding-bottom:10px">
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="posts.form.name" data-jc-config="required:true;maxlength:100">@(Name)</div>
+				<div data-jc="checkbox" data-jc-path="posts.form.ispublished" class="b mt10">@(Is published)</div>
+			</div>
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-md-4 m">
+						<div data-jc="dropdown" data-jc-path="posts.form.idcategory" data-jc-config="datasource:common.dependencies.posts;icon:folder-o;empty:;required:true">@(Category)</div>
+					</div>
+					<div class="col-md-4 m">
+						<div data-jc="dropdown" data-jc-path="posts.form.template" data-jc-config="datasource:common.dependencies.templatesposts;empty:;icon:paint-brush">@(Template)</div>
+					</div>
+					<div class="col-md-4 m">
+						<div data-jc="textbox" data-jc-path="posts.form.date" data-jc-config="type:date;icon:clock-o;placeholder:@(yyyy-MM-dd);align:center">@(Date)</div>
+						<div class="help">@(You can specify a publish date.)</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="cmseditor" data-jc="cmseditor" data-jc-path="posts.form.body" data-jc-import="[url]components/cmseditor.html"></div>
+	<div class="backups hidden" data-b="posts.form.id" data-b-visible="!!value"><a href="javascript:void(0)" class="exec" data-exec="Posts/backups"><i class="fa fa-clock-o mr5"></i>@(Restore a backup)</a></div>
+	<div class="padding bg-yellow">
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="posts.form.description" data-jc-config="maxlength:300">@(Description)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="dropdowncheckbox" data-jc-path="posts.form.signals" data-jc-config="datasource:signals;empty:@(Doesn't contain any signals.);icon:dot-circle-o">@(Signals)</div>
+				<div class="help">@(Signals can start special actions when the page is displayed.)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="posts.form.author" data-jc-config="maxlength:30;icon:user">@(Author)</div>
+			</div>
+		</div>
+	</div>
+	<div data-b="posts.form.id" data-b-visible="value && value.length" class="hidden">
+		<hr class="nmt" />
+		<div class="padding">
+			<div class="row">
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key">@(# Id)</div>
+						<div class="value" data-b="posts.form.id" data-b-html="n => n"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
+						<div class="value" data-b="posts.form.datecreated" data-b-html="n => Tangular.helpers.time(n)"></div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Updated)</div>
+						<div class="value" data-b="posts.form.dateupdated" data-b-html="n => n ? Tangular.helpers.time(n) : '@(unchanged)'"></div>
+					</div>
+				</div>
+				<div class="col-lg-6 m" data-b="posts.form.stats" data-b-visible="value != null">
+					<div data-jc="nosqlcounter" data-jc-path="posts.form.stats" data-jc-config="height:52"></div>
+					<div class="help"><i class="fa fa-bar-chart"></i>@(Stats of all views for the last period)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div data-jc="error" data-jc-path="posts.form.response"></div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="posts.form">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(SAVE)</button>
+	</div>
+</div>
+
+<script>
+
+	SCOPE('Posts', function(ctrl) {
+		ctrl.formShow = function(com) {
+
+			var model = posts.form;
+
+			com.reconfigure({ title: model.id ? '@(Edit post)' : '@(New post)' });
+			model.id && AJAX('GET [url]api/{0}/{1}/stats/'.format(ctrl.scope, model.id), ctrl.scope + '.form.stats');
+
+			WAIT('cmseditor.instance', function() {
+				cmseditor.instance.setWidgetOptions(model.widgets);
+			});
+		};
+
+		ctrl.formSubmit = function(com) {
+
+			SETTER('loading', 'show');
+
+			var model = CLONE(posts.form);
+			var editor = cmseditor.instance;
+
+			model.pictures = editor.getPictures();
+			model.summary = editor.getSummary();
+			model.body = editor.getContent().replace(/\n[\s\t]+\n/g, '\n');
+			model.search = editor.getKeywords();
+
+			var w = editor.getWidgets();
+			model.widgets = w.settings;
+			model.bodywidgets = w.widgets;
+
+			model.stats = undefined;
+
+			AJAX('POST [url]api/posts/', model, function(response) {
+				SETTER('loading', 'hide', 1000);
+				if (response.success) {
+					SETTER('snackbar', 'success', '@(Post has been saved successfully.)');
+					com.hide();
+					ctrl.refresh();
+				}
+			});
+		};
+
+		ctrl.backups = function(el) {
+
+			SETTER('loading', 'show');
+			AJAX('GET [url]api/posts/{0}/backups/'.format(ctrl.get('form.id')), function(response) {
+
+				SETTER('loading', 'hide', 1000);
+
+				for (var i = 0, length = response.length; i < length; i++) {
+					var item = response[i];
+					item.name = '{0} <b class="badge badge-blue"><i class="fa fa-user mr5"></i>{1}</b>'.format(item.date.format('@(yyyy-MM-dd HH:mm)'), item.user);
+				}
+
+				response.quicksort('date', false);
+
+				SETTER('suggestion', 'show', 'left', el, response, function(value) {
+					SETTER('loading', 'show');
+					setTimeout(function() {
+						cmseditor.instance.replace(value.data.body);
+						SETTER('loading', 'hide', 1000);
+					}, 100);
+				});
+			});
+		};
+
+		ctrl.watch('form.template', function(path, value, type) {
+
+			if (type === 2) {
+				cmseditor.instance.reconfigure('template:' + value);
+				cmseditor.instance.set('');
+			}
+
+		}, true);
+
+	});
+
+</script>

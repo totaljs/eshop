@@ -1,0 +1,158 @@
+<div data-jc="form" data-jc-path="cmseditor.form" class="hidden" data-jc-config="icon:quote-left;if:attribute;title:@(Attributes editor);width:500;autofocus:true;submit:cmseditor_attributes_submit">
+
+	<div class="padding npb">
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="cmseditor.attribute.cls">@(Class names)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="cmseditor.attribute.id">@(Element ID)</div>
+				<div class="help"><a href="javascript:void(0)" class="exec" data-exec="cmseditor_attributes_id">@(Make ID from content)</a></div>
+			</div>
+		</div>
+	</div>
+	<div class="padding bg-yellow">
+		<div data-b="cmseditor.attribute.themes" data-b-visible="value && value.length">
+			<div data-jc="dropdown" data-jc-path="cmseditor.attribute.theme" class="m b" data-jc-config="datasource:cmseditor.attribute.themes;icon:paint-brush">@(Theme)</div>
+		</div>
+		<div data-jc="textbox" data-jc-path="cmseditor.attribute.title" class="m">@(Tooltip)</div>
+		<div data-jc="textbox" data-jc-path="cmseditor.attribute.css" class="m">@(Custom styles)</div>
+	</div>
+
+	<div data-b="cmseditor.attribute.isimage" data-b-visible="value === true" class="hidden">
+		<div class="padding">
+			<div class="b m black"><i class="fa fa-photo mr5"></i>@(Image settings)</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<div data-jc="textbox" data-jc-path="cmseditor.attribute.alt" class="m">@(Alternate text)</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-4">
+					<div data-jc="textbox" data-jc-path="cmseditor.attribute.datawidth" class="m" data-jc-config="align:center;maxlength:4;placeholder:120">@(Width)</div>
+				</div>
+				<div class="col-md-4">
+					<div data-jc="textbox" data-jc-path="cmseditor.attribute.dataheight" class="m" data-jc-config="align:center;maxlength:4;placeholder:120">@(Height)</div>
+				</div>
+				<div class="col-md-4 hidden" data-b="cmseditor.attribute.imgdefined" data-b-visible="value === true">
+					<div data-jc="textbox" data-jc-path="cmseditor.attribute.datasize" class="m" data-jc-config="align:center;maxlength:4;placeholder:0%">@(Percentage)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div data-b="cmseditor.attribute.isnone" data-b-visible="value !== true">
+		<hr class="nmt" />
+		<div class="padding npt">
+			<div data-jc="textbox" data-jc-path="cmseditor.attribute.src" data-jc-config="icon:globe">@(Source URL)</div>
+			<div class="m mt10 fs12"><a href="javascript:void(0)" class="exec" data-exec="cmseditor_attributes_files"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a></div>
+		</div>
+	</div>
+
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="cmseditor.attribute">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(APPLY)</button>
+	</div>
+</div>
+
+<script>
+
+	function cmseditor_attributes_files() {
+		cmseditor.instance.filebrowser('cmseditor.attribute.src', (/^image\/*/));
+	}
+
+	function cmseditor_attributes_id() {
+		var target = cmseditor.instance.getTarget();
+		SET('cmseditor.attribute.id', target.text().slug());
+	}
+
+	function cmseditor_attributes_submit(com) {
+
+		var instance = cmseditor.instance;
+		var target = instance.getTarget();
+		var attr = cmseditor.attribute;
+
+		if (target.hclass('CMS_unwrap'))
+			target = target.parent();
+
+		if (attr.title)
+			target.attr('title', attr.title.trim());
+		else
+			target.rattr('title');
+
+		if (attr.isiframe || attr.isimage)
+			target.attr('src', attr.src.trim());
+
+		if (attr.isimage) {
+			if (attr.alt)
+				target.attr('alt', attr.alt.trim());
+			else
+				target.rattr('alt');
+		}
+
+		if (attr.id)
+			target.attr('id', attr.id);
+		else
+			target.rattr('id');
+
+		var arr = target.attr('class').split(' ');
+		var cls = [];
+
+		for (var i = 0, length = arr.length; i < length; i++)
+			arr[i].substring(0, 4) === 'CMS_' && cls.push(arr[i]);
+
+		if (attr.isimage) {
+			if (attr.imgdefined) {
+				if (attr.datawidth)
+					target.attrd('width', attr.datawidth);
+				else
+					target.rattrd('width');
+				if (attr.dataheight)
+					target.attrd('height', attr.dataheight);
+				else
+					target.rattrd('width');
+				if (attr.datasize)
+					target.attrd('size', attr.datasize + (attr.datasize.lastIndexOf('%') === -1 ? '%' : ''));
+				else
+					target.rattrd('size');
+			} else {
+				if (attr.datawidth)
+					target.attr('width', attr.datawidth);
+				else
+					target.rattr('width');
+				if (attr.dateheight)
+					target.attr('height', attr.dataheight);
+				else
+					target.rattr('height');
+			}
+		}
+
+		if (attr.css)
+			target.attr('style', attr.css);
+		else
+			target.rattr('style');
+
+		attr.cls && cls.push(attr.cls.trim());
+
+		var clsnames = cls.join(' ');
+
+		if (attr.themes) {
+			attr.themes.forEach(function(theme) {
+				if (clsnames.indexOf(theme.id) !== -1)
+					clsnames = clsnames.replace(theme.id, '').replace(/\s{2,}/g, ' ').trim();
+			});
+
+			if (attr.theme)
+				clsnames = (clsnames ? clsnames + ' ' : '') + attr.theme;
+		}
+
+		target.attr('class', clsnames);
+		instance.change(true);
+		instance.autoresize();
+
+		com.hide();
+	}
+
+</script>

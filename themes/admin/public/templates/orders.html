@@ -1,0 +1,152 @@
+<div data-jc-controller="Orders" data-jc-scope="orders" class="container">
+	<div class="toolbar">
+		<button class="right exec" data-exec="Orders/create"><i class="fa fa-plus-circle"></i>@(Create)</button>
+		<button class="exec" data-exec="Orders/options"><i class="fa fa-cogs"></i>@(Options)</button>
+		<span></span>
+		<button class="exec" data-exec="Orders/checked" name="checked" disabled="disabled"><i class="fa fa-check-circle"></i>@(Checked)</button>
+	</div>
+	<div class="fullheight">
+		<div data-jc="grid" data-jc-path="grid" data-jc-config="padding:10;filterlabel:@(Search);checked:Orders/checkbox;button:Orders/operation;pagination:true;exec:Orders/filter;external:true">
+			<script type="text/plain">
+			[
+				{ name: 'id', text: '', template: '<input type="checkbox" value="{{ id }}" />', size: '42px', header: '<input type="checkbox" value="{{ id }}" />', filter: false, sort: false, title: 'Options', align: 'center' },
+				{ name: 'number', text: '@(Number)', size: '110px', class: 'hidden-xs center', classtd: 'active fs11 b', template: '{{ if isfinished }}<i class="fa fa-check-circle green mr5"></i>{{ fi }}{{ number }}' },
+				{ name: 'name', text: '@(Customer)', size: 2, template: '{{ if !isfinished }}<i class="fa fa-refresh fa-spin mr5 red"></i>{{ fi }}{{ if ispaid }}<span class="badge badge-green mr5"><i class="fa fa-credit-card"></i>@(paid)</span>{{ fi }}{{ name }}', classth: 'left', classfilter: 'left' },
+				{ name: 'status', text: '@(Status)', size: '200px', class: 'hidden-xs' },
+				{ name: 'discount', text: '@(Discount)', size: '100px', template: '{{ discount | format(2) }}%', class: 'hidden-xs', classtd: 'right' },
+				{ name: 'price', text: '@(Price)', size: '100px', template: '{{ price | format(2) }}', class: 'hidden-xs', classtd: 'right active' },
+				{ name: 'datecreated', text: '@(Created)', size: '140px', class: 'hidden-xs center', template: '{{ datecreated | format(\'yyyy-MM-dd HH:mm\') }}' },
+				{ name: '@(Options)', align: 'center', filter: false, sort: false, size: '90px', template: '<button name="update" title="@(Edit)"><i class="fa fa-pencil"></i></button><button class="btn-remove" name="remove" title="@(Remove)"><i class="fa fa-trash-o"></i></button>' }
+			]
+			</script>
+		</div>
+	</div>
+</div>
+<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:orders-form;url:[url]forms/orders.html" data-jc-controller="Orders"></div>
+
+<script>
+	CONTROLLER('Orders', function(ctrl) {
+
+		ctrl.scope = 'orders';
+		ctrl.limit = 100; // Count of items per page
+
+		var toolbar = ctrl.virtualize({ btnChecked: '.toolbar button[name="checked"]' });
+		var filter; // A grid filter
+
+		ctrl.destroy = function() {
+			SETTER('sitemap', 'remove', ctrl.scope);
+		};
+
+		ctrl.refresh = function() {
+
+			SETTER('loading', 'show');
+
+			!filter && (filter = {});
+			filter.limit = ctrl.limit;
+
+			AJAX('GET [url]api/{0}/'.format(ctrl.scope), filter, function(response) {
+				ctrl.set('grid', response);
+				SETTER('loading', 'hide', 500);
+			});
+		};
+
+		ctrl.reload = function() {
+			ctrl.refresh();
+		};
+
+		ctrl.operation = function(btn, row, grid) {
+			var name = btn.prop('name');
+			switch (name) {
+				case 'remove':
+					SETTER('confirm', 'show', '@(Are you sure you want to remove selected order?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+						if (index)
+							return;
+						SETTER('loading', 'show');
+						AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), row, function(response) {
+							SETTER('loading', 'hide', 1000);
+							if (response.success) {
+								SETTER('snackbar', 'success', '@(Order has been removed successfully.)');
+								ctrl.refresh();
+							}
+						});
+					});
+					break;
+				case 'update':
+					SETTER('loading', 'show');
+					AJAX('GET [url]api/{0}/{1}/'.format(ctrl.scope, row.id), function(response) {
+						SET('{0}.form'.format(ctrl.scope), response, true);
+						SET('common.form', '{0}-form'.format(ctrl.scope));
+					});
+					break;
+			}
+		};
+
+		ctrl.checkbox = function(el, grid) {
+			el && !el.value && grid.checked(el.checked);
+			var count = grid.checked().length;
+			toolbar.btnChecked.disable(count === 0);
+		};
+
+		ctrl.checked = function(el) {
+			var items = [];
+			items.push({ id: 'completed', name: '@(Completed)', icon: 'check-circle' });
+			items.push({ id: 'paid', name: '@(Paid)', icon: 'credit-card' });
+			items.push({ id: 'remove', name: '@(Remove orders)', icon: 'trash' });
+			SETTER('contextmenu', 'show', 'center', el, items, function(item) {
+				switch (item.id) {
+					case 'completed':
+					case 'paid':
+						var arr = [];
+						FIND('.{0}.grid'.format(ctrl.scope)).checked().each(function() {
+							arr.push(this.value);
+						});
+						AJAX('GET [url]api/{0}/toggle/'.format(ctrl.scope), { id: arr.join(','), type: item.id }, ctrl.refresh);
+						break;
+					case 'remove':
+						SETTER('confirm', 'show', '@(Are you sure you want to remove all selected orders?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+							if (index)
+								return;
+							SETTER('loading', 'show', 'trash-o');
+							var arr = FIND('.{0}.grid'.format(ctrl.scope)).checked().toArray();
+							arr.waitFor(function(el, next, index) {
+								SET('common.progress', (index / arr.length) * 100);
+								AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), { id: el.value }, next);
+							}, function() {
+								ctrl.refresh();
+								SETTER('loading', 'hide', 1000);
+								SETTER('snackbar', 'success', '@(Orders have been removed successfully.)');
+							});
+						});
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.create = function() {
+			ctrl.set('form', { items: [], discount: 0 }, true);
+			SET('common.form', ctrl.scope + '-form');
+		};
+
+		ctrl.options = function(el) {
+			var items = [];
+			items.push({ id: 'refresh', name: '@(Refresh)', icon: 'refresh' });
+			items.push({ id: 'create', name: '@(Create order)', icon: 'plus-circle' });
+			SETTER('contextmenu', 'show', 'left', el, items, function(item) {
+				switch (item.id) {
+					case 'refresh':
+					case 'create':
+						ctrl[item.id]();
+						break;
+				}
+			}, 0, 5);
+		};
+
+		ctrl.filter = function(type, input, sort, page, grid) {
+			filter = input ? CLONE(input) : {};
+			sort && (filter.sort = sort.name + '_' + sort.sorting);
+			filter.page = page;
+			ctrl.refresh();
+		};
+	});
+
+</script>

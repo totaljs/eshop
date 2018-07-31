@@ -1,0 +1,441 @@
+<style>
+	/*auto*/
+	.ui-orderedproducts { display: table; width: 100%; margin-bottom: 10px; }
+	.ui-orderedproducts .fa { color: red; cursor: pointer; margin-left: 8px; }
+	.ui-orderedproducts-item { display: table-row; }
+	.ui-orderedproducts-item > div { display: table-cell; padding: 2px 5px; }
+	.ui-orderedproducts-item > div:first-child { padding-left: 0; }
+	.ui-orderedproducts-item > div:last-child { padding-right: 0; }
+	.ui-orderedproducts-item input { width: 100%; background-color: transparent; border: 0; border-bottom: 1px dotted black; font-weight: normal; outline: 0; text-align: right; padding: 1px 5px; margin: 0; font-size: 12px; }
+	.ui-orderedproducts-reference { width: 100px; }
+	.ui-orderedproducts-reference input { text-align: left; }
+	.ui-orderedproducts-name input { text-align: left; font-weight: bold; }
+	.ui-orderedproducts-count { width: 90px; }
+	.ui-orderedproducts-price { width: 120px; background-color: #F0F0F0; }
+	.ui-orderedproducts-sum { width: 120px; text-align: right; background-color: #FFFFF5; font-size: 12px; }
+	.ui-orderedproducts-sum > div { padding: 1px 5px; border-bottom: 1px solid black; }
+
+	.orderstatushistory > div { font-size: 11px; border-bottom: 1px solid #D0D0D0; padding: 3px 0; }
+	.orderstatushistory .fa { margin-right: 5px; }
+
+	@media(max-width: 768px) {
+		.ui-orderedproducts-item > div { display: block; height: 30px; }
+		.ui-orderedproducts-item { display: block; height: 80px; }
+		.ui-orderedproducts { display: block; }
+		.ui-orderedproducts-reference { width: 33%; float: left;}
+		.ui-orderedproducts-name { margin-left: 33%; }
+		.ui-orderedproducts-price { width: 33%; float: left; }
+		.ui-orderedproducts-count { width: 33%; float: left; }
+		.ui-orderedproducts-sum { width: 33%; float: right; }
+	}
+</style>
+
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:shopping-cart;if:orders-form;width:999;reload:Orders/formShow;submit:Orders/formSubmit;autofocus:true" data-jc-controller="Orders">
+
+	<div data-b="orders.form" data-b-template="true">
+		<script type="text/html">
+		{{ if value && value.id }}
+		<div class="padding">
+			<div class="row">
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key">@(ID)</div>
+						<div class="value">{{ value.id }}</div>
+					</div>
+				</div>
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key">@(Number)</div>
+						<div class="value">{{ value.number }}</div>
+					</div>
+				</div>
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-credit-card"></i>@(Price)</div>
+						<div class="value">{{ value.price | format(2) }}</div>
+					</div>
+				</div>
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-destkop"></i>@(Ordered items)</div>
+						<div class="value">{{ value.count }}x</div>
+					</div>
+				</div>
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Created)</div>
+						<div class="value">{{ value.datecreated | time }}</div>
+					</div>
+				</div>
+				{{ if value.dateupdated }}
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-calendar"></i>@(Updated)</div>
+						<div class="value">{{ value.dateupdated | time }}</div>
+					</div>
+				</div>
+				{{ fi }}
+				{{ if value.ispaid && value.datepaid }}
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-credit-card"></i>@(Paid)</div>
+						<div class="value">{{ value.datepaid | format('@(yyyy-MM-dd HH:mm)') }}</div>
+					</div>
+				</div>
+				{{ fi }}
+				{{ if value.ip }}
+				<div class="col-md-3 m">
+					<div class="keyvalue">
+						<div class="key"><i class="fa fa-desktop"></i>@(IP address)</div>
+						<div class="value">{{ value.ip }}</div>
+					</div>
+				</div>
+				{{ fi }}
+			</div>
+		</div>
+		{{ fi }}
+		</script>
+	</div>
+
+	<div class="toolbar2 toolbar nmb">
+		<button class="exec" data-exec="Orders/formStatus" name="sent"><i class="fa fa-truck"></i>@(Sent)</button>
+		<span></span>
+		<button class="exec" data-exec="Orders/formStatus" name="finished"><i class="fa fa-check"></i>@(Finished)</button>
+		<span></span>
+		<button class="exec" data-exec="Orders/formStatus" name="canceled"><i class="fa fa-times"></i>@(Canceled)</button>
+	</div>
+	<div class="padding bg-yellow">
+		<div data-jc="textbox" data-jc-path="orders.form.status" data-jc-config="required:true;maxlength:100" class="m">@(Order status)</div>
+
+		<div data-jc="repeater" data-jc-path="orders.form.statushistory" class="orderstatushistory m">
+			<script type="text/html">
+				<div><i class="fa fa-clock-o"></i><b>{{ date | format('@(yyyy-MM-dd HH:mm)') }}</b> - {{ status }}</div>
+			</script>
+		</div>
+
+		<div data-jc="textbox" data-jc-path="orders.form.note" data-jc-config="maxlength:100">@(Internal note)</div>
+		<div class="mt10">
+			<div data-jc="checkbox" data-jc-path="orders.form.isfinished" class="inline mr10 b blue">@(Processed and closed)</div>
+			<div data-jc="checkbox" data-jc-path="orders.form.ispaid" class="inline mr10 b green">@(Paid)</div>
+			<div data-jc="checkbox" data-jc-path="orders.form.isemail" class="inline">@(Send email to customer about the order status)</div>
+		</div>
+	</div>
+	<div class="padding npb">
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.delivery" data-jc-config="required:true;maxlength:50;icon:truck">@(Delivery)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.payment" data-jc-config="required:true;maxlength:50;icon:credit-card">@(Payment)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.trackingcode" data-jc-config="maxlength:50;icon:map-pin;align:center">@(Tracking code)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.reference" data-jc-config="maxlength:50;align:center">@(Custom number)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.discount" data-jc-config="maxlength:3;increment:true;type:number;align:center">@(Discount %)</div>
+				<div class="help">@(Information only)</div>
+			</div>
+		</div>
+	</div>
+	<hr class="nmt nmb" />
+	<div class="padding">
+		<div data-jc="textarea" data-jc-path="orders.form.message" data-jc-config="maxlength:500">@(A custom message for the customer)</div>
+	</div>
+	<hr class="nmt nmb" />
+	<div class="padding">
+		<div class="caption"><i class="fa fa-envelope-o"></i>@(Contact information)</div>
+
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.firstname" data-jc-config="required:true;maxlength:50">@(First name)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.lastname" data-jc-config="required:true;maxlength:50">@(Last name)</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.email" data-jc-config="required:true;type:email">@(Email address)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.phone" data-jc-config="maxlength:30">@(Phone number)</div>
+			</div>
+		</div>
+	</div>
+	<hr class="nmt nmb" />
+	<div class="padding">
+		<div data-jc="checkbox" data-jc-path="orders.form.iscompany" class="m">@(Billing to company)</div>
+		<div class="row" data-jc="disable" data-jc-path="orders.form.iscompany" data-jc-config="if:!value">
+			<div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="orders.form.company" data-jc-config="required:true;maxlength:40">@(Company)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.companyid" data-jc-config="required:true;maxlength:15">@(Company ID)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data-jc="textbox" data-jc-path="orders.form.companyvat" data-jc-config="required:true;maxlength:30">@(VAT number)</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="padding bg-yellow">
+		<div class="caption"><i class="fa fa-building-o"></i>@(Billing address)</div>
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="orders.form.billingstreet" data-jc-config="required:true;maxlength:50">@(Street)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="orders.form.billingcity" data-jc-config="required:true;maxlength:50">@(City)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-jc="textbox" data-jc-path="orders.form.billingzip" data-jc-config="required:true;maxlength:15">@(ZIP)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="orders.form.billingcountry" data-jc-config="required:true;maxlength:50">@(Country)</div>
+			</div>
+		</div>
+		<br />
+		<div class="caption"><i class="fa fa-truck"></i>@(Delivery address)</div>
+
+		<div class="m"><a href="javascript:void(0)" class="fs11 exec" data-exec="Orders/formCopyAddress"><i class="fa fa-copy mr5"></i>@(Delivery address is same as billing address)</a></div>
+
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliveryfirstname" data-jc-config="maxlength:50">@(First name)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliverylastname" data-jc-config="maxlength:50">@(Last name)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliveryphone" data-jc-config="maxlength:30">@(Phone number)</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliverystreet" data-jc-config="maxlength:50">@(Street)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliverycity" data-jc-config="maxlength:50">@(City)</div>
+			</div>
+			<div class="col-md-2 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliveryzip" data-jc-config="maxlength:15">@(ZIP)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="orders.form.deliverycountry" data-jc-config="maxlength:50">@(Country)</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="caption"><i class="fa fa-shopping-cart"></i>@(Ordered products)</div>
+		<div class="help nmt"><b><i class="fa fa-warning mr5"></i>@(IMPORTANT:)</b> @(count of products in stock is not affected by change of count of ordered products)</div>
+		<br />
+		<div data-jc="orderedproducts" data-jc-path="orders.form.items">
+			<script type="text/html">
+				<div class="ui-orderedproducts-item">
+					<div class="ui-orderedproducts-reference"><input type="text" maxlength="30" name="reference" placeholder="@(Reference)" /></div>
+					<div class="ui-orderedproducts-name"><input type="text" maxlength="100" name="name" placeholder="@(Name)" /></div>
+					<div class="ui-orderedproducts-price"><input type="text" maxlength="10" name="price" placeholder="@(Price)" /></div>
+					<div class="ui-orderedproducts-count"><input type="text" maxlength="3" name="count" placeholder="@(Count)" /></div>
+					<div class="ui-orderedproducts-sum"><div><b>0.00</b><i class="fa fa-times"></i></div></div>
+				</div>
+			</script>
+		</div>
+		<div class="row">
+			<div class="col-xs-6 fs12"><a href="javascript:void(0)" class="exec" data-exec="Orders/formAddItem"><i class="fa fa-plus-circle mr5"></i>@(Add a new item)</a></div>
+			<div class="col-xs-6 right">
+				@(Summarize:) <span data-b="orders.form.items" data-b-html="orderedproducts_summarize(value)" class="badge badge-blue badge-large b mr5">...</span>
+			</div>
+		</div>
+	</div>
+	<div data-jc="error" data-jc-path="orders.form.response"></div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="orders.form" data-jc-config="flags:enabled">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(SAVE)</button>
+	</div>
+</div>
+
+<script>
+
+	function orderedproducts_summarize(arr) {
+
+		if (!arr)
+			return;
+
+		var sum = 0;
+		for (var i = 0, length = arr.length; i < length; i++) {
+			var item = arr[i];
+			sum += (item.price || 0) * (item.count || 0);
+		}
+		return sum.format(2);
+	}
+
+	SCOPE('Orders', function(ctrl) {
+
+		ctrl.formShow = function(com) {
+			var model = orders.form;
+			com.reconfigure({ title: model.id ? '@(Edit order)' : '@(New order)' });
+
+			// Backup older status
+			if (model.id)
+				model.statusold = model.status;
+
+			SETTER('loading', 'hide', 1000);
+		};
+
+		ctrl.formSubmit = function(com) {
+
+			SETTER('loading', 'show');
+
+			var model = CLONE(ctrl.get('form'));
+
+			if (model.statusold !== model.status) {
+				!model.statushistory && (model.statushistory = []);
+				model.statushistory.push({ date: new Date(), status: model.status });
+			}
+
+			model.statusold = undefined;
+
+			AJAX('POST [url]api/{0}/'.format(ctrl.scope), model, function(response) {
+				SETTER('loading', 'hide', 1000);
+				if (response.success) {
+					SETTER('snackbar', 'success', '@(Order has been saved successfully.)');
+					com.hide();
+					ctrl.refresh();
+				} else
+					SET('orders.form.response', response);
+			});
+		};
+
+		ctrl.formCopyAddress = function() {
+			var model = ctrl.get('form');
+			ctrl.set('form.deliverystreet', model.billingstreet);
+			ctrl.set('form.deliverycity', model.billingcity);
+			ctrl.set('form.deliveryzip', model.billingzip);
+			ctrl.set('form.deliverycountry', model.billingcountry);
+		};
+
+		ctrl.formAddItem = function() {
+			PUSH('orders.form.items', { price: 10, count: 1, name: '@(Enter a product name)' });
+		};
+
+		ctrl.formStatus = function(btn) {
+			var msg = '';
+			switch (btn.attr('name')) {
+				case 'sent':
+					msg = '@(Goods sent)';
+					break;
+				case 'finished':
+					msg = '@(Finished)';
+					break;
+				case 'canceled':
+					msg = '@(Canceled)';
+					break;
+			}
+
+			if (msg) {
+				ctrl.set('form.isfinished', true);
+				ctrl.set('form.status', msg);
+			}
+		};
+	});
+
+	COMPONENT('orderedproducts', function(self, config) {
+
+		var template, items, skip = false;;
+
+		self.validate = function(value) {
+			return value.length > 0;
+		};
+
+		self.make = function() {
+			self.aclass('ui-orderedproducts');
+			var el = self.find('script');
+
+			// Creates a template
+			template = VIRTUALIZE(el.html(), { reference: 'input[name="reference"]', name: 'input[name="name"]', count: 'input[name="count"]', price: 'input[name="price"]', sum: '.ui-orderedproducts-sum b' });
+
+			self.event('change', 'input', function() {
+				self.rebind();
+			});
+
+			self.event('click', '.fa', function() {
+				var index = $(this).closest('.ui-orderedproducts-item').attrd('index');
+				self.get().splice(index, 1);
+				self.update(true);
+				self.change(true);
+			});
+
+			el.remove();
+		};
+
+		self.rebind = function() {
+
+			var arr = self.get();
+			var tmp = {};
+
+			for (var i = 0, length = items.length; i < length; i++) {
+				var item = items[i];
+				var value = arr[i];
+
+				tmp.price = item.price.val().replace(/\s/g, '').parseFloat();
+				tmp.count = item.count.val().replace(/\s/g, '').parseInt();
+
+				if (tmp.count <= 0)
+					tmp.count = 1;
+
+				value.name = item.name.val().trim();
+				value.reference = item.reference.val().trim();
+
+				if (tmp.price !== value.price || tmp.count || value.count) {
+					value.count = tmp.count;
+					value.price = tmp.price;
+					item.sum.html((value.price * value.count).format(2));
+					item.price.val(value.price.format(2));
+					item.count.val(value.count + 'x');
+				}
+			}
+
+			skip = true;
+			self.update(true);
+		};
+
+		self.setter = function(value) {
+
+			if (skip) {
+				skip = false;
+				return;
+			}
+
+			self.empty();
+			items = [];
+
+			for (var i = 0, length = value.length; i < length; i++) {
+				var item = value[i];
+				var el = template.clone();
+
+				el.reference.val(item.reference || '');
+				el.name.val(item.name || '');
+				el.price.val((item.price || 0).format(2));
+				el.count.val((item.count || 0) + 'x');
+				el.sum.html(((item.price || 0) * (item.count || 0)).format(2));
+
+				el.attrd('index', i);
+				items.push(el);
+				self.append(el.element);
+			}
+
+		};
+	});
+
+</script>

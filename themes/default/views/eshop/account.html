@@ -1,70 +1,70 @@
-@{title(user.name)}
-@{sitemap('account')}
+@{repository.loading = true}
 
-<div id="loading"></div>
-<div class="padding">
-	<br />
+<h1>@{title}</h1>
 
-	<h1>@{title}</h1>
-	<nav class="quicknavigation center">
-		<a href="@{sitemap_url('contact')}"><i class="fa fa-envelope"></i>@(Support)</a>
-		<a href="@{sitemap_url('products')}" class="hidden-xs"><i class="fa fa-dropbox"></i>@(Explore)</a>
-		<a href="@{sitemap_url('settings')}"><i class="fa fa-cog"></i>@(Settings)</a>
-		<a href="/account/logoff/"><i class="fa fa-power-off"></i>@(Sign out)</a>
-	</nav>
+<div class="row">
 
-	<div class="row">
-		<div class="col-md-8 col-md-offset-2">
-			<br />
+	<div class="col-md-4 m">
 
-			<div data-jc="visible" data-jc-path="datasource.items" data-if="value.length === 0" class="hidden">
-				<div class="row">
-					<div class="col-md-8 col-md-offset-2 ui-center">
-						<hr />
-						<br />
-						<div>@(You don't have any orders.)</div>
-						<br />
-						<hr />
-						<br />
-						<br />
-						<a href="@{sitemap_url('products')}" class="linkbutton"><span class="fa fa-search"></span> @(Browse all products)</a>
-					</div>
-				</div>
+		<div class="keyvalue npt">
+			<div class="key">@(Account name)</div>
+			<div class="value">@{user.name}</div>
+		</div>
+
+		<div class="keyvalue">
+			<div class="key">@(Email address)</div>
+			<div class="value">@{user.email}</div>
+		</div>
+
+		<div class="keyvalue">
+			<div class="key">@(Phone number)</div>
+			<div class="value">@{if user.phone}@{user.phone}@{else}@(undefined)@{fi}</div>
+		</div>
+
+		<div class="keyvalue">
+			<div class="key">@(Discount)</div>
+			<div class="value">@{user.discount.format(2)}%</div>
+		</div>
+		<br />
+
+		<div>
+			<a href="@{sitemap_url('settings')}" class="link"><i class="fa fa-caret-right"></i>@(Update account)</a>
+			<a href="@{sitemap_url('category')}" class="link"><i class="fa fa-caret-right"></i>@(Browse goods)</a>
+		</div>
+
+	</div>
+
+	<div class="col-md-8 m">
+		<div class="content">
+			<div class="contentbody npb">
+				<div class="caption">@(My orders) (<b data-b="orders" data-b-html="value ? value.length : 0"></b>)</div>
 			</div>
-
-			<div data-jc="visible" data-jc-path="datasource.items" data-if="value.length > 0" class="hidden">
-				<div class="row">
-					<h3>@(My orders:)</h3>
-				</div>
-				<div data-jc="repeater" data-jc-path="datasource.items" class="orders">
-					<script type="text/html">
-						<div class="row">
-							<div class="col-sm-5">
-								<a href="@{sitemap_url('order', '{{ id }}')}">@(Order) # {{ id }}</a>
-								<div>{{ status }}</div>
+			<div data-b="orders" data-b-visible="!value || !value.length" class="hidden">
+				<div class="empty"><i class="fa fa-dropbox"></i>@(You don't have any orders.)</div>
+			</div>
+			<div data-b="orders" data-b-template="true" class="hidden" data-b-visible="value && value.length">
+				<script type="text/html">
+					{{ foreach m in value }}
+						<div class="order">
+							<a href="@{sitemap_url('order', '{{ m.id }}')}" title="@(Preview)"><i class="fa fa-search"></i></a>
+							<div class="line">
+								<div class="price">{{ m.price | format(2) }}</div>
+								<div class="name">{{ m.name }}</div>
 							</div>
-							<div class="col-sm-4 ui-right">
-								<div class="b">@{currency('{{ price }}')}</div>
-								<div>{{ count }} @(items)</div>
-							</div>
-							<div class="col-sm-3 ui-right">
-								<div class="b">{{ datecreated | format('@(yyyy-MM-dd)') }}</div>
-								<div>{{ datecreated | format('HH:mm') }}</div>
+							<div class="line">
+								<div class="date">{{ m.datecreated | format('@(yyyy-MM-dd HH:mm)') }}</div>
+								<div class="status">{{ if m.isfinished }}<b class="green"><i class="fa fa-check-circle"></i>@(Finished)</b>{{ else }}{{ m.status }}{{ fi }}</div>
 							</div>
 						</div>
-					</script>
-				</div>
-				<br />
+					{{ end }}
+				</script>
 			</div>
-			<br />
 		</div>
 	</div>
+
 </div>
 
-@{json(model, 'orders')}
-
-@{section script}
 <script>
-	var datasource = JSON.parse($('#orders').html());
+	SETTER(true, 'loading', 'hide', 1000);
+	AJAXCACHE('GET /api/account/orders/', 'orders', '1 minute');
 </script>
-@{end}

@@ -1,0 +1,24 @@
+// CRUD:
+query              : query (response)
+read               : get (response)
+remove             : remove (response)
+save               : save (response)
+save (Page)        : workflow:'url'       -->      save (response)
+save (Settings)    : workflow:'smtp'      -->      save (response)     --> workflow:'load'
+
+// Workflows
+exec               : workflow:'exec' (response)
+dependencies       : workflow:'dependencies' (response)
+send               : workflow:'send' (response)
+editor             : workflow:'editor' (response)
+files              : workflow:'files' (response)
+clear              : workflow:'clear' (response)
+toggle             : workflow:'toggle' (response)
+test               : workflow:'test' (response)
+stats              : workflow:'stats' (response)
+import             : workflow:'import' (response)
+export             : workflow:'export' (response)
+prices             : workflow:'prices' (response)
+create             : workflow:'create' (response)
+search             : workflow:'search' (response)
+unsubscribe        : workflow:'unsubscribe' (response)

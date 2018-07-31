@@ -1,16 +1,20 @@
-// ID : Title ---> URL --> [Parent]
-homepage                 : @(Homepage)                 --> /
-contact                  : @(Contact)                  --> /contact/                    --> homepage
-products                 : @(All items)                --> /shop/                       --> homepage
-new                      : @(New items in the store)   --> /shop/new/                   --> products
-top                      : @(Top items)                --> /shop/top/                   --> products
-popular                  : @(Popular items)            --> /shop/popular/               --> products
-checkout                 : @(Checkout)                 --> /checkout/                   --> homepage
-order                    : @(Order)                    --> /checkout/{0}/               --> checkout
-payment                  : @(Checkout Payment)         --> /checkout/{0}/{1}/           --> checkout
-account                  : @(Account)                  --> /account/                    --> homepage
-settings                 : @(Account Settings)         --> /account/settings/           --> account
-category                 : @(Category)                 --> /shop/*                      --> products
-detail                   : @(Product)                  --> /product/{0}/                --> category
-blogs                    : @(Blogs)                    --> /blogs/                      --> homepage
-blogsdetail              : @(Blog detail)              --> /blogs/{0}/                  --> blogs
+// Common
+homepage          : @(Homepage)            --> /
+posts             : @(Blog)                --> @(/blog/)                 --> homepage
+post              : @(Post)                --> @(/blog/{0}/)             --> posts
+notices           : @(Notices)             --> @(/notices/)              --> homepage
+
+// Admin area
+admin             : @(Admin)               --> @(/admin/*)
+
+// Eshop
+checkout          : @(Checkout)            --> @(/checkout/)            --> homepage
+category          : @(All products)        --> @(/categories/*)         --> homepage
+detail            : @(Product detail)      --> @(/detail/{0}/)          --> category
+top               : @(Top products)        --> @(/top/)                 --> homepage
+new               : @(New products)        --> @(/new/)                 --> homepage
+popular           : @(Popular products)    --> @(/popular/)             --> homepage
+account           : @(My account)          --> @(/account/)             --> homepage
+order             : @(Order detail)        --> @(/checkout/{0}/)        --> account
+settings          : @(Account settings)    --> @(/account/settings/)    --> account
+logoff            : @(Logoff)              --> @(/logoff/)              --> homepage

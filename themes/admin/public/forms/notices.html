@@ -1,0 +1,111 @@
+<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:bullhorn;if:notices-form;title:@(Edit);width:800;reload:Notices/formShow;submit:Notices/formSubmit;autofocus:true" data-jc-controller="Notices">
+	<div class="padding npb">
+		<div class="row">
+			<div class="col-md-8 m">
+				<div data-jc="textbox" data-jc-path="notices.form.name" data-jc-config="required:true;maxlength:50" class="m">@(Name)</div>
+				<div data-jc="checkbox" data-jc-path="notices.form.ispinned" class="b red">@(Pin this notice)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="textbox" data-jc-path="notices.form.date" data-jc-config="type:date;icon:clock-o;placeholder:@(yyyy-MM-dd);align:center">@(Date)</div>
+				<div class="help mt10">@(You can specify a publish date.)</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding bg-yellow">
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data-jc="dropdown" data-jc-path="notices.form.idcategory" data-jc-config="datasource:common.dependencies.notices;icon:folder-o;empty:;required:true">@(Category)</div>
+				<div class="help">@(Choose a category)</div>
+			</div>
+			<div class="col-md-4">
+				<div data-jc="textbox" data-jc-path="notices.form.author" data-jc-config="maxlength:30;icon:user">@(Author)</div>
+				<div class="help">@(Specify an author's name)</div>
+			</div>
+			<div class="col-md-4">
+				<div data-jc="textbox" data-jc-path="notices.form.event" data-jc-config="type:date;icon:calendar;placeholder:@(yyyy-MM-dd);align:center">@(Event)</div>
+				<div class="help">@(You can specify date of event.)</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding bg-smoke npb">
+		<div class="tabmenu-container">
+			<ul data-jc="tabmenu" class="tabmenu" data-jc-path="notices.formtab" data-jc-value="'editor'">
+				<li data-value="editor"><i class="fa fa-pencil"></i>@(Editor)</li>
+				<li data-value="preview"><i class="fa fa-search"></i>@(Preview)</li>
+			</ul>
+		</div>
+	</div>
+	<div class="padding">
+		<div data-b="notices.formtab" data-b-visible="value === 'editor'">
+			<div data-jc="codemirror" data-jc-path="notices.form.body" data-jc-config="height:200;required:true;type:markdown">@(Body)</div>
+			<div class="row fs12 mt10">
+				<div class="col-xs-6">
+					<a href="javascript:void(0)" class="exec" data-exec="Notices/upload"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a>
+				</div>
+				<div class="col-xs-6 right">
+					<div class="help nmt">@(You can type body in markdown format.)</div>
+				</div>
+			</div>
+		</div>
+		<div data-b="notices.formtab" data-b-visible="value === 'preview'" class="hidden">
+			<div data-b="notices.preview" data-b-html="value" class="noticespreview"></div>
+		</div>
+	</div>
+	<div class="padding bg-smoke">
+		<div data-jc="textbox" data-jc-path="notices.form.url" data-jc-config="placeholder:@(Type a URL address)">URL address</div>
+		<div class="help">@(You can specify a target URL address.)</div>
+	</div>
+	<div class="padding">
+		<div data-jc="fontawesomebox" data-jc-path="notices.form.icon" data-jc-config="search:@(Search icon);height:200"></div>
+		<div class="help">@(Choose an icon for this notice.)</div>
+	</div>
+	<div data-jc="error" data-jc-path="notices.form.response"></div>
+	<div class="ui-form-buttons" data-jc="validation" data-jc-path="notices.form">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(SAVE)</button>
+	</div>
+</div>
+
+<script>
+
+	SCOPE('Notices', function(ctrl) {
+
+		ctrl.formShow = function(com) {
+			ctrl.set('formtab', 'editor');
+			com.reconfigure({ title: ctrl.get('form.id') ? '@(Edit notice)' : '@(New notice)' });
+			SETTER('loading', 'hide', 1000);
+		};
+
+		ctrl.watch('formtab', function(path, value) {
+			if (value === 'preview')
+				AJAX('POST [url]api/notices/preview/', { body: ctrl.get('form.body') }, 'notices.preview');
+		});
+
+		ctrl.upload = function(el) {
+			refresh_filebrowser(function(file, name) {
+
+				name = name.replace(/\.[a-z]+$/i, '');
+
+				if ((/\.(jpg|png|gif|jpeg|svg)$/i).test(file))
+					file = '![{0}]({1})'.format(name, file);
+				else
+					file = '[{0}]({1})'.format(name, file);
+
+				SETTER('.notices.form.body', 'insert', file);
+			});
+		};
+
+		ctrl.formSubmit = function(com) {
+			SETTER('loading', 'show');
+			AJAX('POST [url]api/notices/', ctrl.get('form'), function(response) {
+				SETTER('loading', 'hide', 1000);
+				if (response.success) {
+					SETTER('snackbar', 'success', '@(Notice has been saved successfully.)');
+					com.hide();
+					ctrl.refresh();
+				}
+			});
+		};
+	});
+
+</script>

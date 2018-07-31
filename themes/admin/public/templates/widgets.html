@@ -1,0 +1,156 @@
+<div data-jc-controller="Widgets" data-jc-scope="widgets" class="container">
+	<div class="toolbar">
+		<button class="right exec b hidden-xs" data-exec="Widgets/import"><i class="fa fa-cloud-download"></i>@(Download existing)</button>
+		<button class="right exec" data-exec="Widgets/create"><i class="fa fa-plus-circle"></i>@(Create)</button>
+		<button class="exec" data-exec="Widgets/options"><i class="fa fa-cogs"></i>@(Options)</button>
+		<div class="hidden-xs">
+			<span></span>
+			<button class="exec" data-exec="Widgets/globals"><i class="fa fa-clone"></i>@(Globals)</button>
+		</div>
+		<span></span>
+		<button class="exec" data-exec="Widgets/checked" name="checked" disabled="disabled"><i class="fa fa-check-circle"></i>@(Checked)</button>
+	</div>
+	<div class="fullheight">
+		<div data-jc="grid" data-jc-path="grid" data-jc-config="padding:10;filterlabel:Filter...;checked:Widgets/checkbox;button:Widgets/operation">
+			<script type="text/plain">
+			[
+				{ name: 'id', text: '', template: '<input type="checkbox" value="{{ id }}" />', size: '36px', header: '<input type="checkbox" value="{{ id }}" />', filter: false, sort: false, title: 'Options', align: 'center' },
+				{ name: 'name', text: '@(Name)', size: 2, template: '{{ if picture }}<i class="fa fa-camera mr5 blue"></i>{{ fi }}{{ name }}', classth: 'left', classfilter: 'left' },
+				{ name: 'category', text: '@(Category)', size: '150px', class: 'hidden-xs' },
+				{ name: '@(Options)', filter: false, align: 'center', sort: false, size: '100px', template: '<button title="@(Duplicate)" name="duplicate"><i class="fa fa-copy"></i></button><button name="update" title="@(Edit)"><i class="fa fa-pencil"></i></button><button class="btn-remove" name="remove" title="@(Remove)"><i class="fa fa-trash-o"></i></button>' }
+			]
+			</script>
+		</div>
+	</div>
+</div>
+<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:widgets-form;url:[url]forms/widgets.html" data-jc-controller="Widgets"></div>
+<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:widgets-import;url:[url]forms/widgets-import.html" data-jc-controller="Widgets"></div>
+
+<script>
+	CONTROLLER('Widgets', function(ctrl) {
+
+		ctrl.scope = 'widgets';
+
+		var toolbar = ctrl.virtualize({ btnChecked: '.toolbar button[name="checked"]' });
+
+		ctrl.destroy = function() {
+			SETTER('sitemap', 'remove', ctrl.scope);
+		};
+
+		ctrl.refresh = function() {
+			SETTER('loading', 'show', 'refresh fa-spin');
+			AJAX('GET [url]api/{0}/'.format(ctrl.scope), function(response) {
+
+				var categories = {};
+
+				for (var i = 0, length = response.items.length; i < length; i++)
+					categories[response.items[i].category] = true;
+
+				ctrl.set('categories', Object.keys(categories));
+				ctrl.set('grid', response);
+
+				if (window.cmseditor)
+					window.cmseditor.widgetcachereset = true;
+
+				SETTER('loading', 'hide', 1000);
+			});
+		};
+
+		ctrl.import = function() {
+			SET('common.form', 'widgets-import');
+		};
+
+		ctrl.reload = function() {
+			ctrl.refresh();
+		};
+
+		ctrl.operation = function(btn, row, grid) {
+			var name = btn.prop('name');
+			switch (name) {
+				case 'remove':
+					SETTER('confirm', 'show', '@(Are you sure you want to remove selected widget?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+						if (index)
+							return;
+						SETTER('loading', 'show');
+						AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), row, function(response) {
+							SETTER('loading', 'hide', 1000);
+							if (response.success) {
+								SETTER('snackbar', 'success', '@(Widget has been removed successfully.)');
+								ctrl.refresh();
+							}
+						});
+					});
+					break;
+				case 'update':
+				case 'duplicate':
+					SETTER('loading', 'show');
+					AJAX('GET [url]api/{0}/{1}/'.format(ctrl.scope, row.id), function(response) {
+
+						if (name === 'duplicate')
+							response.id = '';
+
+						SET(ctrl.scope + '.form', response, true);
+						SET('common.form', ctrl.scope + '-form');
+					});
+					break;
+			}
+		};
+
+		ctrl.create = function() {
+			SET(ctrl.scope + '.form', {}, true);
+			SET('common.form', ctrl.scope + '-form');
+		};
+
+		ctrl.options = function(el) {
+			var items = [];
+			items.push({ id: 'refresh', name: '@(Refresh)', icon: 'refresh' });
+			items.push({ id: 'create', name: '@(Create widget)', icon: 'plus-circle' });
+			items.push({ id: 'import', name: '@(Download existing)', icon: 'cloud-download' });
+			items.push({ id: 'globals', name: '@(Globals)', icon: 'clone' });
+			SETTER('contextmenu', 'show', 'left', el, items, function(item) {
+				ctrl[item.id]();
+			}, 0, 5);
+		};
+
+		ctrl.globals = function(el) {
+			var items = [];
+			items.push({ value: 'pages-globals', name: '@(Variables)', icon: 'cog' });
+			items.push({ value: 'widgets-globals', name: '@(Global style/script)', icon: 'paint-brush' });
+			SETTER('contextmenu', 'show', 'left', el, items, function(item) {
+				SET('common.form', item.value);
+			}, 8, 5);
+		};
+
+		ctrl.checkbox = function(el, grid) {
+			el && !el.value && grid.checked(el.checked);
+			var count = grid.checked().length;
+			toolbar.btnChecked.disable(count === 0);
+		};
+
+		ctrl.checked = function(el) {
+			var items = [];
+			items.push({ id: 'remove', name: '@(Remove widgets)', icon: 'trash' });
+			SETTER('contextmenu', 'show', 'center', el, items, function(item) {
+				switch (item.id) {
+					case 'remove':
+						SETTER('confirm', 'show', '@(Are you sure you want to remove all selected widgets?)', ['"trash"@(Remove)', '@(No)'], function(index) {
+							if (index)
+								return;
+							var arr = FIND('.{0}.grid'.format(ctrl.scope)).checked().toArray();
+							SETTER('loading', 'show', 'trash-o');
+							arr.waitFor(function(el, next, index) {
+								SET('common.progress', (index / arr.length) * 100);
+								AJAX('DELETE [url]api/{0}/'.format(ctrl.scope), { id: el.value }, next);
+							}, function() {
+								ctrl.refresh();
+								SETTER('loading', 'hide', 1000);
+								SETTER('snackbar', 'success', '@(Widgets have been removed successfully.)');
+							});
+						});
+						break;
+				}
+			}, 0, 5);
+		};
+	});
+
+</script>
