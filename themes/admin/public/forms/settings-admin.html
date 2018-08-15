@@ -1,29 +1,29 @@
-<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:user;if:settings-admin;title:@(Administrator);width:500;submit:Settings/userSave;autofocus:true" data-jc-controller="Settings">
+<div data-jc="form__common.form__icon:user;if:settings-admin;title:@(Administrator);width:500;submit:settingsform/submit;autofocus:true" class="hidden">
 	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-jc="textbox" data-jc-path="settings.formuser.name" data-jc-config="placeholder:@(Peter Sirka);required:true">@(User name)</div>
+				<div data-jc="textbox__settings.formuser.name__placeholder:@(Peter Sirka);required:true">@(User name)</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-jc="textbox" data-jc-path="settings.formuser.login" data-jc-config="required:true;placeholder:@(petersirka)">@(Login name)</div>
+				<div data-jc="textbox__settings.formuser.login__required:true;placeholder:@(petersirka)">@(Login name)</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-jc="textbox" data-jc-path="settings.formuser.password" data-jc-config="required:true">@(Login password)</div>
-				<div class="help"><a href="javascript:void(0)" class="exec" data-exec="Settings/userPassword">@(Generate password)</a></div>
+				<div data-jc="textbox__settings.formuser.password__required:true">@(Login password)</div>
+				<div class="help"><a href="javascript:void(0)" class="exec" data-exec="settingsform/password">@(Generate password)</a></div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12 m">
-				<div data-jc="dropdowncheckbox" data-jc-path="settings.formuser.roles" data-jc-config="items:[roles]">@(Roles)</div>
+				<div data-jc="dropdowncheckbox__settings.formuser.roles__alltext:null;items:[roles]">@(Roles)</div>
 				<div class="help">@(If the user roles will be empty then the user will be access to all functionality.)</div>
 			</div>
 		</div>
 	</div>
-	<div class="ui-form-buttons center" data-jc="validation" data-jc-path="settings.formuser">
+	<div class="ui-form-buttons center" data-jc="validation__settings.formuser">
 		<button name="cancel">@(Cancel)</button>
 		<button name="submit">@(SAVE)</button>
 	</div>
@@ -31,13 +31,13 @@
 
 <script>
 
-	SCOPE('Settings', function(ctrl) {
+	PLUGIN('settingsform', function(exports) {
 
-		ctrl.userPassword = function() {
+		exports.password = function() {
 			SET('settings.formuser.password', GUID(10));
 		};
 
-		ctrl.userSave = function(com) {
+		exports.submit = function(com) {
 
 			com.hide();
 
@@ -49,14 +49,14 @@
 				user.login = frm.login;
 				user.password = frm.password;
 				user.roles = frm.roles;
-				ctrl.update('form.users');
+				UPDATE('settings.form.users');
 			} else {
 				frm.id = GUID(15);
-				ctrl.push('form.users', frm);
+				PUSH('settings.form.users', frm);
 			}
 
 			// Performs change for validation
-			ctrl.change('form.url', true);
+			CHANGE('settings.form.url');
 		};
 	});
 

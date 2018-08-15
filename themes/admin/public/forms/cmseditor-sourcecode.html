@@ -1,8 +1,8 @@
-<div data-jc="form" data-jc-path="cmseditor.form" class="hidden" data-jc-config="icon:code;if:sourcecode;title:@(Source code editor);width:1100;submit:cmseditor_sourcecode_submit;cancel:cmseditor_sourcecode_cancel">
+<div data-jc="form__cmseditor.form__icon:code;if:sourcecode;title:@(Source code editor);width:1100;submit:cmseditorsourcecode/submit;cancel:cmseditorsourcecode/cancel" class="hidden">
 	<div class="padding">
-		<div data-jc="codemirror" data-jc-path="cmseditor.sourcecode" data-jc-config="height:500;icon:code;required:true;tabs:true;trim:true">@(HTML)</div>
+		<div data-jc="codemirror__cmseditor.sourcecode__height:500;required:true;tabs:true;trim:true">@(HTML)</div>
 	</div>
-	<div class="ui-form-buttons" data-jc="validation" data-jc-path="cmseditor.sourcecode">
+	<div class="ui-form-buttons" data-jc="validation__cmseditor.sourcecode">
 		<button name="cancel">@(Cancel)</button>
 		<button name="submit">@(APPLY)</button>
 	</div>
@@ -10,16 +10,20 @@
 
 <script>
 
-	function cmseditor_sourcecode_submit(com) {
-		cmseditor.instance.replace(cmseditor.sourcecode);
-		com.hide();
-	}
+	PLUGIN('cmseditorsourcecode', function(exports) {
 
-	function cmseditor_sourcecode_cancel(com) {
-		var editor = cmseditor.instance;
-		editor.resize();
-		editor.load('sourcecode');
-		com.hide();
-	}
+		exports.submit = function(com) {
+			cmseditor.instance.replace(cmseditor.sourcecode);
+			com.hide();
+		};
+
+		exports.cancel = function(com) {
+			var editor = cmseditor.instance;
+			editor.resize();
+			editor.load('sourcecode');
+			com.hide();
+		};
+
+	});
 
 </script>

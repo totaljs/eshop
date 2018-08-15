@@ -3,8 +3,13 @@ const REGEXP_HTML_ATTR = /(\s)data-cms-id="[a-z0-9]+"|data-cms-widget="[a-z0-9]+
 const REGEXP_HTML_DIV = /<div\s>/g;
 const REGEXP_GLOBAL = /\$[0-9a-z-_]+/gi;
 const Fs = require('fs');
-var GLOBALS = {};
+
 var loaded = false;
+
+F.global.pages = [];
+F.global.sitemap = [];
+F.global.variables = {};
+F.global.redirects = {};
 
 NEWSCHEMA('Page').make(function(schema) {
 
@@ -28,15 +33,23 @@ NEWSCHEMA('Page').make(function(schema) {
 	schema.define('widgets', '[Object]');               // List of dynamic widgets, contains Array of ID widget
 	schema.define('signals', '[String(30)]');           // Registered signals
 	schema.define('navigations', '[String]');           // List of navigation ID (optional, for side rendering)
+	schema.define('language', 'String');                // Only information
+	schema.define('redirects', '[String]');             // Temporary
+	schema.define('css', String);                       // Custom page styles
 
+	schema.define('draft', Boolean);                    // Determines draft
 	schema.define('navicon', Boolean);                  // Can replace the item icon in navigation
 	schema.define('navname', Boolean);                  // Can replace the item name in navigation
 	schema.define('replacelink', Boolean);              // Can replace the link in the whole content
 
+	schema.define('lockedtemplate', Boolean);           // Disables choosing templates
+	schema.define('lockedcontent', Boolean);            // Locks a content for editing
+	schema.define('usedefault', Boolean);               // Doesn't save a content, still shows a default content from the template
+
 	// Gets listing
 	schema.setQuery(function($) {
 		var filter = NOSQL('pages').find();
-		filter.fields('id', 'name', 'title', 'url', 'ispartial', 'icon', 'parent');
+		filter.fields('id', 'name', 'title', 'url', 'ispartial', 'icon', 'parent', 'language', 'draft');
 		filter.sort('datecreated', true);
 		filter.callback((err, docs, count) => $.callback(filter.adminOutput(docs, count)));
 	});
@@ -48,7 +61,37 @@ NEWSCHEMA('Page').make(function(schema) {
 		opt.url && filter.where('url', opt.url);
 		opt.id && filter.where('id', opt.id);
 		$.id && filter.where('id', $.id);
-		filter.callback($.callback, 'error-pages-404');
+
+		filter.callback(function(err, response) {
+
+			if (err) {
+				$.invalid(err);
+				return;
+			}
+
+			ADMIN.alert($.user, 'pages.edit', response.id);
+
+			var redirects = Object.keys(F.global.redirects);
+			response.redirects = [];
+
+			for (var i = 0, length = redirects.length; i < length; i++) {
+				var key = redirects[i];
+				if (F.global.redirects[key] === response.url)
+					response.redirects.push(key);
+			}
+
+			F.functions.read('pages', response.id, function(err, body) {
+				response.body = body;
+				if (response.draft) {
+					F.functions.read('pages', response.id + '_draft', function(err, body) {
+						response.bodydraft = body;
+						$.callback(response);
+					});
+				} else
+					$.callback(response);
+			});
+
+		}, 'error-pages-404');
 	});
 
 	// Removes a specific page
@@ -56,24 +99,29 @@ NEWSCHEMA('Page').make(function(schema) {
 		var user = $.user.name;
 		var id = $.body.id;
 		var db = NOSQL('pages');
+
 		db.remove().where('id', id).backup(user).log('Remove: ' + id, user).callback(function(err, count) {
 			$.success();
-			count && db.counter.remove(id);
-			count && setTimeout2('pages', refresh, 1000);
+			if (count) {
+				F.functions.remove('pages', id);
+				db.counter.remove(id);
+				setTimeout2('pages', refresh, 1000);
+			}
 		});
+
+		NOSQL('parts').remove().where('idowner', id).where('type', 'page');
 	});
 
 	// Saves a page into the database
 	schema.setSave(function($) {
 
-		var model = $.model.$clean();
+		var model = $.clean();
 		var user = $.user.name;
 		var oldurl = model.oldurl;
 		var isUpdate = !!model.id;
 		var nosql = NOSQL('pages');
 
-		if (!model.title)
-			model.title = model.name;
+		!model.title && (model.title = model.name);
 
 		if (isUpdate) {
 			model.dateupdated = F.datetime;
@@ -84,9 +132,30 @@ NEWSCHEMA('Page').make(function(schema) {
 			model.admincreated = user;
 		}
 
+		var redirectsmod = false;
+		var redirects = Object.keys(F.global.redirects);
+		for (var i = 0, length = redirects.length; i < length; i++) {
+			var key = redirects[i];
+			if (F.global.redirects[key] === model.oldurl || F.global.redirects[key] === model.url) {
+				delete F.global.redirects[key];
+				redirectsmod = true;
+			}
+		}
+
+		if (model.redirects && model.redirects.length) {
+			for (var i = 0, length = model.redirects.length; i < length; i++) {
+				F.global.redirects[model.redirects[i]] = model.url;
+				redirectsmod = true;
+			}
+		}
+
+		redirectsmod && $WORKFLOW('Redirects', 'update');
+
 		if (!model.navigations.length)
 			model.navigations = null;
 
+		model.stamp = new Date().format('yyyyMMddHHmm');
+		model.redirects = undefined;
 		model.body = U.minifyHTML(model.body);
 		model.search = ((model.title || '') + ' ' + (model.keywords || '') + ' ' + model.search).keywords(true, true).join(' ').max(1000);
 
@@ -98,6 +167,24 @@ NEWSCHEMA('Page').make(function(schema) {
 		}
 
 		model.oldurl = undefined;
+
+		if (model.draft) {
+			// Draft can have another widgets
+			// Therefore we must create a helper values
+			model.dwidgets = model.widgets;
+			model.dbodywidgets = model.widgets;
+			model.widgets = undefined;
+			model.bodywidgets = undefined;
+			F.functions.write('pages', model.id + '_draft', model.body, isUpdate);
+		} else {
+			// Removes helper values
+			model.dwidgets = null;
+			model.dbodywidgets = null;
+			F.functions.write('pages', model.id + '_' + model.stamp, model.body); // backup
+			F.functions.write('pages', model.id, model.body, isUpdate);
+		}
+
+		model.body = undefined;
 		var db = isUpdate ? nosql.modify(model).where('id', model.id).backup(user).log('Update: ' + model.id, user) : nosql.insert(model).log('Create: ' + model.id, user);
 
 		// Update a URL in all navigations where this page is used
@@ -114,7 +201,7 @@ NEWSCHEMA('Page').make(function(schema) {
 			else
 				setTimeout2('pages', refresh, 1000);
 
-			$.success();
+			$.success(model.id);
 		});
 	});
 
@@ -145,10 +232,18 @@ NEWSCHEMA('Page').make(function(schema) {
 		var opt = $.options;
 		var reg = new RegExp(opt.oldurl.replace(/\//, '\\/'), 'gi');
 
-		NOSQL('pages').update(function(doc) {
-			doc.body = doc.body.replace(reg, opt.url);
-			return doc;
-		}).where('ispartial', false).callback(refresh);
+		NOSQL('pages').find().fields('id').callback(function(err, docs) {
+			// Updates files
+			// doc.body.replace(reg, opt.url);
+			docs.wait(function(item, next) {
+				F.functions.read('pages', item.id, function(err, body) {
+					if (body)
+						F.functions.write('pages', item.id, body.replace(reg, opt.url), next, true);
+					else
+						next();
+				});
+			}, refresh);
+		}).where('ispartial', false);
 
 		$.success();
 	});
@@ -163,7 +258,7 @@ NEWSCHEMA('Page').make(function(schema) {
 	});
 });
 
-NEWSCHEMA('PageGlobals').make(function(schema) {
+NEWSCHEMA('Globals').make(function(schema) {
 
 	var pending = [];
 
@@ -190,7 +285,7 @@ NEWSCHEMA('PageGlobals').make(function(schema) {
 
 	schema.addWorkflow('add', function($) {
 
-		if (GLOBALS[$.options.name]) {
+		if (F.global.variables[$.options.name]) {
 			$.success();
 			return;
 		}
@@ -208,7 +303,7 @@ NEWSCHEMA('PageGlobals').make(function(schema) {
 					var arr = pending.slice(0);
 					var is = false;
 					for (var i = 0, length = arr.length; i < length; i++) {
-						if (!GLOBALS[arr[i].name]) {
+						if (!F.global.variables[arr[i].name]) {
 							response.body += '\n' + arr[i].name.padRight(25) + ': ' + arr[i].value;
 							is = true;
 						}
@@ -223,38 +318,103 @@ NEWSCHEMA('PageGlobals').make(function(schema) {
 	});
 });
 
+NEWSCHEMA('Redirects').make(function(schema) {
+
+	schema.define('body', 'String');
+
+	schema.setSave(function($) {
+		Fs.writeFile(F.path.databases('pagesredirects.json'), JSON.stringify($.model.$clean()), function() {
+			refresh_redirects();
+			$.success();
+		});
+	});
+
+	schema.setGet(function($) {
+		Fs.readFile(F.path.databases('pagesredirects.json'), function(err, data) {
+
+			if (data) {
+				data = data.toString('utf8').parseJSON(true);
+				$.model.body = data.body;
+			}
+
+			$.callback();
+		});
+	});
+
+	schema.addWorkflow('update', function($) {
+
+		var redirects = Object.keys(F.global.redirects);
+		var builder = [];
+
+		for (var i = 0, length = redirects.length; i < length; i++) {
+			var key = redirects[i];
+			builder.push(key.padRight(40) + ' : ' + F.global.redirects[key]);
+		}
+
+		var model = schema.create();
+		model.body = builder.join('\n');
+		model.$save();
+
+		$.success();
+	});
+});
+
+function refresh_redirects() {
+	$GET('Redirects', function(err, response) {
+		var lines = response.body.split('\n');
+		F.global.redirects = {};
+		for (var i = 0, length = lines.length; i < length; i++) {
+			var line = lines[i].trim();
+			var beg = line.indexOf(':');
+			if (beg === -1 || !line || (line[0] === '/' && line[1] === '/'))
+				continue;
+			var a = U.path(line.substring(0, beg - 1).trim());
+			var b = U.path(line.substring(beg + 1).trim());
+
+			if (a[0] !== '/')
+				a = '/' + a;
+
+			if (b[0] !== '/' && b[0] !== 'h')
+				b = '/' + b;
+
+			F.global.redirects[a] = b;
+		}
+	});
+}
+
 // Refreshes internal information (sitemap)
 function refresh() {
 
-	var sitemap = {};
-	var helper = {};
-	var partial = [];
-	var pages = [];
+	NOSQL('pages').find().fields('id', 'url', 'name', 'title', 'parent', 'icon', 'language', 'ispartial').callback(function(err, response) {
 
-	var prepare = function(doc) {
+		var sitemap = {};
+		var helper = {};
+		var partial = [];
+		var pages = [];
 
-		// A partial content is skipped from the sitemap
-		if (doc.ispartial) {
-			partial.push({ id: doc.id, url: doc.url, name: doc.name, title: doc.title, icon: doc.icon });
-			return;
+		for (var i = 0, length = response.length; i < length; i++) {
+			var doc = response[i];
+
+			// A partial content is skipped from the sitemap
+			if (doc.ispartial) {
+				partial.push({ id: doc.id, url: doc.url, name: doc.name, title: doc.title, icon: doc.icon, language: doc.language });
+				continue;
+			}
+
+			var key = doc.url;
+			var obj = { id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, icon: doc.icon, links: [], language: doc.language };
+
+			helper[doc.id] = key;
+			sitemap[key] = obj;
+			pages.push(obj);
 		}
-
-		var key = doc.url;
-		var obj = { id: doc.id, url: doc.url, name: doc.name, title: doc.title, parent: doc.parent, icon: doc.icon, links: [] };
-
-		helper[doc.id] = key;
-		sitemap[key] = obj;
-		pages.push(obj);
-	};
-
-	NOSQL('pages').find().prepare(prepare).callback(function() {
 
 		// Pairs parents by URL
 		Object.keys(sitemap).forEach(function(key) {
 			var parent = sitemap[key].parent;
 			if (parent) {
 				sitemap[key].parent = helper[parent];
-				sitemap[sitemap[key].parent].links.push(sitemap[key]);
+				sitemap[sitemap[key].parent] && sitemap[sitemap[key].parent].links.push(sitemap[key]);
 			}
 		});
 
@@ -262,16 +422,17 @@ function refresh() {
 		F.global.partial = partial;
 		F.global.pages = pages;
 
-		$GET('PageGlobals', function(err, response) {
+		$GET('Globals', function(err, response) {
 			parseGlobals(response.body);
 			F.cache.removeAll('cachecms');
 			loaded = true;
 		});
+
 	});
 }
 
 function parseGlobals(val) {
-	GLOBALS = {};
+	F.global.variables = {};
 	var arr = val.split('\n');
 	for (var i = 0, length = arr.length; i < length; i++) {
 		var str = arr[i];
@@ -292,7 +453,7 @@ function parseGlobals(val) {
 
 		var value = str.substring(index + 2).trim();
 		if (name && value)
-			GLOBALS[name] = value;
+			F.global.variables[name] = value;
 	}
 }
 
@@ -359,7 +520,7 @@ String.prototype.CMSrender = function(settings, callback, controller) {
 		widget.total.render.call(controller || EMPTYCONTROLLER, widgetsettings(widget, item.options), content, function(response) {
 			body = body.replace(content, response);
 			next();
-		});
+		}, widget.template);
 
 	}, () => callback(body.CMSglobals().CMStidy()));
 };
@@ -378,7 +539,7 @@ function widgetsettings(widget, settings) {
 }
 
 function globalsreplacer(text) {
-	var val = GLOBALS[text.substring(1)];
+	var val = F.global.variables[text.substring(1)];
 	return val ? val : text;
 }
 
@@ -412,6 +573,17 @@ String.prototype.CMStidy = function() {
 	}
 
 	b = ' data-cms-category="';
+	while (true) {
+		beg = body.indexOf(b, beg);
+		if (beg === -1)
+			break;
+		index = body.indexOf('"', beg + b.length);
+		if (index === -1)
+			break;
+		body = body.substring(0, beg) + body.substring(index + 1);
+	}
+
+	b = ' data-cms-part="';
 	while (true) {
 		beg = body.indexOf(b, beg);
 		if (beg === -1)
@@ -520,7 +692,11 @@ Controller.prototype.CMSpage = function(callback, cache) {
 	var page = F.global.sitemap[self.url];
 
 	if (!page) {
-		self.throw404();
+		if (F.global.redirects && F.global.redirects[self.url]) {
+			self.redirect(F.global.redirects[self.url], RELEASE);
+			NOSQL('pages').counter.hit('redirect');
+		} else
+			self.throw404();
 		return self;
 	}
 
@@ -529,7 +705,11 @@ Controller.prototype.CMSpage = function(callback, cache) {
 		callback = null;
 	}
 
+	if (self.query.DRAFT)
+		cache = false;
+
 	self.memorize('cachecms' + self.url, cache || '1 minute', cache === false, function() {
+
 		var nosql = NOSQL('pages');
 		nosql.one().where('id', page.id).callback(function(err, response) {
 
@@ -544,28 +724,39 @@ Controller.prototype.CMSpage = function(callback, cache) {
 				tmp = F.global.sitemap[tmp.parent];
 			}
 
-			nosql.counter.hit('all').hit(response.id);
+			var counter = nosql.counter.hit('all').hit(response.id);
+			var DRAFT = !!self.query.DRAFT;
+			response.language && counter.hit(response.language);
 
-			response.body.CMSrender(response.widgets, function(body) {
+			if (response.css) {
+				response.css = U.minifyStyle('/*auto*/\n' + response.css);
+				self.head('<style type="text/css">' + response.css + '</style>');
+			}
+
+			repo.page = response;
+
+			F.functions.read('pages', response.id + (DRAFT ? '_draft' : ''), function(err, body) {
 				response.body = body;
-				repo.page = response;
-				loadpartial(repo.page, function(partial) {
-					repo.page.partial = partial;
-					if (callback) {
-						callback.call(self, function(model) {
-							self.view('~cms/' + repo.page.template, model);
+				response.body.CMSrender(DRAFT ? response.dwidgets : response.widgets, function(body) {
+					response.body = body;
+					loadpartial(repo.page, function(partial) {
+						repo.page.partial = partial;
+						if (callback) {
+							callback.call(self, function(model) {
+								self.view('~cms/' + repo.page.template, model);
+								repo.page.body = null;
+								repo.page.pictures = EMPTYARRAY;
+								repo.page.search = null;
+							});
+						} else {
+							self.view('~cms/' + repo.page.template);
 							repo.page.body = null;
 							repo.page.pictures = EMPTYARRAY;
 							repo.page.search = null;
-						});
-					} else {
-						self.view('~cms/' + repo.page.template);
-						repo.page.body = null;
-						repo.page.pictures = EMPTYARRAY;
-						repo.page.search = null;
-					}
+						}
+					}, self);
 				}, self);
-			}, self);
+			});
 		});
 	}, function() {
 		if (self.repository.page)
@@ -598,14 +789,23 @@ Controller.prototype.CMSrender = function(url, callback) {
 			tmp = F.global.sitemap[tmp.parent];
 		}
 
-		response.body.CMSrender(response.widgets, function(body) {
+		if (response.css) {
+			response.css = U.minifyStyle('/*auto*/\n' + response.css);
+			self.head('<style type="text/css">' + response.css + '</style>');
+		}
+
+		repo.page = response;
+
+		F.functions.read('pages', response.id, function(err, body) {
 			response.body = body;
-			repo.page = response;
-			loadpartial(repo.page.partial, function(partial) {
-				repo.page.partial = partial;
-				callback(null, repo.page);
+			response.body.CMSrender(response.widgets, function(body) {
+				response.body = body;
+				loadpartial(repo.page.partial, function(partial) {
+					repo.page.partial = partial;
+					callback(null, repo.page);
+				}, self);
 			}, self);
-		}, self);
+		});
 	});
 
 	return self;
@@ -624,13 +824,25 @@ Controller.prototype.CMSpartial = function(url, callback) {
 	var nosql = NOSQL('pages');
 	nosql.counter.hit(page.id);
 	nosql.one().where('id', page.id).callback(function(err, response) {
-		response.body.CMSrender(response.widgets, function(body) {
+
+		if (response.css) {
+			response.css = U.minifyStyle('/*auto*/\n' + response.css);
+			self.head('<style type="text/css">' + response.css + '</style>');
+		}
+
+		F.functions.read('pages', response.id, function(err, body) {
 			response.body = body;
-			callback(null, response);
-		}, self);
+			response.body.CMSrender(response.widgets, function(body) {
+				response.body = body;
+				callback(null, response);
+			}, self);
+		});
 	});
 
 	return self;
 };
 
-ON('settings', refresh);
+ON('settings', function() {
+	refresh();
+	refresh_redirects();
+});

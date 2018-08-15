@@ -13,13 +13,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
 	<meta name="robots" content="all,follow" />
 	<link rel="apple-touch-icon" href="/icon.png" />
-	<link rel="stylesheet" href="//cdn.componentator.com/spa.min@14.css" />
-	<script src="//cdn.componentator.com/spa.min@14.js"></script>
+	<link rel="stylesheet" href="//cdn.componentator.com/spa.min@15.css" />
+	<script src="//cdn.componentator.com/spa.min@15.js"></script>
 	<style type="text/css">
 		/*auto*/
 		html,body { overflow: hidden; height: 100%; }
 		body { background-color: #E6E9ED; }
-		.panel { max-width: 280px; width: 100%; position: absolute; left: 50%; top: 50%; margin: -300px 0 0 -140px; background-color: white; box-shadow: 0 5px 10px rgba(0,0,0,0.1); border-radius: 4px; transition: all 0.5s; transform: scale(1.5); }
+		.panel { max-width: 320px; width: 100%; position: absolute; left: 50%; top: 50%; margin: -300px 0 0 -140px; background-color: white; box-shadow: 0 5px 10px rgba(0,0,0,0.1); border-radius: 4px; transition: all 0.5s; transform: scale(1.5); }
 		.padding { padding: 20px; }
 		.panelshow { transform: scale(1); }
 
@@ -65,14 +65,14 @@
 	<div class="panel">
 		<h1><i class="fa fa-lock"></i>@(Admin)</h1>
 		<div class="padding">
-			<div class="m" data-jc="textbox" data-jc-path="form.name" data-jc-config="icon2:user;required:true;autofocus:true;autofill:true">@(Login name)</div>
-			<div class="m" data-jc="textbox" data-jc-path="form.password" data-jc-config="icon2:lock;required:true;type:password;autofill:true">@(Password)</div>
-			<div data-jc="error" data-jc-path="form.response"></div>
-			<div data-jc="validation" data-jc-path="form">
+			<div class="m" data-jc="textbox__form.name__icon2:user;required:true;autofocus:true;autofill:true">@(Login name)</div>
+			<div class="m" data-jc="textbox__form.password__icon2:lock;required:true;type:password;autofill:true">@(Password)</div>
+			<div data-jc="error__form.response"></div>
+			<div data-jc="validation__form">
 				<button name="submit" disabled="disabled"><i class="fa fa-lock"></i>@(Login)</button>
 			</div>
 			<footer>
-				<div>All rights reserved &copy; 2017</div>
+				<div>All rights reserved &copy; 2018</div>
 				<a href="https://www.totaljs.com" target="_blank">www.totaljs.com</a>
 			</footer>
 		</div>
@@ -105,7 +105,7 @@
 		};
 
 		self.state = function() {
-			var disabled = MAIN.disabled(path);
+			var disabled = DISABLED(path);
 			if (!disabled && config.if)
 				disabled = !EVALUATE(self.path, config.if);
 			elements.prop('disabled', disabled);
@@ -362,7 +362,7 @@
 	});
 
 	$(document).on('click', 'button', function() {
-		if (!MAIN.can('form.*') || BLOCKED('adminlogin', 2000))
+		if (!CAN('form.*') || BLOCKED('adminlogin', 2000))
 			return;
 		RESET('form.*');
 		AJAX('POST /api/login/admin/', form, function(response) {

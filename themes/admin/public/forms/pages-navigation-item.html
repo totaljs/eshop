@@ -1,48 +1,52 @@
-<div data-jc="form" data-jc-path="common.form2" class="hidden" data-jc-config="icon:sitemap;if:pages-navigation-item;title:@(Navigation);width:650;autofocus:true;submit:Pages/formNavigationItemSubmit" data-jc-controller="Pages">
+<div data-jc="form__common.form2__icon:sitemap;if:pages-navigation-item;title:@(Navigation);width:650;autofocus:true;submit:pagesnavigationitem/submit" class="hidden">
 	<div class="padding bg-smoke">
-		<div data-jc="dropdown" data-jc-path="pages.navigationitem.url" data-jc-config="datasource:pages.grid.items;if:n => n.ispartial === false;empty:;icon:sitemap;text:path;value:url">@(URL according to the sitemap)</div>
+		<div data-jc="dropdown__pages.navigationitem.url__datasource:pages.list;if:n => n.ispartial === false;empty:;icon:sitemap;value:url">@(URL according to the sitemap)</div>
 		<div class="help m"><i class="fa fa-refresh"></i>@(CMS will synchronizes all information automatically according to the page settings.)</div>
+	</div>
+	<hr class="nmt" />
+	<div class="padding npt">
+		<div class="row">
+			<div class="col-md-8 m">
+				<div data-jc="textbox__pages.navigationitem.name__required:true;maxlength:50">@(Name)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data-jc="dropdown__pages.navigationitem.language__datasource:common.dependencies.languages">@(Language)</div>
+			</div>
+		</div>
+		<div data-jc="textbox__pages.navigationitem.url__maxlength:500;required:true">@(URL address)</div>
+		<div class="mt10 fs12"><a href="javascript:void(0)" class="exec" data-exec="pagesnavigationitem/file"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a></div>
 	</div>
 	<hr class="nmt" />
 	<div class="padding npt npb">
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-jc="textbox" data-jc-config="required:true;maxlength:50" data-jc-path="pages.navigationitem.name">@(Name)</div>
+				<div data-jc="dropdown__pages.navigationitem.target__items:@(Current tab or window)|_self,@(New tab or window)|_blank;required:true__'_self'">@(Target)</div>
 			</div>
 			<div class="col-md-6 m">
-				<div data-jc="textbox" data-jc-config="maxlength:100" data-jc-path="pages.navigationitem.title">@(Tooltip)</div>
+				<div data-jc="dropdown__pages.navigationitem.behaviour__items:@(Default)|default,@(Highlight)|highlight,@(Info)|info,@(Warning)|warn,@(Special)|special__'default'">@(Behaviour)</div>
 			</div>
 		</div>
-		<div data-jc="textbox" data-jc-config="maxlength:500;required:true" data-jc-path="pages.navigationitem.url">@(URL address)</div>
-		<div class="mt10 fs12"><a href="javascript:void(0)" class="exec" data-exec="Pages/formNavigationItemFile"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a></div>
-		<br />
-		<div class="row">
-			<div class="col-md-6 m">
-				<div data-jc="dropdown" data-jc-path="pages.navigationitem.target" data-jc-config="items:@(Current tab or window)|_self,@(New tab or window)|_blank;required:true" data-jc-value="'_self'">@(Target)</div>
-			</div>
-			<div class="col-md-6 m">
-				<div data-jc="dropdown" data-jc-path="pages.navigationitem.behaviour" data-jc-config="items:@(Default)|default,@(Highlight)|highlight,@(Info)|info,@(Warning)|warn,@(Special)|special" data-jc-value="'default'">@(Behaviour)</div>
-			</div>
-		</div>
+		<div data-jc="textbox__pages.navigationitem.title__maxlength:100">@(Tooltip)</div>
 	</div>
 	<hr class="nmb" />
 	<div class="padding bg-yellow">
-		<div class="mt5" data-jc="fontawesomebox" data-jc-path="pages.navigationitem.icon" data-jc-config="search:@(Search icons);height:152"></div>
+		<div class="mt5" data-jc="fontawesomebox__pages.navigationitem.icon__search:@(Search icons);height:152"></div>
 	</div>
-	<div class="ui-form-buttons" data-jc="validation" data-jc-path="pages.navigationitem">
+	<div class="ui-form-buttons" data-jc="validation__pages.navigationitem">
 		<button name="cancel">@(Cancel)</button>
 		<button name="submit">@(APPLY)</button>
 	</div>
 </div>
 
 <script>
-	SCOPE('Pages', function(ctrl) {
 
-		ctrl.formNavigationItemFile = function() {
+	PLUGIN('pagesnavigationitem', function(exports) {
+
+		exports.file = function() {
 			refresh_filebrowser('pages.navigationitem.url');
 		};
 
-		ctrl.formNavigationItemSubmit = function(com) {
+		exports.submit = function(com) {
 
 			var obj = pages.navigationitem;
 			var page = pages.grid.items.findItem('url', obj.url);
@@ -66,13 +70,16 @@
 			CHANGE('pages.navigation.children', true);
 		};
 
-		ctrl.watch('navigationitem.url', function(path, value, type) {
+		WATCH('pages.navigationitem.url', function(path, value, type) {
 			if (type === 2) {
 				var item = pages.grid.items.findItem('url', value);
 				if (item) {
-					ctrl.set('navigationitem.name', item.name);
-					ctrl.set('navigationitem.icon', item.icon);
-					ctrl.set('navigationitem.title', item.title);
+					var tmp = GET('pages.navigationitem');
+					tmp.name = item.name;
+					tmp.icon = item.icon;
+					tmp.title = item.title;
+					tmp.language = item.language;
+					UPDATE('pages.navigationitem');
 				}
 			}
 		});

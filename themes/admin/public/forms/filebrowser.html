@@ -40,15 +40,15 @@
 
 </style>
 
-<div data-jc="form" data-jc-path="common.form3" class="hidden" data-jc-config="icon:folder-o;if:filebrowser;title:@(File Browser);width:800;autofocus:true">
+<div data-jc="form__common.form3__icon:folder-o;if:filebrowser;title:@(File Browser);width:800;autofocus:true" class="hidden">
 	<div class="padding">
-		<div class="m" data-jc="filelistbox" data-jc-path="filebrowser.id" data-jc-config="datasource:filebrowser.files;search:@(Search file ...);exec:filebrowser_submit;filter:filebrowser_filter"></div>
+		<div class="m" data-jc="filelistbox__filebrowser.id__datasource:filebrowser.files;search:@(Search file ...);exec:filelistbox/submit;filter:filelistbox/filter"></div>
 		<div class="row">
 			<div class="col-xs-6">
-				<a href="javascript:void(0)" data-jc="fileupload" data-jc-id="filebrowser.filename" data-jc-path="filebrowser.filename" data-jc-config="url:[url]api/upload/" class="fs12"><i class="fa fa-folder-o mr5"></i>@(Upload new file)</a>
+				<a href="javascript:void(0)" data-jc="fileupload__filebrowser.filename__url:[url]api/upload/" data-jc-id="filebrowser.filename" class="fs12"><i class="fa fa-folder-o mr5"></i>@(Upload new file)</a>
 			</div>
 			<div class="col-xs-6 right">
-				<a href="javascript:void(0)" class="fs12 red exec" data-exec="filebrowser_clear"><i class="fa fa-trash mr5"></i>@(Clear useless files)</a>
+				<a href="javascript:void(0)" class="fs12 red exec" data-exec="filelistbox/clear"><i class="fa fa-trash mr5"></i>@(Clear useless files)</a>
 			</div>
 		</div>
 	</div>
@@ -58,12 +58,90 @@
 </div>
 
 <script>
+
+	PLUGIN('filelistbox', function(exports) {
+
+		exports.filter = function(item) {
+			if (filebrowser.type)
+				return filebrowser.type.test(item.type) ? true : false;
+			else
+				return true;
+		};
+
+		exports.clear = function() {
+			SETTER('confirm', 'confirm', '@(Are you sure you want to remove all useless files?)', ['"trash" @(Remove)', '@(No)'], function(index) {
+				if (!index) {
+					SETTER('loading', 'show');
+					AJAX('GET [url]api/files/clear/', function() {
+						SETTER('loading', 'hide', 1000);
+						SETTER('snackbar', 'success', '@(Cleaning of useless files has been started.)');
+					});
+				}
+			});
+		};
+
+		exports.refresh = function() {
+			filebrowser.clear = true;
+			refresh_filebrowser(filebrowser.target, filebrowser.type);
+		};
+
+		exports.submit = function(val, text) {
+			var obj = filebrowser;
+			var url = '/download/' + obj.id;
+			var type = typeof(obj.target);
+			if (type === 'string') {
+				SET(obj.target, url);
+				CHANGE(obj.target, true);
+			} else if (type === 'function') {
+				obj.target(url, text);
+			} else {
+				if (/\.(jpg|png|gif|svg|jpeg)$/.test(url))
+					$(obj.target).attr('src', url);
+				else {
+					SETTER('snackbar', 'warning', '@(You need to choose an image.)');
+					return;
+				}
+			}
+			SET('common.form3', '');
+		};
+
+		WATCH('filebrowser.filename', function(path, value) {
+
+			if (!value || !value.length)
+				return;
+
+			var files = filebrowser.files;
+			files.push.apply(files, value);
+			files.quicksort('ctime', false);
+
+			var obj = filebrowser;
+			var url = value[0].download;
+			var type = typeof(obj.target);
+			if (type === 'string') {
+				SET(obj.target, url);
+				CHANGE(obj.target, true);
+			} else if (type === 'function') {
+				obj.target(url, value[0].name);
+			} else {
+				if (/\.(jpg|png|gif|svg|jpeg)$/.test(url))
+					$(obj.target).attr('src', url);
+				else {
+					SETTER('snackbar', 'warning', '@(You need to choose an image.)');
+					return;
+				}
+			}
+
+			SET('common.form3', '');
+		});
+
+	});
+
 	COMPONENT('filelistbox', 'height:200', function(self, config) {
 
 		var Eitems, datasource, filter = null;
 		var skip = false;
 		var psel = '.ui-filelistbox-pagination';
-		var pages = self.virtualize({ prev: psel + ' button[name="prev"]', next: psel + ' button[name="next"]', info: psel + ' div' });
+		var pages = { prev: self.find(psel + ' button[name="prev"]'), next: self.find(psel + ' button[name="next"]'), info: self.find(psel + ' div') };
 
 		self.readonly();
 		self.datasource = EMPTYARRAY;
@@ -236,8 +314,8 @@
 				builder.push(self.template(obj));
 			}
 
-			pages.prev.disable(page === 0);
-			pages.next.disable(self.datasource.length === 0);
+			pages.prev.prop('disabled', page === 0);
+			pages.next.prop('disabled', self.datasource.length === 0);
 			pages.info.html('<b>{0}</b> / @(page)'.format((page + 1)));
 			Eitems.empty().append(builder.join(''));
 		};
@@ -292,78 +370,5 @@
 			self.tclass('ui-filelistbox-invalid', invalid);
 		};
 	});
-
-	WATCH('filebrowser.filename', function(path, value) {
-
-		if (!value || !value.length)
-			return;
-
-		var files = filebrowser.files;
-		files.push.apply(files, value);
-		files.quicksort('ctime', false);
-
-		var obj = filebrowser;
-		var url = value[0].download;
-		var type = typeof(obj.target);
-		if (type === 'string') {
-			SET(obj.target, url);
-			CHANGE(obj.target, true);
-		} else if (type === 'function') {
-			obj.target(url, value[0].name);
-		} else {
-			if (/\.(jpg|png|gif|svg|jpeg)$/.test(url))
-				$(obj.target).attr('src', url);
-			else {
-				SETTER('snackbar', 'warning', '@(You need to choose an image.)');
-				return;
-			}
-		}
-
-		SET('common.form3', '');
-	});
-
-	function filebrowser_filter(item) {
-		if (filebrowser.type)
-			return filebrowser.type.test(item.type) ? true : false;
-		else
-			return true;
-	}
-
-	function filebrowser_clear() {
-		SETTER('confirm', 'confirm', '@(Are you sure you want to remove all useless files?)', ['"trash"@(Remove)', '@(No)'], function(index) {
-			if (index)
-				return;
-			SETTER('loading', 'show');
-			AJAX('GET [url]api/files/clear/', function() {
-				SETTER('loading', 'hide', 1000);
-				SETTER('snackbar', 'success', '@(Cleaning of useless files has been started.)');
-			});
-		});
-	}
-
-	function filebrowser_refresh() {
-		filebrowser.clear = true;
-		refresh_filebrowser(filebrowser.target, filebrowser.type);
-	}
-
-	function filebrowser_submit(val, text) {
-		var obj = filebrowser;
-		var url = '/download/' + obj.id;
-		var type = typeof(obj.target);
-		if (type === 'string') {
-			SET(obj.target, url);
-			CHANGE(obj.target, true);
-		} else if (type === 'function') {
-			obj.target(url, text);
-		} else {
-			if (/\.(jpg|png|gif|svg|jpeg)$/.test(url))
-				$(obj.target).attr('src', url);
-			else {
-				SETTER('snackbar', 'warning', '@(You need to choose an image.)');
-				return;
-			}
-		}
-		SET('common.form3', '');
-	}
 
 </script>

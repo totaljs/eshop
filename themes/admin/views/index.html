@@ -9,34 +9,35 @@
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<meta name="robots" content="all,follow" />
-	<link rel="stylesheet" href="//cdn.componentator.com/spa.min@14.css" />
-	<script src="//cdn.componentator.com/spa.min@14.js"></script>
+	<link rel="stylesheet" href="//cdn.componentator.com/spa.min@15.css" />
+	<script src="//cdn.componentator.com/spa.min@15.js"></script>
 	@{import('head', '/admin.css', '/admin.js', 'favicon.ico')}
 </head>
-<body data-jc="exec,binder">
+<body data-jc="exec,avatar">
 
 	@{json(user, 'userprofile', (k,v) => k === 'password' ? undefined : v)}
 
-	<div data-jc="calendar" data-jc-config="days:@(SU,MO,TU,WE,TH,FR,SO);months:@(January,February,March,April,May,June,July,August,September,October,November,December);today:@(Set date to today);firstday:0"></div>
-	<div data-jc="confirm"></div>
+	<div data-jc="LAZY autocomplete"></div>
+	<div data-jc="LAZY calendar" data-jc-config="days:@(SU,MO,TU,WE,TH,FR,SO);months:@(January,February,March,April,May,June,July,August,September,October,November,December);today:@(Set date to today);firstday:0"></div>
+	<div data-jc="LAZY confirm"></div>
+	<div data-jc="LAZY features" data-jc-config="placeholder:@(Search ...)"></div>
+	<div data-jc="LAZY snackbar" data-jc-config="button:@(Close);timeout:5500"></div>
+	<div data-jc="LAZY suggestion" data-jc-config="placeholder:@(Search)"></div>
+
 	<div data-jc="contextmenu"></div>
 	<div data-jc="loading" class="hidden"></div>
-	<div data-jc="snackbar" data-jc-config="button:@(Close);timeout:4500"></div>
-	<div data-jc="suggestion" data-jc-config="placeholder:@(Search)"></div>
-	<div data-jc="mainprogress" data-jc-path="common.progress"></div>
-	<div data-jc="websocket" data-jc-config="reconnect:5000;url:[url]live/"></div>
+	<div data-jc="mainprogress__common.progress"></div>
 	<div data-jc="shortcuts"></div>
-	<div data-jc="features" data-jc-config="placeholder:@(Search ...)"></div>
-	<div data-jc="autocomplete"></div>
+	<div data-jc="websocket" data-jc-config="reconnect:5000;url:[url]live/"></div>
 
 	<header>
 		<nav>
 			<a href="/" title="@{'%name'}" target="_blank"><i class="fa fa-globe"></i></a>
-			<button class="navigation"><i class="fa fa-navicon"></i>@(Options)</button>
+			<button class="navigation exec" data-exec="navigation"><i class="fa fa-navicon"></i>@(Options)</button>
 		</nav>
-		<div class="title"></div>
+		<div class="title" data-bind="common.title__html:value"></div>
 		<div class="user hidden-xs">
-			<i class="fa fa-circle"></i><span data-b="user.name" data-b-html="value"></span>
+			<i class="fa fa-circle"></i><span data-bind="user.name__html:value"></span>
 		</div>
 		<div class="header-message">
 			<i class="fa fa-bell"></i>
@@ -49,88 +50,92 @@
 	</header>
 	<div class="header-empty"></div>
 
-	<div data-jc="sitemap" data-jc-path="common.page">
-		<script type="application/json">
-			[
-				{ "role": "Dashboard", "title": "@(Dashboard)", "if": "dashboard", "template": "/admin/templates/dashboard.html", "route": "@{sitemap_url('admin')}dashboard/", "reload": "Dashboard/reload", "icon": "dashboard", "hidden": "Dashboard/hidden" },
-				{ "role": "Orders", "title": "@(Orders)", "if": "orders", "template": "/admin/templates/orders.html", "route": "@{sitemap_url('admin')}orders/", "reload": "Orders/reload", "icon": "shopping-cart" },
-				{ "role": "Products", "title": "@(Products)", "if": "products", "template": "/admin/templates/products.html", "route": "@{sitemap_url('admin')}products/", "reload": "Products/reload", "icon": "dropbox" },
-				{ "role": "Posts", "title": "@(Posts)", "if": "posts", "template": "/admin/templates/posts.html", "route": "@{sitemap_url('admin')}posts/", "reload": "Posts/reload", "icon": "newspaper-o" },
-				{ "role": "Notices", "title": "@(Notices)", "if": "notices", "template": "/admin/templates/notices.html", "route": "@{sitemap_url('admin')}notices/", "reload": "Notices/reload", "icon": "bullhorn" },
-				{ "role": "Pages", "title": "@(Pages)", "if": "pages", "template": "/admin/templates/pages.html", "route": "@{sitemap_url('admin')}pages/", "reload": "Pages/reload", "icon": "file-text-o" },
-				{ "role": "Widgets", "title": "@(Widgets)", "if": "widgets", "template": "/admin/templates/widgets.html", "route": "@{sitemap_url('admin')}widgets/", "reload": "Widgets/reload", "icon": "plug" },
-				{ "role": "Users", "title": "@(Users)", "if": "users", "template": "/admin/templates/users.html", "route": "@{sitemap_url('admin')}users/", "reload": "Users/reload", "icon": "users" },
-				{ "role": "Newsletters", "title": "@(Newsletters)", "if": "newsletters", "template": "/admin/templates/newsletters.html", "route": "@{sitemap_url('admin')}newsletters/", "reload": "Newsletters/reload", "icon": "envelope-o" },
-				{ "role": "Subscribers", "title": "@(Subscribers)", "if": "subscribers", "template": "/admin/templates/subscribers.html", "route": "@{sitemap_url('admin')}subscribers/", "reload": "Subscribers/reload", "icon": "address-book-o" },
-				{ "role": "Settings", "title": "@(Settings)", "if": "settings", "template": "/admin/templates/settings.html", "route": "@{sitemap_url('admin')}settings/", "reload": "Settings/reload", "icon": "cog" }
-			]
-		</script>
+	<div id="parts">
+		<div data-jc="part__common.page__if:dashboard;url:/admin/pages/dashboard.html;reload:dashboard/reload;hidden:dashboard/hidden;cleaner:10"></div>
+		<div data-jc="part__common.page__if:posts;url:/admin/pages/posts.html;reload:posts/reload;cleaner:10"></div>
+		<div data-jc="part__common.page__if:notices;url:/admin/pages/notices.html;reload:notices/reload;cleaner:10"></div>
+		<div data-jc="part__common.page__if:pages;url:/admin/pages/pages.html;reload:pages/reload;cleaner:10"></div>
+		<div data-jc="part__common.page__if:widgets;url:/admin/pages/widgets.html;reload:widgets/reload;cleaner:10"></div>
+		<div data-jc="part__common.page__if:newsletters;url:/admin/pages/newsletters.html;reload:newsletters/reload;cleaner:10"></div>
+		<div data-jc="part__common.page__if:subscribers;url:/admin/pages/subscribers.html;reload:subscribers/reload;cleaner:10"></div>
+		<div data-jc="part__common.page__if:settings;url:/admin/pages/settings.html;reload:settings/reload;cleaner:10"></div>
+		<div data-jc="part__common.page__if:orders;url:/admin/pages/orders.html;reload:orders/reload;cleaner:10"></div>
+		<div data-jc="part__common.page__if:products;url:/admin/pages/products.html;reload:products/reload;cleaner:10"></div>
+		<div data-jc="part__common.page__if:users;url:/admin/pages/users.html;reload:users/reload;cleaner:10"></div>
 	</div>
 
-	<div data-jc="importer" data-jc-path="common.form3" data-jc-config="if:filebrowser;url:[url]forms/filebrowser.html"></div>
-	<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:widgets-globals;url:[url]forms/widgets-globals.html"></div>
-	<div data-jc="importer" data-jc-path="common.form" data-jc-config="if:pages-globals;url:[url]forms/pages-globals.html"></div>
+	<div data-jc="importer__common.form3__if:filebrowser;url:[url]forms/filebrowser.html"></div>
+	<div data-jc="importer__common.form3__if:widgets-import;url:[url]forms/widgets-import.html;cleaner:5"></div>
+	<div data-jc="importer__common.form__if:widgets-globals;url:[url]forms/widgets-globals.html;cleaner:5"></div>
+	<div data-jc="importer__common.form__if:pages-globals;url:[url]forms/pages-globals.html;cleaner:5"></div>
 
 	<script>
 
-		var filebrowser = {};
-		var common = { title: document.title };
 		var user = PARSE($('#userprofile').html());
+		var filebrowser = {};
+
+		common.nav = [];
+		common.nav.push({ role: 'Dashboard', title: '@(Dashboard)', url: '@{sitemap_url('admin')}dashboard/', value: 'dashboard', icon: 'dashboard' });
+		common.nav.push({ role: 'Orders', title: '@(Orders)', url: '@{sitemap_url('admin')}orders/', value: 'orders', icon: 'shopping-cart' });
+		common.nav.push({ role: 'Products', title: '@(Products)', url: '@{sitemap_url('admin')}products/', value: 'products', icon: 'box' });
+		common.nav.push({ role: 'Pages', title: '@(Pages)', url: '@{sitemap_url('admin')}pages/', value: 'pages', icon: 'file-text-o' });
+		common.nav.push({ role: 'Widgets', title: '@(Widgets)', url: '@{sitemap_url('admin')}widgets/', value: 'widgets', icon: 'plug' });
+		common.nav.push({ role: 'Posts', title: '@(Posts)', url: '@{sitemap_url('admin')}posts/', value: 'posts', icon: 'newspaper-o' });
+		common.nav.push({ role: 'Notices', title: '@(Notices)', url: '@{sitemap_url('admin')}notices/', value: 'notices', icon: 'bullhorn' });
+		common.nav.push({ role: 'Newsletters', title: '@(Newsletters)', url: '@{sitemap_url('admin')}newsletters/', value: 'newsletters', icon: 'envelope-o' });
+		common.nav.push({ role: 'Users', title: '@(Users)', url: '@{sitemap_url('admin')}users/', value: 'users', icon: 'users' });
+		common.nav.push({ role: 'Subscribers', title: '@(Subscribers)', url: '@{sitemap_url('admin')}subscribers/', value: 'subscribers', icon: 'address-book-o' });
+		common.nav.push({ role: 'Settings', title: '@(Settings)', url: '@{sitemap_url('admin')}settings/', value: 'settings', icon: 'cog' });
 
 		ENV('url', '@{sitemap_url('admin')}');
-		ENV('roles', 'Dashboard,Newsletters,Notices,Orders,Pages,Posts,Products,Settings,Subscribers,Users,Widgets');
+		ENV('roles', 'Dashboard,Orders,Products,Newsletters,Notices,Pages,Posts,Settings,Subscribers,Widgets');
 
-		common.elements = VIRTUALIZE($('body'), { title: 'header .title' });
-		common.notifications = {};
-		common.notifications.ui = VIRTUALIZE($('.header-message'), { icon: '> .fa', body: '.header-message-cell' });
-		common.notifications.messages = []; // messages from notifications
-		common.notifications.running = false;
-		common.notifications.template = '<b>{0}</b><br />{1}';
+		MAKE('common', function(obj) {
 
-		// Navigation
-		common.page = '';
-		common.form = '';
-		common.form2 = ''; // Form 2nd level
-		common.form3 = ''; // Form 3nd level
+			obj.name = document.title;
+			obj.notifications = {};
 
-		ROUTE('[url]', function() {
-			FIND('sitemap', function(com) {
-				var items = com.items;
-				for (var i = 0, length = items.length; i < length; i++) {
-					var item = items[i];
-					if (user.sa || !user.roles.length || (user.roles.indexOf(item.role) !== -1)) {
-						REDIRECT(item.route);
-						break;
-					}
-				}
-			});
+			var tmp = $('.header-message');
+			obj.notifications.ui = { el: tmp, icon: tmp.find('> .fa'), body: tmp.find('.header-message-cell') };
+			obj.notifications.messages = []; // messages from notifications
+			obj.notifications.running = false;
+			obj.notifications.template = '<b>{0}</b><br />{1}';
+
+			obj.componentator = @{if G.config.componentator !== false}true@{else}false@{fi};
+
+			// Navigation
+			obj.page = '';
+			obj.form = '';
+			obj.form2 = ''; // Form 2nd level
+			obj.form3 = ''; // Form 3nd level
 		});
 
 		ON('page', function(item) {
-			common.elements.title.html('<i class="fa fa-{0}"></i>{1}'.format(item.icon, item.title));
-			document.title = common.title + ': ' + item.title;
+			SET('common.title', '<i class="fa fa-{icon}"></i>{title}'.arg(item));
+			document.title = common.name + ': ' + item.title;
 			setTimeout(refresh_height, 500);
+			setTimeout(refresh_height, 1000);
 		});
 
-		$(document).on('click', '.navigation', function() {
+		function navigation(el) {
 
 			var items = [];
 
-			FIND('sitemap').items.forEach(function(item) {
-				(user.sa || !user.roles.length || user.roles.indexOf(item.role) !== -1) && items.push({ name: item.title, icon: item.icon, url: item.route });
+			common.nav.forEach(function(item) {
+				(user.sa || !user.roles.length || user.roles.indexOf(item.role) !== -1) && items.push({ name: item.title, icon: item.icon, url: item.url });
 			});
 
 			items.push({ name: '@(Sign out)', icon: 'power-off', signout: true });
 
-			SETTER('contextmenu', 'show', 'left', $(this), items, function(item) {
+			SETTER('contextmenu', 'show', 'left', el, items, function(item) {
 				if (item.signout) {
-					MAIN.cookies.rem('@{'%admin-cookie'}');
+					COOKIES.rem('@{'%admin-cookie'}');
 					location.reload(true);
 				} else
 					REDIRECT(item.url);
 			}, 8, 5);
 
-		});
+		}
 
 		Tangular.register('time', function(value) {
 
@@ -182,7 +187,7 @@
 			var item = common.notifications.messages.shift();
 
 			if (item === undefined) {
-				common.notifications.ui.rclass('header-message-visible');
+				common.notifications.ui.el.rclass('header-message-visible');
 				common.notifications.running = false;
 				return;
 			}
@@ -191,20 +196,32 @@
 			var t = common.notifications.template;
 
 			switch (item.type) {
-				case 'products.save':
-					msg = t.format('@(Product has been saved)', item.message);
-					break;
 				case 'navigation.save':
 					msg = t.format('@(Navigation has been saved)', item.message);
 					break;
-				case 'products.replace-category':
-					msg = t.format('@(Category has been replaced)', item.message);
+				case 'navigations.edit':
+				case 'orders.edit':
+				case 'products.edit':
+				case 'pages.edit':
+				case 'posts.edit':
+				case 'newsletters.edit':
+				case 'notices.edit':
+				case 'widgets.edit':
+				case 'users.edit':
+
+					if (user.name !== item.user) {
+						var t = item.type.substring(0, item.type.indexOf('.'));
+						if (t === 'navigations')
+							t = 'pages-navigation';
+						else
+							t += '-form';
+						if (t === common.form)
+							SETTER('snackbar', 'warning', '@(<b>IMPORTANT:</b> The user called "<b>{0}</b>" is editing same item.)'.format(user.name));
+					}
+
 					break;
-				case 'products.replace-manufacturer':
-					msg = t.format('@(Manufacturer has been replaced)', item.message);
-					break;
-				case 'products.import':
-					msg = t.format('@(Importing has been finished)', '@(Imported: {0}x products)'.format(item.message));
+				case 'users.save':
+					msg = t.format('@(User has been saved)', item.message);
 					break;
 				case 'newsletters.save':
 					msg = t.format('@(Nesletter has been saved)', item.message);
@@ -225,12 +242,6 @@
 					msg = t.format('@(Useless files have been removed)', '@(Count of files: {0}x)'.format(item.message));
 					common.form3 === 'filebrowser' && EXEC('filebrowser_refresh');
 					break;
-				case 'orders.save':
-					msg = t.format('@(Order has been saved)', item.message);
-					break;
-				case 'orders.create':
-					msg = t.format('@(New order has been created)', item.message);
-					break;
 				case 'contacts.create':
 					msg = t.format('@(New contact form received)', '@(From: {0})'.format(item.message));
 					break;
@@ -240,23 +251,17 @@
 				case 'posts.save':
 					msg = t.format('@(Post has been saved)', item.message);
 					break;
+				case 'orders.save':
+					msg = t.format('@(Order has been saved)', item.message);
+					break;
+				case 'products.save':
+					msg = t.format('@(Product has been saved)', item.message);
+					break;
 				case 'notices.save':
 					msg = t.format('@(Notice has been saved)', item.message);
 					break;
 				case 'widgets.save':
 					msg = t.format('@(Widget has been saved)', item.message);
-					break;
-				case 'users.save':
-					msg = t.format('@(User has been saved)', item.message);
-					break;
-				case 'users.create':
-					msg = t.format('@(New user has been registered)', item.message);
-					break;
-				case 'users.update':
-					msg = t.format('@(Account has been updated)', item.message);
-					break;
-				case 'users.login':
-					msg = t.format('@(User has been logged)', item.message);
 					break;
 				case 'admin.login':
 					msg = t.format('@(Administrator has been logged)', item.message);
@@ -264,10 +269,14 @@
 				case 'settings.save':
 					msg = '@(Settings have been updated.)';
 					break;
+				case 'success':
+				case 'warning':
+					SETTER('snackbar', item.type, item.message);
+					break;
 			}
 
 			if (msg) {
-				!common.notifications.running && common.notifications.ui.aclass('header-message-visible');
+				!common.notifications.running && common.notifications.ui.el.aclass('header-message-visible');
 				common.notifications.running = true;
 				msg && common.notifications.ui.body.html(msg);
 			}
@@ -276,20 +285,23 @@
 		}
 
 		SETTER(true, 'shortcuts', 'register', 'ESC', function() {
-			if (window.cmseditor && cmseditor.form)
-				SET('cmseditor.form', '');
-			else if (common.form3)
+			if (common.form3)
 				SET('common.form3', '');
+			else if (window.cmseditor && cmseditor.form)
+				SET('cmseditor.form', '');
 			else if (common.form2)
 				SET('common.form2', '');
 			else if (common.form) {
 				switch (common.form) {
 					case 'pages-form':
 					case 'products-form':
+					case 'orders-form':
 					case 'newsletters-form':
 					case 'widgets-form':
 					case 'notices-form':
 					case 'posts-form':
+					case 'users-form':
+					case 'pages-redirects':
 						var fields = MODIFIED(common.page + '.form').join(',');
 						if (fields.indexOf('.body') !== -1) {
 							SETTER('confirm', 'show', '@(Are you sure you want to close this form without saving?)', ['@(Yes)', '@(Cancel)'], function(index) {
@@ -307,15 +319,15 @@
 
 			var items = [];
 
-			FIND('sitemap').items.forEach(function(item) {
-				(user.sa || !user.roles.length || user.roles.indexOf(item.role) !== -1) && items.push({ name: item.title, icon: item.icon, url: item.route });
+			common.nav.forEach(function(item) {
+				(user.sa || !user.roles.length || user.roles.indexOf(item.role) !== -1) && items.push({ name: item.title, icon: item.icon, url: item.url });
 			});
 
 			items.push({ name: '@(Sign out)', icon: 'power-off', signout: true });
 
 			SETTER('features', 'show', items, function(item) {
 				if (item.signout) {
-					MAIN.cookies.rem('@{'%admin-cookie'}');
+					COOKIES.rem('@{'%admin-cookie'}');
 					location.reload(true);
 				} else {
 					window.cmseditor && cmseditor.form && SET('cmseditor.form', '');
@@ -327,7 +339,27 @@
 			}, true);
 		}, true);
 
+		ROUTE('[url]', function() {
+			var items = common.nav;
+			for (var i = 0, length = items.length; i < length; i++) {
+				var item = items[i];
+				if (user.sa || !user.roles.length || (user.roles.indexOf(item.role) !== -1)) {
+					REDIRECT(item.url);
+					return;
+				}
+			}
+		});
+
+		common.nav.forEach(function(item) {
+			ROUTE(item.url, function() {
+				EMIT('page', item);
+				SET('common.page', item.value);
+			});
+		});
+
 	</script>
+
+	@{components('admin')}
 
 </body>
 </html>

@@ -1,6 +1,6 @@
 const REG_URL = /href="\/|src="\//g;
 
-F.global.newsletter = { id: null, sending: false, percentage: 0 };
+G.newsletter = { id: null, sending: false, percentage: 0 };
 
 NEWSCHEMA('Newsletter').make(function(schema) {
 
@@ -10,6 +10,7 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 	schema.define('search', 'String(1000)', true);
 	schema.define('body', String);
 	schema.define('send', Boolean);
+	schema.define('limit', Number);
 	schema.define('widgets', '[Object]');
 
 	// Gets listing
@@ -35,16 +36,31 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 
 	// Gets a specific post
 	schema.setGet(function($) {
+		var id = $.options.id || $.id;
 		var filter = NOSQL('newsletters').one();
-		$.options.id && filter.where('id', $.options.id);
-		filter.callback($.callback);
+		filter.where('id', id);
+		filter.callback(function(err, response) {
+
+			if (err) {
+				$.callback();
+				return;
+			}
+
+			F.functions.read('newsletters', response.id, function(err, body) {
+				response.body = body;
+				$.callback(response);
+			});
+
+		}, 'error-newsletter-404');
 	});
 
 	// Removes a specific post
 	schema.setRemove(function($) {
 		var id = $.body.id;
 		var user = $.user.name;
+		F.functions.remove('newsletters', id);
 		NOSQL('newsletters').remove().backup(user).log('Remove: ' + id, user).where('id', id).callback(() => $.success());
+		NOSQL('parts').remove().where('idowner', id).where('type', 'newsletter');
 	});
 
 	// Saves the post into the database
@@ -65,26 +81,33 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 			model.count = 0;
 		}
 
+		var body = U.minifyHTML(model.body);
 		!model.datecreated && (model.datecreated = F.datetime);
+		model.stamp = model.stamp = new Date().format('yyyyMMddHHmm');
 		model.linker = model.datecreated.format('yyyyMMdd') + '-' + model.name.slug();
-
 		model.search = ((model.name || '') + ' ' + (model.search || '')).keywords(true, true).join(' ').max(1000);
-		model.body = U.minifyHTML(model.body);
+
+		F.functions.write('newsletters', model.id + '_' + model.stamp, body); // backup
+		F.functions.write('newsletters', model.id, body, isUpdate);
+
+		model.body = undefined;
 
 		var db = isUpdate ? nosql.modify(model).where('id', model.id).backup(user).log('Update: ' + model.id, user) : nosql.insert(model).log('Create: ' + model.id, user);
 
 		db.callback(function() {
 			ADMIN.notify({ type: 'newsletters.save', message: model.name });
 			EMIT('newsletter.save', model);
-			if ($.model.send)
+			if ($.model.send) {
+				$.model.body = body;
 				$.model.$workflow('send', $.callback);
-			else
-				$.success();
+			} else
+				$.success(model.id);
 		});
 	});
 
 	// Clears database
 	schema.addWorkflow('clear', function($) {
+		F.functions.remove('newsletters');
 		NOSQL('newsletters').remove().callback(NOOP);
 		$.success();
 	});
@@ -96,22 +119,22 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 	schema.addWorkflow('test', function($) {
 
 		var newsletter = $.model.$clean();
-		var repository = {};
 
 		newsletter.body.CMSrender(newsletter.widgets, function(body) {
 
+			var repository = {};
 			repository.page = {};
-			repository.page.body = body;
 			repository.page.id = newsletter.id;
 			repository.page.name = newsletter.name;
+			repository.page.body = body;
 			repository.preview = false;
 			newsletter.body = F.view('~/cms/' + newsletter.template, null, repository);
-			newsletter.unsubscribe = F.global.config.url + '/api/unsubscribe/?email=';
+			newsletter.unsubscribe = G.config.url + '/api/unsubscribe/?email=';
 
 			var message = new Mail.Message(newsletter.name, prepare_urladdress(newsletter.body.replace('@@@', $.query.email)));
 			message.to($.query.email);
-			message.from(F.global.config.emailsender, F.config.name);
-			message.reply(F.global.config.emailreply);
+			message.from(G.config.emailsender, F.config.name);
+			message.reply(G.config.emailreply);
 			message.unsubscribe(newsletter.unsubscribe + $.query.email);
 			message.callback = internal_notvalidaddress;
 			Mail.send2(message);
@@ -122,36 +145,38 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 
 	schema.addWorkflow('send', function($) {
 
-		if (F.global.newsletter.sending) {
+		if (G.newsletter.sending) {
 			$.invalid().push('error-newsletter-sending');
 			return;
 		}
 
 		var newsletter = $.model.$clean();
 
-		F.global.newsletter.sending = true;
-		F.global.newsletter.percentage = 0;
-		F.global.newsletter.id = $.model.id;
+		G.newsletter.sending = true;
+		G.newsletter.percentage = 0;
+		G.newsletter.id = $.model.id;
 
 		$.success();
 
 		newsletter.body.CMSrender(newsletter.widgets, function(body) {
 
 			var repository = {};
+			var cache = F.cache.get2('newsletters');
 
 			repository.page = {};
-			repository.page.body = body;
 			repository.page.id = newsletter.id;
 			repository.page.name = newsletter.name;
 			repository.preview = false;
+			repository.page.body = body;
 
 			newsletter.body = F.view('~/cms/' + newsletter.template, null, repository);
-			newsletter.unsubscribe = F.global.config.url + '/api/unsubscribe/?email=';
+			newsletter.unsubscribe = G.config.url + '/api/unsubscribe/?email=';
 
-			NOSQL('subscribers').find().where('unsubscribed', false).callback(function(err, response) {
+			NOSQL('subscribers').find().where('unsubscribed', false).skip(cache ? cache.count : 0).callback(function(err, response) {
 
 				var count = response.length;
-				var sum = 0;
+				var sum = cache ? cache.count : 0;
+				var old = 0;
 
 				response.limit(10, function(items, next) {
 
@@ -160,45 +185,71 @@ NEWSCHEMA('Newsletter').make(function(schema) {
 					for (var i = 0, length = items.length; i < length; i++) {
 						var message = new Mail.Message(newsletter.name, prepare_urladdress(newsletter.body.replace('@@@', items[i].email)));
 						message.to(items[i].email);
-						message.from(F.global.config.emailsender, F.config.name);
-						message.reply(F.global.config.emailreply);
+						message.from(G.config.emailsender, F.config.name);
+						message.reply(G.config.emailreply);
 						message.unsubscribe(newsletter.unsubscribe + items[i].email);
 						message.callback = internal_notvalidaddress;
 						messages.push(message);
 					}
 
 					sum += items.length;
-					F.global.newsletter.percentage = ((sum / count) * 100) >> 0;
-					ADMIN.notify({ type: 'newsletters.percentage', message: F.global.newsletter.percentage + '' });
+					G.newsletter.percentage = ((sum / count) * 100) >> 0;
+
+					// Updates cache
+					F.cache.set2('newsletters', { id: G.newsletter.id, count: sum }, '5 days');
+
+					if (G.newsletter.percentage !== old)
+						ADMIN.notify({ type: 'newsletters.percentage', message: G.newsletter.percentage + '' });
+
+					old = G.newsletter.percentage;
 
 					// Sends email
-					// Each 100 email waits 1 minute ....
-					if (sum % 100 === 0)
+					if (sum % newsletter.limit === 0) {
+						// Each "limit" it waits 24 hours
+						setTimeout(() => Mail.send2(messages, next), 60000 * 1440);
+					} else if (sum % 100 === 0) {
+
+						// Each 100 email waits 1 minute ....
 						setTimeout(() => Mail.send2(messages, next), 60000);
-					else
+
+						// Updates DB
+						NOSQL('newsletters').modify({ count: sum, datesent: F.datetime }).first().where('id', G.newsletter.id);
+
+					} else
 						Mail.send2(messages, () => setTimeout(next, 2000));
 
 				}, function() {
-
+					F.cache.remove('newsletters');
 					ADMIN.notify({ type: 'newsletters.sent', message: repository.page.name });
-					NOSQL('newsletters').modify({ count: count, datesent: F.datetime }).where('id', F.global.newsletter.id);
-
-					F.global.newsletter.sending = false;
-					F.global.newsletter.percentage = 0;
-					F.global.newsletter.id = null;
+					NOSQL('newsletters').modify({ count: sum, datesent: F.datetime }).first().where('id', G.newsletter.id);
+					G.newsletter.sending = false;
+					G.newsletter.percentage = 0;
+					G.newsletter.id = null;
 
 				});
 			});
 
 		}, $.controller);
 	});
+
+	// Loads unset newlsetter
+	var cache = F.cache.get2('newsletters');
+	if (cache) {
+		setTimeout(function() {
+			schema.get({ id: cache.id }, function(err, response) {
+				if (response)
+					schema.workflow('send', response);
+				else
+					F.cache.remove('newsletters');
+			});
+		}, 5000);
+	}
 });
 
 function prepare_urladdress(body) {
-	return body.replace(REG_URL, (text) => text[0] === 'h' ? ('href="' + F.global.config.url + '/') : ('src="' + F.global.config.url + '/'));
+	return body.replace(REG_URL, (text) => text[0] === 'h' ? ('href="' + G.config.url + '/') : ('src="' + G.config.url + '/'));
 }
 
 function internal_notvalidaddress(err, message) {
-	if (err)
-		console.log('---> problem in email', message.addressTo);
+	err && console.log('Newsletter error:', message.addressTo, err);
 }

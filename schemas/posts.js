@@ -60,7 +60,21 @@ NEWSCHEMA('Post').make(function(schema) {
 		options.template && filter.where('template', options.template);
 		$.id && filter.where('id', $.id);
 
-		filter.callback($.callback, 'error-posts-404');
+		filter.callback(function(err, response) {
+
+			if (err) {
+				$.callback();
+				return;
+			}
+
+			ADMIN.alert($.user, 'posts.edit', response.id);
+
+			F.functions.read('posts', response.id, function(err, body) {
+				response.body = body;
+				$.callback(response);
+			});
+
+		}, 'error-posts-404');
 	});
 
 	schema.addWorkflow('render', function($) {
@@ -75,12 +89,15 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		filter.callback(function(err, response) {
 			if (response) {
-				response.body = response.body.CMSrender(response.widgets, function(body) {
+				$.controller && ($.controller.repository.post = $.controller.repository.page = response);
+				F.functions.read('posts', response.id, function(err, body) {
 					response.body = body;
-					$.controller && ($.controller.repository.page = response);
-					nosql.counter.hit('all').hit(response.id);
-					$.callback(response);
-				}, $.controller);
+					response.body = response.body.CMSrender(response.widgets, function(body) {
+						response.body = body;
+						nosql.counter.hit('all').hit(response.id);
+						$.callback(response);
+					}, $.controller);
+				});
 			} else
 				$.invalid('error-posts-404');
 		});
@@ -90,10 +107,14 @@ NEWSCHEMA('Post').make(function(schema) {
 	schema.setRemove(function($) {
 		var id = $.body.id;
 		var user = $.user.name;
+
 		NOSQL('posts').remove().backup(user).log('Remove: ' + id, user).where('id', id).callback(function() {
+			F.functions.remove('posts', id);
 			$.success();
 			refresh_cache();
 		});
+
+		NOSQL('parts').remove().where('idowner', id).where('type', 'post');
 	});
 
 	// Saves the post into the database
@@ -115,6 +136,7 @@ NEWSCHEMA('Post').make(function(schema) {
 
 		!model.date && (model.date = F.datetime);
 		model.linker = model.date.format('yyyyMMdd') + '-' + model.name.slug();
+		model.stamp = new Date().format('yyyyMMddHHmm');
 
 		var category = F.global.posts.find('id', model.idcategory);
 		if (category) {
@@ -123,14 +145,19 @@ NEWSCHEMA('Post').make(function(schema) {
 		}
 
 		model.search = ((model.name || '') + ' ' + (model.keywords || '') + ' ' + (model.search || '')).keywords(true, true).join(' ').max(1000);
+
 		model.body = U.minifyHTML(model.body);
+		F.functions.write('posts', model.id + '_' + model.stamp, model.body); // backup
+		F.functions.write('posts', model.id, model.body, isUpdate);
+
+		model.body = undefined;
 
 		var db = isUpdate ? nosql.modify(model).where('id', model.id).backup(user).log('Update: ' + model.id, user) : nosql.insert(model).log('Create: ' + model.id, user);
 
 		db.callback(function() {
 			ADMIN.notify({ type: 'posts.save', message: model.name });
 			EMIT('posts.save', model);
-			$.success();
+			$.success(model.id);
 			refresh_cache();
 		});
 
@@ -152,6 +179,7 @@ NEWSCHEMA('Post').make(function(schema) {
 	schema.addWorkflow('clear', function($) {
 		var user = $.user.name;
 		NOSQL('posts').remove().backup(user).log('Clear all posts', user).callback(function() {
+			F.functions.remove('posts');
 			$.success();
 			refresh_cache();
 		});
@@ -169,16 +197,23 @@ function refresh() {
 
 	var config = F.global.config;
 	var categories = {};
-	var prepare = doc => doc.ispublished && categories[doc.category] && (categories[doc.category] += 1);
 
 	config.posts && config.posts.forEach(item => categories[item.id] = 0);
 
-	NOSQL('posts').find().prepare(prepare).callback(function() {
+	NOSQL('posts').find().fields('ispublished', 'category').callback(function(err, response) {
+
+		for (var i = 0, length = response.length; i < length; i++) {
+			var doc = response[i];
+			if (doc.ispublished && categories[doc.category])
+				categories[doc.category] += 1;
+		}
+
 		var output = [];
 		Object.keys(categories).forEach(function(key) {
 			var category = config.posts.findItem('id', key);
 			category && output.push({ id: key, name: category.name, linker: key.slug(), count: categories[key] });
 		});
+
 		F.global.posts = output;
 		F.cache.removeAll('cachecms');
 	});

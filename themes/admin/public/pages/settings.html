@@ -1,0 +1,320 @@
+<div data-jc-scope="settings">
+
+	<br />
+	<div class="container">
+		<div class="panel">
+			<label>@(Main settings)</label>
+			<div class="panelbody">
+				<div data-jc="textbox__form.url__required:true;placeholder:@(https://eshop.totaljs.com)" class="m">@(URL address)</div>
+				<div class="row">
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox__form.emailsender__required:true;type:email">@(Email for sending)</div>
+					</div>
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox__form.emailcontactform__required:true;type:email">@(Email for contact form)</div>
+					</div>
+					<div class="col-md-4 col-sm-4 m">
+						<div data-jc="textbox__form.emailreply__required:true;type:email">@(Email for answers)</div>
+					</div>
+				</div>
+				<hr />
+				<div data-jc="checkbox__form.componentator">@(Allow to download widgets from <b>componentator.com</b>)</div>
+			</div>
+		</div>
+	</div>
+	<br />
+	<br />
+
+	<div class="bg-white" data-bind="user__show:value.sa">
+		<br />
+		<br />
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3 col-sm-4 m">
+					<h3><i class="fa fa-file-text-o"></i>@(Templates)</h3>
+				</div>
+				<div class="col-md-9 col-sm-8 m">
+					<div data-jc="keyvalue__form.templates__icon:file-text-o;placeholderkey:@(A template name);placeholdervalue:@(Type a view name)__{}">@(Page templates)</div>
+					<br />
+					<div data-jc="keyvalue__form.templatesposts__icon:file-text-o;placeholderkey:@(A template name);placeholdervalue:@(Type a view name)__{}">@(Post templates)</div>
+					<br />
+					<div data-jc="keyvalue__form.templatesnewsletters__icon:file-text-o;placeholderkey:@(A template name);placeholdervalue:@(Type a view name)__{}">@(Newsletter templates)</div>
+					<br />
+					<div class="help nmt"><i class="fa fa-warning"></i>@(All templates need to be created manually in <code>/themes/THEME_NAME/views/cms/</code> directory.)</div>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3 col-sm-4 m">
+					<h3><i class="fa fa-folder-o"></i>@(Categories)</h3>
+				</div>
+				<div class="col-md-9 col-sm-8 m">
+					<div data-jc="keyvalue__form.posts__icon:folder-o;placeholderkey:@(A category name);placeholdervalue:@(Type an identificator and press enter)">@(Posts categories)</div>
+					<div class="help">@(Global variable: <code>F.global.posts</code>)</div>
+					<br />
+					<div data-jc="keyvalue__form.notices__icon:folder-o;placeholderkey:@(A category name);placeholdervalue:@(Type an identificator and press enter)">@(Notices categories)</div>
+					<div class="help">@(Global variable: <code>F.global.notices</code>)</div>
+					<br />
+					<div data-jc="keyvalue__form.signals__icon:dot-circle-o;placeholderkey:@(A signal name);placeholdervalue:@(Type an identificator and press enter)">@(Signals)</div>
+					<div class="help">@(Signals can affect a behaviour in pages or posts.)</div>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3 col-sm-4 m">
+					<h3><i class="fa fa-folder-o"></i>@(Miscellaneous)</h3>
+				</div>
+				<div class="col-md-9 col-sm-8 m">
+					<div data-jc="keyvalue__form.navigations__icon:sitemap;placeholderkey:@(A navigation name);placeholdervalue:@(Type an identificator and press enter)">@(Navigations)</div>
+					<div class="help">@(Global variable: <code>F.global.navigation.IDENTIFICATOR</code>)</div>
+					<br />
+					<div data-jc="keyvalue__form.languages__icon:sitemap;placeholderkey:@(A language name);placeholdervalue:@(Type an identificator (e.g. en, de, fr) and press enter)">@(Languages)</div>
+					<br />
+					<div data-jc="keyvalue__form.signals__icon:dot-circle-o;placeholderkey:@(A signal name);placeholdervalue:@(Type an identificator and press enter)">@(Signals)</div>
+					<div class="help">@(Signals can affect a behaviour in pages or posts.)</div>
+				</div>
+			</div>
+		</div>
+		<br />
+		<br />
+	</div>
+	<div class="bg-yellow" data-bind="user__show:value.sa">
+		<br />
+		<div class="container">
+			<h3><i class="fa fa-envelope-o"></i>@(SMTP settings)</h3>
+			<div class="row">
+				<div class="col-md-6 m">
+					<div data-jc="textbox__form.smtp__icon:server;placeholder:@(smtp.yourdomain.com)">@(SMTP server)</div>
+					<div class="help">@(IP address or hostname.)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-jc="textbox__form.smtpoptions__icon:code;placeholder:@(SMTP options)">@(SMTP options)</div>
+					<div class="help">@(Options need to be defined in JSON format according.) <a href="https://docs.totaljs.com/latest/en.html#api~FrameworkConfiguration~mail-smtp-options" target="_blank">Total.js specification</a></div>
+				</div>
+			</div>
+		</div>
+		<br />
+	</div>
+	<br />
+
+	<div class="container">
+		<br />
+		<div class="help nmt">@(List of all administrators:)</div>
+		<div class="mt5"><a href="javascript:void(0)" class="exec" data-exec="settings/create"><i class="fa fa-user mr5"></i>@(Add a new administrator)</a></div>
+		<br />
+		<table class="table ui-table-grid">
+			<tbody data-jc="repeater__form.users">
+				<script type="text/html">
+				<tr data-index="{{ index }}">
+					<td>{{ name }}</td>
+					<td style="width:300px" class="active hidden-xs fs11"><div class="singleline"><i class="fa fa-lock mr5"></i>{{ if roles && roles.length }}{{ roles | join(', ') }}{{ else }}<b class="b">@(Full privileges)</b>{{ fi }}</div></td>
+					<td style="width:80px" class="center">
+						<button name="edit" title="@(Edit)" class="exec" data-exec="settings/edit"><i class="fa fa-pencil"></i></button>
+						<button name="remove" title="@(Remove)" class="exec btn-remove" data-exec="settings/remove"><i class="fa fa-times"></i></button>
+					</td>
+				</tr>
+				</script>
+			</tbody>
+		</table>
+		<hr style="border-color:#D0D0D0" />
+		<br />
+		<div data-jc="error__form.response"></div>
+		<div class="row">
+			<div class="col-md-4 m col-md-offset-4">
+				<div data-jc="validation__form">
+					<button class="button b exec" name="submit" disabled="disabled" data-exec="settings/save">@(SAVE SETTINGS)</button>
+				</div>
+			</div>
+		</div>
+		<br />
+	</div>
+</div>
+<div data-jc="importer__common.form__if:settings-admin;url:[url]forms/settings-admin.html;cleaner:5"></div>
+
+<script>
+
+	PLUGIN('settings', function(exports) {
+
+		exports.scope = 'settings';
+
+		exports.save = function() {
+
+			// Prepare users
+			var data = CLONE(GETR(exports.scope + '.form'));
+
+			var tmp = [];
+			Object.keys(data.templates).forEach(function(key) {
+				tmp.push({ name: key, id: settings.form.templates[key] });
+			});
+			data.templates = tmp;
+
+			tmp = [];
+			Object.keys(data.templatesposts).forEach(function(key) {
+				tmp.push({ name: key, id: data.templatesposts[key] });
+			});
+			data.templatesposts = tmp;
+
+			tmp = [];
+			Object.keys(data.templatesnewsletters).forEach(function(key) {
+				tmp.push({ name: key, id: data.templatesnewsletters[key] });
+			});
+			data.templatesnewsletters = tmp;
+
+			tmp = [];
+			Object.keys(data.navigations).forEach(function(key) {
+				tmp.push({ name: key, id: data.navigations[key] });
+			});
+			data.navigations = tmp;
+
+			tmp = [];
+			Object.keys(data.posts).forEach(function(key) {
+				tmp.push({ name: key, id: data.posts[key] });
+			});
+			data.posts = tmp;
+
+			tmp = [];
+			Object.keys(data.notices).forEach(function(key) {
+				tmp.push({ name: key, id: data.notices[key] });
+			});
+			data.notices = tmp;
+
+			tmp = [];
+			Object.keys(data.signals).forEach(function(key) {
+				tmp.push({ name: key, id: data.signals[key] });
+			});
+			data.signals = tmp;
+
+			tmp = [];
+			Object.keys(data.languages).forEach(function(key) {
+				tmp.push({ name: key, id: data.languages[key] });
+			});
+			data.languages = tmp;
+
+			SETTER('loading', 'show');
+			AJAX('POST [url]api/settings/ REPEAT', data, function(response) {
+
+				SETTER('loading', 'hide', 1000);
+				SET(exports.scope + '.form.response', response);
+
+				if (response instanceof Array)
+					return;
+
+				refresh_dependencies();
+				SETTER('snackbar', 'success', '@(Settings have been saved successfully.)');
+				SET('common.componentator', data.componentator);
+			});
+		};
+
+		exports.reload = function() {
+			AJAX('GET [url]api/settings/', function(response) {
+
+				var tmp = {};
+				response.templates && response.templates.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+
+				response.templates = tmp;
+
+				tmp = {};
+				response.templatesposts && response.templatesposts.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.templatesposts = tmp;
+
+				tmp = {};
+				response.templatesnewsletters && response.templatesnewsletters.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.templatesnewsletters = tmp;
+
+				tmp = {};
+				response.navigations && response.navigations.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.navigations = tmp;
+
+				tmp = {};
+				response.posts && response.posts.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.posts = tmp;
+
+				tmp = {};
+				response.notices && response.notices.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.notices = tmp;
+
+				tmp = {};
+				response.languages && response.languages.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.languages = tmp;
+
+				tmp = {};
+				response.signals && response.signals.forEach(function(item) {
+					if (typeof(item) === 'string')
+						tmp[item] = item;
+					else
+						tmp[item.name] = item.id;
+				});
+				response.signals = tmp;
+
+				SET(exports.scope + '.form', response, true);
+			});
+
+		};
+
+		exports.create = function() {
+			SET(exports.scope + '.formuser', {}, true);
+			SET('common.form', exports.scope + '-admin');
+		};
+
+		exports.edit = function(el) {
+			SET(exports.scope + '.formuser', CLONE(settings.form.users[+el.closest('tr').attrd('index')]), true);
+			SET('common.form', exports.scope + '-admin');
+		};
+
+		exports.remove = function(el) {
+
+			var index = +el.closest('tr').attrd('index');
+			var users = settings.form.users;
+			var user = users[index];
+
+			SETTER('confirm', 'confirm', '@(Are you sure you want to remove the user <b>"{0}"</b>?)'.format(user.name), ['"times-circle" @(Remove)', '@(No)'], function(index) {
+				if (!index) {
+					users.splice(index, 1);
+					UPDATE(exports.scope + '.form.users');
+					CHANGE(exports.scope + '.form.url');
+				}
+			});
+		};
+
+	});
+
+</script>

@@ -5,6 +5,7 @@ NEWSCHEMA('NavigationItem').make(function(schema) {
 	schema.define('url', 'String(500)', true);
 	schema.define('title', 'String(100)');
 	schema.define('icon', 'Lower(20)');
+	schema.define('language', 'Lower(2)');
 	schema.define('target', ['_self', '_blank']);
 	schema.define('children', '[NavigationItem]');
 	schema.define('behaviour', ['default', 'info', 'warn', 'highlight', 'special']);
@@ -15,6 +16,7 @@ NEWSCHEMA('Navigation').make(function(schema) {
 	schema.define('children', '[NavigationItem]');
 
 	schema.setGet(function($) {
+		ADMIN.alert($.user, 'navigations.edit', $.controller.id);
 		NOSQL('navigations').one().where('id', $.controller.id).callback(function(err, response) {
 			if (response) {
 				$.callback(response);
@@ -68,6 +70,7 @@ NEWSCHEMA('Navigation').make(function(schema) {
 					if (page.navname) {
 						item.name = page.name;
 						item.title = page.title;
+						item.language = page.language;
 					}
 
 					item.dateupdated = F.datetime;

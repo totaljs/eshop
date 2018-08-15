@@ -28,6 +28,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('templatesposts', '[SettingsKeyValue]');
 	schema.define('templatesproducts', '[SettingsKeyValue]');
 	schema.define('templatesnewsletters', '[SettingsKeyValue]');
+	schema.define('languages', '[SettingsKeyValue]');
 	schema.define('posts', '[SettingsKeyValue]');
 	schema.define('notices', '[SettingsKeyValue]');
 	schema.define('navigations', '[SettingsKeyValue]');
@@ -39,6 +40,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 	schema.define('signals', '[SettingsKeyValue]');
 	schema.define('smtp', 'String');
 	schema.define('smtpoptions', 'JSON');
+	schema.define('componentator', Boolean);
 
 	// PayPal account
 	schema.define('paypaluser', String);
@@ -173,6 +175,7 @@ NEWSCHEMA('Settings').make(function(schema) {
 			!settings.templatesnewsletters && (settings.templatesnewsletters = []);
 			!settings.templatesproducts && (settings.templatesproducts = []);
 			!settings.templatesposts && (settings.templatesposts = []);
+			!settings.languages && (settings.languages = []);
 
 			settings.smtp && F.useSMTP(settings.smtp, settings.smtpoptions.parseJSON());
 			EMIT('settings', settings);

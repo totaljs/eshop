@@ -9,7 +9,7 @@ NEWSCHEMA('Notice').make(function(schema) {
 	schema.define('event', Date);
 	schema.define('icon', 'Lower(20)');
 	schema.define('ispinned', Boolean);
-	schema.define('url', 'Url');
+	schema.define('url', 'String(500)');
 
 	// Gets listing
 	schema.setQuery(function($) {
@@ -52,11 +52,10 @@ NEWSCHEMA('Notice').make(function(schema) {
 
 		var options = $.options;
 		var filter = NOSQL('notices').one();
-
-		options.id && filter.where('id', options.id);
-		$.id && filter.where('id', $.id);
-
+		var id = options.id || $.id;
+		filter.where('id', id);
 		filter.callback($.callback, 'error-notices-404');
+		ADMIN.alert($.user, 'notices.edit', id);
 	});
 
 	// Removes a specific post
@@ -130,7 +129,7 @@ function markdown(md) {
 
 	var links = /(!)?\[.*?\]\(.*?\)/g;
 	var imagelinks = /\[!\[.*?\]\(.*?\)\]\(.*?\)/g;
-	var format = /__.*?__|_.*?_|\*\*.*?\*\*|\*.*?\*/g;
+	var format = /__.*?__|_.*?_|\*\*.*?\*\*|\*.*?\*|~.*?~/g;
 	var code = /`.*?`/g;
 	var lines = md.split('\n');
 	var builder = [];
@@ -205,7 +204,7 @@ function markdown_links(value) {
 }
 
 function markdown_format(value) {
-	var clean = /_|\*/g;
+	var clean = /_|\*|~/g;
 	switch (value[0]) {
 		case '_':
 			return '<strong>' + value.replace(clean, '') + '</strong>';

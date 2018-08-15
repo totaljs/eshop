@@ -1,28 +1,29 @@
-<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:sitemap;if:pages-navigation;title:@(Navigation);width:800;submit:Pages/formNavigationSubmit;reload:Pages/formNavigationReload" data-jc-controller="Pages">
+<div data-jc="form__common.form__icon:sitemap;if:pages-navigation;title:@(Navigation);width:800;submit:pagesnavigation/submit;reload:pagesnavigation/reload" class="hidden">
 	<div class="toolbar toolbar2">
-		<button class="exec" data-exec="Pages/formNavigationCreate"><i class="fa fa-plus-circle"></i>@(Add new)</button>
+		<button class="exec" data-exec="pagesnavigation/create"><i class="fa fa-plus-circle"></i>@(Add new)</button>
 		<span></span>
-		<button class="exec" data-exec="Pages/formNavigationClear"><i class="fa fa-trash"></i>@(Clear all)</button>
+		<button class="exec" data-exec="pagesnavigation/clear"><i class="fa fa-trash"></i>@(Clear all)</button>
 	</div>
 	<div class="padding npt">
-		<div data-jc="navigation" data-jc-path="pages.navigation.children"></div>
+		<div data-jc="navigation__pages.navigation.children"></div>
 	</div>
-	<div class="ui-form-buttons" data-jc="validation" data-jc-path="pages.navigation">
+	<div class="ui-form-buttons" data-jc="validation__pages.navigation">
 		<button name="cancel">@(Cancel)</button>
 		<button name="submit">@(APPLY)</button>
 	</div>
 </div>
 
 <style>
-	.ui-navigation-children { margin-left: 32px; }
-	.ui-navigation-item { background-color: #FFF9D1; border-radius: 3px; margin-bottom: 3px; font-size: 12px; height: 38px; line-height: 14px; cursor: pointer; }
+	.ui-navigation-children { margin-left: 38px; }
+	.ui-navigation-item { background-color: #FFF9D1; border-radius: 3px; margin-bottom: 3px; font-size: 12px; height: 42px; line-height: 14px; cursor: pointer; }
 	.ui-navigation-item:hover { background-color: #FFF7B6; }
-	.ui-navigation-item .name { margin: 0 84px 0 42px; padding: 6px 0 0; font-weight: bold; }
-	.ui-navigation-item .plus { float: right; width: 32px; text-align: center; font-size: 14px; padding: 12px 0 0 0; cursor: pointer; border-right: 1px solid #F5F1A3; border-left: 1px solid #F5F1A3; height: 38px; }
-	.ui-navigation-item .edit { float: right; width: 32px; text-align: center; font-size: 14px; padding: 12px 0 0 0; cursor: pointer; border-right: 1px solid #F5F1A3; height: 38px; }
-	.ui-navigation-item .remove { float: right; width: 32px; text-align: center; color: red; font-size: 14px; padding: 12px 0 0 0; cursor: pointer; }
-	.ui-navigation-item span { display: block; font-size: 11px; color: gray; font-weight: normal; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
-	.ui-navigation-item .icon { width: 32px; border-right: 1px solid #F5F1A3; text-align: center; height: 38px; padding: 12px 0 0 4px; float: left; font-size: 14px; }
+	.ui-navigation-item .name { margin: 0 94px 0 84px; padding: 5px 30px 0 0; font-weight: bold; }
+	.ui-navigation-item .language { float: left; width: 38px; border-right: 1px solid #F5F1A3; color: #996; text-align: center; height: 42px; padding: 15px 0 0 0; float: left; font-size: 12px; }
+	.ui-navigation-item .plus { float: right; width: 38px; text-align: center; font-size: 16px; padding: 13px 0 0 0; cursor: pointer; border-right: 1px solid #F5F1A3; border-left: 1px solid #F5F1A3; height: 42px; }
+	.ui-navigation-item .edit { float: right; width: 38px; text-align: center; font-size: 16px; padding: 13px 0 0 0; cursor: pointer; border-right: 1px solid #F5F1A3; height: 42px; }
+	.ui-navigation-item .remove { float: right; width: 38px; text-align: center; color: red; font-size: 16px; padding: 13px 0 0 0; cursor: pointer; }
+	.ui-navigation-item .name span { display: block; font-size: 11px; color: gray; font-weight: normal; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-top: 2px; }
+	.ui-navigation-item .icon { width: 38px; border-right: 1px solid #F5F1A3; text-align: center; height: 42px; padding: 13px 0 0 4px; float: left; font-size: 16px; }
 	.ui-navigation-empty { padding: 50px 0; text-align: center; color: #A0A0A0; }
 	.ui-navigation-empty .fa { margin-right: 5px; }
 </style>
@@ -33,7 +34,7 @@
 
 		var dragdrop;
 
-		self.template = Tangular.compile('<div data-id="{{ id }}" class="ui-navigation-itemcontainer" draggable="true"><div class="ui-navigation-item"><i class="fa fa-times remove"></i><i class="fa fa-pencil edit"></i><i class="fa fa-plus-circle plus"></i><i class="icon{{ if icon }} fa fa-{{ icon }}{{ fi }}"></i><div class="name">{{ name }}<span>URL: {{ url }}</span></div></div>{{ if children && children.length }}<div class="ui-navigation-children">{{ children | navigationchildren($.template) }}</div>{{ fi }}</div>');
+		self.template = Tangular.compile('<div data-id="{{ id }}" class="ui-navigation-itemcontainer" draggable="true"><div class="ui-navigation-item"><i class="fa fa-times remove"></i><i class="fa fa-pencil edit"></i><i class="fa fa-plus-circle plus"></i><i class="icon{{ if icon }} fa fa-{{ icon }}{{ fi }}"></i><span class="language">{{ language }}</span><div class="name">{{ name }}<span><i class="fa fa-globe mr5"></i>{{ url }}</span></div></div>{{ if children && children.length }}<div class="ui-navigation-children">{{ children | navigationchildren($.template) }}</div>{{ fi }}</div>');
 		self.noValid();
 		self.getter = null;
 
@@ -86,7 +87,7 @@
 						if (!el.hclass(cls))
 							el = el.closest('.' + cls);
 
-						if (!el.length || el.closest(dragdrop).length || el.get(0) === dragdrop.get(0))
+						if (!el.length || el.closest(dragdrop).length || el[0] === dragdrop[0])
 							return;
 
 						setTimeout2(self.id, function() {
@@ -156,7 +157,7 @@
 				builder.push(self.template(item, { template: self.template }));
 			}
 
-			self.html(builder.length ? builder : '<div class="ui-navigation-empty"><i class="fa fa-ban"></i>@(No items)</div>');
+			self.html(builder.length ? builder : '<div class="ui-navigation-empty"><i class="fa fa-ban"></i>@(No items in this navigation)</div>');
 		};
 	});
 
@@ -169,23 +170,23 @@
 		return builder.join('');
 	});
 
-	SCOPE('Pages', function(ctrl) {
+	PLUGIN('pagesnavigation', function(exports) {
 
-		ctrl.formNavigationCreate = function() {
-			ctrl.set('navigationitem', { $target: pages.navigation.children, target: '_self', behaviour: 'default' }, true);
+		exports.create = function() {
+			SET('pages.navigationitem', { $target: pages.navigation.children, target: '_self', behaviour: 'default' }, true);
 			SET('common.form2', 'pages-navigation-item');
 		};
 
-		ctrl.formNavigationClear = function() {
-			ctrl.set('navigation.children', []);
-			ctrl.change('navigation.children', true);
+		exports.clear = function() {
+			SET('pages.navigation.children', []);
+			CHANGE('pages.navigation.children', true);
 		};
 
-		ctrl.formNavigationReload = function(com) {
+		exports.reload = function(com) {
 			com.reconfigure({ title: '@(Edit navigation: {0})'.format(common.dependencies.navigations.findItem('id', pages.navigation.id).name) });
 		};
 
-		ctrl.formNavigationSubmit = function(com) {
+		exports.submit = function(com) {
 			SETTER('loading', 'show');
 
 			function clean(arr) {
@@ -196,8 +197,7 @@
 			}
 
 			clean(pages.navigation.children);
-
-			AJAX('POST [url]api/nav/', pages.navigation, function(response) {
+			AJAX('POST [url]api/nav/ REPEAT', pages.navigation, function(response) {
 				SETTER('loading', 'hide', 1000);
 				com.hide();
 			});

@@ -1,0 +1,23 @@
+<div data-jc="form__cmseditor.form__icon:code;if:styles;title:@(Page styles);width:800;submit:cmseditorstyles/submit" class="hidden">
+	<div class="padding">
+		<div data-jc="codemirror__cmseditor.styles__height:500;type:css;tabs:true;trim:true">@(Styles)</div>
+		<div class="help">@(CMS performs auto-vendor prefixes automatically.)</div>
+	</div>
+	<div class="ui-form-buttons" data-jc="validation__cmseditor.styles">
+		<button name="cancel">@(Cancel)</button>
+		<button name="submit">@(APPLY)</button>
+	</div>
+</div>
+
+<script>
+
+	PLUGIN('cmseditorstyles', function(exports) {
+		exports.submit = function(com) {
+			cmseditor.css = cmseditor.styles;
+			cmseditor.instance.setCSS();
+			cmseditor.instance.change(true);
+			com.hide();
+		};
+	});
+
+</script>

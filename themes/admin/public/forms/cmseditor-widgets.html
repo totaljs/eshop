@@ -4,12 +4,11 @@
 	.ui-widgetlist ul { list-style-type: none; width: 100%; height: 100%; overflow: auto; margin: 0; padding: 20px 10px; overflow-scrolling: touch; }
 	.ui-widgetlist li { border: 0; padding: 5px 10px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; position: relative; display: inline-block; width: 20%; transition: all 0.3s; }
 	.ui-widgetlist li img { display: block; max-width: 100%; height: auto; border-radius: 4px; }
-	.ui-widgetlist li:hover { transform: scale(0.95); }
-	.ui-widgetlist li:hover .ui-widgetlist-picture { background-color: #E0E0E0; }
+	.ui-widgetlist li:hover .ui-widgetlist-picture { background-color: #E0E0E0; border: 2px solid #4299F7; }
 	.ui-widgetlist li .fa { width: 22px; font-size: 12px; border-right: 1px solid #E0E0E0; margin-right: 7px; color: #A0A0A0; }
-	.ui-widgetlist-name { font-size: 11px; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 14px; }
+	.ui-widgetlist-name { font-size: 11px; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 13px; }
 	.ui-widgetlist-name b { font-size: 12px; }
-	.ui-widgetlist-picture { background-color: #F8F8F8; padding: 10px; border-radius: 3px; }
+	.ui-widgetlist-picture { background-color: #F8F8F8; padding: 10px; border-radius: 3px; border: 2px solid #E0E0E0; }
 	.ui-widgetlist-selected { background-color: #FFE7A4 !important; font-weight: bold; }
 	.ui-widgetlist-search-empty { height: 34px; }
 	.ui-widgetlist-search { border-bottom: 1px solid #E0E0E0; height: 34px; background-color: white; position: absolute; width: 100%; box-shadow: 0 5px 10px rgba(0,0,0,0.05); }
@@ -25,15 +24,19 @@
 	.ui-widgetlist.ui-disabled li:hover { background-color: white; }
 	.ui-widgetlist.ui-disabled li { cursor: not-allowed; }
 	.ui-widgetlist.ui-disabled .ui-widgetlist-selected { background-color: #D0D0D0 !important; }
-
+	.ui-widget-avatar { text-align: center; }
+	.ui-widget-avatar div { position: relative; display: inline-block; }
 	@media(max-width: 768px) {
 		.ui-widgetlist li { width: 33%; }
 	}
 </style>
 
-<div data-jc="form" data-jc-path="cmseditor.form" class="hidden" data-jc-config="icon:plug;if:widgets;title:@(Widgets);width:888;autofocus:true;reload:cmseditor_widgets">
+<div data-jc="form__cmseditor.form__icon:plug;if:widgets;title:@(Widgets);width:888;autofocus:true;reload:cmseditorwidgets/reload" class="hidden">
 	<div class="padding">
-		<div data-jc="widgetlist" data-jc-config="search:@(Search widgets);datasource:cmseditor.widgets;height:450;exec:cmseditor_widgets_select"></div>
+		<div data-jc="widgetlist" data-jc-config="search:@(Search widgets);datasource:cmseditor.widgets;height:480;exec:cmseditorwidgets/select"></div>
+		<div class="help" style="float:right"><a href="javascript:void(0)" class="exec" data-exec="cmseditorwidgets/inject"><i class="fa fa-code"></i>@(Inject custom HTML)</a></div>
+		<div data-bind="common.componentator__show:value" class="hidden help"><a href="javascript:void(0)" class="exec" data-exec="cmseditorwidgets/import"><i class="fa fa-download"></i>@(Download existing widgets)</a></div>
+		<div class="clearfix"></div>
 	</div>
 	<div class="ui-form-buttons">
 		<button name="cancel" style="width:100%">@(Cancel)</button>
@@ -42,35 +45,53 @@
 
 <script>
 
-	function cmseditor_widgets_select(id) {
+	PLUGIN('cmseditorwidgets', function(exports) {
 
-		var item = cmseditor.widgets.findItem('id', id);
-		var is = item.istemplate;
-		var editor = cmseditor.instance;
+		exports.reload = function() {
+			SETTER('widgetlist', 'reset');
+		};
 
-		SET('cmseditor.form', '');
+		exports.inject = function() {
+			SET('cmseditor.form', 'inject');
+		};
 
-		var target = editor.getTarget();
-		if (!target.hclass('CMS_widgets')) {
-			var tmp = editor.getContainer(10);
-			if (!tmp)
-				return;
-			target = tmp;
-		}
+		exports.import = function() {
+			// current category
+			var category = cmseditor.instance.widgetscategory;
+			category && category.length && SET('widgets.externaltab', category[0]);
+			SET('common.form3', 'widgets-import');
+		};
 
-		var after = target.hclass('CMS_widget');
-		SETTER('loading', 'show');
-		AJAX('GET [url]api/widgets/{0}/editor/'.format(id), function(response) {
-			var content = '<div class="CMS_widget CMS_remove" data-cms-id="{0}" data-cms-widget="{1}">{2}</div>'.format(GUID(10), id, response);
-			if (after)
-				target.after(content);
-			else
-				target.append(content);
-			editor.change(true);
-			editor.resize();
-			SETTER('loading', 'hide', 500);
-		});
-	}
+		exports.select = function(id) {
+			var item = cmseditor.widgets.findItem('id', id);
+			var is = item.istemplate;
+			var editor = cmseditor.instance;
+
+			SET('cmseditor.form', '');
+
+			var target = editor.getTarget();
+			if (!target.hclass('CMS_widgets')) {
+				var tmp = editor.getContainer(10);
+				if (!tmp)
+					return;
+				target = tmp;
+			}
+
+			var after = target.hclass('CMS_widget');
+			SETTER('loading', 'show');
+			AJAX('GET [url]api/widgets/{0}/editor/'.format(id), function(response) {
+				var content = '<div class="CMS_widget CMS_remove" data-cms-id="{0}" data-cms-widget="{1}" data-cms-category="{3}">{2}</div>'.format(GUID(10), id, response.body, response.category);
+				if (after)
+					target.after(content);
+				else
+					target.append(content);
+				editor.change(true);
+				editor.resize();
+				SETTER('loading', 'hide', 500);
+			});
+		};
+
+	});
 
 	COMPONENT('widgetlist', function(self, config) {
 
@@ -78,7 +99,7 @@
 		var skip = false;
 
 		self.datasource = EMPTYARRAY;
-		self.template = Tangular.compile('<li data-search="{{ search }}" data-index="{{ index }}"><div class="ui-widgetlist-picture"><img src="{{ if picture }}{{ picture }}{{ else }}data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADIAQMAAABoEU4WAAAAA1BMVEX///+nxBvIAAAAHklEQVQYGe3BMQEAAADCoPVPbQdvoAAAAAAAAADgNx54AAF6IZJGAAAAAElFTkSuQmCC{{ fi }}" alt="{{ text }}" border="0" /></div><div class="ui-widgetlist-name"><b>{{ text }}</b><br />{{ category }}</div></li>');
+		self.template = Tangular.compile('<li data-search="{{ search }}" data-index="{{ index }}"><div class="ui-widgetlist-picture">{{ if picture }}<img src="{{ picture }}" alt="{{ text }}" border="0" />{{ else }}<div class="ui-widget-avatar"><div class="avatar" data-a="widget">{{ text }}</div></div>{{ fi }}</div><div class="ui-widgetlist-name"><b>{{ text }}</b><br />{{ category }}</div></li>');
 
 		self.validate = function(value) {
 			return config.disabled || !config.required ? true : value ? (config.multiple ? value.length > 0 : true) : false;
@@ -195,7 +216,7 @@
 					first = el;
 			});
 			self.find('.ui-widgetlist-search-icon').tclass('fa-search', search.length === 0).tclass('fa-times', search.length > 0);
-			!skip && first && first.get(0).scrollIntoView(true);
+			!skip && first && first[0].scrollIntoView(true);
 			skip = false;
 		};
 
@@ -234,6 +255,10 @@
 
 			Eitems.empty().append(builder.join(''));
 			self.search();
+
+			setTimeout(function() {
+				SETTER('avatar', 'refresh');
+			}, 500);
 		};
 
 		self.setter = function(value) {
@@ -278,9 +303,5 @@
 			self.tclass('ui-widgetlist-invalid', invalid);
 		};
 	});
-
-	function cmseditor_widgets() {
-		SETTER('widgetlist', 'reset');
-	}
 
 </script>

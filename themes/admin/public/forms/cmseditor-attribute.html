@@ -1,57 +1,82 @@
-<div data-jc="form" data-jc-path="cmseditor.form" class="hidden" data-jc-config="icon:quote-left;if:attribute;title:@(Attributes editor);width:500;autofocus:true;submit:cmseditor_attributes_submit">
+<style>
+	.ui-style input { width: 100%; border: 0; outline: 0; background-color: white; display: block; font-weight: bold; font-size: 14px; height: 24px; }
+	.ui-style-numeric { margin-bottom: 15px; }
+	.ui-style-numeric span { display: block; font-size: 10px; border-top: 1px solid #E0E0E0; margin-top: 5px; color: #A0A0A0; padding: 2px 0 0 0; }
+	.ui-style-numeric-control { position: relative; display: inline-block; width: 25%; text-align: center; }
+	.ui-style-numeric-control input { text-align: center; }
+	.ui-style-numeric-control div { border: 1px solid #D0D0D0; border-radius: 3px; margin-right: 10px; padding: 2px 0; background-color: white; }
+	.ui-style-label { margin-bottom: 5px; font-size: 12px; }
+	.ui-style-color { margin-bottom: 15px; }
+	.ui-style-color ul { margin: 0 -2px; padding: 0; list-style-type: none; }
+	.ui-style-color li { margin: 0; padding: 0; width: 8.333%; position: relative; display: inline-block; vertical-align: top; }
+	.ui-style-color li div { height: 16px; margin: 2px; text-align: center; padding: 3px 0 0; color: white; cursor: pointer; border-radius: 2px; }
+	.ui-style-color .fa { display: none; }
+	.ui-style-color li:nth-child(3) div { border: 1px solid #E0E0E0; color: black; }
+	.ui-style-color .selected .fa { display: block; font-size: 9px; }
+</style>
+
+<div data-jc="form__cmseditor.form__icon:quote-left;if:attribute;title:@(Attributes editor);width:540;autofocus:true;submit:cmseditorattribute/submit" class="hidden">
 
 	<div class="padding npb">
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data-jc="textbox" data-jc-path="cmseditor.attribute.cls">@(Class names)</div>
+				<div data-jc="textbox__cmseditor.attribute.cls">@(Class names)</div>
 			</div>
 			<div class="col-md-6 m">
-				<div data-jc="textbox" data-jc-path="cmseditor.attribute.id">@(Element ID)</div>
-				<div class="help"><a href="javascript:void(0)" class="exec" data-exec="cmseditor_attributes_id">@(Make ID from content)</a></div>
+				<div data-jc="textbox__cmseditor.attribute.id">@(Element ID)</div>
+				<div class="help"><a href="javascript:void(0)" class="exec" data-exec="cmseditorattribute/id">@(Make ID from content)</a></div>
 			</div>
 		</div>
 	</div>
-	<div class="padding bg-yellow">
-		<div data-b="cmseditor.attribute.themes" data-b-visible="value && value.length">
-			<div data-jc="dropdown" data-jc-path="cmseditor.attribute.theme" class="m b" data-jc-config="datasource:cmseditor.attribute.themes;icon:paint-brush">@(Theme)</div>
-		</div>
-		<div data-jc="textbox" data-jc-path="cmseditor.attribute.title" class="m">@(Tooltip)</div>
-		<div data-jc="textbox" data-jc-path="cmseditor.attribute.css" class="m">@(Custom styles)</div>
-	</div>
 
-	<div data-b="cmseditor.attribute.isimage" data-b-visible="value === true" class="hidden">
+	<div data-bind="cmseditor.attribute.isimage__show:value" class="hidden">
+		<hr class="nmb" />
 		<div class="padding">
 			<div class="b m black"><i class="fa fa-photo mr5"></i>@(Image settings)</div>
 
 			<div class="row">
 				<div class="col-md-12">
-					<div data-jc="textbox" data-jc-path="cmseditor.attribute.alt" class="m">@(Alternate text)</div>
+					<div data-jc="textbox__cmseditor.attribute.alt" class="m">@(Alternate text)</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="col-md-4">
-					<div data-jc="textbox" data-jc-path="cmseditor.attribute.datawidth" class="m" data-jc-config="align:center;maxlength:4;placeholder:120">@(Width)</div>
+					<div data-jc="textbox__cmseditor.attribute.datawidth__align:center;maxlength:4;placeholder:120" class="m">@(Width)</div>
 				</div>
 				<div class="col-md-4">
-					<div data-jc="textbox" data-jc-path="cmseditor.attribute.dataheight" class="m" data-jc-config="align:center;maxlength:4;placeholder:120">@(Height)</div>
+					<div data-jc="textbox__cmseditor.attribute.dataheight__align:center;maxlength:4;placeholder:120" class="m">@(Height)</div>
 				</div>
-				<div class="col-md-4 hidden" data-b="cmseditor.attribute.imgdefined" data-b-visible="value === true">
-					<div data-jc="textbox" data-jc-path="cmseditor.attribute.datasize" class="m" data-jc-config="align:center;maxlength:4;placeholder:0%">@(Percentage)</div>
+				<div class="col-md-4 hidden" data-bind="cmseditor.attribute.imgdefined__show:value">
+					<div data-jc="textbox__cmseditor.attribute.datasize__align:center;maxlength:4;placeholder:0%" class="m">@(Percentage)</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div data-b="cmseditor.attribute.isnone" data-b-visible="value !== true">
+	<div class="padding bg-yellow npb">
+		<div data-bind="cmseditor.attribute.themes__show:value && value.length">
+			<div data-jc="dropdown__cmseditor.attribute.theme__datasource:cmseditor.attribute.themes;icon:paint-brush" class="m b">@(Theme)</div>
+		</div>
+		<div data-jc="textbox__cmseditor.attribute.title" class="m">@(Tooltip)</div>
+		<div data-jc="textbox__cmseditor.attribute.css" class="m">@(Custom styles)</div>
+		<div data-jc="style__cmseditor.attribute.css"></div>
+	</div>
+
+	<div data-bind="cmseditor.attribute.isconfig__show:value" class="hidden padding">
+		<div data-jc="textbox__cmseditor.attribute.config__placeholder:@(keyA)\:@(valueA);@(keyB)\:@(valueB)">@(j-Configuration)</div>
+		<div class="help">@(Be careful with this item.)</div>
+	</div>
+
+	<div data-bind="cmseditor.attribute.isnone__show:!value">
 		<hr class="nmt" />
 		<div class="padding npt">
-			<div data-jc="textbox" data-jc-path="cmseditor.attribute.src" data-jc-config="icon:globe">@(Source URL)</div>
-			<div class="m mt10 fs12"><a href="javascript:void(0)" class="exec" data-exec="cmseditor_attributes_files"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a></div>
+			<div data-jc="textbox__cmseditor.attribute.src__icon:globe">@(Source URL)</div>
+			<div class="m mt10 fs12"><a href="javascript:void(0)" class="exec" data-exec="cmseditorattribute/files"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a></div>
 		</div>
 	</div>
 
-	<div class="ui-form-buttons" data-jc="validation" data-jc-path="cmseditor.attribute">
+	<div class="ui-form-buttons" data-jc="validation__cmseditor.attribute">
 		<button name="cancel">@(Cancel)</button>
 		<button name="submit">@(APPLY)</button>
 	</div>
@@ -59,100 +84,356 @@
 
 <script>
 
-	function cmseditor_attributes_files() {
-		cmseditor.instance.filebrowser('cmseditor.attribute.src', (/^image\/*/));
-	}
+	PLUGIN('cmseditorattribute', function(exports) {
 
-	function cmseditor_attributes_id() {
-		var target = cmseditor.instance.getTarget();
-		SET('cmseditor.attribute.id', target.text().slug());
-	}
+		exports.files = function() {
+			cmseditor.instance.filebrowser('cmseditor.attribute.src', (/^image\/*/));
+		};
 
-	function cmseditor_attributes_submit(com) {
+		exports.id = function() {
+			var target = cmseditor.instance.getTarget();
+			SET('cmseditor.attribute.id', target.text().slug());
+		};
 
-		var instance = cmseditor.instance;
-		var target = instance.getTarget();
-		var attr = cmseditor.attribute;
+		exports.submit = function(com) {
 
-		if (target.hclass('CMS_unwrap'))
-			target = target.parent();
+			var instance = cmseditor.instance;
+			var target = instance.getTarget();
+			var attr = cmseditor.attribute;
 
-		if (attr.title)
-			target.attr('title', attr.title.trim());
-		else
-			target.rattr('title');
+			if (target.hclass('CMS_unwrap'))
+				target = target.parent();
 
-		if (attr.isiframe || attr.isimage)
-			target.attr('src', attr.src.trim());
-
-		if (attr.isimage) {
-			if (attr.alt)
-				target.attr('alt', attr.alt.trim());
+			if (attr.title)
+				target.attr('title', attr.title.trim());
 			else
-				target.rattr('alt');
-		}
+				target.rattr('title');
 
-		if (attr.id)
-			target.attr('id', attr.id);
-		else
-			target.rattr('id');
+			if (attr.isiframe) {
+				// Is YouTube or Vimeo?
+				var video = attr.src.trim().replace('/watch?v=', '/embed/').replace('/vimeo.com/', '/player.vimeo.com/video/');
+				if (video.indexOf('?') === -1) {
+					var index = video.indexOf('&');
+					if (index !== -1)
+						video = video.substring(0, index);
+				}
+				target.attr('src', video);
+			} else if (attr.isiframe || attr.isimage)
+				target.attr('src', attr.src.trim());
 
-		var arr = target.attr('class').split(' ');
-		var cls = [];
+			attr.isimage && target.attr('alt', attr.alt ? attr.alt.trim() : '');
+			attr.isconfig && target.attrd('jc-config', attr.config.trim());
 
-		for (var i = 0, length = arr.length; i < length; i++)
-			arr[i].substring(0, 4) === 'CMS_' && cls.push(arr[i]);
+			if (attr.id)
+				target.attr('id', attr.id);
+			else
+				target.rattr('id');
 
-		if (attr.isimage) {
-			if (attr.imgdefined) {
-				if (attr.datawidth)
-					target.attrd('width', attr.datawidth);
-				else
-					target.rattrd('width');
-				if (attr.dataheight)
-					target.attrd('height', attr.dataheight);
-				else
-					target.rattrd('width');
-				if (attr.datasize)
-					target.attrd('size', attr.datasize + (attr.datasize.lastIndexOf('%') === -1 ? '%' : ''));
-				else
-					target.rattrd('size');
-			} else {
-				if (attr.datawidth)
-					target.attr('width', attr.datawidth);
-				else
-					target.rattr('width');
-				if (attr.dateheight)
-					target.attr('height', attr.dataheight);
-				else
-					target.rattr('height');
+			var arr = (target.attr('class') || '').split(' ');
+			var cls = [];
+
+			for (var i = 0, length = arr.length; i < length; i++)
+				arr[i].substring(0, 4) === 'CMS_' && cls.push(arr[i]);
+
+			if (attr.isimage) {
+				if (attr.imgdefined) {
+					if (attr.datawidth)
+						target.attrd('width', attr.datawidth);
+					else
+						target.rattrd('width');
+					if (attr.dataheight)
+						target.attrd('height', attr.dataheight);
+					else
+						target.rattrd('width');
+					if (attr.datasize)
+						target.attrd('size', attr.datasize + (attr.datasize.lastIndexOf('%') === -1 ? '%' : ''));
+					else
+						target.rattrd('size');
+				} else {
+					if (attr.datawidth)
+						target.attr('width', attr.datawidth);
+					else
+						target.rattr('width');
+					if (attr.dateheight)
+						target.attr('height', attr.dataheight);
+					else
+						target.rattr('height');
+				}
 			}
-		}
 
-		if (attr.css)
-			target.attr('style', attr.css);
-		else
-			target.rattr('style');
+			if (attr.css)
+				target.attr('style', attr.css);
+			else
+				target.rattr('style');
 
-		attr.cls && cls.push(attr.cls.trim());
+			attr.cls && cls.push(attr.cls.trim());
 
-		var clsnames = cls.join(' ');
+			var clsnames = cls.join(' ');
 
-		if (attr.themes) {
-			attr.themes.forEach(function(theme) {
-				if (clsnames.indexOf(theme.id) !== -1)
-					clsnames = clsnames.replace(theme.id, '').replace(/\s{2,}/g, ' ').trim();
+			if (attr.themes) {
+				attr.themes.forEach(function(theme) {
+					if (clsnames.indexOf(theme.id) !== -1)
+						clsnames = clsnames.replace(theme.id, '').replace(/\s{2,}/g, ' ').trim();
+				});
+
+				if (attr.theme)
+					clsnames = (clsnames ? clsnames + ' ' : '') + attr.theme;
+			}
+
+			target.attr('class', clsnames);
+			instance.change(true);
+			instance.autoresize();
+
+			com.hide();
+		};
+
+	});
+
+	COMPONENT('style', 'margin:@(Margin);padding:@(Padding);radius:@(Border radius);color:@(Text color);background:@(Background color);font:@(Font settings)', function(self, config) {
+
+		var others;
+		var skip = false;
+
+		self.make = function() {
+			var numeric = '<div class="ui-style-numeric" data-name="{1}"><div class="ui-style-label">{0}</div><div class="ui-style-numeric-controls"><div class="ui-style-numeric-control"><div><input type="text" maxlength="3" placeholder="px" name="top" /><span>top</span></div></div><div class="ui-style-numeric-control"><div><input type="text" maxlength="3" placeholder="px" name="right" /><span>right</span></div></div><div class="ui-style-numeric-control"><div><input type="text" maxlength="3" placeholder="px" name="bottom" /><span>bottom</span></div></div><div class="ui-style-numeric-control"><div><input type="text" maxlength="3" placeholder="px" name="left" /><span>left</span></div></div></div></div>';
+			self.aclass('ui-style');
+			self.append('<div class="row"><div class="col-sm-6"></div><div class="col-sm-6"></div></div>');
+
+			var panels = self.find('.col-sm-6');
+			var a = panels.eq(0);
+			var b = panels.eq(1);
+
+			a.append(numeric.format(config.radius, 'border-radius'));
+			a.append(numeric.format(config.margin, 'margin'));
+			a.append(numeric.format(config.padding, 'padding'));
+			a.append('<div class="ui-style-numeric" data-name="font"><div class="ui-style-label">{0}</div><div class="ui-style-numeric-controls"><div class="ui-style-numeric-control"><div><input type="text" maxlength="3" placeholder="px" name="size" /><span>size</span></div></div><div class="ui-style-numeric-control"><div><input type="text" maxlength="3" placeholder="px" name="line" /><span>line h.</span></div></div></div>'.format(config.font));
+
+			var colors = '4D4D4D,999999,FFFFFF,F44E3B,FE9200,FCDC00,DBDF00,A4DD00,68CCCA,73D8FF,AEA1FF,FDA1FF,333333,808080,CCCCCC,D33115,E27300,FCC400,B0BC00,68BC00,16A5A5,009CE0,7B64FF,FA28FF,000000,666666,B3B3B3,9F0500,C45100,FB9E00,808900,194D33,0C797D,0062B1,653294,AB149E'.split(',');
+			var output = [];
+
+			for (var i = 0; i < colors.length; i++)
+				output.push('<li><div class="ui-style-color-hex" data-color="{0}" style="background-color:#{0}"><i class="fa fa-circle"></i></div></li>'.format(colors[i]));
+
+			b.append('<div class="ui-style-color" data-name="color"><div class="ui-style-label">{0}</div><ul>{1}</ul></div>'.format(config.color, output.join('')));
+			b.append('<div class="ui-style-color" data-name="background-color"><div class="ui-style-label">{0}</div><ul>{1}</ul></div>'.format(config.background, output.join('')));
+
+			self.event('input', 'input', function() {
+				setTimeout2(self._id, self.create, 500);
 			});
 
-			if (attr.theme)
-				clsnames = (clsnames ? clsnames + ' ' : '') + attr.theme;
-		}
+			self.event('click', '.ui-style-color-hex', function() {
+				var el = $(this);
+				var main = el.closest('.ui-style-color');
+				self.selectcolor(main.attrd('name'), el.attrd('color'));
+			});
+		};
 
-		target.attr('class', clsnames);
-		instance.change(true);
-		instance.autoresize();
+		self.selectcolor = function(type, color, reset) {
 
-		com.hide();
-	}
+			self.find('.ui-style-color[data-name="{0}"]'.format(type)).find('.ui-style-color-hex').each(function() {
+				var el = $(this);
+				var col = el.attrd('color');
+				var sel = el.hclass('selected');
+				if (col === color) {
+					el.tclass('selected', !sel || reset == true);
+				} else if (sel)
+					el.rclass('selected');
+			});
+
+			setTimeout2(self._id, self.create, 500);
+		};
+
+		self.create = function() {
+
+			if (skip) {
+				skip = false;
+				return;
+			}
+
+			var style = [];
+
+			self.find('.ui-style-numeric').each(function() {
+				var el = $(this);
+				var type = el.attrd('name');
+				var tmp = el.find('input');
+				var a;
+
+				if (type === 'font') {
+					a = tmp.eq(0).val().parseInt();
+					a && style.push('font-size:{0}px'.format(a));
+					a = tmp.eq(1).val().parseInt();
+					a && style.push('line-height:{0}px'.format(a));
+					return;
+				}
+
+				a = tmp.eq(0).val().parseInt();
+				var b = tmp.eq(1).val().parseInt();
+				var c = tmp.eq(2).val().parseInt();
+				var d = tmp.eq(3).val().parseInt();
+
+				if (a && b && c && d) {
+					if (a === b && b === c && c === d)
+						style.push(type + ':{0}px'.format(a));
+					else if (a === c && b === d)
+						style.push(type + ':{0}px {1}px'.format(a, b));
+					else
+						style.push(type + ':{0}px {1}px {2}px {3}px'.format(a, b, c, d));
+				} else {
+					if (type === 'border-radius') {
+						a && style.push('border-top-left-radius:{0}px'.format(a));
+						b && style.push('border-top-right-radius:{0}px'.format(b));
+						c && style.push('border-bottom-right-radius:{0}px'.format(c));
+						d && style.push('border-bottom-left-radius:{0}px'.format(d));
+					} else {
+						a && style.push(type + '-top:{0}px'.format(a));
+						b && style.push(type + '-right:{0}px'.format(b));
+						c && style.push(type + '-bottom:{0}px'.format(c));
+						d && style.push(type + '-left:{0}px'.format(d));
+					}
+				}
+			});
+
+			self.find('.ui-style-color').each(function() {
+				var el = $(this);
+				var type = el.attrd('name');
+				var tmp = el.find('.selected');
+				tmp.length && style.push(type + ':#' + tmp.attrd('color'));
+			});
+
+			others && style.push(others);
+			self.set(self.path, style.join(';'), 100);
+		};
+
+		self.parse = function() {
+
+			var arr = (self.get() || '').split(';').trim();
+			var obj = {};
+
+			obj.padding = ['', '', '', ''];
+			obj.margin = ['', '', '', ''];
+			obj.radius = ['', '', '', ''];
+			obj.fontsize = '';
+			obj.lineheight = '';
+			obj.color = '';
+			obj.background = '';
+			obj.others = [];
+
+			arr.forEach(function(prop) {
+				var a = prop.split(':').trim();
+
+				if (!a[1])
+					return;
+
+				var val = a[1].replace(/px|%|em/g, '');
+				var n = a[0].substring(0, 1) === 'm' ? 'margin' : 'padding';
+
+				if (!a[0])
+					return;
+
+				switch (a[0]) {
+					case 'font-size':
+						obj.fontsize = val;
+						break;
+					case 'line-height':
+						obj.lineheight = val;
+						break;
+					case 'color':
+						obj.color = val.replace('#', '');
+						break;
+					case 'background-color':
+						obj.background = val.replace('#', '');
+						break;
+					case 'padding':
+					case 'margin':
+					case 'border-radius':
+						if (a[0] === 'border-radius')
+							a[0] = 'radius';
+						obj[a[0]] = self.parseNumeric(val.split(' '));
+						break;
+					case 'padding-top':
+					case 'margin-top':
+						obj[n][0] = val;
+						break;
+					case 'padding-right':
+					case 'margin-right':
+						obj[n][1] = val;
+						break;
+					case 'padding-bottom':
+					case 'margin-bottom':
+						obj[n][2] = val;
+						break;
+					case 'padding-left':
+					case 'margin-left':
+						obj[n][3] = val;
+						break;
+					case 'border-top-left-radius':
+						obj[a[0]][0] = val;
+						break;
+					case 'border-top-right-radius':
+						obj[a[0]][1] = val;
+						break;
+					case 'border-bottom-right-radius':
+						obj[a[0]][2] = val;
+						break;
+					case 'border-bottom-left-radius':
+						obj[a[0]][3] = val;
+						break;
+					default:
+						obj.others.push(a[0] + ':' + a[1]);
+						break;
+				}
+			});
+
+			self.find('.ui-style-numeric').each(function() {
+				var el = $(this);
+				var type = el.attrd('name');
+				var tmp = el.find('input');
+
+				if (type === 'font') {
+					tmp.eq(0).val(obj.fontsize);
+					tmp.eq(1).val(obj.lineheight);
+					return;
+				}
+
+				var name = type;
+				if (name === 'border-radius')
+					name = 'radius';
+
+				tmp.eq(0).val(obj[name][0]);
+				tmp.eq(1).val(obj[name][1]);
+				tmp.eq(2).val(obj[name][2]);
+				tmp.eq(3).val(obj[name][3]);
+			});
+
+			self.selectcolor('color', obj.color, true);
+			self.selectcolor('background-color', obj.background, true);
+			others = obj.others.join(';');
+		};
+
+		self.parseNumeric = function(arr) {
+			switch (arr.length) {
+				case 1:
+					return [arr[0], arr[0], arr[0], arr[0]];
+				case 2:
+					return [arr[0], arr[1], arr[0], arr[1]];
+				case 3:
+					return [arr[0], arr[1], arr[2], arr[1]];
+				case 3:
+					return [arr[0], arr[1], arr[2], arr[3]];
+			}
+			return ['', '', '', ''];
+		};
+
+		self.setter = function(value, path, type) {
+			if (skip || type === 100)
+				return;
+			skip = true;
+			self.parse();
+			setTimeout(function() {
+				skip = false;
+			}, 500);
+		};
+
+	});
 
 </script>

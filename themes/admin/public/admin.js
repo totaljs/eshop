@@ -1,8 +1,11 @@
 var common = {};
 
+SETTER(true, 'avatar', 'register', 'widget', 'size:80');
+
 ON('ready', function() {
 	refresh_height();
 	refresh_dependencies();
+	setTimeout(refresh_height, 100);
 });
 
 function refresh_dependencies() {

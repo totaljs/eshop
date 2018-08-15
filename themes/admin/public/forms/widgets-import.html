@@ -1,9 +1,21 @@
-<div data-jc="form" data-jc-path="common.form" class="hidden" data-jc-config="icon:plug;if:widgets-import;title:@(Download existing widgets);width:800;reload:Widgets/importShow;submit:Widgets/importSubmit" data-jc-controller="Widgets">
+<div data-jc="form__common.form3__icon:plug;if:widgets-import;title:@(Download existing widgets);width:800;reload:widgetsimport/show" class="hidden">
 	<div class="padding">
-		<div data-jc="listing" data-jc-path="widgets.external">
+
+		<div class="tabmenu-container">
+			<ul data-jc="tabmenu__widgets.externaltab__null__'all'" class="tabmenu">
+				<li data-value="all">@(All)</li>
+				<li data-value="Layouts">@(Layouts)</li>
+				<li data-value="Columns">@(Columns)</li>
+				<li data-value="Content">@(Content)</li>
+				<li data-value="Inline">@(Inline)</li>
+			</ul>
+		</div>
+		<br />
+
+		<div data-jc="listing__widgets.external -> widgetsimport/filter(value)">
 			<script type="text/html">
 				<div class="col-xs-4 col-sm-3 m">
-					<div class="widgetext exec{{ id | widgetsinstalled }}" data-id="{{ id }}" data-exec="Widgets/importSubmit">
+					<div class="widgetext exec{{ id | widgetsinstalled }}" data-id="{{ id }}" data-exec="widgetsimport/submit">
 						<i class="fa fa-check-circle green"></i>
 						<div><img src="{{ picture }}" border="0" class="img-responsive" /></div>
 						<div class="widgetext-name">{{ name }}</div>
@@ -26,7 +38,7 @@
 <style>
 	.widgetext { cursor: pointer; position: relative; }
 	.widgetext img { border: 1px solid #E0E0E0; border-radius: 3px; }
-	.widgetext-name { font-weight: bold; color: black; margin-top: 8px; line-height: 16px; }
+	.widgetext-name { font-weight: bold; color: black; margin-top: 8px; line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.widgetext-category { font-size: 11px; color: gray; }
 	.widgetext .fa { margin-right: 5px; }
 	.widgetext .fa-check-circle { display: none; }
@@ -35,22 +47,44 @@
 </style>
 
 <script>
-	SCOPE('Widgets', function(ctrl) {
+	PLUGIN('widgetsimport', function(exports) {
 
-		ctrl.importShow = function() {
-			AJAXCACHE('GET https://componentator.com/api/widgets/', function(response) {
-
-				for (var i = 0; i < response.items.length; i++) {
-					var item = response.items[i];
-					if (item.picture.substring(0, 5) !== 'https')
-						item.picture = 'https://componentator.com' + item.picture;
-				}
-
-				ctrl.set('external', response.items);
-			}, '2 minutes');
+		exports.filter = function(value) {
+			if (!value)
+				return value;
+			switch (widgets.externaltab) {
+				case 'Layouts':
+				case 'Inline':
+				case 'Columns':
+				case 'Content':
+					return value.findAll('category', widgets.externaltab);
+				case 'all':
+				default:
+					return value;
+			}
 		};
 
-		ctrl.importSubmit = function(el) {
+		WATCH('widgets.externaltab', function() {
+			UPDATE('widgets.external');
+		});
+
+		exports.show = function() {
+			AJAX('GET [url]api/widgets/', function(response) {
+				SET('widgets.grid', response);
+				AJAXCACHE('GET https://componentator.com/api/widgets/', function(response) {
+
+					for (var i = 0; i < response.items.length; i++) {
+						var item = response.items[i];
+						if (item.picture.substring(0, 5) !== 'https')
+							item.picture = 'https://componentator.com' + item.picture;
+					}
+
+					SET('widgets.external', response.items);
+				}, '2 minutes');
+			});
+		};
+
+		exports.submit = function(el) {
 			SETTER('confirm', 'show', '@(Are you sure you want to import selected widget?)', ['"cloud-download" @(Import)', '@(Cancel)'], function(index) {
 				!index && AJAX('GET https://componentator.com/api/widgets/{0}/'.format(+el.attrd('id')), function(response) {
 					var data = {};
@@ -66,7 +100,14 @@
 						if (response.success) {
 							el.aclass('widgetextinstalled');
 							SETTER('snackbar', 'success', '@(Widget <b>{0}</b> has been imported successfully.)'.format(data.name));
-							ctrl.refresh();
+							EXEC('widgets/refresh');
+
+							// Hack
+							if (window.cmseditor && common.page !== 'widgets') {
+								cmseditor.widgetcachereset = true;
+								cmseditor.instance.updWidgetsList();
+								cmseditor.instance.updWidgetsCSS();
+							}
 						}
 					});
 				});

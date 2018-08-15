@@ -1,20 +1,30 @@
-<div data-jc="form" data-jc-path="cmseditor.form" class="hidden" data-jc-config="icon:link;if:link;title:@(Link editor);width:500;autofocus:true;submit:cmseditor_link_submit;cancel:cmseditor_link_cancel">
+<div data-jc="form__cmseditor.form__icon:link;if:link;title:@(Link editor);width:600;autofocus:true;submit:cmseditorlink/submit;cancel:cmseditorlink/cancel;reload:cmseditorlink/reload" class="hidden">
 	<div class="padding">
-		<div data-jc="dropdown" data-jc-path="cmseditor.link.href" class="m" data-jc-config="datasource:%links;empty:;icon:sitemap;text:path;value:url">@(URL according to the sitemap)</div>
+		<div data-jc="dropdown__cmseditor.link.href2__datasource:%links;empty:;icon:sitemap;text:path;value:url" class="m">@(URL according to the sitemap)</div>
 	</div>
 	<hr class="nmt nmb" />
 	<div class="padding bg-yellow">
-		<div data-jc="textbox" data-jc-path="cmseditor.link.href" data-jc-id="cmseditorlinkhref" data-jc-config="icon:globe;required:true">@(URL address)</div>
+		<div data-jc="textbox__cmseditor.link.href__icon:globe;required:true;autocomplete:cmseditorlink/autocomplete">@(URL address)</div>
 		<div class="m mt10 fs12">
-			<a href="javascript:void(0)" class="exec mr10" data-exec="cmseditor_link_type" data-type="upload"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a>
-			<a href="javascript:void(0)" class="exec mr10" data-exec="cmseditor_link_type" data-type="email"><i class="fa fa-envelope-o mr5"></i>@(Email)</a>
-			<a href="javascript:void(0)" class="exec" data-exec="cmseditor_link_type" data-type="phone"><i class="fa fa-phone mr5"></i>@(Phone number)</a>
+			<a href="javascript:void(0)" class="exec mr10" data-exec="cmseditorlink/type" data-type="upload"><i class="fa fa-folder-o mr5"></i>@(Browse files)</a>
+			<a href="javascript:void(0)" class="exec mr10" data-exec="cmseditorlink/type" data-type="email"><i class="fa fa-envelope-o mr5"></i>@(Email)</a>
+			<a href="javascript:void(0)" class="exec" data-exec="cmseditorlink/type" data-type="phone"><i class="fa fa-phone mr5"></i>@(Phone number)</a>
 		</div>
-		<div data-jc="dropdown" data-jc-path="cmseditor.link.target" class="m" data-jc-config="items:@(Current tab or window)|_self,@(New tab or window)|_blank;required:true">@(Target)</div>
-		<div data-jc="textbox" data-jc-path="cmseditor.link.title" data-jc-config="icon:info-circle" class="m">@(Tooltip)</div>
-		<div data-jc="checkbox" data-jc-path="cmseditor.link.alllinks">@(Apply on all links in the parent container)</div>
+		<div data-jc="dropdown__cmseditor.link.target__items:@(Current tab or window)|_self,@(New tab or window)|_blank;required:true" class="m">@(Target)</div>
+		<div data-jc="textbox__cmseditor.link.title__icon:info-circle" class="m">@(Tooltip)</div>
+		<div data-jc="checkbox__cmseditor.link.alllinks">@(Apply on all links in the parent container)</div>
 	</div>
-	<div class="ui-form-buttons" data-jc="validation" data-jc-path="cmseditor.link">
+	<div class="padding">
+		<div data-bind="cmseditor.link.tracking__show:!value" class="hidden">
+			<div class="help"><i class="fa fa-chart-bar mr5"></i>@(This feature tracks clicks to this link.)</div>
+			<div class="fs12 b"><a href="javascript:void(0)" class="exec" data-path="common.form2" data-value="'tracking'">@(Enable link tracking)</a></div>
+		</div>
+		<div data-bind="cmseditor.link.tracking__show:value" class="hidden">
+			<div data-jc="nosqlcounter__cmseditor.link.tracking"></div>
+			<div class="fs11 mt5"><a href="javascript:void(0)" class="red exec" data-exec="cmseditorlink/removetracking"><i class="fa fa-times-circle mr5"></i>@(Remove tracking)</a></div>
+		</div>
+	</div>
+	<div class="ui-form-buttons" data-jc="validation__cmseditor.link">
 		<button name="cancel">@(Cancel)</button>
 		<button name="submit">@(APPLY)</button>
 	</div>
@@ -22,86 +32,141 @@
 
 <script>
 
-	function cmseditor_link_type(el) {
-		var r = /^(tel|mailto)\:/;
-		switch (el.attrd('type')) {
-			case 'upload':
-				cmseditor.instance.filebrowser('cmseditor.link.href');
-				break;
-			case 'email':
-				SET('cmseditor.link.href', 'mailto:' + cmseditor.link.href.replace(r, ''));
-				break;
-			case 'phone':
-				SET('cmseditor.link.href', 'tel:' + cmseditor.link.href.replace(r, ''));
-				break;
-		}
-	}
+	PLUGIN('cmseditorlink', function(exports) {
 
-	function cmseditor_link_submit(com) {
+		WATCH('cmseditor.link.href2', function(path, value, type) {
+			if (value && type === 2)
+				SET('cmseditor.link.href', value);
+		});
 
-		var editor = cmseditor.instance;
-		var target = editor.getTarget();
-		var link;
+		WATCH('cmseditor.link.href', function(path, value, type) {
+			SET('cmseditor.link.href2', value);
+			if (type === 1 && cmseditor.link.target !== '_blank' && (/^(http|https)\:\/\//i).test(value))
+				SET('cmseditor.link.target', '_blank');
+		}, true);
 
-		if (target.prop('tagName') === 'A')
-			link = target;
-		else
-			link = editor.getParentElement('A');
+		exports.reload = function() {
+			var id = cmseditor.link.idtracking;
+			id && exports.tracking(id);
+		};
 
-		link.attr('href', cmseditor.link.href);
+		exports.type = function(el) {
+			var r = /^(tel|mailto)\:/;
+			var path = 'cmseditor.link.href';
+			switch (el.attrd('type')) {
+				case 'upload':
+					cmseditor.instance.filebrowser(path);
+					break;
+				case 'email':
+					SET(path, 'mailto:' + cmseditor.link.href.replace(r, ''));
+					break;
+				case 'phone':
+					SET(path, 'tel:' + cmseditor.link.href.replace(r, ''));
+					break;
+			}
+		};
 
-		if (cmseditor.link.title)
-			link.attr('title', cmseditor.link.title.trim());
-		else
-			link.rattr('title');
+		exports.submit = function(com) {
 
-		if (cmseditor.link.target === '_self')
-			link.rattr('target');
-		else
-			link.attr('target', cmseditor.link.target);
+			var editor = cmseditor.instance;
+			var target = editor.getTarget();
+			var obj = cmseditor.link;
+			var link;
 
-		if (cmseditor.link.alllinks) {
-			var parent = editor.getParent('CMS_repeat', 8);
-			parent == null && (parent = editor.getParent('CMS_remove', 5));
-			parent && parent.find('a').each(function() {
-				var link = $(this);
+			if (target.prop('tagName') === 'A')
+				link = target;
+			else
+				link = editor.getParentElement('A');
 
-				link.attr('href', cmseditor.link.href);
+			var href = obj.href;
 
-				if (cmseditor.link.title)
-					link.attr('title', cmseditor.link.title.trim());
-				else
-					link.rattr('title');
+			if (href.isEmail()) {
+				if (href.substring(0, 7) !== 'mailto:')
+					href = 'mailto:' + href;
+			} else if (href.substring(0, 1) === '+')
+				href = 'tel:' + href;
 
-				if (cmseditor.link.target === '_self')
-					link.rattr('target');
-				else
-					link.attr('target', cmseditor.link.target);
+			link.attr('href', href);
+
+			if (obj.title)
+				link.attr('title', obj.title.trim());
+			else
+				link.rattr('title');
+
+			if (obj.target === '_self')
+				link.rattr('target');
+			else
+				link.attr('target', obj.target);
+
+			if (obj.idtracking)
+				link.attrd('cms-track', obj.idtracking);
+			else
+				link.rattr('data-cms-track');
+
+			if (obj.alllinks) {
+				var parent = editor.getParent('CMS_repeat', 8);
+				parent == null && (parent = editor.getParent('CMS_remove', 5));
+				parent && parent.find('a').each(function() {
+					var link = $(this);
+
+					link.attr('href', obj.href);
+
+					if (obj.title)
+						link.attr('title', obj.title.trim());
+					else
+						link.rattr('title');
+
+					if (obj.target === '_self')
+						link.rattr('target');
+					else
+						link.attr('target', obj.target);
+				});
+			}
+
+			target.data('temporary') && target.removeData('temporary');
+			editor.change(true);
+			com.hide();
+		};
+
+		exports.cancel = function(com) {
+
+			var editor = cmseditor.instance;
+			var target = editor.getTarget();
+
+			if (target.data('temporary')) {
+				target.removeData('temporary');
+				target.replaceWith(target.html());
+			}
+
+			com.hide();
+		};
+
+		exports.tracking = function(id) {
+			AJAX('GET [url]api/tracking/{0}/'.format(id), 'cmseditor.link.tracking');
+			cmseditor.link.idtracking = id;
+		};
+
+		exports.removetracking = function() {
+			var id = cmseditor.link.idtracking;
+			cmseditor.link.idtracking = null;
+			SET('cmseditor.link.tracking', null);
+			SETTER('confirm', 'show', '@(Do you want to remove this tracking from database?)', ['"trash-o"@(Remove)', '@(No)'], function(index) {
+				if (!index) {
+					AJAX('DELETE [url]api/tracking/{0}/'.format(id), NOOP);
+					var arr = GET('%tracking');
+					if (arr) {
+						arr = arr.remove('id', id);
+						SET('%tracking', arr);
+					}
+				}
 			});
-		}
+		};
 
-		target.data('temporary') && target.removeData('temporary');
-		editor.change(true);
-		com.hide();
-	}
-
-	function cmseditor_link_cancel(com) {
-		var editor = cmseditor.instance;
-		var target = editor.getTarget();
-
-		if (target.data('temporary')) {
-			target.removeData('temporary');
-			target.replaceWith(target.html());
-		}
-
-		com.hide();
-	}
-
-	ON('#cmseditorlinkhref', function(component) {
-		component.event('focus', 'input', function(e) {
-			SETTER('autocomplete', 'attach', this, function(query, render) {
+		exports.autocomplete = function(com) {
+			SETTER('autocomplete', 'attach', com, function(query, render) {
 
 				var q = query.substring(0, 6);
+
 				if (q === 'http:/' || q === 'https:') {
 					render(EMPTYARRAY);
 					return;
@@ -120,15 +185,25 @@
 						var item = arr[i];
 						(item.url.indexOf(query) !== -1 || item.name.indexOf(query) !== -1) && output.push({ name: item.url, type: item.name });
 					}
+
+					$(cmseditor.instance.getDocument()).find('a').each(function() {
+						var el = $(this);
+						var href = el.attr('href');
+						if (!href || href.substring(0, 1) === '#' || href.indexOf('void(0)') !== -1)
+							return;
+						if (output.findIndex('name', href) === -1) {
+							var text = el.text();
+							output.push({ name: href, type: text || '' });
+						}
+					});
 				}
 
 				output.quicksort('name');
 				render(output);
 
-			}, function(value, input) {
-				input.closest('[data-jc]').component().set(value.name);
-			}, 12, -6, 9);
-		});
+			});
+		};
+
 	});
 
 </script>

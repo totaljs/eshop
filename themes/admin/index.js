@@ -7,6 +7,6 @@ exports.install = function() {
 	// Localization + minification
 	LOCALIZE('/admin/components/*.html');
 	LOCALIZE('/admin/forms/*.html');
-	LOCALIZE('/admin/templates/*.html');
+	LOCALIZE('/admin/pages/*.html');
 
 };

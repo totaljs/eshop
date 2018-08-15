@@ -1,27 +1,35 @@
 NEWSCHEMA('Subscriber').make(function(schema) {
 
-	schema.define('email', 'Email', true);
-	schema.define('language' ,'String(2)');
+	schema.define('email', String, true);
 
 	// Saves the model into the database
 	schema.setSave(function($) {
 
 		var model = $.model;
-
-		model.datecreated = F.datetime;
-		model.ip = $.ip;
-		model.language = $.language;
-		model.unsubscribed = false;
-
 		var db = NOSQL('subscribers');
+		var email = model.email.split(',');
 
-		db.modify(model, model).where('email', model.email).callback(function(err, count) {
-			if (count) {
-				ADMIN.notify({ type: 'subscribers.save', message: model.email });
-				EMIT('subscribers.save', model);
-				db.counter.hit('all', 1);
-			}
-		});
+		for (var i = 0; i < email.length; i++) {
+
+			if (!email[i] || !email[i].isEmail())
+				continue;
+
+			var obj = {};
+			obj.datecreated = F.datetime;
+			obj.ip = $.ip;
+			obj.language = $.language;
+			obj.unsubscribed = false;
+			obj.email = email[i];
+
+			db.modify(obj, obj).where('email', obj.email).callback(function(err, count) {
+				if (count) {
+					if (email.length === 1)
+						ADMIN.notify({ type: 'subscribers.save', message: obj.email });
+					EMIT('subscribers.save', obj);
+					db.counter.hit('all', 1);
+				}
+			});
+		}
 
 		$.success();
 	});

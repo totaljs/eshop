@@ -1,17 +1,22 @@
 <script type="text/html" id="cmseditortoolbar">
 	<div class="cmseditor-help">
 		<nav><i class="fa fa-desktop"></i> <a href="javascript:void(0)" class="exec" data-exec="cmseditor.instance.setDevice" data-device="lg">@(Device width)</a><a href="javascript:void(0)" class="exec" data-exec="cmseditor.instance.setDevice" data-device="md">@(Medium)</a><a href="javascript:void(0)" class="exec" data-exec="cmseditor.instance.setDevice" data-device="sm">@(Tablet)</a><a href="javascript:void(0)" class="exec" data-exec="cmseditor.instance.setDevice" data-device="xs">@(Mobile)</a></nav>
-		<div class="hidden-xs"><b>@(Formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L), @(icon) (&#8984+P). <a href="javascript:void(0)" data-exec="cmseditor.instance.sourcecode" class="exec black ml5"><i class="fa fa-code mr5"></i>@(Show source-code)</a></div>
+		<div class="hidden-xs cmseditorsourcecode"><b>@(Formatting:)</b> @(bold) (&#8984+B), @(italic) (&#8984+I), @(underline) (&#8984+U), @(link) (&#8984+L), @(icon) (&#8984+P). <a href="javascript:void(0)" data-exec="cmseditor.instance.sourcecode" class="exec black ml5"><i class="fa fa-code mr5"></i>@(Show Source-Code)</a></div>
 	</div>
 </script>
 
-<div data-jc="importer" data-jc-path="cmseditor.form" data-jc-config="if:sourcecode;url:[url]forms/cmseditor-sourcecode.html"></div>
-<div data-jc="importer" data-jc-path="cmseditor.form" data-jc-config="if:link;url:[url]forms/cmseditor-link.html"></div>
-<div data-jc="importer" data-jc-path="cmseditor.form" data-jc-config="if:attribute;url:[url]forms/cmseditor-attribute.html"></div>
-<div data-jc="importer" data-jc-path="cmseditor.form" data-jc-config="if:picture;url:[url]forms/cmseditor-picture.html"></div>
-<div data-jc="importer" data-jc-path="cmseditor.form" data-jc-config="if:widgets;url:[url]forms/cmseditor-widgets.html"></div>
-<div data-jc="importer" data-jc-path="cmseditor.form" data-jc-config="if:icons;url:[url]forms/cmseditor-icons.html"></div>
-<div data-jc="importer" data-jc-path="cmseditor.form" data-jc-config="if:settings;url:[url]forms/cmseditor-settings.html"></div>
+<div data-jc="importer__cmseditor.form__if:sourcecode;url:[url]forms/cmseditor-sourcecode.html;cleaner:5"></div>
+<div data-jc="importer__cmseditor.form__if:link;url:[url]forms/cmseditor-link.html;cleaner:5"></div>
+<div data-jc="importer__cmseditor.form__if:attribute;url:[url]forms/cmseditor-attribute.html;cleaner:5"></div>
+<div data-jc="importer__cmseditor.form__if:picture;url:[url]forms/cmseditor-picture.html;cleaner:5"></div>
+<div data-jc="importer__cmseditor.form__if:widgets;url:[url]forms/cmseditor-widgets.html;cleaner:5"></div>
+<div data-jc="importer__cmseditor.form__if:icons;url:[url]forms/cmseditor-icons.html;cleaner:5"></div>
+<div data-jc="importer__cmseditor.form__if:styles;url:[url]forms/cmseditor-styles.html;cleaner:5"></div>
+<div data-jc="importer__cmseditor.form__if:settings;url:[url]forms/cmseditor-settings.html;cleaner:5"></div>
+<div data-jc="importer__cmseditor.form__if:part;url:[url]forms/cmseditor-part.html;cleaner:5"></div>
+<div data-jc="importer__cmseditor.form__if:inject;url:[url]forms/cmseditor-inject.html;cleaner:5"></div>
+<div data-jc="importer__common.form2__if:tracking;url:[url]forms/cmseditor-tracking.html;cleaner:5"></div>
+
 <input type="file" class="hidden" id="cmseditor_inlineupload" accept="image/*" />
 
 <script>
@@ -69,7 +74,8 @@
 	COMPONENT('cmseditor', function(self, config) {
 
 		var target, iframe, container, width;
-		var offsetter = '<span id="cmseditorheight"></span><script>window.parent.cmseditor_iframeloaded();<\/script>';
+		var offsetter = '<span id="cmseditorheight"></span><scr' + 'ipt>window.parent.cmseditor_iframeloaded();</sc' + 'ript>';
+		var locked = false;
 
 		self.readonly();
 
@@ -99,6 +105,44 @@
 			return self;
 		};
 
+		self.editPart = function() {
+			var el = target.hclass('CMS_widget') ? target : self.getParent('CMS_widget');
+			cmseditor.part = {};
+			cmseditor.part.target = el;
+			cmseditor.part.name = el.attrd('cms-part');
+			cmseditor.part.isnew = !el.hclass('CMS_part');
+			cmseditor.part.id = el.attrd('cms-id');
+			UPDATE('cmseditor.part', true);
+			SET('cmseditor.form', 'part');
+		};
+
+		self.editCSS = function() {
+			SET('cmseditor.styles', cmseditor.css, true);
+			SET('cmseditor.form', 'styles');
+		};
+
+		self.setCSS = function() {
+
+			var doc = cmseditor.instance.getWindow().document;
+			var style = doc.getElementById('pagecustomcss');
+
+			style && style.parentNode.removeChild(style);
+
+			if (!cmseditor.css)
+				return;
+
+			AJAX('POST [url]/api/pages/css/', { css: cmseditor.css }, function(value) {
+				style = doc.createElement('style');
+				style.id = 'pagecustomcss';
+				style.type = 'text/css';
+				if (style.styleSheet)
+					style.styleSheet.cssText = value;
+				else
+					style.appendChild(document.createTextNode(value));
+				(doc.head || doc.getElementsByTagName('head')[0]).appendChild(style);
+			});
+		};
+
 		self.setWidgetOptions = function(arr) {
 			cmseditor.widgetsettings = {};
 			for (var i = 0, length = arr.length; i < length; i++) {
@@ -126,6 +170,11 @@
 			return self.resize();
 		};
 
+		self.lock = function(is) {
+			locked = is;
+			$('.cmseditorsourcecode').tclass('hidden', is);
+		};
+
 		self.save = function(callback, type) {
 			var w = self.getWindow();
 			w.$cmseditor_save && w.$cmseditor_save(type);
@@ -138,52 +187,9 @@
 			refresh_filebrowser(target, type);
 		};
 
-		self.screenshot = function() {
-			var frm = iframe.get(0).contentWindow;
-			if (frm) {
-				html2canvas(frm.document.body, { onrendered: function(canvas) {
-
-					var fc = document.createElement('canvas');
-					var fctx = fc.getContext('2d');
-
-					var img = new Image();
-					var sc = document.createElement('canvas');
-					var sctx = sc.getContext('2d');
-
-					img.onload = function() {
-
-						fc.width = 300;
-						fc.height = fc.width * (img.height / img.width);
-
-						sc.width = img.width * 0.5;
-						sc.height = img.height * 0.5;
-						sctx.drawImage(img, 0, 0, sc.width, sc.height);
-						// sctx.drawImage(sc, 0, 0, sc.width * 0.5, sc.height * 0.5);
-
-						var p = sctx.getImageData(1, 1, 1, 1).data;
-
-						// fctx.drawImage(sc, 0, 0, sc.width * 0.5, sc.height * 0.5, 0, 0, fc.width, fc.height);
-						fctx.drawImage(sc, 0, 0, sc.width, sc.height, 0, 0, fc.width, fc.height);
-
-						img = new Image();
-						img.src = fc.toDataURL('image/png');
-						img.onload = function () {
-							fc.height = 200;
-							fctx.fillStyle = 'rgba({0},{1},{2},{3})'.format(p[0], p[1], p[2], p[3]);
-							fctx.fillRect(0,0, fc.width, fc.height);
-							fctx.drawImage(img, 0, 0);
-							$('<img src="{0}" />'.format(fc.toDataURL('image/jpeg'))).appendTo('body');
-						};
-					};
-
-					img.src = canvas.toDataURL('image/png');
-				}});
-			}
-		};
-
 		self.write = function(content) {
 
-			var frm = iframe.get(0).contentWindow;
+			var frm = iframe[0].contentWindow;
 			if (!frm)
 				return;
 
@@ -196,7 +202,7 @@
 				doc.close();
 				iframe.css({ height: 'auto' });
 				setTimeout(function() {
-					SETTER('autocomplete', 'resize');
+					M.components.findItem('name', 'autocomplete') && SETTER('autocomplete', 'resize');
 				}, 500);
 				return;
 			}
@@ -242,11 +248,16 @@
 		};
 
 		self.getWindow = function() {
-			return iframe.get(0).contentWindow;
+			return iframe[0].contentWindow;
 		};
 
 		self.getTarget = function() {
 			return target;
+		};
+
+		self.setTarget = function(val) {
+			target = val;
+			return self;
 		};
 
 		self.getParent = function(cls, max) {
@@ -280,11 +291,11 @@
 		};
 
 		self.getParentElement = function(name) {
-			if (target.get(0).nodeName === name)
+			if (target[0].nodeName === name)
 				return target;
 			var parent = target.parent();
 			for (var i = 0; i < 20; i++) {
-				var el = parent.get(0);
+				var el = parent[0];
 				if (!el)
 					break;
 				if (el.nodeName === name)
@@ -306,11 +317,41 @@
 				var el = $(this);
 				var id = el.attrd('cms-id');
 				var idwidget = el.attrd('cms-widget');
-				unique[idwidget] = true;
-				widgets.push({ id: id, idwidget: idwidget, options: cmseditor.widgetsettings[id] || {} });
+				if (idwidget.substring(0, 4) !== '0000') {
+					unique[idwidget] = true;
+					widgets.push({ id: id, idwidget: idwidget, options: cmseditor.widgetsettings[id] || {} });
+				}
 			});
 
 			return { settings: widgets, widgets: Object.keys(unique) };
+		};
+
+		self.getParts = function() {
+
+			var parts = [];
+
+			self.doFind('.CMS_part').each(function() {
+
+				var el = $(this);
+				var widgets = [];
+
+				var idwidget = el.attrd('cms-widget');
+				if (idwidget) {
+					var id = el.attrd('cms-id');
+					widgets.push({ id: id, idwidget: idwidget, options: cmseditor.widgetsettings[id] || {} });
+				}
+
+				el.find('.CMS_widget').each(function() {
+					var el = $(this);
+					var id = el.attrd('cms-id');
+					var idwidget = el.attrd('cms-widget');
+					id && idwidget && widgets.push({ id: id, idwidget: idwidget, options: cmseditor.widgetsettings[id] || {} });
+				});
+
+				parts.push({ id: el.attrd('cms-id'), name: el.attrd('cms-part'), widgets: widgets, body: el[0].outerHTML, category: el.attrd('cms-category') });
+			});
+
+			return parts;
 		};
 
 		self.getSummary = function() {
@@ -452,7 +493,7 @@
 		};
 
 		self.check = function(el) {
-			var type = el.get(0).nodeName;
+			var type = el[0].nodeName;
 			if (type === 'DIV' || type === 'P' || type === 'B' || type.substring(0, 1) === 'H')
 				!el.html() && el.html('&nbsp;');
 		};
@@ -528,6 +569,41 @@
 			});
 		};
 
+		self.updWidgetsList = function() {
+			AJAXCACHE('GET [url]api/widgets/', function(response) {
+
+				response = response.items;
+				var arr = [];
+
+				for (var i = 0, length = response.length; i < length; i++) {
+					var item = response[i];
+					if (!self.widgetscategory || self.widgetscategory.indexOf(item.category) !== -1)
+						arr.push(item);
+				}
+
+				arr.quicksort('name');
+				SET('cmseditor.widgets', arr);
+				SET('cmseditor.form', 'widgets');
+
+			}, '1 minute', 0, cmseditor.widgetcachereset);
+
+			cmseditor.widgetcachereset = false;
+		};
+
+		self.updWidgetsCSS = function() {
+			var doc = $(cmseditor.instance.getWindow().document);
+			doc.find('link').each(function() {
+				var el = $(this);
+				var href = el.attr('href');
+				if (href.indexOf('widgets.css') !== -1) {
+					var n = el.clone().attr('href', '/widgets.css?ts=' + GUID(4));
+					var p = el.parent();
+					el.remove();
+					p.append(n);
+				}
+			});
+		};
+
 		self.setEvents = function() {
 
 			var body = self.getContents();
@@ -536,6 +612,10 @@
 			body.off('click touchstart touchmove touchend dblclick');
 
 			body.on('dblclick', '.CMS_edit', function(e) {
+
+				if (locked)
+					return;
+
 				e.preventDefault();
 				e.stopPropagation();
 				!this.getAttribute('contenteditable') && setTimeout2('cmseditordblclick', function() {
@@ -545,6 +625,10 @@
 			});
 
 			body.on('dblclick', '.CMS_widgets', function(e) {
+
+				if (locked)
+					return;
+
 				e.preventDefault();
 				e.stopPropagation();
 				 setTimeout2('cmseditordblclick', function() {
@@ -565,12 +649,15 @@
 					touch.time = 0;
 				}
 
+				if (locked)
+					return;
+
 				e.preventDefault();
 				e.stopPropagation();
 
 				var el = $(this);
 
-				if (target && this !== target.get(0)) {
+				if (target && this !== target[0]) {
 					self.check(target);
 					target.rclass('CMS_selected');
 					target.rattr('contenteditable');
@@ -630,7 +717,7 @@
 					if (name === 'widgets' && !disabled)
 						disabled = cmseditor.widgets.length === 0;
 
-					if (name === 'settings' && disabled)
+					if ((name === 'settings' || name === 'part') && disabled)
 						disabled = self.getParent('CMS_widget') === null;
 
 					if (disabled && name === 'repeat')
@@ -664,6 +751,10 @@
 			body.on('paste', function(e) {
 				e.preventDefault();
 				e.stopPropagation();
+
+				if (locked)
+					return;
+
 				var text = e.originalEvent.clipboardData.getData('text/plain');
 				if (target) {
 					if (!target.hclass('CMS_multiline'))
@@ -676,6 +767,9 @@
 
 				e.stopPropagation();
 				e.preventDefault();
+
+				if (locked)
+					return;
 
 				switch (e.type) {
 					case 'drop':
@@ -709,7 +803,7 @@
 
 					FIND('#cmseditor.crop', function(com) {
 						com.reconfigure('width:{0};height:{1}'.format(w, h));
-						SET('cmseditor.crop.url', el.attrd('cms-original') || el.attr('src'), 100);
+						SET('cmseditor.crop.url', el.attrd('cms-src') || el.attr('src'), 100);
 						setTimeout(function() {
 							com.load(files[0]);
 						}, 500);
@@ -722,6 +816,8 @@
 					var parent = el.parent('a');
 					if (parent.length)
 						cmseditor.crop.href = parent.attr('href');
+
+					cmseditor.crop.ishref = !!cmseditor.crop.href;
 
 					UPDATE('cmseditor.crop', true);
 					SET('cmseditor.form', 'picture');
@@ -755,7 +851,7 @@
 
 			body.unbind('keydown').on('keydown', function(e) {
 
-				if (!target)
+				if (!target || locked)
 					return;
 
 				if (e.keyCode === 13 && !target.hclass('CMS_multiline')) {
@@ -782,8 +878,8 @@
 				if (e.keyCode === 80) {
 					// Font-Awesome icon
 					var tmp = self.getTarget();
-					var tag = tmp.get(0).nodeName.toLowerCase();
-					var icon = '<i class="fa fa-font-awesome CMS_edit CMS_remove"></i>';
+					var tag = tmp[0].nodeName.toLowerCase();
+					var icon = '<i class="fa fa-flag CMS_edit CMS_remove"></i>';
 
 					switch (tag) {
 						case 'span':
@@ -832,6 +928,8 @@
 					link.target = '_self';
 					link.title = '';
 					link.alllinks = false;
+					link.tracking = null;
+					link.idtracking = null;
 
 					UPDATE('cmseditor.link', true);
 					SET('cmseditor.form', 'link');
@@ -860,15 +958,15 @@
 			});
 
 			body.find('#CMS_panel').on('mouseenter mouseleave', '.fa-arrow-up,.fa-arrow-down', function(e) {
-				cmseditor.wrap && cmseditor.wrap.length && cmseditor.wrap.tclass('CMS_selected_template', e.type === 'mouseenter');
+				!locked && cmseditor.wrap && cmseditor.wrap.length && cmseditor.wrap.tclass('CMS_selected_template', e.type === 'mouseenter');
 			});
 
 			body.find('#CMS_panel').on('mouseenter mouseleave', '.fa-plug', function(e) {
-				cmseditor.wrap_widgets && cmseditor.wrap_widgets.length && cmseditor.wrap_widgets.tclass('CMS_selected_template', e.type === 'mouseenter');
+				!locked && cmseditor.wrap_widgets && cmseditor.wrap_widgets.length && cmseditor.wrap_widgets.tclass('CMS_selected_template', e.type === 'mouseenter');
 			});
 
-			body.find('#CMS_panel').on('mouseenter mouseleave', '.fa-trash,.fa-copy', function(e) {
-				cmseditor.wrapremove && cmseditor.wrapremove.tclass('CMS_operation', e.type === 'mouseenter');
+			body.find('#CMS_panel').on('mouseenter mouseleave', '.fa-trash,.fa-object-ungroup,.fa-copy', function(e) {
+				!locked && this.classList.value.indexOf('_disabled') === -1 && cmseditor.wrapremove && cmseditor.wrapremove.tclass('CMS_operation', e.type === 'mouseenter');
 			});
 
 			body.find('#CMS_panel').on('click', 'span', function(e) {
@@ -877,8 +975,7 @@
 				e.stopPropagation();
 
 				var el = $(this);
-
-				if (el.hclass('CMS_panel_disabled'))
+				if (el.hclass('CMS_panel_disabled') || locked)
 					return;
 
 				var hide = function() {
@@ -889,6 +986,10 @@
 				var tmp;
 
 				switch (name) {
+
+					case 'part':
+						self.editPart();
+						break;
 
 					case 'wm':
 					case 'wp':
@@ -908,7 +1009,7 @@
 
 						var parent = self.getTarget().closest('.CMS_widget');
 
-						if (parent.parent().get(0) === cmseditor.copypasteparent.get(0))
+						if (parent.parent()[0] === cmseditor.copypasteparent[0])
 							parent.after(clone);
 						else
 							cmseditor.copypasteparent.append(clone);
@@ -999,40 +1100,27 @@
 						if (!categories.length)
 							categories = null;
 
-						AJAXCACHE('GET [url]api/widgets/', function(response) {
-
-							response = response.items;
-							var arr = [];
-
-							for (var i = 0, length = response.length; i < length; i++) {
-								var item = response[i];
-								if (!categories || categories.indexOf(item.category) !== -1)
-									arr.push(item);
-							}
-
-							arr.quicksort('name');
-							SET('cmseditor.widgets', arr);
-							SET('cmseditor.form', 'widgets');
-
-						}, '1 minute', 0, cmseditor.widgetcachereset);
-						cmseditor.widgetcachereset = false;
-
+						cmseditor.widgetcachereset = true;
+						self.widgetscategory = categories;
+						self.updWidgetsList();
 						return;
 
 					case 'attribute':
 
 						var targettmp = target.hclass('CMS_unwrap') ? target.parent() : target;
-						var cls = targettmp.attr('class').split(' ');
+						var cls = (targettmp.attr('class') || '').split(' ');
 						var arr = [];
 
 						cls.forEach(function(cls) {
 							cls.substring(0, 4) !== 'CMS_' && arr.push(cls);
 						});
 
-						var tag = targettmp.get(0).nodeName;
+						var tag = targettmp[0].nodeName;
 						var cattr = cmseditor.attribute;
 
 						cattr.isimage = tag === 'IMG';
+						cattr.config = targettmp.attrd('jc-config');
+						cattr.isconfig = cattr.config != null;
 						cattr.isiframe = tag === 'IFRAME';
 						cattr.isnone = !cattr.isimage && !cattr.isiframe;
 						cattr.id = targettmp.attr('id') || '';
@@ -1086,16 +1174,19 @@
 						var href = '';
 						var targ = '';
 						var title = '';
+						var idtracking = '';
 
 						if (target.prop('tagName') === 'A') {
 							href = target.attr('href');
 							title = target.attr('title');
 							targ = target.attr('target') || '_self';
+							idtracking = target.attrd('cms-track');
 						} else {
 							var tmp = self.getParentElement('A');
 							href = tmp.attr('href');
 							title = tmp.attr('title');
 							targ = tmp.attr('target') || '_self';
+							idtracking = tmp.attrd('cms-track');
 						}
 
 						var link = cmseditor.link;
@@ -1104,6 +1195,8 @@
 						link.target = targ;
 						link.title = (title || '').trim();
 						link.alllinks = false;
+						link.tracking = null;
+						link.idtracking = idtracking;
 
 						UPDATE('cmseditor.link', true);
 						SET('cmseditor.form', 'link');
@@ -1145,7 +1238,7 @@
 							return;
 						}
 
-						if (target.hclass('fa')) {
+						if (target.hclass('fa') || target.hclass('far') || target.hclass('fal')) {
 							var fa = target.attr('class').match(/fa-[a-z0-9\-]+/i);
 							fa = fa ? fa.toString() : '';
 							SET('cmseditor.icons.icon', fa);
@@ -1168,7 +1261,7 @@
 
 							FIND('#cmseditor.crop', function(com) {
 								com.reconfigure('width:{0};height:{1}'.format(w, h));
-								SET('cmseditor.crop.url', target.attrd('cms-original') || target.attr('src'), 100);
+								SET('cmseditor.crop.url', target.attrd('cms-src') || target.attr('src'), 100);
 							});
 
 							cmseditor.crop.alt = target.attr('alt');
@@ -1230,7 +1323,7 @@
 			setTimeout(function() {
 				var w = self.getWindow();
 				w.$cmseditor_load && w.$cmseditor_load(type);
-				w.MAIN && w.MAIN.emit('cmseditor.load', type);
+				w.EMIT && w.EMIT('cmseditor.load', type);
 			}, 1000);
 		};
 
@@ -1240,12 +1333,12 @@
 				var elheight = contents.find('#cmseditorheight');
 				if (!elheight.length)
 					return self.resize(500);
-				var h = navigator.userAgent.indexOf('Safari') === -1 ? $(contents).find('body').get(0).scrollHeight : elheight.offset().top + 80;
+				var h = navigator.userAgent.indexOf('Safari') === -1 ? $(contents).find('body')[0].scrollHeight : elheight.offset().top + 80;
 				iframe.css({ height: h });
 				width = contents.width();
 				setTimeout(function() {
 					SETTER('form', 'resize');
-					SETTER('autocomplete', 'resize');
+					M.components.findItem('name', 'autocomplete') && SETTER('autocomplete', 'resize');
 				}, 300);
 			}, force ? 10 : 500);
 		};
@@ -1274,19 +1367,22 @@
 
 			SETTER('loading', 'show');
 			AJAX('POST [url]api/pages/preview/', options, function(response) {
-				self.write(response.replace('</body>', '<div id="CMS_panel"><div id="CMS_panel_buttons_move"><span class="fa fa-arrow-up" data-name="up" title="@(Move up)"></span><span class="fa fa-arrow-down" data-name="down" title="@(Move down)"></span></div><div id="CMS_panel_buttons_reposition"><span class="fa fa-chevron-up" data-name="up2" title="@(Move up current repeated element)"></span><span class="fa fa-chevron-down" data-name="down2" title="@(Move down current repeated element)"></span></div><div id="CMS_panel_buttons_copy"><span class="fa fa-paste" data-name="paste" title="@(Paste widget)"></span><span class="fa fa-copy" data-name="copy" title="@(Copy widget)"></span></div><div id="CMS_panel_info"></div><div class="CMS_panel_buttons"><span class="fa fa-pencil" title="@(Edit)" data-name="edit"></span><span class="fa fa-cog" title="@(Widget settings)" data-name="settings"></span><span class="fa fa-link" title="@(Change link)" data-name="link"></span><span class="fa fa-quote-left" title="@(Change attributes)" data-name="attribute"></span><span class="fa fa-file-text-o" title="@(Choose a partial content)" data-name="partial"></span><span class="fa fa-copy" title="@(Duplicate)" data-name="repeat"></span></span><span class="fa fa-plus-circle" title="@(Add a widget)" data-name="widgets"></span><span class="fa fa-trash" title="@(Remove content)" data-name="remove"></span><span class="fa fa-caret-square-o-down" title="@(Hide)" data-name="hide"></span></div><div id="CMS_panel_buttons_body"><span class="fa fa-arrows-v" data-name="wm"></span><span class="fa fa-arrows-h" data-name="wp"></span></div></div></body>'));
-				SETTER('loading', 'hide', 500);
-				!GET('%links') && AJAX('GET [url]api/pages/links/', function(response) {
 
-					for (var i = 0, length = response.length; i < length; i++) {
-						var item = response[i];
+				self.write(response.replace('</body>', '<div id="CMS_panel"><div id="CMS_panel_buttons_move"><span class="fa fa-arrow-up" data-name="up" title="@(Move up)"></span><span class="fa fa-arrow-down" data-name="down" title="@(Move down)"></span></div><div id="CMS_panel_buttons_reposition"><span class="fa fa-chevron-up" data-name="up2" title="@(Move up current repeated element)"></span><span class="fa fa-chevron-down" data-name="down2" title="@(Move down current repeated element)"></span></div><div id="CMS_panel_buttons_copy"><span class="fa fa-paste" data-name="paste" title="@(Paste widget)"></span><span class="fa fa-copy" data-name="copy" title="@(Copy widget)"></span></div><div id="CMS_panel_info"></div><div class="CMS_panel_buttons"><span class="fa fa-pencil" title="@(Edit)" data-name="edit"></span><span class="fa fa-cog" title="@(Widget settings)" data-name="settings"></span><span class="fa fa-link" title="@(Change link)" data-name="link"></span><span class="fa fa-quote-left" title="@(Change attributes)" data-name="attribute"></span><span class="fa fa-file-text-o" title="@(Choose a partial content)" data-name="partial"></span><span class="fa fa-object-ungroup" title="@(Edit as part)" data-name="part"></span><span class="fa fa-copy" title="@(Duplicate)" data-name="repeat"></span></span><span class="fa fa-plus-circle" title="@(Add a widget)" data-name="widgets"></span><span class="fa fa-trash" title="@(Remove content)" data-name="remove"></span><span class="fa fa-caret-square-o-down" title="@(Hide)" data-name="hide"></span></div><div id="CMS_panel_buttons_body"><span class="fa fa-arrows-v" data-name="wm"></span><span class="fa fa-arrows-h" data-name="wp"></span></div></div></body>'));
+				setTimeout(self.setCSS, 500);
+
+				SETTER('loading', 'hide', 500);
+				AJAX('GET [url]api/pages/dependencies/', function(response) {
+					var links = response.links;
+					for (var i = 0, length = links.length; i < length; i++) {
+						var item = links[i];
 						var parent = item.parent;
 						var path = item.name;
 						var is = false;
 
 						while (parent) {
 
-							var sub = response.findItem('url', parent);
+							var sub = links.findItem('url', parent);
 							if (!sub)
 								break;
 
@@ -1301,8 +1397,11 @@
 						item.path = path;
 					}
 
-					response.quicksort('path');
-					SET('%links', response);
+					links.quicksort('path');
+					response.parts.quicksort('name');
+
+					SET('%links', links);
+					SET('%parts', response.parts);
 				});
 			});
 		};
@@ -1322,6 +1421,9 @@
 		var builder = [];
 		var count = 0;
 		var tmp;
+
+		if (body.indexOf('\t') !== -1)
+			return body;
 
 		var pad = function(count) {
 			return '\n'.padRight(count, '\t');
@@ -1373,10 +1475,10 @@
 		return builder.join('').replace(/\t{1,}\n/g, '\n').trim();
 	}
 
-	$(document).on('click touchstart', '#cmseditoricons .fa', function() {
+	$(document).on('click touchstart', '#cmseditoricons .fa, #cmseditoricons .far, #cmseditoricons .fal', function() {
 		SET('cmseditor.form', '');
 		var target = cmseditor.instance.getTarget();
-		if (!target.hclass('fa'))
+		if (!target.hclass('fa') && !target.hclass('far') && !target.hclass('fal'))
 			return;
 		var cls = target.attr('class');
 		var arr = cls.split(' ');

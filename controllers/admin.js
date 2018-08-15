@@ -1,5 +1,7 @@
 const MSG_NOTIFY = { TYPE: 'notify' };
+const MSG_ALERT = { TYPE: 'alert' };
 const ALLOW = ['/api/dependencies/', '/api/pages/preview/', '/api/upload/', '/api/nav/', '/api/files/', '/stats/', '/live/', '/api/widgets/'];
+
 var DDOS = {};
 var WS = null;
 
@@ -9,6 +11,15 @@ global.ADMIN.notify = function(value) {
 		MSG_NOTIFY.type = value instanceof Object ? value.type : value;
 		MSG_NOTIFY.message = value instanceof Object ? value.message : '';
 		WS.send(MSG_NOTIFY);
+	}
+};
+
+global.ADMIN.alert = function(user, type, value) {
+	if (user && WS) {
+		MSG_ALERT.type = type;
+		MSG_ALERT.message = value;
+		MSG_ALERT.user = user.name;
+		WS.send(MSG_ALERT);
 	}
 };
 
@@ -22,158 +33,125 @@ F.config['admin-tracking'] && ON('visitor', function(obj) {
 
 exports.install = function() {
 
-	// Routes are according to the sitemap
-	ROUTE('#admin', '=admin/index');
-
-	ROUTE('#admin/api/upload/',                   upload,        ['post', 'upload', 10000], 3084); // 3 MB
-	ROUTE('#admin/api/upload/base64/',            upload_base64, ['post', 10000], 2048); // 2 MB
-
-	ROUTE('#admin/api/dashboard/',                json_dashboard);
-	ROUTE('#admin/api/dashboard/referrers/',      json_dashboard_referrers);
-	ROUTE('#admin/api/dashboard/online/',         json_dashboard_online);
-
 	// Internal
-	ROUTE('#admin/api/dependencies/',             ['*Settings --> dependencies']);
+	ROUTE('GET     #admin', '=admin/index');
+	ROUTE('POST    /api/login/admin/',                        login);
+	ROUTE('POST    #admin/api/upload/',                       upload, ['upload', 10000], 3084); // 3 MB
+	ROUTE('POST    #admin/api/upload/base64/',                upload_base64, [10000], 2048); // 2 MB
+	ROUTE('GET     #admin/api/dependencies/                   *Settings --> @dependencies');
+
+	// Dashboard
+	ROUTE('GET     #admin/api/dashboard/',                    json_dashboard);
+	ROUTE('GET     #admin/api/dashboard/referrers/',          json_dashboard_referrers);
+	ROUTE('GET     #admin/api/dashboard/online/',             json_dashboard_online);
+	ROUTE('GET     #admin/api/dashboard/tracking/             *Tracking --> @stats');
 
 	// MODEL: /models/widgets.js
-	ROUTE('#admin/api/widgets/',                  ['*Widget --> query']);
-	ROUTE('#admin/api/widgets/{id}/',             ['*Widget --> read']);
-	ROUTE('#admin/api/widgets/',                  ['*Widget --> save', 'post']);
-	ROUTE('#admin/api/widgets/',                  ['*Widget --> remove', 'delete']);
-	ROUTE('#admin/api/widgets/{id}/editor/',      ['*Widget --> editor']);
-	ROUTE('#admin/api/widgets/dependencies/',     ['*Widget --> dependencies']);
-	ROUTE('#admin/api/widgets/{id}/settings/',    json_widget_settings, ['*Widget']);
-	ROUTE('#admin/api/widgets/{id}/backups/',     json_backups);
+	ROUTE('GET     #admin/api/widgets/                        *Widget --> @query');
+	ROUTE('GET     #admin/api/widgets/{id}/                   *Widget --> @read');
+	ROUTE('POST    #admin/api/widgets/                        *Widget --> @save');
+	ROUTE('DELETE  #admin/api/widgets/                        *Widget --> @remove');
+	ROUTE('GET     #admin/api/widgets/{id}/editor/            *Widget --> @editor');
+	ROUTE('GET     #admin/api/widgets/dependencies/           *Widget --> @dependencies');
+	ROUTE('GET     #admin/api/widgets/{id}/settings/          *Widget', json_widget_settings);
+	ROUTE('GET     #admin/api/widgets/{id}/backups/           *Common --> @backup');
 
 	// MODEL: /models/widgets.js
-	ROUTE('#admin/api/widgetsglobals/',           ['*WidgetGlobals --> read']);
-	ROUTE('#admin/api/widgetsglobals/',           ['*WidgetGlobals --> save', 'post'], 30);
+	ROUTE('GET     #admin/api/widgets/globals/                *WidgetGlobals --> @read');
+	ROUTE('POST    #admin/api/widgets/globals/                *WidgetGlobals --> @save', 30);
 
 	// MODEL: /models/pages.js
-	ROUTE('#admin/api/pages/',                    ['*Page --> query']);
-	ROUTE('#admin/api/pages/{id}/',               ['*Page --> read']);
-	ROUTE('#admin/api/pages/',                    ['*Page --> save', 'post']);
-	ROUTE('#admin/api/pages/',                    ['*Page --> remove', 'delete']);
-	ROUTE('#admin/api/pages/stats/',              ['*Page --> stats']);
-	ROUTE('#admin/api/pages/{id}/stats/',         ['*Page --> stats']);
-	ROUTE('#admin/api/pages/{id}/backups/',       json_backups);
-	ROUTE('#admin/api/pages/preview/',            view_pages_preview, ['json'], 512);
-	ROUTE('#admin/api/pages/links/',              json_pages_links);
+	ROUTE('GET     #admin/api/pages/                          *Page --> @query');
+	ROUTE('GET     #admin/api/pages/{id}/                     *Page --> @read');
+	ROUTE('POST    #admin/api/pages/                          *Page --> @url @save (response)');
+	ROUTE('DELETE  #admin/api/pages/                          *Page --> @remove');
+	ROUTE('GET     #admin/api/pages/stats/                    *Page --> @stats');
+	ROUTE('GET     #admin/api/pages/{id}/stats/               *Page --> @stats');
+	ROUTE('GET     #admin/api/pages/{id}/backups/             *Common --> @backup');
+	ROUTE('POST    #admin/api/pages/preview/',                view_pages_preview, ['json'], 512);
+	ROUTE('GET     #admin/api/pages/dependencies/',           json_pages_dependencies);
+	ROUTE('POST    #admin/api/pages/css/',                    css_pages, ['json'], 512);
+
+	ROUTE('POST    #admin/api/parts/                          *Part --> @save');
+	ROUTE('POST    #admin/api/tracking/                       *Tracking --> @save');
+	ROUTE('GET     #admin/api/tracking/                       *Tracking --> @query');
+	ROUTE('GET     #admin/api/tracking/{id}/                  *Tracking --> @stats');
+	ROUTE('DELETE  #admin/api/tracking/{id}/                  *Tracking --> @remove');
 
 	// MODEL: /models/pages.js
-	ROUTE('#admin/api/pagesglobals/',             ['*PageGlobals --> read']);
-	ROUTE('#admin/api/pagesglobals/',             ['*PageGlobals --> save', 'post'], 30);
+	ROUTE('GET     #admin/api/pages/globals/                  *Globals --> @read');
+	ROUTE('POST    #admin/api/pages/globals/                  *Globals --> @save', 30);
+	ROUTE('GET     #admin/api/pages/redirects/                *Redirects --> @read');
+	ROUTE('POST    #admin/api/pages/redirects/                *Redirects --> @save', 30);
 
 	// MODEL: /models/posts.js
-	ROUTE('#admin/api/posts/',                    ['*Post --> query']);
-	ROUTE('#admin/api/posts/{id}/',               ['*Post --> read']);
-	ROUTE('#admin/api/posts/',                    ['*Post --> save', 'post']);
-	ROUTE('#admin/api/posts/',                    ['*Post --> remove', 'delete']);
-	ROUTE('#admin/api/posts/toggle/',             ['*Post --> toggle']);
-	ROUTE('#admin/api/posts/stats/'     ,         ['*Post --> stats']);
-	ROUTE('#admin/api/posts/{id}/stats/',         ['*Post --> stats']);
-	ROUTE('#admin/api/posts/{id}/backups/',       json_backups);
+	ROUTE('GET     #admin/api/posts/                          *Post --> @query');
+	ROUTE('GET     #admin/api/posts/{id}/                     *Post --> @read');
+	ROUTE('POST    #admin/api/posts/                          *Post --> @save');
+	ROUTE('DELETE  #admin/api/posts/                          *Post --> @remove');
+	ROUTE('GET     #admin/api/posts/toggle/                   *Post --> @toggle');
+	ROUTE('GET     #admin/api/posts/stats/                    *Post --> @stats');
+	ROUTE('GET     #admin/api/posts/{id}/stats/               *Post --> @stats');
+	ROUTE('GET     #admin/api/posts/{id}/backups/             *Common --> @backup');
 
 	// MODEL: /models/notices.js
-	ROUTE('#admin/api/notices/',                  ['*Notice --> query']);
-	ROUTE('#admin/api/notices/{id}/',             ['*Notice --> read']);
-	ROUTE('#admin/api/notices/',                  ['*Notice --> save', 'post']);
-	ROUTE('#admin/api/notices/',                  ['*Notice --> remove', 'delete']);
-	ROUTE('#admin/api/notices/toggle/',           ['*Notice --> toggle']);
-	ROUTE('#admin/api/notices/preview/',          view_notices_preview, ['json']);
+	ROUTE('GET     #admin/api/notices/                        *Notice --> @query');
+	ROUTE('GET     #admin/api/notices/{id}/                   *Notice --> @read');
+	ROUTE('POST    #admin/api/notices/                        *Notice --> @save');
+	ROUTE('DELETE  #admin/api/notices/                        *Notice --> @remove');
+	ROUTE('GET     #admin/api/notices/toggle/                 *Notice --> @toggle');
+	ROUTE('POST    #admin/api/notices/preview/',              view_notices_preview, ['json']);
 
 	// MODEL: /models/subscribers.js
-	ROUTE('#admin/api/subscribers/',              ['*Subscriber --> query']);
-	ROUTE('#admin/api/subscribers/{id}/',         ['*Subscriber --> read']);
-	ROUTE('#admin/api/subscribers/',              ['*Subscriber --> save', 'post']);
-	ROUTE('#admin/api/subscribers/',              ['*Subscriber --> remove', 'delete']);
-	ROUTE('#admin/api/subscribers/stats/',        ['*Subscriber --> stats']);
-	ROUTE('#admin/api/subscribers/toggle/',       ['*Subscriber --> toggle']);
+	ROUTE('GET     #admin/api/subscribers/                    *Subscriber --> @query');
+	ROUTE('GET     #admin/api/subscribers/{id}/               *Subscriber --> @read');
+	ROUTE('POST    #admin/api/subscribers/                    *Subscriber --> @save');
+	ROUTE('DELETE  #admin/api/subscribers/                    *Subscriber --> @remove');
+	ROUTE('GET     #admin/api/subscribers/stats/              *Subscriber --> @stats');
+	ROUTE('GET     #admin/api/subscribers/toggle/             *Subscriber --> @toggle');
 
 	// MODEL: /models/newsletters.js
-	ROUTE('#admin/api/newsletters/',              ['*Newsletter --> query']);
-	ROUTE('#admin/api/newsletters/{id}/',         ['*Newsletter --> read']);
-	ROUTE('#admin/api/newsletters/',              ['*Newsletter --> save', 'post']);
-	ROUTE('#admin/api/newsletters/',              ['*Newsletter --> remove', 'delete']);
-	ROUTE('#admin/api/newsletters/test/',         ['*Newsletter --> test', 'post']);
-	ROUTE('#admin/api/newsletters/toggle/',       ['*Newsletter --> toggle']);
-	ROUTE('#admin/api/newsletters/stats/',        ['*Newsletter --> stats']);
-	ROUTE('#admin/api/newsletters/{id}/stats/',   ['*Newsletter --> stats']);
-	ROUTE('#admin/api/newsletters/{id}/backups/', json_backups);
-	ROUTE('#admin/api/newsletters/state/',        json_newsletter_state);
+	ROUTE('GET     #admin/api/newsletters/                    *Newsletter --> @query');
+	ROUTE('GET     #admin/api/newsletters/{id}/               *Newsletter --> @read');
+	ROUTE('POST    #admin/api/newsletters/                    *Newsletter --> @save');
+	ROUTE('DELETE  #admin/api/newsletters/                    *Newsletter --> @remove');
+	ROUTE('POST    #admin/api/newsletters/test/               *Newsletter --> @test');
+	ROUTE('GET     #admin/api/newsletters/toggle/             *Newsletter --> @toggle');
+	ROUTE('GET     #admin/api/newsletters/stats/              *Newsletter --> @stats');
+	ROUTE('GET     #admin/api/newsletters/{id}/stats/         *Newsletter --> @stats');
+	ROUTE('GET     #admin/api/newsletters/{id}/backups/       *Common --> @backup');
+	ROUTE('GET     #admin/api/newsletters/state/',            json_newsletter_state);
 
 	// MODEL: /models/navigations.js
-	ROUTE('#admin/api/nav/{id}/',                 ['*Navigation --> read']);
-	ROUTE('#admin/api/nav/',                      ['*Navigation --> save', 'post']);
+	ROUTE('GET     #admin/api/nav/{id}/                       *Navigation --> @read');
+	ROUTE('POST    #admin/api/nav/                            *Navigation --> @save');
+
+	// MODEL: /models/navigations.js
+	ROUTE('GET     #admin/api/redirects/{id}/                 *Redirect --> @read');
+	ROUTE('POST    #admin/api/redirects/                      *Redirect --> @save');
 
 	// MODEL: /models/settings.js
-	ROUTE('#admin/api/settings/',                 ['*Settings --> read']);
-	ROUTE('#admin/api/settings/',                 ['*Settings --> save', 'post']);
-
-	// ESHOP
-	// MODEL: /models/products.js
-	ROUTE('#admin/api/products/',                 ['*Product --> query']);
-	ROUTE('#admin/api/products/{id}/',            ['*Product --> read']);
-	ROUTE('#admin/api/products/',                 ['*Product --> save', 'post']);
-	ROUTE('#admin/api/products/',                 ['*Product --> remove', 'delete']);
-	ROUTE('#admin/api/products/toggle/',          ['*Product --> toggle']);
-	ROUTE('#admin/api/products/dependencies/',    ['*Product --> dependencies']);
-	ROUTE('#admin/api/products/stats/',           ['*Product --> stats']);
-	ROUTE('#admin/api/products/{id}/stats/',      ['*Product --> stats']);
-	ROUTE('#admin/api/products/{id}/backups/',    json_backups);
-	ROUTE('#admin/api/products/category/',        json_products_replace, ['*Product']);
-	ROUTE('#admin/api/products/manufacturer/',    json_products_replace, ['*Product']);
-	ROUTE('#admin/api/products/import/',          json_products_import,  ['post']);
-	ROUTE('#admin/api/products/export/',          json_products_export,  ['*Product']);
-
-	// MODEL: /models/orders.js
-	ROUTE('#admin/api/orders/',                   ['*Order --> query']);
-	ROUTE('#admin/api/orders/{id}/',              ['*Order --> read']);
-	ROUTE('#admin/api/orders/',                   ['*Order --> save', 'post']);
-	ROUTE('#admin/api/orders/',                   ['*Order --> remove', 'delete']);
-	ROUTE('#admin/api/orders/stats/',             ['*Order --> stats']);
-	ROUTE('#admin/api/orders/toggle/',            ['*Order --> toggle']);
-	ROUTE('#admin/api/orders/dependencies/',      ['*Order --> dependencies']);
-
-	// MODEL: /models/users.js
-	ROUTE('#admin/api/users/',                    ['*User --> query']);
-	ROUTE('#admin/api/users/{id}/',               ['*User --> read']);
-	ROUTE('#admin/api/users/',                    ['*User --> save', 'post']);
-	ROUTE('#admin/api/users/',                    ['*User --> remove', 'delete']);
-	ROUTE('#admin/api/users/stats/',              ['*User --> stats']);
-	ROUTE('#admin/api/users/{id}/stats/',         ['*User --> stats']);
+	ROUTE('GET     #admin/api/settings/                       *Settings --> @read');
+	ROUTE('POST    #admin/api/settings/                       *Settings --> @smtp @save (response) @load');
 
 	// Files
-	ROUTE('#admin/api/files/',                    ['*File --> query']);
-	ROUTE('#admin/api/files/clear/',              ['*File --> clear']);
+	ROUTE('GET     #admin/api/files/                          *File --> @query');
+	ROUTE('GET     #admin/api/files/clear/                    *File --> @clear');
 
-	// Other
-	ROUTE('#admin/api/contactforms/stats/',       ['*Contact --> stats']);
+	// Others
+	ROUTE('GET     #admin/api/contactforms/stats/             *Contact --> stats');
 
 	// Websocket
 	WEBSOCKET('#admin/live/', socket, ['json']);
 
-	// Login
-	ROUTE('/api/login/admin/', login, ['post']);
 };
-
-function login() {
-
-	var self = this;
-	var key = (self.body.name + ':' + self.body.password).hash();
-
-	if (F.global.config.users[key]) {
-		OPERATION('admin.notify', { type: 'admin.login', message: self.body.name });
-		self.cookie(F.config['admin-cookie'], key, '1 month');
-		self.success();
-	} else
-		self.invalid().push('error-users-credentials');
-}
 
 ON('controller', function(controller, name) {
 
-	if (name !== 'admin' || controller.url === '/api/login/admin/')
-		return;
+	if (name !== 'admin' || controller.url === '/api/login/admin/') {
+		if (!controller.route.groups || !controller.route.groups.admin)
+			return;
+	}
 
 	var ddos = DDOS[controller.ip];
 
@@ -246,6 +224,19 @@ function socket() {
 	self.autodestroy(() => WS = null);
 }
 
+function login() {
+
+	var self = this;
+	var key = (self.body.name + ':' + self.body.password).hash();
+
+	if (F.global.config.users[key]) {
+		OPERATION('admin.notify', { type: 'admin.login', message: self.body.name });
+		self.cookie(F.config['admin-cookie'], key, '1 month');
+		self.success();
+	} else
+		self.invalid('error-users-credentials');
+}
+
 // Upload (multiple) pictures
 function upload() {
 
@@ -257,11 +248,12 @@ function upload() {
 
 			// Store current file into the HDD
 			file.extension = U.getExtension(file.filename);
-			var ref = NOSQL('files').binary.insert(file.filename, data);
-			id.push({ id: ref, name: file.filename, size: file.size, width: file.width, height: file.height, type: file.type, ctime: F.datetime, mtime: F.datetime, extension: file.extension, download: '/download/' + ref + '.' + file.extension });
 
-			// Next file
-			setTimeout(next, 100);
+			FILESTORAGE('files').insert(file.filename, data, function(err, ref) {
+				id.push({ id: ref, name: file.filename, size: file.size, width: file.width, height: file.height, type: file.type, ctime: F.datetime, mtime: F.datetime, extension: file.extension, download: '/download/' + ref + '.' + file.extension });
+				setImmediate(next);
+			});
+
 		});
 
 	}, () => self.json(id));
@@ -295,8 +287,7 @@ function upload_base64() {
 	}
 
 	var data = self.body.file.base64ToBuffer();
-	var id = NOSQL('files').binary.insert((self.body.name || 'base64').replace(/\.[0-9a-z]+$/i, '').max(40) + ext, data);
-	self.json('/download/' + id + ext);
+	FILESTORAGE('files').insert((self.body.name || 'base64').replace(/\.[0-9a-z]+$/i, '').max(40) + ext, data, (err, id) => self.json('/download/' + id + ext));
 }
 
 // Creates a preview
@@ -308,48 +299,45 @@ function view_pages_preview() {
 	self.view('~cms/' + self.body.template);
 }
 
+function css_pages() {
+	var self = this;
+	self.content(U.minifyStyle('/*auto*/\n' + (self.body.css || '')), 'text/css');
+}
+
 function json_widget_settings(id) {
 	var self = this;
 	var item = F.global.widgets[id];
 	self.json(item ? item.editor : null);
 }
 
-function json_backups(id) {
-	var self = this;
-	NOSQL(self.req.split[self.req.split.length - 3]).backups(n => n.data.id === id, self.callback());
-}
-
 function json_newsletter_state() {
 	this.json(F.global.newsletter);
 }
 
-function json_products_replace() {
-	var self = this;
-	self.$workflow('replace-' + self.req.split[self.req.split.length - 1], self.callback());
-}
-
-function json_products_export() {
-	var self = this;
-	self.$workflow('export', (err, response) => self.binary(Buffer.from(response), 'applications/json', 'binary', 'products.json'));
-}
-
-function json_products_import() {
-	$WORKFLOW('Product', 'import', this.body, this.callback(), this);
-}
-
 function json_dashboard_online() {
 	var self = this;
-	self.json(MODULE('visitors').today());
+	var data = MODULE('visitors').today();
+	data.memory = process.memoryUsage();
+	data.performance = F.stats.performance;
+	self.json(data);
 }
 
-function json_pages_links() {
+function json_pages_dependencies() {
 	var self = this;
 	var arr = [];
+
 	for (var i = 0, length = F.global.pages.length; i < length; i++) {
 		var item = F.global.pages[i];
 		arr.push({ url: item.url, name: item.name, parent: item.parent });
 	}
-	self.json(arr);
+
+	var output = {};
+	output.links = arr;
+
+	NOSQL('parts').find().fields('id', 'name', 'category').callback(function(err, response) {
+		output.parts = response;
+		self.json(output);
+	});
 }
 
 function json_dashboard() {

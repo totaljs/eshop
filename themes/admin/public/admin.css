@@ -3,16 +3,16 @@
 body { background-color: #F0F0F0; }
 
 header { height: 41px; background-color: white; position: fixed; left: 0; top: 0; right: 0; box-shadow: 0 5px 10px rgba(0,0,0,.03);  border-bottom: 1px solid #E0E0E0; z-index: 10; }
-header nav a { float: left; width: 40px; height: 40px; text-align: center; font-size: 16px; padding: 8px 0 0 0; color: #8A93A0; background-color: #F8F8F8; }
-header nav a:hover { color: black; }
+header nav a { float: left; width: 40px; height: 40px; text-align: center; font-size: 16px; padding: 8px 0 0 0; color: white; background-color: #4584F1; }
+header nav a:hover { opacity: 0.8; }
 header nav button { background: white; border: 0; color: black; float: left; text-transform: uppercase; font-size: 11px; outline: 0; height: 40px; padding: 0 20px; line-height: 0; }
 header nav button:hover { background-color: #FFFCE9; }
-header nav button .fa { margin: 0 8px 0 0; font-size: 14px; position: relative; display: inline-block; }
+header nav button .fa, header nav button .fal, header nav button .far { margin: 0 8px 0 0; font-size: 14px; position: relative; display: inline-block; }
 
 header .user { float: right; font-size: 12px; padding: 12px 20px 0 0; }
-header .user .fa { margin-right: 5px; }
-header .title { height: 40px; border-left: 1px solid #F0F0F0; font-size: 16px; float: left; padding: 8px 0 0 20px; color: black; font-weight: bold; }
-header .title .fa { margin-right: 8px; }
+header .user .fa, header .user .fal { margin-right: 5px; }
+header .title { height: 40px; border-left: 1px solid #F0F0F0; font-size: 16px; float: left; padding: 9px 0 0 20px; color: black; font-weight: bold; }
+header .title .fa, header .title .fal { margin-right: 8px; }
 
 .header-message { display: none; float: right; width: 300px; vertical-align: middle; height: 40px; font-size: 12px; background-color: #FFFFD5; margin-right: 20px; opacity: 0; transition: all 0.3s; transform: translate(100px,0px); box-shadow: -2px 0 5px rgba(0,0,0,0.05); }
 .header-message-visible { opacity: 1; transform: translate(0,0); }
@@ -23,12 +23,15 @@ header .title .fa { margin-right: 8px; }
 
 .header-empty { height: 60px; }
 
-.backups { border-bottom: 1px solid #E0E0E0; padding: 10px 20px; font-size: 11px; }
+.backups { border-bottom: 1px solid #E0E0E0; padding: 10px 20px; font-size: 12px; height: 37px; }
+.backups > div { margin: -1px 18px 0 0; float: left; border-right: 1px solid #E0E0E0; padding-right: 20px }
+.backups > div a { border-right: 1px solid #E0E0E0; padding-right: 20px; margin-right: 18px; }
+.backups > div a:last-child { padding-right: 0; margin-right: 0; border-right: 0; }
 
 .toolbar2 { background-color: #F0F0F0; padding: 12px 20px; margin-bottom: 15px; }
 .toolbar { margin-bottom: 20px; }
 .toolbar button { outline: 0; background-color: transparent; border: 1px solid transparent; border-radius: 4px; font-size: 12px; height: 24px; padding: 0 5px; margin: 0; color: black; margin-right: 5px; }
-.toolbar button .fa { margin-right: 5px; }
+.toolbar button .fa, .toolbar button .fal, .toolbar button .far { margin-right: 5px; }
 .toolbar button:hover { background-color: white; box-shadow: 0 2px 3px rgba(0,0,0,0.05); }
 .toolbar button:disabled { color: silver; cursor: not-allowed; background-color: #E0E0E0; box-shadow: none; }
 .toolbar button:disabled .fa { color: silver; }
@@ -37,9 +40,18 @@ header .title .fa { margin-right: 8px; }
 .toolbar .selected { background-color: #FFE7A1 !important; box-shadow: 0 2px 3px rgba(0,0,0,0.05); }
 .toolbar > div { position: relative; display: inline-block; }
 .toolbar button .fa-check-circle { color: #68B25B; }
+.toolbar .highlight { background-color: #FFFFD5; }
 
 .uppercase { text-transform: uppercase; }
 .inline { position: relative; display: inline-block; }
+
+.buttonmenu { border: 1px solid #1A88E0; border-radius: 3px; }
+.buttonmenu button{ display: block; width: 100%; background-color: white; border: 0; text-align: left; padding: 0 10px 0 5px; border-top: 1px solid #1A88E0; height: 26px; font-size: 12px; color: #1A88E0; outline: 0; }
+.buttonmenu button:first-child { border-top: 0; border-top-left-radius: 2px; border-top-right-radius: 2px; }
+.buttonmenu button:last-child { border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; }
+.buttonmenu button:hover { background-color: #1A88E0; color: white; }
+.buttonmenu button:hover .fa, .buttonmenu button:hover .fal, .buttonmenu button:hover .far { border-right-color: white; }
+.buttonmenu button .fa, .buttonmenu button .fal, .buttonmenu button .far { width: 24px; border-right: 1px solid #1A88E0; margin-right: 10px; text-align: center; padding-right: 3px; }
 
 .b { font-weight: bold; }
 .silver { color: #999999 !important; }
@@ -50,7 +62,7 @@ header .title .fa { margin-right: 8px; }
 
 .fs11 { font-size: 11px !important; }
 .help { font-size: 11px; color: #A0A0A0; margin-top: 8px; line-height: 13px; }
-.help .fa { margin-right: 5px; }
+.help .fa, .help .far, .help .fal { margin-right: 5px; }
 .help code { font: normal normal 11px Arial; background-color: #F0F0F0; padding: 1px 3px; border-radius: 2px; border: 1px solid #E0E0E0; }
 
 .m { margin-bottom: 15px; }
@@ -78,7 +90,7 @@ h2 .fa { margin-right: 8px; }
 
 h3 { font-weight: 700; font-family: Arial; margin: 0 0 20px 0; padding: 0; color: black; font-size: 18px; }
 h3 b { font-weight: 700; }
-h3 .fa { margin-right: 8px; }
+h3 .fa, h3 .far, h3 .fal { margin-right: 8px; }
 
 .caption { font-size: 12px; text-transform: uppercase; margin-bottom: 20px; color: black; font-weight: bold; border: 1px solid #808080; padding: 3px 5px; border-radius: 3px; }
 .caption .fa { margin-right: 5px; border-right: 1px solid black; padding-right: 5px; }
@@ -91,12 +103,12 @@ h3 .fa { margin-right: 8px; }
 .cmseditor-help nav { float: left; }
 .cmseditor-help nav a { margin-right: 8px; padding-right: 8px; border-right: 1px solid #E0E0E0; }
 .cmseditor-help > div { float: right; }
-.cmseditor-help nav .fa { margin-right: 5px; }
+.cmseditor-help nav .far, .cmseditor-help nav .fa, .cmseditor-help nav .fal { margin-right: 5px; }
 
 .keyvalue { border-bottom: 1px dashed #D0D0D0; padding: 10px 0 5px; }
 .keyvalue .key { font-size: 10px; text-transform: uppercase; font-weight: bold; color: black; }
 .keyvalue .key:after { content: ':'; }
-.keyvalue .key .fa { margin-right: 4px; }
+.keyvalue .key .fa, .keyvalue .key .far, .keyvalue .key .fal { margin-right: 4px; }
 .keyvalue .value { font-size: 14px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
 
 .stats { border-bottom: 1px solid #E0E0E0; padding: 5px 0 0; font-size: 14px; height: 35px; }
@@ -109,12 +121,12 @@ h3 .fa { margin-right: 8px; }
 .button { background-color: #4285F4; border: 0; color: white; cursor: pointer; outline: 0; width: 100%; border-radius: 3px; height: 50px; text-transform: uppercase; font-family: Arial; }
 .button:hover { box-shadow: 0 2px 5px rgba(0,0,0,0.1); opacity: 0.9; }
 .button:disabled { background-color: #E0E0E0; color: silver; cursor: not-allowed; box-shadow: none; opacity: 1; }
-.button .fa { margin-right: 5px; }
+.button .fa, .button .fal, .button .far { margin-right: 5px; }
 .button-small { height: 32px; font-size: 12px; }
 
-.panel { background-color: white; border-radius: 3px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #E0E0E0; }
-.panel > label { display: block; padding: 13px 20px; border-bottom: 1px solid #E0E0E0; font-size: 14px; font-weight: bold; }
-.panel > label .fa { margin-right: 5px; }
+.panel { background-color: white; border-radius: 3px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border: 1px solid #E0E0E0; }
+.panel > label { display: block; padding: 10px 20px; border-bottom: 1px solid #E0E0E0; font-size: 14px; font-weight: bold; }
+.panel > label .fa, .panel > label .fal, .panel > label .far { margin-right: 5px; }
 .panelbody { padding: 20px; position: relative; }
 
 .bg-white { background-color: white; }
@@ -131,7 +143,7 @@ h3 .fa { margin-right: 8px; }
 .tabmenu li { position: relative; display: inline-block; border-bottom: 0; margin: 0 0 0 10px; border: 1px solid #D0D0D0; border-bottom: 0; padding: 0; border-radius: 3px 3px 0 0; background-color: #E5E5E5; text-align: center; padding: 8px 10px; color: #505050; cursor: pointer; min-width: 90px; }
 .tabmenu li:first-child { margin-left: 0; }
 .tabmenu .selected { background-color: white; color: black; }
-.tabmenu .fa { margin-right: 8px; }
+.tabmenu .fa, .tabmenu .fab, .tabmenu .fal, .tabmenu .far { margin-right: 8px; }
 
 .noticespreview { padding: 10px 20px 20px; border: 2px solid #E0E0E0; border-radius: 3px; font-size: 16px; }
 .noticespreview p { margin: 10px 0 0; }
