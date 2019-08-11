@@ -68,6 +68,7 @@ function file_read(req, res) {
 
 				// Image processing
 				res.image(filename, function(image) {
+					image.islimit = true;
 					image.output(req.extension);
 					req.extension === 'jpg' && image.quality(85);
 					size && image.resize(size + '%');
@@ -105,6 +106,7 @@ function file_image(req, res) {
 
 				// Image processing
 				res.image(filename, function(image) {
+					image.islimit = true;
 					image.output('jpg');
 					image.quality(90);
 
