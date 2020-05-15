@@ -417,5 +417,5 @@ function createNumber(nosql) {
 	var key = 'numbering' + year;
 	var number = (nosql.get(key) || 0) + 1;
 	nosql.set(key, number);
-	return (year + '000001').parseInt() + number;
+	return ((year + '000001').parseInt() + number) + '';
 }
