@@ -1,10 +1,12 @@
 const COOKIE = '__user';
-const SECRET = '06eshopToTal11';
+function cookiesecret() {
+	return F.config['eshop-cookie-secret'] || F.config.secret;
+}
 const ONLINE = {};
 
 // Creates a cookie
 exports.login = function(controller, id) {
-	controller.cookie(COOKIE, F.encrypt({ id: id, ip: controller.ip }, SECRET, true), '6 days');
+	controller.cookie(COOKIE, F.encrypt({ id: id, ip: controller.ip }, cookiesecret(), true), '6 days');
 };
 
 // Removes a cookie
@@ -360,7 +362,7 @@ F.onAuthorize = function(req, res, flags, callback) {
 		return;
 	}
 
-	var user = F.decrypt(hash, SECRET, true);
+	var user = F.decrypt(hash, cookiesecret(), true);
 	if (!user || user.ip !== req.ip) {
 		exports.logoff(res);
 		callback(false);
